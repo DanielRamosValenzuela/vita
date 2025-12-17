@@ -2,13 +2,36 @@
 
 **Sistema de Gestión de Turnos Médicos Multi-Tenant SaaS B2B**
 
-**Última actualización:** 18 de noviembre de 2025
+**Última actualización:** 18 de diciembre de 2025
 
-**Versión:** 3.0.0
+**Versión:** 3.1.0
 
-**Estado:** Proyecto nuevo - 0% completado - Por iniciar
+**Estado:** FASE 2 en progreso - Setup Técnico 80% completado
 
 **Competidor Principal:** Rflex (análisis competitivo en sección de Negocio)
+
+---
+
+## 🎉 PROGRESO RECIENTE (Diciembre 2025)
+
+### ✅ FASE 2: Setup Técnico (80% completado)
+
+**Completado:**
+- ✅ Prisma + Supabase configurado y funcionando
+- ✅ Schema de BD diseñado con multi-country support (docNumber, docType)
+- ✅ ESLint + Prettier configurado (no muy estricto)
+- ✅ NextAuth v4 instalado y configurado
+- ✅ Estructura de carpetas organizada (`lib/`, `types/`)
+- ✅ Dark mode preparado (next-themes pendiente de implementar UI)
+
+**En progreso:**
+- 🔄 Google OAuth (esperando credenciales)
+- ⏸️ Página de onboarding (pendiente)
+- ⏸️ Middleware de protección (pendiente)
+
+**Pendiente:**
+- ⏸️ TODO 2.4: Configurar Dark Mode UI
+- ⏸️ TODO 2.5: Probar app completa
 
 ---
 
@@ -6977,23 +7000,66 @@ npm install react-big-calendar date-fns
 - ✅ Más económico (~$20/mes vs ~$50+/mes)
 - ✅ Control total de configuración
 
-### 7. Auth.js v5 con JWT Strategy
+### 7. NextAuth v4 (Estable) con JWT Strategy
 
-**Decisión:** Usar JWT sessions en lugar de database sessions
+**Decisión:** Usar NextAuth v4 estable (NO v5 beta) con JWT sessions
 
 **Razón:**
 
-- ✅ Evita problemas del Prisma Adapter en Next.js 16
+- ✅ v4 es estable y producción-ready (v5 está en beta)
+- ✅ Documentación completa y soporte de comunidad
+- ✅ JWT evita problemas del Prisma Adapter en database sessions
 - ✅ Más rápido (no query a BD por cada request)
-- ✅ Funciona perfecto en serverless y VPS
+- ✅ Funciona perfecto en VPS
 
 **Configuración:**
 
 ```typescript
+import NextAuth from 'next-auth' // v4.24.13
+import GoogleProvider from 'next-auth/providers/google'
+
 session: {
   strategy: "jwt", // IMPORTANTE
+  maxAge: 30 * 24 * 60 * 60
 }
 ```
+
+### 7.1 Estrategia de OAuth + Onboarding
+
+**Decisión:** Solo Google OAuth en MVP1, sin registro tradicional
+
+**Flujo:**
+```
+1. Usuario hace login con Google
+2. NextAuth crea usuario (email, name, image automáticos)
+3. Middleware detecta perfil incompleto (sin docNumber)
+4. Redirige a /onboarding
+5. Usuario completa: país, docType, docNumber
+6. Validación de docNumber duplicado
+7. Acceso a dashboard según rol
+```
+
+**MVP2:** Agregar Microsoft OAuth (hospitales usan Microsoft 365)
+
+**MVP3:** Considerar registro tradicional si clientes lo piden
+
+### 7.2 Problema de Email Corporativo y Soluciones
+
+**Problema identificado:**
+- Doctor trabaja en Hospital A: `juan@hospitalA.cl`
+- Luego es despedido y pierde acceso al email
+- No puede hacer login con Google
+
+**Solución MVP1:** Feature "Cambiar email" en settings
+- Usuario puede agregar email personal preventivamente
+- VITA envía código de verificación
+- Email actualizado → Puede hacer login con nuevo email
+
+**Solución MVP2:** Soporte manual
+- SUPER_ADMIN puede actualizar email tras verificar identidad
+- Para casos excepcionales
+
+**Solución MVP3:** Login tradicional como backup (si es necesario)
 
 ### 8. React Query: Opcional, No Requerido en MVP1
 
