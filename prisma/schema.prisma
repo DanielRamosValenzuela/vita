@@ -6,6 +6,82 @@ datasource db {
   provider = "postgresql"
 }
 
+model Organization {
+  id         String   @id @default(cuid())
+  name       String
+  country    Country  @default(CL)
+  taxId      String   @unique
+  maxAdminHR Int      @default(5)
+  maxChiefs  Int      @default(0)
+  maxStaff   Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  users      User[]
+
+  @@index([taxId])
+  @@index([country])
+}
+
+model User {
+  id             String        @id @default(cuid())
+  email          String        @unique
+  name           String
+  country        Country?
+  docType        DocType?
+  docNumber      String?
+  emailVerified  DateTime?
+  image          String?
+  role           Role          @default(STAFF_HEALTH)
+  organizationId String?
+  linkingCode    String        @unique @default(cuid())
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  accounts       Account[]
+  sessions       Session[]
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([country, docType, docNumber])
+  @@index([email])
+  @@index([docNumber])
+  @@index([linkingCode])
+  @@index([organizationId])
+  @@index([country])
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
 enum Role {
   SUPER_ADMIN
   ADMIN_HR
@@ -35,90 +111,4 @@ enum DocType {
   CURP
   RFC
   PASSPORT
-}
-
-model Organization {
-  id            String   @id @default(cuid())
-  name          String
-  country       Country  @default(CL)
-  taxId         String   @unique
-  
-  maxAdminHR    Int @default(5)
-  maxChiefs     Int @default(0)
-  maxStaff      Int @default(0)
-  
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  
-  users         User[]
-  
-  @@index([taxId])
-  @@index([country])
-}
-
-model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  name          String
-  
-  country       Country?
-  docType       DocType?
-  docNumber     String?
-  
-  emailVerified DateTime?
-  image         String?
-  
-  role          Role      @default(STAFF_HEALTH)
-  organizationId String?
-  organization  Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  
-  linkingCode   String    @unique @default(cuid())
-  
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  
-  accounts      Account[]
-  sessions      Session[]
-  
-  @@unique([country, docType, docNumber])
-  @@index([email])
-  @@index([docNumber])
-  @@index([linkingCode])
-  @@index([organizationId])
-  @@index([country])
-}
-
-model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String? @db.Text
-  session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
-}
-
-model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
-
-  @@unique([identifier, token])
 }

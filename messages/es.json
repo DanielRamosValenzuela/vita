@@ -1,0 +1,30 @@
+{
+  "common": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "create": "Crear",
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito"
+  },
+  "auth": {
+    "welcome": "Bienvenido a VITA",
+    "login": "Iniciar sesión",
+    "logout": "Cerrar sesión",
+    "signIn": "Iniciar Sesión con Google",
+    "signOut": "Cerrar Sesión",
+    "authenticated": "Autenticado",
+    "notAuthenticated": "No autenticado",
+    "email": "Email",
+    "name": "Nombre",
+    "id": "ID",
+    "role": "Rol"
+  },
+  "meta": {
+    "title": "VITA - Gestión de Turnos Médicos",
+    "description": "Sistema de gestión de turnos y asistencia para instituciones de salud"
+  }
+}
+

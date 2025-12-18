@@ -2,14 +2,31 @@ import { NextAuthOptions } from 'next-auth'
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import GoogleProvider from 'next-auth/providers/google'
 import { PrismaClient, Role } from '@prisma/client'
+import { Pool } from 'pg'
+import { PrismaPg } from '@prisma/adapter-pg'
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
 }
 
-export const prisma = globalForPrisma.prisma ?? new PrismaClient()
+let prisma: PrismaClient
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+try {
+  const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+  })
+  
+  const adapter = new PrismaPg(pool)
+  
+  prisma = globalForPrisma.prisma ?? new PrismaClient({
+    adapter,
+  })
+  if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+} catch (error) {
+  throw error
+}
+
+export { prisma }
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -42,10 +59,11 @@ export const authOptions: NextAuthOptions = {
     },
   },
   
-  pages: {
-    signIn: '/auth/signin',
-    error: '/auth/error',
-  },
+  // Páginas personalizadas (comentado temporalmente para probar)
+  // pages: {
+  //   signIn: '/auth/signin',
+  //   error: '/auth/error',
+  // },
   
   session: {
     strategy: 'jwt',

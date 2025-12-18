@@ -4,9 +4,9 @@
 
 **Última actualización:** 18 de diciembre de 2025
 
-**Versión:** 3.1.0
+**Versión:** 3.2.0
 
-**Estado:** FASE 2 en progreso - Setup Técnico 80% completado
+**Estado:** FASE 2 completada - FASE 3 iniciada (Autenticación básica funcionando)
 
 **Competidor Principal:** Rflex (análisis competitivo en sección de Negocio)
 
@@ -14,24 +14,47 @@
 
 ## 🎉 PROGRESO RECIENTE (Diciembre 2025)
 
-### ✅ FASE 2: Setup Técnico (80% completado)
+### ✅ FASE 2: Setup Técnico (100% completado - Base)
 
 **Completado:**
 - ✅ Prisma + Supabase configurado y funcionando
 - ✅ Schema de BD diseñado con multi-country support (docNumber, docType)
 - ✅ ESLint + Prettier configurado (no muy estricto)
-- ✅ NextAuth v4 instalado y configurado
-- ✅ Estructura de carpetas organizada (`lib/`, `types/`)
-- ✅ Dark mode preparado (next-themes pendiente de implementar UI)
+- ✅ NextAuth v4 instalado y configurado completamente
+- ✅ Google OAuth funcionando y probado
+- ✅ PrismaAdapter configurado con @prisma/adapter-pg para Prisma 7.1.0
+- ✅ SessionProvider configurado correctamente (Client Component)
+- ✅ Route handler de NextAuth funcionando (`app/api/auth/[...nextauth]/route.ts`)
+- ✅ Estructura de carpetas organizada (`lib/`, `types/`, `lib/auth/`, `lib/providers/`)
+- ✅ Modelos básicos de BD: User, Account, Session, Organization, VerificationToken
+- ✅ meta.json creado (resuelve warning 404)
+- ✅ Variables de entorno configuradas (DATABASE_URL, NEXTAUTH_SECRET, GOOGLE_CLIENT_ID, etc.)
+
+**Pendiente (para completar schema completo):**
+- ⏸️ Modelos de Turnos (ShiftType, Shift, ShiftExchange)
+- ⏸️ Modelos complementarios (StaffRate, Holiday, Payment, Attendance)
+- ⏸️ Migración de BD (cuando se completen todos los modelos)
+- ⏸️ Seed de feriados chilenos
+- ⏸️ Validación RUT y schemas Zod
+
+### 🔄 FASE 3: Autenticación (30% completado)
+
+**Completado:**
+- ✅ NextAuth v4 configurado con Google OAuth
+- ✅ PrismaAdapter funcionando
+- ✅ JWT callbacks configurados (id, role, organizationId en token)
+- ✅ Session callbacks configurados
+- ✅ Route handler de autenticación funcionando
+- ✅ Autenticación con Google probada y funcionando
 
 **En progreso:**
-- 🔄 Google OAuth (esperando credenciales)
-- ⏸️ Página de onboarding (pendiente)
-- ⏸️ Middleware de protección (pendiente)
+- 🔄 Helpers de sesión y RBAC (pendiente)
+- 🔄 Páginas de login/registro (pendiente)
+- 🔄 Middleware de protección de rutas (pendiente)
 
 **Pendiente:**
-- ⏸️ TODO 2.4: Configurar Dark Mode UI
-- ⏸️ TODO 2.5: Probar app completa
+- ⏸️ TODO 3.2-3.4: Helpers de sesión y RBAC
+- ⏸️ TODO 3.6-3.11: Server Actions, formularios y UI de autenticación
 
 ---
 
@@ -2122,11 +2145,11 @@ VITA:  "Check-in por GPS desde tu celular. $0 hardware adicional."
 :root {
   --background: #ffffff;
   --foreground: #171717;
-
+  
   --primary: 217 91% 60%; /* Azul médico */
   --secondary: 142 71% 45%; /* Verde salud */
   --accent: 38 92% 50%; /* Ámbar atención */
-
+  
   --status-scheduled: 217 91% 60%;
   --status-in-progress: 38 92% 50%;
   --status-completed: 142 71% 45%;
@@ -3085,7 +3108,7 @@ const createShiftSchema = z.object({
 export async function createShiftAction(formData: FormData) {
   try {
     const session = await requireAuth()
-
+    
     const rawData = {
       date: formData.get('date') as string,
       startTime: formData.get('startTime') as string,
@@ -3330,7 +3353,7 @@ export async function createShiftAction(formData: FormData) {
 ```typescript
 export async function createShiftAction(formData: FormData) {
   const validation = createShiftSchema.safeParse(rawData)
-
+  
   if (!validation.success) {
     return { success: false, error: validation.error.issues[0].message }
   }
@@ -3366,16 +3389,16 @@ Cada función, componente o módulo debe hacer UNA sola cosa.
 export function UserDashboard() {
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(false)
-
+  
   // Fetch users
   useEffect(() => { /* ... */ }, [])
-
+  
   // Handle delete
   const handleDelete = async (id: string) => { /* ... */ }
-
+  
   // Handle edit
   const handleEdit = async (id: string) => { /* ... */ }
-
+  
   // Render table, modals, forms, etc.
   return (
     <div>
@@ -3394,11 +3417,11 @@ import { UserTable } from './user-table'
 
 export async function UserDashboard() {
   const result = await getUsersAction()
-
+  
   if (!result.success) {
     return <ErrorState message={result.error} />
   }
-
+  
   return <UserTable users={result.data} />
 }
 
@@ -4012,9 +4035,9 @@ export const useAsyncAction = <T extends unknown[], R>(
 
 // Uso:
 const { execute: deleteShift, isLoading } = useAsyncAction(deleteShiftAction, {
-  successMessage: 'Turno eliminado',
-  errorMessage: 'No se pudo eliminar el turno',
-  onSuccess: () => router.refresh(),
+    successMessage: 'Turno eliminado',
+    errorMessage: 'No se pudo eliminar el turno',
+    onSuccess: () => router.refresh(),
 })
 ```
 
@@ -4073,7 +4096,7 @@ export const getWeekDays = (date: Date): Date[] => {
 // lib/utils/currency.ts
 export const formatCurrency = (amount: number, currency: 'CLP' | 'USD' = 'CLP'): string => {
   const locale = currency === 'CLP' ? 'es-CL' : 'en-US'
-
+  
   return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency,
@@ -4092,12 +4115,12 @@ formatCurrency(50, 'USD') // "$50.00"
 export const groupBy = <T>(array: T[], key: keyof T): Record<string, T[]> => {
   return array.reduce(
     (acc, item) => {
-      const groupKey = String(item[key])
-      if (!acc[groupKey]) {
-        acc[groupKey] = []
-      }
-      acc[groupKey].push(item)
-      return acc
+    const groupKey = String(item[key])
+    if (!acc[groupKey]) {
+      acc[groupKey] = []
+    }
+    acc[groupKey].push(item)
+    return acc
     },
     {} as Record<string, T[]>
   )
@@ -4315,10 +4338,10 @@ export { cn } from './cn'
 ````typescript
 /**
  * Valida si un RUT chileno es válido.
- *
+ * 
  * @param rut - RUT en formato 12.345.678-9 o 12345678-9
  * @returns true si el RUT es válido, false en caso contrario
- *
+ * 
  * @example
  * ```typescript
  * validateRut('12.345.678-9') // true
@@ -4328,9 +4351,9 @@ export { cn } from './cn'
 export const validateRut = (rut: string): boolean => {
   const cleanRut = cleanRutFormat(rut)
   const [body, verifier] = cleanRut.split('-')
-
+  
   const calculatedVerifier = calculateVerifier(body)
-
+  
   return verifier.toUpperCase() === calculatedVerifier.toUpperCase()
 }
 ````
@@ -4556,31 +4579,33 @@ npm install bcryptjs
 npm install --save-dev @types/bcryptjs
 ```
 
-#### TODO 2.1: Configurar Prisma con Supabase
+#### TODO 2.1: Configurar Prisma con Supabase ✅
 
-- [ ] [ ] **IMPORTANTE:** Consultar MCP server de Supabase para configuración actualizada con Prisma
-- [ ] `npx prisma init`
-- [ ] Crear `.env.local` con template
-- [ ] Configurar `DATABASE_URL` y `DIRECT_URL` según documentación de Supabase
-- [ ] Agregar `.env.local` a `.gitignore`
-- [ ] Crear `.env.example` con template
-- [ ] **Resultado:** Prisma configurado correctamente con Supabase
+- [x] **IMPORTANTE:** Consultar MCP server de Supabase para configuración actualizada con Prisma
+- [x] `npx prisma init`
+- [x] Crear `.env.local` con template
+- [x] Configurar `DATABASE_URL` y `DIRECT_URL` según documentación de Supabase
+- [x] Agregar `.env.local` a `.gitignore`
+- [x] Crear `.env.example` con template
+- [x] Configurar Prisma 7.1.0 con @prisma/adapter-pg para Supabase pooler
+- [x] **Resultado:** Prisma configurado correctamente con Supabase ✅
 
-#### TODO 2.2: Definir schema Prisma - Modelos de Usuario y Auth
+#### TODO 2.2: Definir schema Prisma - Modelos de Usuario y Auth ✅
 
-- [ ] [ ] Modelo `User` completo
-- [ ] Modelo `Account` (para Auth.js)
-- [ ] Modelo `Session` (para Auth.js)
-- [ ] Índices necesarios
-- [ ] **Resultado:** Modelos de autenticación listos
+- [x] Modelo `User` completo (con country, docType, docNumber, role, organizationId, linkingCode)
+- [x] Modelo `Account` (para NextAuth)
+- [x] Modelo `Session` (para NextAuth)
+- [x] Modelo `VerificationToken` (para NextAuth)
+- [x] Índices necesarios (email, docNumber, linkingCode, organizationId, country)
+- [x] **Resultado:** Modelos de autenticación listos ✅
 
-#### TODO 2.3: Definir schema Prisma - Modelos de Organización
+#### TODO 2.3: Definir schema Prisma - Modelos de Organización ✅ (Parcial)
 
-- [ ] [ ] Modelo `Organization`
-- [ ] Modelo `OrganizationMember` (roles multi-tenant)
-- [ ] Modelo `Area`
-- [ ] Relaciones entre modelos
-- [ ] **Resultado:** Multi-tenancy configurado
+- [x] Modelo `Organization` (con country, taxId, maxAdminHR, maxChiefs, maxStaff)
+- [ ] Modelo `OrganizationMember` (roles multi-tenant) - Pendiente
+- [ ] Modelo `Area` - Pendiente
+- [x] Relaciones básicas entre User y Organization
+- [ ] **Resultado:** Multi-tenancy configurado (parcial - falta OrganizationMember y Area)
 
 #### TODO 2.4: Definir schema Prisma - Modelos de Turnos
 
@@ -4605,11 +4630,13 @@ npm install --save-dev @types/bcryptjs
 - [ ] `npx prisma generate` para generar cliente
 - [ ] **Resultado:** Base de datos creada
 
-#### TODO 2.7: Crear cliente Prisma singleton
+#### TODO 2.7: Crear cliente Prisma singleton ✅ (Implementado en lib/auth/config.ts)
 
-- [ ] [ ] `lib/db/prisma.ts`
-- [ ] Singleton pattern para desarrollo y producción
-- [ ] **Resultado:** Cliente Prisma listo para usar
+- [x] Cliente Prisma configurado con singleton pattern
+- [x] Configurado con @prisma/adapter-pg para Prisma 7.1.0
+- [x] Pool de conexiones PostgreSQL configurado
+- [x] Exportado desde `lib/auth/config.ts` (puede moverse a `lib/db/prisma.ts` más adelante)
+- [x] **Resultado:** Cliente Prisma listo para usar ✅
 
 #### TODO 2.8: Seed - Feriados chilenos 2024-2025
 
@@ -4635,33 +4662,44 @@ npm install --save-dev @types/bcryptjs
 - [ ] Validación de RUT integrada
 - [ ] **Resultado:** Validaciones listas
 
-**✅ Checkpoint FASE 2:**
+**✅ Checkpoint FASE 2 (Base completada):**
 
-- Prisma Studio funciona: `npx prisma studio`
-- Se pueden ver todas las tablas vacías
-- Tabla `Holiday` tiene datos
-- Validación de RUT funciona
+- ✅ Prisma Studio funciona: `npx prisma studio`
+- ✅ Cliente Prisma configurado con @prisma/adapter-pg para Prisma 7.1.0
+- ✅ Modelos básicos de autenticación creados (User, Account, Session, VerificationToken)
+- ✅ Modelo Organization creado
+- ✅ NextAuth v4 configurado y funcionando
+- ✅ Google OAuth probado y funcionando
+- ✅ Route handler de autenticación funcionando
+- ✅ SessionProvider configurado correctamente
+- ⏸️ Tabla `Holiday` pendiente (falta seed)
+- ⏸️ Validación de RUT pendiente
+- ⏸️ Modelos de Turnos pendientes (ShiftType, Shift, ShiftExchange)
+- ⏸️ Modelos complementarios pendientes (StaffRate, Payment, Attendance)
 
 ---
 
-### 🔐 FASE 3: Autenticación Completa (Auth.js v5)
+### 🔐 FASE 3: Autenticación Completa (NextAuth v4)
 
 **Objetivo:** Sistema de login y registro funcional.
 
-**Dependencias a instalar:**
+**Dependencias instaladas:**
 
 ```bash
-npm install next-auth@beta
-npm install @auth/core @auth/prisma-adapter
+npm install next-auth@^4.24.13
+npm install @next-auth/prisma-adapter@^1.0.7
+npm install @prisma/adapter-pg
+npm install pg @types/pg
 ```
 
-#### TODO 3.1: Configurar Auth.js v5
+#### TODO 3.1: Configurar NextAuth v4 ✅
 
-- [ ] `lib/auth/config.ts`
-- [ ] Configurar `PrismaAdapter`
-- [ ] Configurar `Credentials` provider
-- [ ] JWT y session callbacks
-- [ ] **Resultado:** Auth.js configurado
+- [x] `lib/auth/config.ts` creado y configurado
+- [x] Configurar `PrismaAdapter` con @prisma/adapter-pg
+- [x] Configurar `GoogleProvider` con OAuth
+- [x] JWT y session callbacks configurados (id, role, organizationId en token/session)
+- [x] SessionProvider configurado como Client Component (`lib/providers/session-provider.tsx`)
+- [x] **Resultado:** NextAuth v4 configurado y funcionando ✅
 
 #### TODO 3.2: Crear helpers de sesión
 
@@ -4678,17 +4716,18 @@ npm install @auth/core @auth/prisma-adapter
 - [ ] `canManageOrganization()`, `canManageShifts()`, etc.
 - [ ] **Resultado:** Sistema de permisos
 
-#### TODO 3.4: Exportar handlers de Auth.js
+#### TODO 3.4: Exportar helpers de NextAuth
 
-- [ ] `lib/auth/index.ts`
-- [ ] Exportar `handlers`, `auth`, `signIn`, `signOut`
-- [ ] **Resultado:** Auth listo para usar
+- [ ] `lib/auth/index.ts` (opcional - puede exportarse desde config.ts)
+- [ ] Exportar `getServerSession`, helpers de autenticación
+- [ ] **Resultado:** Auth listo para usar en toda la app
 
-#### TODO 3.5: Crear route handler para Auth.js
+#### TODO 3.5: Crear route handler para NextAuth ✅
 
-- [ ] `app/api/auth/[...nextauth]/route.ts`
-- [ ] Exportar `GET` y `POST` handlers
-- [ ] **Resultado:** API de auth funcionando
+- [x] `app/api/auth/[...nextauth]/route.ts` creado
+- [x] Exportar `GET` y `POST` handlers
+- [x] Handler funcionando correctamente
+- [x] **Resultado:** API de auth funcionando ✅
 
 #### TODO 3.6: Server Actions de autenticación
 
@@ -4742,12 +4781,19 @@ npm install @auth/core @auth/prisma-adapter
 - [ ] Dropdown con "Cerrar Sesión"
 - [ ] **Resultado:** Navbar con auth
 
-**✅ Checkpoint FASE 3:**
+**✅ Checkpoint FASE 3 (30% completado):**
 
-- Registrar usuario nuevo funciona
-- Login con ese usuario funciona
-- Sesión persiste después de refresh
-- Logout funciona
+- ✅ NextAuth v4 configurado completamente
+- ✅ Google OAuth funcionando y probado
+- ✅ PrismaAdapter configurado correctamente
+- ✅ JWT y session callbacks funcionando
+- ✅ Route handler de autenticación funcionando
+- ✅ Sesión persiste después de refresh (SessionProvider configurado)
+- ⏸️ Login con email/password pendiente (solo Google OAuth por ahora)
+- ⏸️ Registro pendiente
+- ⏸️ Rutas protegidas pendiente (middleware)
+- ⏸️ Navbar con estado de sesión pendiente
+- ⏸️ Helpers de sesión y RBAC pendientes
 - Rutas protegidas redirigen a login
 
 ---
@@ -5670,19 +5716,19 @@ Sentry.setUser({
     "next": "16.0.3",
     "react": "19.2.0",
     "react-dom": "19.2.0",
-
+    
     // Autenticación
     "@auth/core": "^0.41.0",
     "@auth/prisma-adapter": "^2.11.1",
     "next-auth": "^5.0.0-beta.30",
     "bcryptjs": "^3.0.3",
-
+    
     // Base de Datos
     "@prisma/client": "^6.19.0",
-
+    
     // Validación
     "zod": "^4.1.12",
-
+    
     // UI (instaladas por shadcn automáticamente)
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -5695,14 +5741,14 @@ Sentry.setUser({
     // Calendario
     "react-big-calendar": "^1.13.0", // FASE 4
     "date-fns": "^3.0.0", // Para localización del calendario
-
+    
     // Notificaciones
     "sonner": "^1.x", // FASE 8
     "resend": "^3.x", // FASE 8 (emails)
 
     // State Management
     "zustand": "^4.5.0", // Para UI local (sidebar, modales)
-
+    
     // Utilidades
     "tsx": "^4.x"
   }

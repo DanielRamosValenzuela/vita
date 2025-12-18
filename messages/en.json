@@ -1,0 +1,30 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success"
+  },
+  "auth": {
+    "welcome": "Welcome to VITA",
+    "login": "Sign in",
+    "logout": "Sign out",
+    "signIn": "Sign in with Google",
+    "signOut": "Sign Out",
+    "authenticated": "Authenticated",
+    "notAuthenticated": "Not authenticated",
+    "email": "Email",
+    "name": "Name",
+    "id": "ID",
+    "role": "Role"
+  },
+  "meta": {
+    "title": "VITA - Medical Shift Management",
+    "description": "Shift and attendance management system for healthcare institutions"
+  }
+}
+
