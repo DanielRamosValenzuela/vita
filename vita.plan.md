@@ -2,11 +2,11 @@
 
 **Sistema de Gestión de Turnos Médicos Multi-Tenant SaaS B2B**
 
-**Última actualización:** 18 de diciembre de 2025
+**Última actualización:** 19 de diciembre de 2025
 
-**Versión:** 3.2.0
+**Versión:** 3.3.0
 
-**Estado:** FASE 2 completada - FASE 3 iniciada (Autenticación básica funcionando)
+**Estado:** FASE 2 completada - FASE 3 en progreso (50% - Helpers de sesión y RBAC completados)
 
 **Competidor Principal:** Rflex (análisis competitivo en sección de Negocio)
 
@@ -37,7 +37,7 @@
 - ⏸️ Seed de feriados chilenos
 - ⏸️ Validación RUT y schemas Zod
 
-### 🔄 FASE 3: Autenticación (30% completado)
+### 🔄 FASE 3: Autenticación (50% completado)
 
 **Completado:**
 - ✅ NextAuth v4 configurado con Google OAuth
@@ -46,14 +46,17 @@
 - ✅ Session callbacks configurados
 - ✅ Route handler de autenticación funcionando
 - ✅ Autenticación con Google probada y funcionando
+- ✅ Helpers de sesión creados (`lib/auth/session.ts`)
+- ✅ Helpers RBAC creados (`lib/auth/rbac.ts`)
+- ✅ Tipos compartidos (`lib/auth/types.ts`)
+- ✅ Exports centralizados (`lib/auth/index.ts`)
+- ✅ Estructura de `lib/auth/` reorganizada y organizada
 
 **En progreso:**
-- 🔄 Helpers de sesión y RBAC (pendiente)
 - 🔄 Páginas de login/registro (pendiente)
 - 🔄 Middleware de protección de rutas (pendiente)
 
 **Pendiente:**
-- ⏸️ TODO 3.2-3.4: Helpers de sesión y RBAC
 - ⏸️ TODO 3.6-3.11: Server Actions, formularios y UI de autenticación
 
 ---
@@ -4701,26 +4704,28 @@ npm install pg @types/pg
 - [x] SessionProvider configurado como Client Component (`lib/providers/session-provider.tsx`)
 - [x] **Resultado:** NextAuth v4 configurado y funcionando ✅
 
-#### TODO 3.2: Crear helpers de sesión
+#### TODO 3.2: Crear helpers de sesión ✅
 
-- [ ] `lib/auth/session.ts`
-- [ ] `getCurrentUser()` - Obtener usuario actual
-- [ ] `requireAuth()` - Proteger rutas
-- [ ] `requireSuperAdmin()` - Solo SUPER_ADMIN
-- [ ] **Resultado:** Helpers de autenticación
+- [x] `lib/auth/session.ts` creado
+- [x] `getCurrentUser()` - Obtener usuario actual
+- [x] `requireAuth()` - Proteger rutas
+- [x] `requireSuperAdmin()` - Solo SUPER_ADMIN
+- [x] `getUserWithOrganization()` - Obtener usuario con organización
+- [x] **Resultado:** Helpers de autenticación ✅
 
-#### TODO 3.3: Crear helpers RBAC
+#### TODO 3.3: Crear helpers RBAC ✅
 
-- [ ] Agregar a `lib/auth/session.ts`
-- [ ] `hasRole()`, `isSuperAdmin()`, `isAdminHR()`, etc.
-- [ ] `canManageOrganization()`, `canManageShifts()`, etc.
-- [ ] **Resultado:** Sistema de permisos
+- [x] `lib/auth/rbac.ts` creado (separado de session.ts)
+- [x] `hasRole()`, `isSuperAdmin()`, `isAdminHR()`, `isChiefArea()`, `isStaffHealth()`
+- [x] `canManageOrganization()`, `canManageShifts()`, `canViewShifts()`, `canManageStaff()`, `canManageRates()`
+- [x] **Resultado:** Sistema de permisos RBAC ✅
 
-#### TODO 3.4: Exportar helpers de NextAuth
+#### TODO 3.4: Exportar helpers de NextAuth ✅
 
-- [ ] `lib/auth/index.ts` (opcional - puede exportarse desde config.ts)
-- [ ] Exportar `getServerSession`, helpers de autenticación
-- [ ] **Resultado:** Auth listo para usar en toda la app
+- [x] `lib/auth/index.ts` creado con exports centralizados
+- [x] `lib/auth/types.ts` creado para tipos compartidos (CurrentUser)
+- [x] Estructura reorganizada: `config.ts`, `session.ts`, `rbac.ts`, `types.ts`, `index.ts`
+- [x] **Resultado:** Auth listo para usar en toda la app ✅
 
 #### TODO 3.5: Crear route handler para NextAuth ✅
 
@@ -4781,11 +4786,13 @@ npm install pg @types/pg
 - [ ] Dropdown con "Cerrar Sesión"
 - [ ] **Resultado:** Navbar con auth
 
-**✅ Checkpoint FASE 3 (30% completado):**
+**✅ Checkpoint FASE 3 (50% completado):**
 
 - ✅ NextAuth v4 configurado completamente
 - ✅ Google OAuth funcionando y probado
 - ✅ PrismaAdapter configurado correctamente
+- ✅ Helpers de sesión y RBAC implementados
+- ✅ Estructura de `lib/auth/` organizada (config, session, rbac, types, index)
 - ✅ JWT y session callbacks funcionando
 - ✅ Route handler de autenticación funcionando
 - ✅ Sesión persiste después de refresh (SessionProvider configurado)
