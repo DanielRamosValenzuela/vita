@@ -4,9 +4,9 @@
 
 **Última actualización:** 18 de diciembre de 2025
 
-**Versión:** 3.1.0
+**Versión:** 3.2.0
 
-**Estado:** FASE 2 en progreso - Setup Técnico 80% completado
+**Estado:** FASE 2 en progreso - Setup Técnico 90% completado
 
 **Competidor Principal:** Rflex (análisis competitivo en sección de Negocio)
 
@@ -14,7 +14,7 @@
 
 ## 🎉 PROGRESO RECIENTE (Diciembre 2025)
 
-### ✅ FASE 2: Setup Técnico (80% completado)
+### ✅ FASE 2: Setup Técnico (90% completado)
 
 **Completado:**
 - ✅ Prisma + Supabase configurado y funcionando
@@ -22,15 +22,21 @@
 - ✅ ESLint + Prettier configurado (no muy estricto)
 - ✅ NextAuth v4 instalado y configurado
 - ✅ Estructura de carpetas organizada (`lib/`, `types/`)
-- ✅ Dark mode preparado (next-themes pendiente de implementar UI)
+- ✅ Dark mode implementado con next-themes (funcionando)
+- ✅ **next-intl implementado según documentación oficial** (español e inglés, routing completo)
+- ✅ Landing page con Hero Section, Navbar y Footer
+- ✅ Componentes organizados con Atomic Design (atoms, molecules, templates)
+- ✅ Tema "Healthcare Modern" implementado (colores médicos)
+- ✅ Estructura de rutas implementada: `(global)` para páginas públicas, rutas normales para dashboards (`admin/`, `hr/`, `chief/`, `staff/`)
+- ✅ **Limpieza de código:** Eliminados archivos redundantes (`lib/providers/theme-provider.tsx`, `i18n/request-config.ts`, `ROUTES_STRUCTURE.md`, SVGs no usados)
+- ✅ **Configuración i18n optimizada:** Implementación según [next-intl docs](https://next-intl.dev/docs/routing/setup)
 
 **En progreso:**
-- 🔄 Google OAuth (esperando credenciales)
+- 🔄 Google OAuth (configurado, funcionando en desarrollo)
 - ⏸️ Página de onboarding (pendiente)
 - ⏸️ Middleware de protección (pendiente)
 
 **Pendiente:**
-- ⏸️ TODO 2.4: Configurar Dark Mode UI
 - ⏸️ TODO 2.5: Probar app completa
 
 ---
@@ -1095,12 +1101,7 @@ export function useTranslation() {
 }
 ```
 
-**Ventajas:**
-
-- ✅ MVP1 simple (sin dependencias extra)
-- ✅ Fácil migrar a next-intl o react-i18next después
-- ✅ Todos los textos centralizados desde el inicio
-- ✅ Preparado para expansión a Latinoamérica (portugués Brasil)
+**✅ IMPLEMENTADO:** next-intl v4.6.1 con routing completo. Ver documentación completa arriba.
 
 **Idiomas objetivo:**
 
@@ -2112,32 +2113,61 @@ VITA:  "Check-in por GPS desde tu celular. $0 hardware adicional."
 
 ---
 
-## 🎨 PALETA DE COLORES (Neuromarketing Médico)
+## 🎨 PALETA DE COLORES (Healthcare Modern Theme)
 
-**Tailwind v4 CSS:**
+**Tema implementado:** "Healthcare Modern" - Optimizado para sector salud desde tweakcn.com
+
+**Filosofía de diseño:**
+- ❌ **Evitado:** Tema "Cyberpunk" (colores neón, fondos muy oscuros) - No apropiado para sector salud
+- ❌ **Evitado:** Tema "Violet Bloom" (púrpura/violeta) - No transmite confianza médica
+- ✅ **Implementado:** Paleta médica moderna adaptada desde tweakcn con azules de confianza, verdes de bienestar y acentos sutiles
+
+**Análisis y adaptación:**
+- Tema base importado desde tweakcn.com (Violet Bloom)
+- Colores primarios cambiados de púrpura (277°) a azul médico (250°)
+- Secondary cambiado de gris a verde salud (150°)
+- Charts adaptados a paleta médica (azules, verdes, ámbar)
+- Dark mode optimizado con azul oscuro suave en lugar de púrpura
+
+**Tailwind v4 CSS (OKLCH):**
 
 ```css
-@import 'tailwindcss';
-
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-  
-  --primary: 217 91% 60%; /* Azul médico */
-  --secondary: 142 71% 45%; /* Verde salud */
-  --accent: 38 92% 50%; /* Ámbar atención */
-  
-  --status-scheduled: 217 91% 60%;
-  --status-in-progress: 38 92% 50%;
-  --status-completed: 142 71% 45%;
-  --status-cancelled: 215 16% 47%;
+  --background: oklch(0.99 0.003 250);
+  --foreground: oklch(0.15 0.01 250);
+  --primary: oklch(0.5 0.15 250);
+  --secondary: oklch(0.7 0.12 150);
+  --accent: oklch(0.85 0.08 200);
+  --destructive: oklch(0.55 0.2 25);
+  --chart-1: oklch(0.5 0.15 250);
+  --chart-2: oklch(0.7 0.12 150);
+  --chart-3: oklch(0.65 0.15 45);
 }
 
 .dark {
-  --background: 240 10% 3.9%;
-  --foreground: 0 0% 98%;
+  --background: oklch(0.12 0.01 250);
+  --foreground: oklch(0.98 0 0);
+  --primary: oklch(0.65 0.15 250);
+  --secondary: oklch(0.75 0.12 150);
 }
 ```
+
+**Colores de estado (para turnos):**
+- `scheduled`: Azul médico (primary) - oklch(0.5 0.15 250)
+- `in-progress`: Ámbar/amarillo suave - oklch(0.65 0.15 45)
+- `completed`: Verde salud (secondary) - oklch(0.7 0.12 150)
+- `cancelled`: Gris con tinte azul - oklch(0.5 0.01 250)
+
+**Justificación de colores:**
+- **Azul médico (250°):** Transmite confianza, profesionalismo, tecnología médica
+- **Verde salud (150°):** Asociado con bienestar, calma, éxito
+- **Grises modernos:** Limpieza, tecnología, neutralidad
+- **Acentos sutiles:** Modernidad sin ser agresivo o "gaming"
+- **Dark mode azul:** Más apropiado que púrpura para sector salud
+
+**Implementado en:** `app/globals.css`
+**Fecha:** Diciembre 2024
+**Fuente base:** tweakcn.com (adaptado para salud)
 
 ---
 
@@ -2760,42 +2790,47 @@ Esta sección detalla qué verá cada administrador en su dashboard y menú de n
 vita/
 ├── app/                                 # Next.js 16 App Router
 │   ├── globals.css                      # Tailwind v4 + variables CSS
-│   ├── layout.tsx                       # Layout root (Server Component)
-│   ├── page.tsx                         # Landing page (Server Component)
+│   ├── layout.tsx                        # Layout root (Server Component)
 │   ├── error.tsx                        # Error Boundary root
 │   │
-│   ├── (auth)/                          # Grupo de rutas de autenticación
-│   │   ├── layout.tsx                   # Layout para login/register
-│   │   ├── error.tsx                    # Error Boundary auth
-│   │   ├── login/page.tsx               # Página de login (Server Component)
-│   │   └── register/page.tsx            # Página de registro (Server Component)
-│   │
-│   ├── (super-admin)/                   # Dashboard SUPER_ADMIN
-│   │   ├── layout.tsx                   # Layout con sidebar
-│   │   ├── error.tsx
-│   │   ├── page.tsx                     # Dashboard principal
-│   │   ├── organizations/
-│   │   │   ├── page.tsx                 # Lista de organizaciones
-│   │   │   ├── new/page.tsx             # Crear organización
-│   │   │   └── [id]/
-│   │   │       ├── page.tsx             # Ver detalles
-│   │   │       └── edit/page.tsx        # Editar organización
-│   │   ├── payments/page.tsx            # Registrar pagos
-│   │   └── analytics/page.tsx           # Métricas globales
-│   │
-│   ├── (dashboard)/                     # Dashboards multi-rol
-│   │   ├── layout.tsx                   # Layout general con sidebar dinámico
-│   │   ├── error.tsx
+│   ├── [locale]/                        # Rutas localizadas (es, en)
+│   │   ├── layout.tsx                    # Layout raíz con Providers
+│   │   │
+│   │   ├── (global)/                    # Páginas públicas globales
+│   │   │   ├── layout.tsx               # Layout con Navbar + Footer
+│   │   │   ├── page.tsx                 # Home / Landing
+│   │   │   ├── login/
+│   │   │   │   └── page.tsx             # Página de login
+│   │   │   ├── register/
+│   │   │   │   └── page.tsx             # Página de registro
+│   │   │   ├── support/
+│   │   │   │   └── page.tsx             # Soporte
+│   │   │   └── contact/
+│   │   │       └── page.tsx             # Contacto
+│   │   │
+│   │   ├── admin/                       # Dashboard SUPER_ADMIN
+│   │   │   ├── layout.tsx               # Layout con Sidebar
+│   │   │   ├── page.tsx                 # Dashboard admin (/admin)
+│   │   │   ├── organizations/
+│   │   │   │   ├── page.tsx             # Lista de organizaciones
+│   │   │   │   ├── new/page.tsx         # Crear organización
+│   │   │   │   └── [id]/
+│   │   │   │       ├── page.tsx         # Ver detalles
+│   │   │   │       └── edit/page.tsx     # Editar organización
+│   │   │   ├── payments/page.tsx        # Registrar pagos
+│   │   │   └── analytics/page.tsx       # Métricas globales
 │   │   │
 │   │   ├── hr/                          # Dashboard ADMIN_HR
-│   │   │   ├── page.tsx                 # Resumen HR
+│   │   │   ├── layout.tsx               # Layout con Sidebar
+│   │   │   ├── page.tsx                 # Resumen HR (/hr)
 │   │   │   ├── areas/page.tsx           # CRUD Áreas
 │   │   │   ├── shift-types/page.tsx     # CRUD Tipos de Turno
 │   │   │   ├── rates/page.tsx           # CRUD Tarifas
 │   │   │   └── chiefs/page.tsx          # Gestionar jefes y límites
 │   │   │
 │   │   ├── chief/                       # Dashboard CHIEF_AREA
-│   │   │   ├── page.tsx                 # Resumen del equipo
+│   │   │   ├── layout.tsx               # Layout con Sidebar
+│   │   │   ├── page.tsx                 # Resumen del equipo (/chief)
 │   │   │   ├── calendar/page.tsx        # Calendario del equipo
 │   │   │   ├── staff/
 │   │   │   │   ├── page.tsx             # Lista de personal
@@ -2808,18 +2843,19 @@ vita/
 │   │   │   └── approvals/page.tsx       # Aprobar intercambios/postulaciones
 │   │   │
 │   │   └── staff/                       # Dashboard STAFF_HEALTH
-│   │       ├── page.tsx                 # Resumen personal
+│   │       ├── layout.tsx               # Layout con Sidebar
+│   │       ├── page.tsx                 # Resumen personal (/staff)
 │   │       ├── calendar/page.tsx        # Calendario unificado
 │   │       ├── shifts/
 │   │       │   ├── open/page.tsx        # Postular a turnos abiertos
-│   │       │   └── exchanges/page.tsx   # Solicitar intercambios
+│   │       │   └── exchanges/page.tsx    # Solicitar intercambios
 │   │       ├── linking/page.tsx         # Aprobar vinculaciones
 │   │       └── profile/page.tsx         # Perfil y configuración
 │   │
 │   └── api/                             # API Routes (solo webhooks)
 │       ├── auth/[...nextauth]/route.ts  # Auth.js v5 handler
 │       └── webhooks/
-│           └── biometric/route.ts       # Webhook para sistemas biométricos (MVP2)
+│           └── biometric/route.ts      # Webhook para sistemas biométricos (MVP2)
 │
 ├── actions/                             # Server Actions (patrón principal)
 │   ├── auth/
@@ -4657,98 +4693,121 @@ npm install @auth/core @auth/prisma-adapter
 
 #### TODO 3.1: Configurar Auth.js v5
 
-- [ ] `lib/auth/config.ts`
-- [ ] Configurar `PrismaAdapter`
-- [ ] Configurar `Credentials` provider
-- [ ] JWT y session callbacks
-- [ ] **Resultado:** Auth.js configurado
+- [x] `lib/auth/config.ts`
+- [x] Configurar `PrismaAdapter` con `@prisma/adapter-pg`
+- [x] Configurar `Credentials` provider
+- [x] Configurar Google OAuth provider
+- [x] JWT y session callbacks
+- [x] **Resultado:** Auth.js configurado ✅
 
 #### TODO 3.2: Crear helpers de sesión
 
-- [ ] `lib/auth/session.ts`
-- [ ] `getCurrentUser()` - Obtener usuario actual
-- [ ] `requireAuth()` - Proteger rutas
-- [ ] `requireSuperAdmin()` - Solo SUPER_ADMIN
-- [ ] **Resultado:** Helpers de autenticación
+- [x] `lib/auth/session.ts`
+- [x] `getCurrentUser()` - Obtener usuario actual
+- [x] `requireAuth()` - Proteger rutas
+- [x] `requireSuperAdmin()` - Solo SUPER_ADMIN
+- [x] `getUserWithOrganization()` - Usuario con organización
+- [x] **Resultado:** Helpers de autenticación ✅
 
 #### TODO 3.3: Crear helpers RBAC
 
-- [ ] Agregar a `lib/auth/session.ts`
-- [ ] `hasRole()`, `isSuperAdmin()`, `isAdminHR()`, etc.
-- [ ] `canManageOrganization()`, `canManageShifts()`, etc.
-- [ ] **Resultado:** Sistema de permisos
+- [x] `lib/auth/rbac.ts` (separado para mejor organización)
+- [x] `hasRole()`, `isSuperAdmin()`, `isAdminHR()`, etc.
+- [x] `canManageOrganization()`, `canManageShifts()`, etc.
+- [x] `canViewShifts()`, `canManageStaff()`, `canManageRates()`
+- [x] **Resultado:** Sistema de permisos ✅
 
 #### TODO 3.4: Exportar handlers de Auth.js
 
-- [ ] `lib/auth/index.ts`
-- [ ] Exportar `handlers`, `auth`, `signIn`, `signOut`
-- [ ] **Resultado:** Auth listo para usar
+- [x] `lib/auth/index.ts`
+- [x] Exportar `authOptions`, `prisma`, helpers de sesión y RBAC
+- [x] Exportar tipos `CurrentUser`
+- [x] **Resultado:** Auth listo para usar ✅
 
 #### TODO 3.5: Crear route handler para Auth.js
 
-- [ ] `app/api/auth/[...nextauth]/route.ts`
-- [ ] Exportar `GET` y `POST` handlers
-- [ ] **Resultado:** API de auth funcionando
+- [x] `app/api/auth/[...nextauth]/route.ts`
+- [x] Exportar `GET` y `POST` handlers
+- [x] **Resultado:** API de auth funcionando ✅
 
 #### TODO 3.6: Server Actions de autenticación
 
-- [ ] `actions/auth/auth-actions.ts`
-- [ ] `registerAction(formData)` - Crear usuario con hash de password
-- [ ] `loginAction(formData)` - Verificar credenciales y crear sesión
-- [ ] `logoutAction()` - Cerrar sesión
-- [ ] Validación con Zod
-- [ ] **Resultado:** Actions de auth
+- [x] `actions/auth/auth-actions.ts`
+- [x] `registerAction(formData)` - Crear usuario con hash de password (bcrypt)
+- [x] `loginAction(formData)` - Verificar credenciales
+- [x] `logoutAction()` - Cerrar sesión
+- [x] Validación con Zod (`lib/validations/auth.ts`)
+- [x] Validación de RUT chileno (`lib/validations/rut.ts`)
+- [x] **Resultado:** Actions de auth ✅
 
 #### TODO 3.7: Crear proxy.ts (middleware)
 
-- [ ] `proxy.ts` en raíz
-- [ ] Proteger rutas privadas
-- [ ] Redirect a login si no autenticado
-- [ ] Redirect según rol después del login
-- [ ] **Resultado:** Rutas protegidas
+- [x] `proxy.ts` en raíz
+- [x] Proteger rutas privadas con `getToken` de NextAuth
+- [x] Redirect a login si no autenticado
+- [x] Redirect a home si ya autenticado en rutas de auth
+- [x] Mantener lógica de i18n
+- [x] **Resultado:** Rutas protegidas ✅
 
 #### TODO 3.8: Página de Registro - UI
 
-- [ ] `app/(auth)/register/page.tsx` (Server Component wrapper)
-- [ ] `components/auth/register-form.tsx` (Client Component)
-- [ ] Campos: Nombre, Email, RUT, Password, Confirmar Password
-- [ ] Validación en tiempo real del RUT
-- [ ] Loading states
-- [ ] **Resultado:** UI de registro completa
+- [x] `app/[locale]/register/page.tsx` (Server Component wrapper)
+- [x] `components/auth/register-form.tsx` (Client Component)
+- [x] Campos: Nombre, Email, RUT, Password, Confirmar Password
+- [x] Validación en tiempo real del RUT
+- [x] Loading states
+- [x] Manejo de errores por campo
+- [x] **Resultado:** UI de registro completa ✅
 
 #### TODO 3.9: Página de Login - UI
 
-- [ ] `app/(auth)/login/page.tsx` (Server Component wrapper)
-- [ ] `components/auth/login-form.tsx` (Client Component)
-- [ ] Campos: Email, Password
-- [ ] Checkbox "Recordarme" (opcional)
-- [ ] Link a "¿Olvidaste tu contraseña?" (placeholder)
-- [ ] Loading states
-- [ ] **Resultado:** UI de login completa
+- [x] `app/[locale]/login/page.tsx` (Server Component wrapper)
+- [x] `components/auth/login-form.tsx` (Client Component)
+- [x] Campos: Email, Password
+- [x] Checkbox "Recordarme" (opcional)
+- [x] Link a "¿Olvidaste tu contraseña?" (placeholder)
+- [x] Botón de Google OAuth
+- [x] Loading states
+- [x] **Resultado:** UI de login completa ✅
 
 #### TODO 3.10: Conectar formularios con Server Actions
 
-- [ ] Integrar `registerAction` en `RegisterForm`
-- [ ] Integrar `loginAction` en `LoginForm`
-- [ ] Toast notifications con `sonner`
-- [ ] Redirect después del éxito
-- [ ] Manejo de errores
-- [ ] **Resultado:** Auth funcional end-to-end
+- [x] Integrar `registerAction` en `RegisterForm`
+- [x] Integrar `loginAction` en `LoginForm`
+- [x] Integrar `signIn('credentials')` después de validación
+- [x] Redirect después del éxito
+- [x] Manejo de errores por campo
+- [x] **Resultado:** Auth funcional end-to-end ✅
 
 #### TODO 3.11: Actualizar navbar con estado de sesión
 
-- [ ] Mostrar "Iniciar Sesión" si no hay sesión
-- [ ] Mostrar nombre de usuario si hay sesión
-- [ ] Dropdown con "Cerrar Sesión"
-- [ ] **Resultado:** Navbar con auth
+- [x] `components/layout/navbar.tsx`
+- [x] Mostrar "Iniciar Sesión" si no hay sesión
+- [x] Mostrar nombre de usuario y avatar si hay sesión
+- [x] Dropdown con "Cerrar Sesión"
+- [x] Integrado en `app/[locale]/layout.tsx`
+- [x] **Resultado:** Navbar con auth ✅
 
 **✅ Checkpoint FASE 3:**
 
-- Registrar usuario nuevo funciona
-- Login con ese usuario funciona
-- Sesión persiste después de refresh
-- Logout funciona
-- Rutas protegidas redirigen a login
+- ✅ Registrar usuario nuevo funciona (con validación de RUT)
+- ✅ Login con credenciales funciona
+- ✅ Login con Google OAuth funciona
+- ✅ Sesión persiste después de refresh
+- ✅ Logout funciona
+- ✅ Rutas protegidas redirigen a login
+- ✅ Rutas de auth redirigen a home si ya autenticado
+- ✅ Navbar muestra estado de sesión
+- ✅ Validación completa con Zod
+- ✅ Hash de contraseñas con bcrypt
+- ✅ Prisma configurado con adapter de PostgreSQL para Supabase
+
+**Notas de implementación:**
+- Prisma 7.1.0 requiere `engineType = "library"` y adapter explícito
+- Usado `@prisma/adapter-pg` con `pg.Pool` para Supabase
+- Validación de RUT chileno implementada y funcionando
+- Server Actions separados en `actions/auth/`
+- Helpers RBAC separados en `lib/auth/rbac.ts` para mejor organización
 
 ---
 
@@ -7396,10 +7455,13 @@ session: {
 
 ### Internacionalización
 
-- ✅ Estructura preparada para i18n
-- ✅ MVP1: Solo español, textos centralizados en `lib/i18n/messages.ts`
-- ✅ MVP2: Multi-idioma (inglés, portugués)
-- ✅ Fácil migración a next-intl o react-i18next
+- ✅ **next-intl v4.6.1 implementado y funcionando**
+- ✅ Routing basado en locale prefix (`/es/...`, `/en/...`)
+- ✅ Componentes de navegación localizados (`@/i18n/navigation`)
+- ✅ Cambio de idioma funcional en `LanguageSelector`
+- ✅ Mensajes organizados en `messages/{locale}.json`
+- ✅ Configuración centralizada en `i18n/routing.ts`
+- 📖 Ver sección completa: [INTERNACIONALIZACIÓN (i18n)](#-internacionalización-i18n---implementación-completa)
 
 ### Sistemas Core
 

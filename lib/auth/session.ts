@@ -8,9 +8,7 @@ import type { CurrentUser } from './types'
 export async function getCurrentUser(): Promise<CurrentUser | null> {
   const session = await getServerSession(authOptions)
 
-  if (!session?.user) {
-    return null
-  }
+  if (!session?.user) return null
 
   return {
     id: session.user.id,
@@ -25,29 +23,25 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
   }
 }
 
-export async function requireAuth(): Promise<CurrentUser> {
+export async function requireAuth(locale: string = 'es'): Promise<CurrentUser> {
   const user = await getCurrentUser()
 
-  if (!user) {
-    redirect('/login')
-  }
+  if (!user) redirect(`/${locale}/login`)
 
   return user
 }
 
-export async function requireSuperAdmin(): Promise<CurrentUser> {
-  const user = await requireAuth()
+export async function requireSuperAdmin(locale: string = 'es'): Promise<CurrentUser> {
+  const user = await requireAuth(locale)
 
-  if (user.role !== Role.SUPER_ADMIN) {
-    redirect('/unauthorized')
-  }
+  if (user.role !== Role.SUPER_ADMIN) redirect(`/${locale}`)
 
   return user
 }
 
 export async function getUserWithOrganization(
   userId: string
-): Promise<CurrentUser & { organization: { id: string; name: string } | null } | null> {
+): Promise<(CurrentUser & { organization: { id: string; name: string } | null }) | null> {
   const user = await prisma.user.findUnique({
     where: { id: userId },
     include: {
@@ -60,9 +54,7 @@ export async function getUserWithOrganization(
     },
   })
 
-  if (!user) {
-    return null
-  }
+  if (!user) return null
 
   return {
     id: user.id,

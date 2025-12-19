@@ -9,6 +9,54 @@
     "error": "Error",
     "success": "Éxito"
   },
+  "nav": {
+    "login": "Iniciar Sesión",
+    "register": "Registrarse",
+    "logout": "Cerrar Sesión",
+    "profile": "Mi Perfil",
+    "support": "Soporte",
+    "contact": "Contáctanos"
+  },
+  "hero": {
+    "title": {
+      "line1": "Gestiona tus turnos médicos",
+      "line2": "de forma inteligente"
+    },
+    "description": "Sistema completo de gestión de turnos y asistencia para instituciones de salud. Optimiza tu personal, reduce costos y mejora la eficiencia operativa.",
+    "cta": {
+      "primary": "Comenzar Gratis",
+      "secondary": "Iniciar Sesión",
+      "dashboard": "Ir al Dashboard"
+    },
+    "features": {
+      "scheduling": {
+        "title": "Programación Inteligente",
+        "description": "Asigna turnos automáticamente respetando horarios, descansos y disponibilidad del personal."
+      },
+      "staff": {
+        "title": "Gestión de Personal",
+        "description": "Administra tu equipo, vincula personal y gestiona múltiples organizaciones desde un solo lugar."
+      },
+      "security": {
+        "title": "Seguro y Confiable",
+        "description": "Datos protegidos con encriptación de nivel empresarial y cumplimiento de normativas de salud."
+      }
+    }
+  },
+  "footer": {
+    "description": "Sistema de gestión de turnos y asistencia diseñado específicamente para instituciones de salud.",
+    "product": "Producto",
+    "company": "Empresa",
+    "legal": "Legal",
+    "features": "Características",
+    "pricing": "Precios",
+    "support": "Soporte",
+    "about": "Acerca de",
+    "contact": "Contacto",
+    "privacy": "Privacidad",
+    "terms": "Términos",
+    "copyright": "Todos los derechos reservados."
+  },
   "auth": {
     "welcome": "Bienvenido a VITA",
     "login": "Iniciar sesión",

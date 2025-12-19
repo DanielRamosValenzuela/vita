@@ -9,6 +9,54 @@
     "error": "Error",
     "success": "Success"
   },
+  "nav": {
+    "login": "Sign In",
+    "register": "Sign Up",
+    "logout": "Sign Out",
+    "profile": "My Profile",
+    "support": "Support",
+    "contact": "Contact Us"
+  },
+  "hero": {
+    "title": {
+      "line1": "Manage your medical shifts",
+      "line2": "intelligently"
+    },
+    "description": "Complete shift and attendance management system for healthcare institutions. Optimize your staff, reduce costs, and improve operational efficiency.",
+    "cta": {
+      "primary": "Get Started Free",
+      "secondary": "Sign In",
+      "dashboard": "Go to Dashboard"
+    },
+    "features": {
+      "scheduling": {
+        "title": "Smart Scheduling",
+        "description": "Automatically assign shifts respecting schedules, breaks, and staff availability."
+      },
+      "staff": {
+        "title": "Staff Management",
+        "description": "Manage your team, link staff, and handle multiple organizations from one place."
+      },
+      "security": {
+        "title": "Secure & Reliable",
+        "description": "Data protected with enterprise-level encryption and healthcare compliance."
+      }
+    }
+  },
+  "footer": {
+    "description": "Shift and attendance management system designed specifically for healthcare institutions.",
+    "product": "Product",
+    "company": "Company",
+    "legal": "Legal",
+    "features": "Features",
+    "pricing": "Pricing",
+    "support": "Support",
+    "about": "About",
+    "contact": "Contact",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "copyright": "All rights reserved."
+  },
   "auth": {
     "welcome": "Welcome to VITA",
     "login": "Sign in",

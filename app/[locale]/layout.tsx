@@ -1,9 +1,9 @@
-import { NextIntlClientProvider } from 'next-intl'
+import { NextIntlClientProvider, hasLocale } from 'next-intl'
 import { getMessages } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { Geist, Geist_Mono } from 'next/font/google'
-import { locales } from '@/i18n/config'
-import { SessionProviderWrapper } from '@/lib/providers/session-provider'
+import { routing } from '@/i18n/routing'
+import { AppProviders } from '@/lib/providers/app-providers'
 import '../globals.css'
 
 const geistSans = Geist({
@@ -24,7 +24,7 @@ interface LocaleLayoutProps {
 export default async function LocaleLayout({ children, params }: LocaleLayoutProps) {
   const { locale } = await params
 
-  if (!locales.includes(locale as 'en' | 'es')) {
+  if (!hasLocale(routing.locales, locale)) {
     notFound()
   }
 
@@ -37,7 +37,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
         suppressHydrationWarning
       >
         <NextIntlClientProvider locale={locale} messages={messages}>
-          <SessionProviderWrapper>{children}</SessionProviderWrapper>
+          <AppProviders>{children}</AppProviders>
         </NextIntlClientProvider>
       </body>
     </html>
