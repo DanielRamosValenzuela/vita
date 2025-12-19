@@ -2,11 +2,11 @@
 
 **Sistema de Gestión de Turnos Médicos Multi-Tenant SaaS B2B**
 
-**Última actualización:** 19 de diciembre de 2025
+**Última actualización:** 18 de diciembre de 2025
 
-**Versión:** 3.3.0
+**Versión:** 3.1.0
 
-**Estado:** FASE 2 completada - FASE 3 en progreso (50% - Helpers de sesión y RBAC completados)
+**Estado:** FASE 2 en progreso - Setup Técnico 80% completado
 
 **Competidor Principal:** Rflex (análisis competitivo en sección de Negocio)
 
@@ -14,50 +14,24 @@
 
 ## 🎉 PROGRESO RECIENTE (Diciembre 2025)
 
-### ✅ FASE 2: Setup Técnico (100% completado - Base)
+### ✅ FASE 2: Setup Técnico (80% completado)
 
 **Completado:**
 - ✅ Prisma + Supabase configurado y funcionando
 - ✅ Schema de BD diseñado con multi-country support (docNumber, docType)
 - ✅ ESLint + Prettier configurado (no muy estricto)
-- ✅ NextAuth v4 instalado y configurado completamente
-- ✅ Google OAuth funcionando y probado
-- ✅ PrismaAdapter configurado con @prisma/adapter-pg para Prisma 7.1.0
-- ✅ SessionProvider configurado correctamente (Client Component)
-- ✅ Route handler de NextAuth funcionando (`app/api/auth/[...nextauth]/route.ts`)
-- ✅ Estructura de carpetas organizada (`lib/`, `types/`, `lib/auth/`, `lib/providers/`)
-- ✅ Modelos básicos de BD: User, Account, Session, Organization, VerificationToken
-- ✅ meta.json creado (resuelve warning 404)
-- ✅ Variables de entorno configuradas (DATABASE_URL, NEXTAUTH_SECRET, GOOGLE_CLIENT_ID, etc.)
-
-**Pendiente (para completar schema completo):**
-- ⏸️ Modelos de Turnos (ShiftType, Shift, ShiftExchange)
-- ⏸️ Modelos complementarios (StaffRate, Holiday, Payment, Attendance)
-- ⏸️ Migración de BD (cuando se completen todos los modelos)
-- ⏸️ Seed de feriados chilenos
-- ⏸️ Validación RUT y schemas Zod
-
-### 🔄 FASE 3: Autenticación (50% completado)
-
-**Completado:**
-- ✅ NextAuth v4 configurado con Google OAuth
-- ✅ PrismaAdapter funcionando
-- ✅ JWT callbacks configurados (id, role, organizationId en token)
-- ✅ Session callbacks configurados
-- ✅ Route handler de autenticación funcionando
-- ✅ Autenticación con Google probada y funcionando
-- ✅ Helpers de sesión creados (`lib/auth/session.ts`)
-- ✅ Helpers RBAC creados (`lib/auth/rbac.ts`)
-- ✅ Tipos compartidos (`lib/auth/types.ts`)
-- ✅ Exports centralizados (`lib/auth/index.ts`)
-- ✅ Estructura de `lib/auth/` reorganizada y organizada
+- ✅ NextAuth v4 instalado y configurado
+- ✅ Estructura de carpetas organizada (`lib/`, `types/`)
+- ✅ Dark mode preparado (next-themes pendiente de implementar UI)
 
 **En progreso:**
-- 🔄 Páginas de login/registro (pendiente)
-- 🔄 Middleware de protección de rutas (pendiente)
+- 🔄 Google OAuth (esperando credenciales)
+- ⏸️ Página de onboarding (pendiente)
+- ⏸️ Middleware de protección (pendiente)
 
 **Pendiente:**
-- ⏸️ TODO 3.6-3.11: Server Actions, formularios y UI de autenticación
+- ⏸️ TODO 2.4: Configurar Dark Mode UI
+- ⏸️ TODO 2.5: Probar app completa
 
 ---
 
@@ -4582,33 +4556,31 @@ npm install bcryptjs
 npm install --save-dev @types/bcryptjs
 ```
 
-#### TODO 2.1: Configurar Prisma con Supabase ✅
+#### TODO 2.1: Configurar Prisma con Supabase
 
-- [x] **IMPORTANTE:** Consultar MCP server de Supabase para configuración actualizada con Prisma
-- [x] `npx prisma init`
-- [x] Crear `.env.local` con template
-- [x] Configurar `DATABASE_URL` y `DIRECT_URL` según documentación de Supabase
-- [x] Agregar `.env.local` a `.gitignore`
-- [x] Crear `.env.example` con template
-- [x] Configurar Prisma 7.1.0 con @prisma/adapter-pg para Supabase pooler
-- [x] **Resultado:** Prisma configurado correctamente con Supabase ✅
+- [ ] [ ] **IMPORTANTE:** Consultar MCP server de Supabase para configuración actualizada con Prisma
+- [ ] `npx prisma init`
+- [ ] Crear `.env.local` con template
+- [ ] Configurar `DATABASE_URL` y `DIRECT_URL` según documentación de Supabase
+- [ ] Agregar `.env.local` a `.gitignore`
+- [ ] Crear `.env.example` con template
+- [ ] **Resultado:** Prisma configurado correctamente con Supabase
 
-#### TODO 2.2: Definir schema Prisma - Modelos de Usuario y Auth ✅
+#### TODO 2.2: Definir schema Prisma - Modelos de Usuario y Auth
 
-- [x] Modelo `User` completo (con country, docType, docNumber, role, organizationId, linkingCode)
-- [x] Modelo `Account` (para NextAuth)
-- [x] Modelo `Session` (para NextAuth)
-- [x] Modelo `VerificationToken` (para NextAuth)
-- [x] Índices necesarios (email, docNumber, linkingCode, organizationId, country)
-- [x] **Resultado:** Modelos de autenticación listos ✅
+- [ ] [ ] Modelo `User` completo
+- [ ] Modelo `Account` (para Auth.js)
+- [ ] Modelo `Session` (para Auth.js)
+- [ ] Índices necesarios
+- [ ] **Resultado:** Modelos de autenticación listos
 
-#### TODO 2.3: Definir schema Prisma - Modelos de Organización ✅ (Parcial)
+#### TODO 2.3: Definir schema Prisma - Modelos de Organización
 
-- [x] Modelo `Organization` (con country, taxId, maxAdminHR, maxChiefs, maxStaff)
-- [ ] Modelo `OrganizationMember` (roles multi-tenant) - Pendiente
-- [ ] Modelo `Area` - Pendiente
-- [x] Relaciones básicas entre User y Organization
-- [ ] **Resultado:** Multi-tenancy configurado (parcial - falta OrganizationMember y Area)
+- [ ] [ ] Modelo `Organization`
+- [ ] Modelo `OrganizationMember` (roles multi-tenant)
+- [ ] Modelo `Area`
+- [ ] Relaciones entre modelos
+- [ ] **Resultado:** Multi-tenancy configurado
 
 #### TODO 2.4: Definir schema Prisma - Modelos de Turnos
 
@@ -4633,13 +4605,11 @@ npm install --save-dev @types/bcryptjs
 - [ ] `npx prisma generate` para generar cliente
 - [ ] **Resultado:** Base de datos creada
 
-#### TODO 2.7: Crear cliente Prisma singleton ✅ (Implementado en lib/auth/config.ts)
+#### TODO 2.7: Crear cliente Prisma singleton
 
-- [x] Cliente Prisma configurado con singleton pattern
-- [x] Configurado con @prisma/adapter-pg para Prisma 7.1.0
-- [x] Pool de conexiones PostgreSQL configurado
-- [x] Exportado desde `lib/auth/config.ts` (puede moverse a `lib/db/prisma.ts` más adelante)
-- [x] **Resultado:** Cliente Prisma listo para usar ✅
+- [ ] [ ] `lib/db/prisma.ts`
+- [ ] Singleton pattern para desarrollo y producción
+- [ ] **Resultado:** Cliente Prisma listo para usar
 
 #### TODO 2.8: Seed - Feriados chilenos 2024-2025
 
@@ -4665,74 +4635,60 @@ npm install --save-dev @types/bcryptjs
 - [ ] Validación de RUT integrada
 - [ ] **Resultado:** Validaciones listas
 
-**✅ Checkpoint FASE 2 (Base completada):**
+**✅ Checkpoint FASE 2:**
 
-- ✅ Prisma Studio funciona: `npx prisma studio`
-- ✅ Cliente Prisma configurado con @prisma/adapter-pg para Prisma 7.1.0
-- ✅ Modelos básicos de autenticación creados (User, Account, Session, VerificationToken)
-- ✅ Modelo Organization creado
-- ✅ NextAuth v4 configurado y funcionando
-- ✅ Google OAuth probado y funcionando
-- ✅ Route handler de autenticación funcionando
-- ✅ SessionProvider configurado correctamente
-- ⏸️ Tabla `Holiday` pendiente (falta seed)
-- ⏸️ Validación de RUT pendiente
-- ⏸️ Modelos de Turnos pendientes (ShiftType, Shift, ShiftExchange)
-- ⏸️ Modelos complementarios pendientes (StaffRate, Payment, Attendance)
+- Prisma Studio funciona: `npx prisma studio`
+- Se pueden ver todas las tablas vacías
+- Tabla `Holiday` tiene datos
+- Validación de RUT funciona
 
 ---
 
-### 🔐 FASE 3: Autenticación Completa (NextAuth v4)
+### 🔐 FASE 3: Autenticación Completa (Auth.js v5)
 
 **Objetivo:** Sistema de login y registro funcional.
 
-**Dependencias instaladas:**
+**Dependencias a instalar:**
 
 ```bash
-npm install next-auth@^4.24.13
-npm install @next-auth/prisma-adapter@^1.0.7
-npm install @prisma/adapter-pg
-npm install pg @types/pg
+npm install next-auth@beta
+npm install @auth/core @auth/prisma-adapter
 ```
 
-#### TODO 3.1: Configurar NextAuth v4 ✅
+#### TODO 3.1: Configurar Auth.js v5
 
-- [x] `lib/auth/config.ts` creado y configurado
-- [x] Configurar `PrismaAdapter` con @prisma/adapter-pg
-- [x] Configurar `GoogleProvider` con OAuth
-- [x] JWT y session callbacks configurados (id, role, organizationId en token/session)
-- [x] SessionProvider configurado como Client Component (`lib/providers/session-provider.tsx`)
-- [x] **Resultado:** NextAuth v4 configurado y funcionando ✅
+- [ ] `lib/auth/config.ts`
+- [ ] Configurar `PrismaAdapter`
+- [ ] Configurar `Credentials` provider
+- [ ] JWT y session callbacks
+- [ ] **Resultado:** Auth.js configurado
 
-#### TODO 3.2: Crear helpers de sesión ✅
+#### TODO 3.2: Crear helpers de sesión
 
-- [x] `lib/auth/session.ts` creado
-- [x] `getCurrentUser()` - Obtener usuario actual
-- [x] `requireAuth()` - Proteger rutas
-- [x] `requireSuperAdmin()` - Solo SUPER_ADMIN
-- [x] `getUserWithOrganization()` - Obtener usuario con organización
-- [x] **Resultado:** Helpers de autenticación ✅
+- [ ] `lib/auth/session.ts`
+- [ ] `getCurrentUser()` - Obtener usuario actual
+- [ ] `requireAuth()` - Proteger rutas
+- [ ] `requireSuperAdmin()` - Solo SUPER_ADMIN
+- [ ] **Resultado:** Helpers de autenticación
 
-#### TODO 3.3: Crear helpers RBAC ✅
+#### TODO 3.3: Crear helpers RBAC
 
-- [x] `lib/auth/rbac.ts` creado (separado de session.ts)
-- [x] `hasRole()`, `isSuperAdmin()`, `isAdminHR()`, `isChiefArea()`, `isStaffHealth()`
-- [x] `canManageOrganization()`, `canManageShifts()`, `canViewShifts()`, `canManageStaff()`, `canManageRates()`
-- [x] **Resultado:** Sistema de permisos RBAC ✅
+- [ ] Agregar a `lib/auth/session.ts`
+- [ ] `hasRole()`, `isSuperAdmin()`, `isAdminHR()`, etc.
+- [ ] `canManageOrganization()`, `canManageShifts()`, etc.
+- [ ] **Resultado:** Sistema de permisos
 
-#### TODO 3.4: Exportar helpers de NextAuth ✅
+#### TODO 3.4: Exportar handlers de Auth.js
 
-- [x] `lib/auth/index.ts` creado con exports centralizados
-- [x] `lib/auth/types.ts` creado para tipos compartidos (CurrentUser)
-- [x] Estructura reorganizada: `config.ts`, `session.ts`, `rbac.ts`, `types.ts`, `index.ts`
-- [x] **Resultado:** Auth listo para usar en toda la app ✅
+- [ ] `lib/auth/index.ts`
+- [ ] Exportar `handlers`, `auth`, `signIn`, `signOut`
+- [ ] **Resultado:** Auth listo para usar
 
-#### TODO 3.5: Crear route handler para NextAuth ✅
+#### TODO 3.5: Crear route handler para Auth.js
 
-- [x] `app/api/auth/[...nextauth]/route.ts` creado
-- [x] Exportar `GET` y `POST` handlers
-- [x] Handler funcionando correctamente
-- [x] **Resultado:** API de auth funcionando ✅
+- [ ] `app/api/auth/[...nextauth]/route.ts`
+- [ ] Exportar `GET` y `POST` handlers
+- [ ] **Resultado:** API de auth funcionando
 
 #### TODO 3.6: Server Actions de autenticación
 
@@ -4786,21 +4742,12 @@ npm install pg @types/pg
 - [ ] Dropdown con "Cerrar Sesión"
 - [ ] **Resultado:** Navbar con auth
 
-**✅ Checkpoint FASE 3 (50% completado):**
+**✅ Checkpoint FASE 3:**
 
-- ✅ NextAuth v4 configurado completamente
-- ✅ Google OAuth funcionando y probado
-- ✅ PrismaAdapter configurado correctamente
-- ✅ Helpers de sesión y RBAC implementados
-- ✅ Estructura de `lib/auth/` organizada (config, session, rbac, types, index)
-- ✅ JWT y session callbacks funcionando
-- ✅ Route handler de autenticación funcionando
-- ✅ Sesión persiste después de refresh (SessionProvider configurado)
-- ⏸️ Login con email/password pendiente (solo Google OAuth por ahora)
-- ⏸️ Registro pendiente
-- ⏸️ Rutas protegidas pendiente (middleware)
-- ⏸️ Navbar con estado de sesión pendiente
-- ⏸️ Helpers de sesión y RBAC pendientes
+- Registrar usuario nuevo funciona
+- Login con ese usuario funciona
+- Sesión persiste después de refresh
+- Logout funciona
 - Rutas protegidas redirigen a login
 
 ---
