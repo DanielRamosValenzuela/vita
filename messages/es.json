@@ -73,6 +73,47 @@
   "meta": {
     "title": "VITA - Gestión de Turnos Médicos",
     "description": "Sistema de gestión de turnos y asistencia para instituciones de salud"
+  },
+  "onboarding": {
+    "title": "Bienvenido a VITA",
+    "subtitle": "Completa tu configuración para comenzar",
+    "superAdmin": {
+      "title": "Crear Organización",
+      "description": "Como administrador del sistema, puedes crear una nueva organización.",
+      "createButton": "Crear Organización"
+    },
+    "otherRoles": {
+      "title": "Unirse a una Organización",
+      "description": "Necesitas estar vinculado a una organización para usar VITA.",
+      "options": {
+        "wait": {
+          "title": "Esperar Invitación",
+          "description": "Un administrador de tu organización te invitará pronto.",
+          "button": "Entendido"
+        },
+        "code": {
+          "title": "Usar Código de Vinculación",
+          "description": "Si tienes un código de vinculación, úsalo aquí.",
+          "placeholder": "Ingresa tu código",
+          "button": "Vincular",
+          "error": "Código inválido"
+        }
+      }
+    },
+    "skip": "Omitir por ahora"
+  },
+  "dashboard": {
+    "calendar": "Calendario",
+    "organizations": "Organizaciones",
+    "payments": "Pagos",
+    "analytics": "Analíticas",
+    "areas": "Áreas",
+    "shiftTypes": "Tipos de Turno",
+    "rates": "Tarifas",
+    "staff": "Personal",
+    "shifts": "Turnos",
+    "profile": "Mi Perfil",
+    "settings": "Configuración"
   }
 }
 

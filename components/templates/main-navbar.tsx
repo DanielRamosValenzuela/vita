@@ -61,7 +61,7 @@ export function MainNavbar() {
           ) : isAuthenticated ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-9 w-9 rounded-full p-0">
+                <Button variant="ghost" className="h-9 w-9 cursor-pointer rounded-full p-0">
                   {session.user?.image ? (
                     <div className="relative h-9 w-9 overflow-hidden rounded-full ring-2 ring-border">
                       <Image

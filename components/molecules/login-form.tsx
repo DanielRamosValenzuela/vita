@@ -133,7 +133,7 @@ export function LoginForm() {
       <button
         type="button"
         onClick={() => signIn('google', { callbackUrl })}
-        className="w-full rounded-md border border-gray-300 bg-white px-4 py-2 text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        className="w-full cursor-pointer rounded-md border border-gray-300 bg-white px-4 py-2 text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
       >
         <span className="flex items-center justify-center">
           <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24">
@@ -160,4 +160,5 @@ export function LoginForm() {
     </form>
   )
 }
+
 

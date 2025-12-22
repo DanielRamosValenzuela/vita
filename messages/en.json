@@ -73,6 +73,47 @@
   "meta": {
     "title": "VITA - Medical Shift Management",
     "description": "Shift and attendance management system for healthcare institutions"
+  },
+  "onboarding": {
+    "title": "Welcome to VITA",
+    "subtitle": "Complete your setup to get started",
+    "superAdmin": {
+      "title": "Create Organization",
+      "description": "As system administrator, you can create a new organization.",
+      "createButton": "Create Organization"
+    },
+    "otherRoles": {
+      "title": "Join an Organization",
+      "description": "You need to be linked to an organization to use VITA.",
+      "options": {
+        "wait": {
+          "title": "Wait for Invitation",
+          "description": "An administrator from your organization will invite you soon.",
+          "button": "Got it"
+        },
+        "code": {
+          "title": "Use Linking Code",
+          "description": "If you have a linking code, use it here.",
+          "placeholder": "Enter your code",
+          "button": "Link",
+          "error": "Invalid code"
+        }
+      }
+    },
+    "skip": "Skip for now"
+  },
+  "dashboard": {
+    "calendar": "Calendar",
+    "organizations": "Organizations",
+    "payments": "Payments",
+    "analytics": "Analytics",
+    "areas": "Areas",
+    "shiftTypes": "Shift Types",
+    "rates": "Rates",
+    "staff": "Staff",
+    "shifts": "Shifts",
+    "profile": "My Profile",
+    "settings": "Settings"
   }
 }
 

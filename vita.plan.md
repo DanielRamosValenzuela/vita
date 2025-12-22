@@ -6,7 +6,7 @@
 
 **Versión:** 3.2.0
 
-**Estado:** FASE 2 en progreso - Setup Técnico 90% completado
+**Estado:** FASE 2 completada - Setup Técnico 95% completado (pendiente testing)
 
 **Competidor Principal:** Rflex (análisis competitivo en sección de Negocio)
 
@@ -14,7 +14,7 @@
 
 ## 🎉 PROGRESO RECIENTE (Diciembre 2025)
 
-### ✅ FASE 2: Setup Técnico (90% completado)
+### ✅ FASE 2: Setup Técnico (95% completado - pendiente testing)
 
 **Completado:**
 - ✅ Prisma + Supabase configurado y funcionando
@@ -31,13 +31,16 @@
 - ✅ **Limpieza de código:** Eliminados archivos redundantes (`lib/providers/theme-provider.tsx`, `i18n/request-config.ts`, `ROUTES_STRUCTURE.md`, SVGs no usados)
 - ✅ **Configuración i18n optimizada:** Implementación según [next-intl docs](https://next-intl.dev/docs/routing/setup)
 
+**Completado (adicional):**
+- ✅ Página de onboarding implementada (`/onboarding`)
+- ✅ Middleware mejorado con redirección a onboarding
+- ✅ Checklist de testing creado (`TESTING_CHECKLIST.md`)
+
 **En progreso:**
-- 🔄 Google OAuth (configurado, funcionando en desarrollo)
-- ⏸️ Página de onboarding (pendiente)
-- ⏸️ Middleware de protección (pendiente)
+- 🔄 Google OAuth (configurado, funcionando en desarrollo - verificar en testing)
 
 **Pendiente:**
-- ⏸️ TODO 2.5: Probar app completa
+- ⏸️ TODO 2.5: Probar app completa usando `TESTING_CHECKLIST.md`
 
 ---
 

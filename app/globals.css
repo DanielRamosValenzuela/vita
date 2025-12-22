@@ -171,4 +171,19 @@
   body {
     @apply bg-background text-foreground;
   }
+  button,
+  [role="button"],
+  a,
+  [role="link"],
+  input[type="button"],
+  input[type="submit"],
+  input[type="reset"],
+  [data-slot="button"],
+  [data-slot="dropdown-menu-trigger"],
+  [data-slot="dropdown-menu-item"] {
+    @apply cursor-pointer;
+  }
+  [data-slot="dropdown-menu-item"][data-disabled="true"] {
+    @apply cursor-not-allowed;
+  }
 }

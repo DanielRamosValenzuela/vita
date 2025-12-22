@@ -14,8 +14,18 @@ const publicRoutes = [
   '/test-auth',
   '/test-auth-actions',
   '/forgot-password',
+  '/onboarding',
+  '/',
 ]
 const authRoutes = ['/login', '/register']
+
+const isPublicCalendarRoute = (path: string): boolean => {
+  return path === '/dashboard' || path === '/dashboard/'
+}
+
+const isPublicOrCalendarRoute = (path: string): boolean => {
+  return path === '/' || path === '/dashboard' || path === '/dashboard/'
+}
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -28,7 +38,10 @@ export async function proxy(request: NextRequest) {
     pathnameWithoutLocale.startsWith(route)
   )
 
-  if (!isPublicRoute) {
+  const isPublicCalendar = isPublicCalendarRoute(pathnameWithoutLocale)
+  const isPublicOrCalendar = isPublicOrCalendarRoute(pathnameWithoutLocale)
+  
+  if (!isPublicRoute && !isPublicCalendar) {
     const token = await getToken({
       req: request,
       secret: process.env.NEXTAUTH_SECRET,
@@ -40,6 +53,15 @@ export async function proxy(request: NextRequest) {
       loginUrl.searchParams.set('callbackUrl', pathname)
       return NextResponse.redirect(loginUrl)
     }
+
+    const userRole = token.role as string
+    const hasOrganization = !!token.organizationId
+    const needsOnboarding = hasOrganization === false && userRole !== 'SUPER_ADMIN'
+
+    if (needsOnboarding && !isPublicOrCalendar && !pathnameWithoutLocale.startsWith('/onboarding')) {
+      const locale = pathname.split('/')[1] || defaultLocale
+      return NextResponse.redirect(new URL(`/${locale}/onboarding`, request.url))
+    }
   }
 
   if (isAuthRoute) {
@@ -50,7 +72,7 @@ export async function proxy(request: NextRequest) {
 
     if (token) {
       const locale = pathname.split('/')[1] || defaultLocale
-      return NextResponse.redirect(new URL(`/${locale}`, request.url))
+      return NextResponse.redirect(new URL(`/${locale}/dashboard`, request.url))
     }
   }
 
