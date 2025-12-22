@@ -34,7 +34,16 @@
 **Completado (adicional):**
 - ✅ Página de onboarding implementada (`/onboarding`)
 - ✅ Middleware mejorado con redirección a onboarding
-- ✅ Checklist de testing creado (`TESTING_CHECKLIST.md`)
+- ✅ **Migración a Feature-Sliced Design (FSD) completada**
+  - Estructura `src/` implementada según FSD
+  - Server Actions movidas a `src/features/*/api/`
+  - Validaciones consolidadas en `src/features/*/lib/schemas.ts`
+  - Helpers refactorizados y organizados
+  - Public APIs (index.ts) implementadas
+- ✅ **Refactorización de código:**
+  - Lógica de validación extraída a helpers reutilizables
+  - `auth-actions.ts` reducido de 230 a 173 líneas (~25% menos)
+  - Código más modular y mantenible
 
 **En progreso:**
 - 🔄 Google OAuth (configurado, funcionando en desarrollo - verificar en testing)
@@ -1481,6 +1490,207 @@ PENDING_STAFF → (STAFF B acepta) → PENDING_CHIEF → (CHIEF aprueba) → APP
 @@index([areaId, date])                 // Turnos de un área
 @@index([linkingCode])                  // Búsqueda rápida de usuarios
 ```
+
+---
+
+## 📁 ARQUITECTURA DE CARPETAS (Feature-Sliced Design)
+
+**Estado:** ✅ Migración completada (Diciembre 2025)
+
+### Decisión Arquitectónica: Feature-Sliced Design (FSD)
+
+**Análisis realizado:** Se evaluaron 3 opciones:
+1. **Atomic Design** (parcialmente implementado) - No escala bien para SaaS complejo
+2. **Feature-Sliced Design** - ✅ Seleccionado por escalabilidad y orientación a negocio
+3. **Feature-Based Híbrido** - Más simple pero menos escalable
+
+**Razones para FSD:**
+- VITA es un SaaS complejo que crecerá significativamente
+- Organiza por features y entities (negocio), no solo por tamaño de componente
+- Estándar reconocido (858+ stars en GitHub, usado por empresas grandes)
+- Separa claramente UI, lógica y API
+- Public API (index.ts) para encapsulación
+
+### Estructura Actual
+
+```
+vita/
+├── app/                          # Next.js routing (no tocar)
+│   ├── [locale]/                # Rutas localizadas
+│   │   ├── (global)/            # Páginas públicas
+│   │   └── dashboard/           # Dashboards protegidos
+│   └── api/                     # API routes (webhooks, etc.)
+│
+├── src/                         # FSD structure
+│   ├── app/                     # Capa de aplicación
+│   │   └── providers/           # Providers (Theme, Session)
+│   │
+│   ├── shared/                  # Capa compartida (sin lógica de negocio)
+│   │   ├── ui/                  # Componentes UI base
+│   │   │   ├── atoms/           # Componentes atómicos
+│   │   │   │   ├── logo.tsx
+│   │   │   │   ├── theme-toggle.tsx
+│   │   │   │   └── language-selector.tsx
+│   │   │   ├── button.tsx       # shadcn/ui components
+│   │   │   ├── card.tsx
+│   │   │   └── ...
+│   │   └── lib/                 # Utilidades compartidas
+│   │       ├── auth/            # Auth helpers (prisma, rbac, session)
+│   │       ├── functions/       # Funciones (rut.ts)
+│   │       ├── providers/       # App providers
+│   │       └── utils/           # Utils (cn.ts)
+│   │
+│   ├── entities/                # Capa de entidades (preparada para futuro)
+│   │   └── (vacío - se creará cuando sea necesario)
+│   │
+│   ├── features/                # Capa de features (user scenarios)
+│   │   ├── auth/
+│   │   │   ├── api/             # Server Actions
+│   │   │   │   ├── auth-actions.ts
+│   │   │   │   └── index.ts
+│   │   │   ├── lib/             # Lógica de negocio
+│   │   │   │   ├── schemas.ts           # Validaciones Zod
+│   │   │   │   ├── validation-helpers.ts
+│   │   │   │   ├── user-helpers.ts
+│   │   │   │   └── index.ts
+│   │   │   └── ui/              # Componentes UI
+│   │   │       ├── login-form.tsx
+│   │   │       ├── register-form.tsx
+│   │   │       └── index.ts
+│   │   └── onboarding/
+│   │       └── ui/
+│   │           └── onboarding-content.tsx
+│   │
+│   └── widgets/                 # Capa de widgets (UI blocks complejos)
+│       ├── dashboard-sidebar/
+│       ├── main-navbar/
+│       ├── footer/
+│       ├── hero-section/
+│       └── calendar-view/
+│
+├── types/                       # Tipos globales compartidos
+│   ├── currentUser.ts
+│   └── next-auth.d.ts
+│
+├── i18n/                        # Configuración i18n
+│   ├── routing.ts
+│   ├── request.ts
+│   └── navigation.ts
+│
+└── actions/                     # DEPRECATED (migrado a src/features/*/api/)
+```
+
+### Reglas de Importación (FSD)
+
+**Principio:** Las capas inferiores NO pueden importar de capas superiores.
+
+```
+✅ shared → solo shared
+✅ entities → shared
+✅ features → shared + entities
+✅ widgets → shared + entities + features
+✅ app → todas las capas
+```
+
+**Ejemplo correcto:**
+```typescript
+// src/features/auth/ui/login-form.tsx
+import { Button } from '@/shared/ui'              // ✅ OK
+import { registerAction } from '@/features/auth/lib' // ✅ OK (mismo feature)
+```
+
+**Ejemplo incorrecto:**
+```typescript
+// src/shared/ui/button.tsx
+import { LoginForm } from '@/features/auth/ui'    // ❌ ERROR: shared no puede importar features
+```
+
+### Public APIs (index.ts)
+
+Cada capa y segmento tiene su `index.ts` que actúa como Public API:
+
+- `src/shared/ui/index.ts` - Exporta todos los componentes UI
+- `src/shared/lib/index.ts` - Exporta utilidades
+- `src/features/auth/lib/index.ts` - Exporta schemas, helpers y actions
+- `src/widgets/index.ts` - Exporta todos los widgets
+- `src/features/index.ts` - Exporta todos los features
+
+**Beneficios:**
+- Encapsulación: detalles internos no se exponen
+- Refactorización fácil: cambiar estructura interna sin romper imports
+- Imports más limpios: `from '@/features/auth/lib'` en lugar de rutas largas
+
+### Server Actions en FSD
+
+**Ubicación:** `src/features/{feature}/api/`
+
+**Ejemplo:**
+```typescript
+// src/features/auth/api/auth-actions.ts
+'use server'
+
+export async function registerAction(formData: FormData) {
+  // Lógica de registro
+}
+
+// src/features/auth/lib/index.ts
+export * from '../api'  // Re-exporta actions
+```
+
+**Uso:**
+```typescript
+// Desde cualquier lugar
+import { registerAction } from '@/features/auth/lib'
+```
+
+### Migración Completada
+
+**Cambios realizados:**
+- ✅ `components/ui/` → `src/shared/ui/`
+- ✅ `components/atoms/` → `src/shared/ui/atoms/`
+- ✅ `components/molecules/` → `src/features/*/ui/` o `src/widgets/`
+- ✅ `components/templates/` → `src/widgets/`
+- ✅ `lib/utils/` → `src/shared/lib/utils/`
+- ✅ `lib/providers/` → `src/app/providers/`
+- ✅ `actions/auth/` → `src/features/auth/api/`
+- ✅ `validations/` → `src/features/*/lib/schemas.ts`
+
+**Archivos eliminados:**
+- ✅ `ARCHITECTURE_ANALYSIS.md` (consolidado aquí)
+- ✅ `MIGRATION_FSD.md` (consolidado aquí)
+- ✅ `TESTING_CHECKLIST.md` (consolidado en sección de testing)
+
+### ⚠️ IMPORTANTE: Arquitectura Obligatoria
+
+**Esta arquitectura Feature-Sliced Design (FSD) es OBLIGATORIA para todo el desarrollo futuro de VITA.**
+
+**Reglas estrictas:**
+- ✅ **SIEMPRE** seguir la estructura FSD para código nuevo
+- ✅ **SIEMPRE** respetar las reglas de importación (capas inferiores no importan de superiores)
+- ✅ **SIEMPRE** usar Public APIs (index.ts) para exports
+- ✅ **SIEMPRE** ubicar Server Actions en `src/features/{feature}/api/`
+- ✅ **SIEMPRE** ubicar validaciones en `src/features/{feature}/lib/schemas.ts`
+- ✅ **SIEMPRE** ubicar helpers en `src/features/{feature}/lib/`
+- ❌ **NUNCA** crear código fuera de la estructura FSD
+- ❌ **NUNCA** importar directamente archivos internos (usar index.ts)
+- ❌ **NUNCA** mezclar lógica de diferentes features en un mismo archivo
+
+**Si tienes dudas sobre dónde ubicar código nuevo, consulta esta sección antes de crear archivos.**
+
+### Próximos Pasos
+
+1. **Crear entidades** cuando sea necesario:
+   - `src/entities/organization/` (cuando se implemente gestión de organizaciones)
+   - `src/entities/shift/` (cuando se implemente sistema de turnos)
+   - `src/entities/staff/` (cuando se implemente gestión de personal)
+
+2. **Mantener disciplina FSD:**
+   - No importar de capas superiores
+   - Usar Public APIs (index.ts)
+   - Agrupar código relacionado por feature
+
+3. **Eliminar carpetas antiguas** (cuando todos los imports estén actualizados):
+   - `actions/` (raíz) - ya migrado a `src/features/*/api/`
 
 ---
 

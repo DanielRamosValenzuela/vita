@@ -1,4 +1,4 @@
-import { requireSuperAdmin } from '@/lib/auth/session'
+import { requireSuperAdmin } from '@/src/shared/lib/auth/session'
 
 interface OrganizationsPageProps {
   params: Promise<{ locale: string }>

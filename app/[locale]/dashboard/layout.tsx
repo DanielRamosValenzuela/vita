@@ -1,6 +1,5 @@
-import { getCurrentUser } from '@/lib/auth/session'
-import { redirect } from '@/i18n/navigation'
-import { DashboardSidebar } from '@/components/molecules/dashboard-sidebar'
+import { getCurrentUser } from '@/src/shared/lib/auth'
+import { DashboardSidebar } from '@/src/widgets/dashboard-sidebar'
 
 interface DashboardLayoutProps {
   children: React.ReactNode

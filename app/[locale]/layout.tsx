@@ -3,8 +3,8 @@ import { getMessages } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { routing } from '@/i18n/routing'
-import { AppProviders } from '@/lib/providers/app-providers'
 import '../globals.css'
+import { AppProviders } from '@/src/shared/lib/providers'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',

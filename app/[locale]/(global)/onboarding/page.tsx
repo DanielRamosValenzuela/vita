@@ -1,6 +1,6 @@
 import { redirect } from '@/i18n/navigation'
-import { getCurrentUser } from '@/lib/auth/session'
-import { OnboardingContent } from '@/components/molecules/onboarding-content'
+import { getCurrentUser } from '@/src/shared/lib/auth'
+import { OnboardingContent } from '@/src/features/onboarding/ui'
 
 interface OnboardingPageProps {
   params: Promise<{ locale: string }>

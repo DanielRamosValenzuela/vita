@@ -1,7 +1,7 @@
 import { getServerSession } from 'next-auth/next'
 import { redirect } from 'next/navigation'
-import { authOptions } from '@/lib/auth/config'
-import { LoginForm } from '@/components/molecules'
+import { authOptions } from '@/src/shared/lib/auth'
+import { LoginForm } from '@/src/features/auth/ui'
 
 export default async function LoginPage({
   params,

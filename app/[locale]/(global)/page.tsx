@@ -1,4 +1,4 @@
-import { HeroSection } from '@/components/templates'
+import { HeroSection } from '@/src/widgets/hero-section'
 
 interface HomePageProps {
   params: Promise<{ locale: string }>

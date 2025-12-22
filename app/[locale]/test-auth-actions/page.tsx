@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { registerAction, loginAction } from '@/actions/auth'
+import { registerAction, loginAction } from '@/features/auth/api'
 
 export default function TestAuthActionsPage() {
   const router = useRouter()
