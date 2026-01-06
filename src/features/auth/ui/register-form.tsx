@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { registerAction } from '@/features/auth/api'
-import { validateRUT } from '@/shared/lib/functions/rut'
+import { registerAction } from '../api'
+import { validateRUT } from '@/src/shared/lib/functions/rut'
 
 export function RegisterForm() {
   const router = useRouter()

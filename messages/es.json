@@ -75,45 +75,32 @@
     "description": "Sistema de gestión de turnos y asistencia para instituciones de salud"
   },
   "onboarding": {
-    "title": "Bienvenido a VITA",
-    "subtitle": "Completa tu configuración para comenzar",
+    "title": "¡Bienvenido a VITA!",
+    "subtitle": "Para comenzar a usar VITA, necesitas estar vinculado a una organización",
+    "skip": "Omitir y explorar",
     "superAdmin": {
-      "title": "Crear Organización",
-      "description": "Como administrador del sistema, puedes crear una nueva organización.",
-      "createButton": "Crear Organización"
+      "title": "¡Bienvenido, Administrador!",
+      "description": "Como Super Administrador, puedes crear y gestionar organizaciones. Comienza creando tu primera organización.",
+      "createButton": "Crear mi primera organización"
     },
     "otherRoles": {
-      "title": "Unirse a una Organización",
-      "description": "Necesitas estar vinculado a una organización para usar VITA.",
+      "title": "Únete a una organización",
+      "description": "Tienes dos opciones para continuar:",
       "options": {
         "wait": {
-          "title": "Esperar Invitación",
-          "description": "Un administrador de tu organización te invitará pronto.",
-          "button": "Entendido"
+          "title": "Esperar invitación",
+          "description": "Tu jefe debe agregarte a la organización. Una vez que lo haga, recibirás una invitación.",
+          "button": "Explorar calendario público"
         },
         "code": {
-          "title": "Usar Código de Vinculación",
-          "description": "Si tienes un código de vinculación, úsalo aquí.",
-          "placeholder": "Ingresa tu código",
-          "button": "Vincular",
-          "error": "Código inválido"
+          "title": "Tengo un código de vinculación",
+          "description": "Si tu jefe te proporcionó un código de vinculación, puedes ingresarlo aquí para unirte inmediatamente.",
+          "placeholder": "Código de vinculación",
+          "button": "Vincular con código",
+          "error": "Por favor, ingresa un código de vinculación válido"
         }
       }
-    },
-    "skip": "Omitir por ahora"
-  },
-  "dashboard": {
-    "calendar": "Calendario",
-    "organizations": "Organizaciones",
-    "payments": "Pagos",
-    "analytics": "Analíticas",
-    "areas": "Áreas",
-    "shiftTypes": "Tipos de Turno",
-    "rates": "Tarifas",
-    "staff": "Personal",
-    "shifts": "Turnos",
-    "profile": "Mi Perfil",
-    "settings": "Configuración"
+    }
   }
 }
 

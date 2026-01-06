@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { loginAction } from '@/features/auth/api'
+import { loginAction } from '../api'
 
 export function LoginForm() {
   const router = useRouter()

@@ -1,5 +1,5 @@
 import { redirect } from '@/i18n/navigation'
-import { getCurrentUser } from '@/src/shared/lib/auth'
+import { getCurrentUser } from '@/src/shared/lib/auth/session'
 import { OnboardingContent } from '@/src/features/onboarding/ui'
 
 interface OnboardingPageProps {

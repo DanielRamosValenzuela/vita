@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { Logo } from '@/shared/ui/atoms'
+import { Logo } from '@/src/shared/ui/atoms'
 
 export function Footer() {
   const params = useParams()

@@ -7,8 +7,8 @@ import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
-import { Button } from '@/shared/ui/button'
-import { Sheet, SheetContent, SheetTrigger } from '@/shared/ui/sheet'
+import { Button } from '@/src/shared/ui/button'
+import { Sheet, SheetContent, SheetTrigger } from '@/src/shared/ui/sheet'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,8 +16,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/shared/ui/dropdown-menu'
-import { Logo, ThemeToggle, LanguageSelector } from '@/shared/ui/atoms'
+} from '@/src/shared/ui/dropdown-menu'
+import { Logo, ThemeToggle, LanguageSelector } from '@/src/shared/ui/atoms'
 
 export function MainNavbar() {
   const { data: session, status } = useSession()

@@ -3,13 +3,13 @@
 import { Globe } from 'lucide-react'
 import { useParams } from 'next/navigation'
 import { usePathname, useRouter } from '@/i18n/navigation'
-import { Button } from '@/shared/ui/button'
+import { Button } from '@/src/shared/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/shared/ui/dropdown-menu'
+} from '@/src/shared/ui/dropdown-menu'
 import { routing } from '@/i18n/routing'
 
 const locales = routing.locales

@@ -1,15 +1,15 @@
 'use server'
 
-import { registerSchema, loginSchema } from '@/features/auth/lib'
+import { registerSchema, loginSchema } from '../lib/schemas'
 import { Country, DocType } from '@prisma/client'
+import { formatZodErrors } from '../lib/validation-helpers'
 import {
-  formatZodErrors,
   checkEmailExists,
   checkDocExists,
   createUserWithAccount,
   findUserWithCredentials,
   verifyPassword,
-} from '@/features/auth/lib'
+} from '../lib/user-helpers'
 
 export interface ActionResult<T = unknown> {
   success: boolean
@@ -80,7 +80,9 @@ export async function registerAction(
   }
 }
 
-export async function loginAction(formData: FormData): Promise<ActionResult> {
+export async function loginAction(
+  formData: FormData
+): Promise<ActionResult<{ email: string }>> {
   try {
     const rawData = {
       email: formData.get('email') as string,
@@ -98,10 +100,9 @@ export async function loginAction(formData: FormData): Promise<ActionResult> {
     }
 
     const data = validationResult.data
-
     const user = await findUserWithCredentials(data.email)
 
-    if (!user) {
+    if (!user || !user.accounts || user.accounts.length === 0) {
       return {
         success: false,
         error: 'Credenciales inválidas',
@@ -111,31 +112,25 @@ export async function loginAction(formData: FormData): Promise<ActionResult> {
       }
     }
 
-    const credentialsAccount = user.accounts.find(
-      (acc) => acc.provider === 'credentials'
-    )
-
-    if (!credentialsAccount) {
+    const hashedPassword = user.accounts[0].access_token
+    if (!hashedPassword) {
       return {
         success: false,
-        error: 'Este usuario no tiene credenciales configuradas. Usa Google OAuth para iniciar sesión.',
+        error: 'Credenciales inválidas',
         fieldErrors: {
-          email: ['Usa Google OAuth para iniciar sesión'],
+          email: ['Email o contraseña incorrectos'],
         },
       }
     }
 
-    const isValidPassword = await verifyPassword(
-      data.password,
-      credentialsAccount.access_token || ''
-    )
+    const isValidPassword = await verifyPassword(data.password, hashedPassword)
 
     if (!isValidPassword) {
       return {
         success: false,
         error: 'Credenciales inválidas',
         fieldErrors: {
-          email: ['Email o contraseña incorrectos'],
+          password: ['Email o contraseña incorrectos'],
         },
       }
     }
@@ -144,7 +139,6 @@ export async function loginAction(formData: FormData): Promise<ActionResult> {
       success: true,
       data: {
         email: user.email,
-        name: user.name,
       },
     }
   } catch (error) {
@@ -165,7 +159,7 @@ export async function logoutAction(): Promise<ActionResult> {
     console.error('Error en logoutAction:', error)
     return {
       success: false,
-      error: 'Error al cerrar sesión',
+      error: 'Error al cerrar sesión. Por favor, intenta nuevamente.',
     }
   }
 }

@@ -57,7 +57,7 @@ export async function createUserWithAccount(data: RegisterInput) {
 }
 
 export async function findUserWithCredentials(email: string) {
-  return await prisma.user.findUnique({
+  const user = await prisma.user.findUnique({
     where: { email },
     include: {
       accounts: {
@@ -67,6 +67,8 @@ export async function findUserWithCredentials(email: string) {
       },
     },
   })
+  
+  return user
 }
 
 export async function verifyPassword(

@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { validateRUT } from '@/shared/lib/functions/rut'
+import { validateRUT } from '@/src/shared/lib/functions'
 import { Country, DocType } from '@prisma/client'
 
 const rutSchema = z

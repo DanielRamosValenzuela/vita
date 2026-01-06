@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { Button } from '@/shared/ui/button'
+import { Button } from '@/src/shared/ui/button'
 
 interface HeroSectionProps {
   locale?: string

@@ -3,9 +3,12 @@
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Building2, Key, Clock } from 'lucide-react'
-import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Input, Label } from '@/shared/ui'
+import { Button } from '@/src/shared/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
+import { Input } from '@/src/shared/ui/input'
+import { Label } from '@/src/shared/ui/label'
 import { Role } from '@prisma/client'
-import type { CurrentUser } from '@/types'
+import type { CurrentUser } from '@/types/currentUser'
 import { useRouter } from '@/i18n/navigation'
 
 interface OnboardingContentProps {

@@ -16,7 +16,7 @@ import {
 } from 'lucide-react'
 import { Role } from '@prisma/client'
 import type { CurrentUser } from '@/types'
-import { cn } from '@/shared/lib/utils'
+import { cn } from '@/src/shared/lib/utils/cn'
 
 interface DashboardSidebarProps {
   user: CurrentUser
