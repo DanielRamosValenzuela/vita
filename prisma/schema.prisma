@@ -8,19 +8,25 @@ datasource db {
 }
 
 model Organization {
-  id         String   @id @default(cuid())
-  name       String
-  country    Country  @default(CL)
-  taxId      String   @unique
-  maxAdminHR Int      @default(5)
-  maxChiefs  Int      @default(0)
-  maxStaff   Int      @default(0)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  users      User[]
+  id          String             @id @default(cuid())
+  name        String
+  country     Country            @default(CL)
+  taxId       String             @unique
+  plan        OrganizationPlan   @default(BASIC)
+  status      OrganizationStatus @default(ACTIVE)
+  monthlyFee  Float              @default(0)
+  maxAdminHR  Int                @default(5)
+  maxChiefs   Int                @default(0)
+  maxStaff    Int                @default(0)
+  nextPayment DateTime?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  users       User[]
 
   @@index([taxId])
   @@index([country])
+  @@index([status])
+  @@index([nextPayment])
 }
 
 model User {
@@ -112,4 +118,17 @@ enum DocType {
   CURP
   RFC
   PASSPORT
+}
+
+enum OrganizationPlan {
+  BASIC
+  PRO
+  ENTERPRISE
+}
+
+enum OrganizationStatus {
+  ACTIVE
+  PENDING_PAYMENT
+  SUSPENDED
+  INACTIVE
 }

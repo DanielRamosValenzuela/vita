@@ -34,7 +34,9 @@ export async function requireAuth(locale: string = 'es'): Promise<CurrentUser> {
 export async function requireSuperAdmin(locale: string = 'es'): Promise<CurrentUser> {
   const user = await requireAuth(locale)
 
-  if (user.role !== Role.SUPER_ADMIN) redirect(`/${locale}`)
+  if (user.role !== Role.SUPER_ADMIN) {
+    redirect(`/${locale}/dashboard`)
+  }
 
   return user
 }

@@ -17,6 +17,10 @@ const publicRoutes = [
   '/onboarding',
   '/',
 ]
+
+const protectedAdminRoutes = [
+  '/super-admin',
+]
 const authRoutes = ['/login', '/register']
 
 const isPublicCalendarRoute = (path: string): boolean => {

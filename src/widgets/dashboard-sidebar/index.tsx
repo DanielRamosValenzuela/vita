@@ -107,10 +107,10 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
 
   return (
     <aside className="bg-muted/40 flex h-screen w-64 flex-col border-r">
-      <div className="border-b p-4">
+      <Link href="/" className="border-b p-4 transition-opacity hover:opacity-80">
         <h2 className="text-lg font-semibold">VITA</h2>
         <p className="text-muted-foreground text-xs">{user.role.replace('_', ' ')}</p>
-      </div>
+      </Link>
       <nav className="flex-1 space-y-1 p-4">
         {filteredNavItems.map((item) => {
           const Icon = item.icon

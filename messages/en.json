@@ -7,7 +7,8 @@
     "create": "Create",
     "loading": "Loading...",
     "error": "Error",
-    "success": "Success"
+    "success": "Success",
+    "logout": "Sign Out"
   },
   "nav": {
     "login": "Sign In",
@@ -73,6 +74,94 @@
   "meta": {
     "title": "VITA - Medical Shift Management",
     "description": "Shift and attendance management system for healthcare institutions"
+  },
+  "onboarding": {
+    "title": "Welcome to VITA!",
+    "subtitle": "To start using VITA, you need to be linked to an organization",
+    "skip": "Skip and explore",
+    "superAdmin": {
+      "title": "Welcome, Administrator!",
+      "description": "As Super Administrator, you can create and manage organizations. Start by creating your first organization.",
+      "createButton": "Create my first organization"
+    },
+    "otherRoles": {
+      "title": "Join an organization",
+      "description": "You have two options to continue:",
+      "options": {
+        "wait": {
+          "title": "Wait for invitation",
+          "description": "Your manager must add you to the organization. Once they do, you will receive an invitation.",
+          "button": "Explore public calendar"
+        },
+        "code": {
+          "title": "I have a linking code",
+          "description": "If your manager provided you with a linking code, you can enter it here to join immediately.",
+          "placeholder": "Linking code",
+          "button": "Link with code",
+          "error": "Please enter a valid linking code"
+        }
+      }
+    }
+  },
+  "dashboard": {
+    "calendar": "Calendar",
+    "organizations": "Organizations",
+    "payments": "Payments",
+    "analytics": "Analytics",
+    "areas": "Areas",
+    "shiftTypes": "Shift Types",
+    "rates": "Rates",
+    "staff": "Staff",
+    "shifts": "Shifts",
+    "profile": "Profile"
+  },
+  "superAdmin": {
+    "title": "SUPER ADMIN Dashboard",
+    "sidebar": {
+      "title": "VITA",
+      "role": "Super Administrator",
+      "dashboard": "Dashboard",
+      "organizations": "Organizations",
+      "payments": "Payments",
+      "analytics": "Analytics",
+      "settings": "Settings"
+    },
+    "stats": {
+      "totalOrgs": "Total Organizations",
+      "activeOrgs": "Active",
+      "suspendedOrgs": "Suspended",
+      "monthlyRevenue": "Monthly Revenue",
+      "totalUsers": "Total Users",
+      "upcomingPayments": "Upcoming Payments",
+      "thisMonth": "this month",
+      "inDays": "in {days} days"
+    },
+    "organizations": {
+      "title": "Recent Organizations",
+      "viewAll": "View All",
+      "new": "New Organization",
+      "name": "Organization",
+      "status": "Status",
+      "plan": "Plan",
+      "accounts": "Accounts",
+      "actions": "Actions",
+      "view": "View",
+      "registerPayment": "Register Payment",
+      "reactivate": "Reactivate",
+      "status_active": "Active",
+      "status_pending": "Payment Due",
+      "status_suspended": "Suspended",
+      "status_inactive": "Inactive",
+      "plan_basic": "BASIC",
+      "plan_pro": "PRO",
+      "plan_enterprise": "ENTERPRISE"
+    },
+    "alerts": {
+      "title": "Alerts and Notifications",
+      "upcomingPayments": "{count} organizations with payment due soon",
+      "suspended": "{count} organizations suspended for non-payment",
+      "paymentsToday": "{count} payments registered today ({amount})"
+    }
   }
 }
 

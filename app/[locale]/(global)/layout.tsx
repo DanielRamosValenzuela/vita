@@ -7,9 +7,9 @@ interface GlobalLayoutProps {
 
 export default function GlobalLayout({ children }: GlobalLayoutProps) {
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col bg-background text-foreground">
       <MainNavbar />
-      <main className="flex-1">{children}</main>
+      <main className="flex-1 bg-background">{children}</main>
       <Footer />
     </div>
   )

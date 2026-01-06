@@ -7,7 +7,8 @@
     "create": "Crear",
     "loading": "Cargando...",
     "error": "Error",
-    "success": "Éxito"
+    "success": "Éxito",
+    "logout": "Cerrar Sesión"
   },
   "nav": {
     "login": "Iniciar Sesión",
@@ -100,6 +101,66 @@
           "error": "Por favor, ingresa un código de vinculación válido"
         }
       }
+    }
+  },
+  "dashboard": {
+    "calendar": "Calendario",
+    "organizations": "Organizaciones",
+    "payments": "Pagos",
+    "analytics": "Analíticas",
+    "areas": "Áreas",
+    "shiftTypes": "Tipos de Turno",
+    "rates": "Tarifas",
+    "staff": "Personal",
+    "shifts": "Turnos",
+    "profile": "Perfil"
+  },
+  "superAdmin": {
+    "title": "Dashboard SUPER ADMIN",
+    "sidebar": {
+      "title": "VITA",
+      "role": "Super Administrador",
+      "dashboard": "Dashboard",
+      "organizations": "Organizaciones",
+      "payments": "Pagos",
+      "analytics": "Analytics",
+      "settings": "Configuración"
+    },
+    "stats": {
+      "totalOrgs": "Total Organizaciones",
+      "activeOrgs": "Activas",
+      "suspendedOrgs": "Suspendidas",
+      "monthlyRevenue": "Ingresos del Mes",
+      "totalUsers": "Usuarios Totales",
+      "upcomingPayments": "Próximos Pagos",
+      "thisMonth": "este mes",
+      "inDays": "en {days} días"
+    },
+    "organizations": {
+      "title": "Organizaciones Recientes",
+      "viewAll": "Ver Todas",
+      "new": "Nueva Organización",
+      "name": "Organización",
+      "status": "Estado",
+      "plan": "Plan",
+      "accounts": "Cuentas",
+      "actions": "Acciones",
+      "view": "Ver",
+      "registerPayment": "Registrar Pago",
+      "reactivate": "Reactivar",
+      "status_active": "Activa",
+      "status_pending": "Deuda",
+      "status_suspended": "Suspendida",
+      "status_inactive": "Inactiva",
+      "plan_basic": "BASIC",
+      "plan_pro": "PRO",
+      "plan_enterprise": "ENTERPRISE"
+    },
+    "alerts": {
+      "title": "Alertas y Notificaciones",
+      "upcomingPayments": "{count} organizaciones con pago próximo a vencer",
+      "suspended": "{count} organizaciones suspendidas por falta de pago",
+      "paymentsToday": "{count} pagos registrados hoy ({amount})"
     }
   }
 }
