@@ -2,21 +2,21 @@
 
 **Sistema de Gestión de Turnos Médicos Multi-Tenant SaaS B2B**
 
-**Última actualización:** 18 de diciembre de 2025
+**Última actualización:** 6 de enero de 2026
 
-**Versión:** 3.2.0
+**Versión:** 3.3.0
 
-**Estado:** FASE 2 en progreso - Setup Técnico 90% completado
+**Estado:** FASE 2 completada - Dashboard SUPER_ADMIN implementado
 
 **Competidor Principal:** Rflex (análisis competitivo en sección de Negocio)
 
 ---
 
-## 🎉 PROGRESO RECIENTE (Diciembre 2025)
+## 🎉 PROGRESO RECIENTE (Enero 2026)
 
-### ✅ FASE 2: Setup Técnico (90% completado)
+### ✅ FASE 2: Setup Técnico + Dashboard SUPER_ADMIN (100% completado)
 
-**Completado:**
+**Completado en Diciembre 2025:**
 - ✅ Prisma + Supabase configurado y funcionando
 - ✅ Schema de BD diseñado con multi-country support (docNumber, docType)
 - ✅ ESLint + Prettier configurado (no muy estricto)
@@ -27,17 +27,54 @@
 - ✅ Landing page con Hero Section, Navbar y Footer
 - ✅ Componentes organizados con Atomic Design (atoms, molecules, templates)
 - ✅ Tema "Healthcare Modern" implementado (colores médicos)
-- ✅ Estructura de rutas implementada: `(global)` para páginas públicas, rutas normales para dashboards (`admin/`, `hr/`, `chief/`, `staff/`)
-- ✅ **Limpieza de código:** Eliminados archivos redundantes (`lib/providers/theme-provider.tsx`, `i18n/request-config.ts`, `ROUTES_STRUCTURE.md`, SVGs no usados)
+- ✅ Estructura de rutas implementada: `(global)` para páginas públicas, rutas normales para dashboards
+- ✅ **Limpieza de código:** Eliminados archivos redundantes
 - ✅ **Configuración i18n optimizada:** Implementación según [next-intl docs](https://next-intl.dev/docs/routing/setup)
 
-**En progreso:**
-- 🔄 Google OAuth (configurado, funcionando en desarrollo)
-- ⏸️ Página de onboarding (pendiente)
-- ⏸️ Middleware de protección (pendiente)
+**✅ Completado en Enero 2026:**
+- ✅ **Migración a Feature-Sliced Design (FSD):**
+  - Arquitectura frontend moderna y escalable
+  - Estructura: `app/`, `shared/`, `entities/`, `features/`, `widgets/`
+  - Public APIs con `index.ts` en cada slice
+  - Server Actions en `features/*/api/`
+  - Componentes UI en `features/*/ui/` y `widgets/`
+  - Utilidades compartidas en `shared/lib/`
+  
+- ✅ **Dashboard SUPER_ADMIN completo:**
+  - 6 tarjetas de métricas (Total Orgs, Activas %, Suspendidas %, Ingresos, Usuarios, Próximos Pagos)
+  - Tabla de organizaciones recientes con estados y acciones
+  - Panel de alertas (pagos próximos, orgs suspendidas, pagos del día)
+  - Sidebar con navegación completa
+  - Protección de rutas con `requireSuperAdmin()`
+  - Theme toggle y language selector integrados
+  
+- ✅ **Sistema de Organizations mejorado:**
+  - Nuevos campos: `plan`, `status`, `monthlyFee`, `nextPayment`, `contactName`, `contactEmail`, `contactPhone`
+  - Enums: `OrganizationPlan` (BASIC, PRO, ENTERPRISE)
+  - Enums: `OrganizationStatus` (ACTIVE, PENDING_PAYMENT, SUSPENDED, INACTIVE)
+  - Migration aplicada exitosamente
+  
+- ✅ **Mejoras de UX:**
+  - Dark mode funcionando correctamente en todas las páginas (login, register, dashboards)
+  - Logo "VITA" clickeable en ambos sidebars (redirección a home)
+  - `cursor-pointer` aplicado globalmente a elementos interactivos
+  - Traducciones completas para todos los componentes
+  
+- ✅ **Correcciones técnicas:**
+  - Error de hidratación corregido (números formateados en servidor)
+  - Funciones helper para formateo consistente (`formatCurrency`, `formatPercentage`)
+  - Middleware actualizado para rutas de SUPER_ADMIN
+  - Páginas de onboarding implementadas (UX simplificada)
+  
+- ✅ **Documentación:**
+  - Todo consolidado en `vita.plan.md`
+  - Scripts SQL para configurar SUPER_ADMIN y crear organizaciones de prueba
+  - Documentación de arquitectura FSD
 
-**Pendiente:**
-- ⏸️ TODO 2.5: Probar app completa
+**Decisiones de Diseño:**
+- Mantener sidebars separados (SUPER_ADMIN vs Dashboard regular) por claridad y flexibilidad
+- Formateo de números en servidor para evitar problemas de hidratación
+- Arquitectura FSD adoptada como estándar del proyecto
 
 ---
 
@@ -7486,10 +7523,12 @@ session: {
 
 ### Arquitectura y Patrones
 
+- ✅ **Feature-Sliced Design (FSD)** - Arquitectura frontend moderna implementada
 - ✅ Server Components + Client Components + Server Actions
-- ✅ Atomic Design Pattern
+- ✅ Atomic Design Pattern (en `shared/ui/atoms`)
 - ✅ SOLID principles
 - ✅ Custom Hooks para lógica reutilizable
+- ✅ Public API pattern con `index.ts` en cada módulo
 - ✅ Zustand para UI state local
 
 ### Orden de Desarrollo
@@ -7648,16 +7687,103 @@ Ejecutar el script `scripts/create-test-organizations.sql` en Supabase SQL Edito
 #### 📝 Próximos Pasos del SUPER_ADMIN Dashboard
 
 1. ✅ **Dashboard Principal** - COMPLETADO
-2. ⏸️ **Unificar Sidebars** - Crear componente único que cambie contenido según rol
-3. ⏸️ **Logo Clickeable** - Hacer que "VITA" redirija a home
-4. ⏸️ **Página de Organizaciones** - Lista completa con CRUD
-5. ⏸️ **Formulario Crear Organización** - Con validaciones Zod
-6. ⏸️ **Ver Detalles de Organización** - Métricas individuales
-7. ⏸️ **Editar Organización** - Formulario pre-cargado
-8. ⏸️ **Suspender/Reactivar** - Con confirmación y razón
-9. ⏸️ **Página de Pagos** - Registro manual de pagos
-10. ⏸️ **Página de Analytics** - Gráficos con Recharts
-11. ⏸️ **Historial de Pagos** - Por organización
+2. ✅ **Logo Clickeable** - COMPLETADO
+3. ✅ **Corrección de Hydration Errors** - COMPLETADO
+4. ✅ **Dark Mode en todas las páginas** - COMPLETADO
+5. ⏸️ **Página de Organizaciones** - Lista completa con CRUD, filtros y búsqueda
+6. ⏸️ **Formulario Crear Organización** - Con validaciones Zod completas
+7. ⏸️ **Ver Detalles de Organización** - Métricas individuales, usuarios, historial
+8. ⏸️ **Editar Organización** - Formulario pre-cargado con validaciones
+9. ⏸️ **Suspender/Reactivar** - Con confirmación, razón y notificación por email
+10. ⏸️ **Página de Pagos** - Registro manual de pagos con comprobante
+11. ⏸️ **Página de Analytics** - Gráficos con Recharts (ingresos, crecimiento, churn)
+12. ⏸️ **Historial de Pagos** - Por organización con filtros
+13. ⏸️ **Sistema de Notificaciones** - Alertas de pagos próximos a vencer
+14. ⏸️ **Export a Excel/PDF** - De reportes de organizaciones y pagos
+
+---
+
+## 🚀 PRÓXIMOS PASOS INMEDIATOS (Enero 2026)
+
+### Prioridad 1: Completar SUPER_ADMIN Dashboard
+1. **Página de Organizaciones** (`/super-admin/organizations`)
+   - Tabla completa con todas las organizaciones
+   - Filtros por: estado, plan, país
+   - Búsqueda por nombre o taxId
+   - Paginación (20 por página)
+   - Botón "Nueva Organización"
+
+2. **Crear Organización** (`/super-admin/organizations/new`)
+   - Formulario completo con validaciones Zod
+   - Campos: nombre, taxId, país, plan, contacto
+   - Validación de RUT chileno
+   - Creación de cuenta admin automática
+   - Envío de email de bienvenida
+
+3. **Ver/Editar Organización** (`/super-admin/organizations/[id]`)
+   - Vista detallada con métricas
+   - Editar información básica
+   - Ver usuarios vinculados
+   - Historial de pagos
+   - Acciones: Suspender, Reactivar, Eliminar
+
+### Prioridad 2: Dashboard ADMIN_HR
+1. **Layout y Sidebar**
+   - Sidebar con navegación específica del rol
+   - Links: Dashboard, Áreas, Tipos de Turno, Personal, Tarifas
+   - Protección de rutas con `requireAdminHR()`
+
+2. **Dashboard Principal** (`/dashboard`)
+   - Vista general para ADMIN_HR
+   - Métricas: Total personal, Áreas, Turnos del mes
+   - Accesos rápidos a funciones principales
+
+3. **Gestión de Áreas** (`/dashboard/areas`)
+   - CRUD completo de áreas (Emergencias, UCI, Pediatría, etc.)
+   - Asignación de jefes de área
+   - Estado activo/inactivo
+
+### Prioridad 3: Sistema de Autenticación Mejorado
+1. **Página de Onboarding funcional**
+   - Validación de código de invitación
+   - Vinculación a organización
+   - Redirección según rol
+
+2. **Middleware robusto**
+   - Protección por roles
+   - Redirecciones inteligentes
+   - Manejo de usuarios sin organización
+
+3. **Gestión de perfiles**
+   - Página de perfil de usuario
+   - Cambio de contraseña
+   - Actualización de datos personales
+   - Ver organizaciones vinculadas
+
+### Prioridad 4: Testing y Calidad
+1. **Testing manual completo**
+   - Flujo de registro → onboarding → dashboard
+   - Cambio de idioma en todas las páginas
+   - Dark mode en todas las vistas
+   - Responsiveness mobile
+
+2. **Corrección de bugs**
+   - Revisar logs de Sentry
+   - Corregir warnings de consola
+   - Optimizar queries de Prisma
+
+3. **Documentación técnica**
+   - Guía de deployment
+   - Guía de contribución
+   - API documentation
+
+### Métricas de Éxito (Enero 2026)
+- [ ] SUPER_ADMIN puede crear y gestionar organizaciones
+- [ ] ADMIN_HR puede gestionar áreas y personal
+- [ ] Sistema de onboarding funcional al 100%
+- [ ] Dark mode sin bugs
+- [ ] Traducciones completas (ES/EN)
+- [ ] Zero errores en consola
 
 ---
 
