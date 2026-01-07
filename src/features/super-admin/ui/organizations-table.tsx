@@ -6,18 +6,10 @@ import { Button } from '@/src/shared/ui/button'
 import { Eye, CreditCard, Unlock } from 'lucide-react'
 import { OrganizationPlan, OrganizationStatus } from '@prisma/client'
 import Link from 'next/link'
-
-interface Organization {
-  id: string
-  name: string
-  status: OrganizationStatus
-  plan: OrganizationPlan
-  userCount: number
-  maxUsers: number
-}
+import type { OrganizationSummary } from '../lib/types'
 
 interface OrganizationsTableProps {
-  organizations: Organization[]
+  organizations: OrganizationSummary[]
 }
 
 export function OrganizationsTable({ organizations }: OrganizationsTableProps) {
@@ -80,14 +72,10 @@ export function OrganizationsTable({ organizations }: OrganizationsTableProps) {
           </div>
           <div className="flex gap-2">
             <Button asChild variant="outline">
-              <Link href="/super-admin/organizations/new">
-                {t('new')}
-              </Link>
+              <Link href="/super-admin/organizations/new">{t('new')}</Link>
             </Button>
             <Button asChild variant="ghost">
-              <Link href="/super-admin/organizations">
-                {t('viewAll')}
-              </Link>
+              <Link href="/super-admin/organizations">{t('viewAll')}</Link>
             </Button>
           </div>
         </div>
@@ -97,38 +85,36 @@ export function OrganizationsTable({ organizations }: OrganizationsTableProps) {
           <table className="w-full">
             <thead>
               <tr className="border-b">
-                <th className="pb-3 text-left text-sm font-medium text-muted-foreground">
+                <th className="text-muted-foreground pb-3 text-left text-sm font-medium">
                   {t('name')}
                 </th>
-                <th className="pb-3 text-left text-sm font-medium text-muted-foreground">
+                <th className="text-muted-foreground pb-3 text-left text-sm font-medium">
                   {t('status')}
                 </th>
-                <th className="pb-3 text-left text-sm font-medium text-muted-foreground">
+                <th className="text-muted-foreground pb-3 text-left text-sm font-medium">
                   {t('plan')}
                 </th>
-                <th className="pb-3 text-left text-sm font-medium text-muted-foreground">
+                <th className="text-muted-foreground pb-3 text-left text-sm font-medium">
                   {t('accounts')}
                 </th>
-                <th className="pb-3 text-right text-sm font-medium text-muted-foreground">
-                  {t('actions')}
+                <th className="text-muted-foreground pb-3 text-right text-sm font-medium">
+                  {t('table.actions')}
                 </th>
               </tr>
             </thead>
             <tbody>
               {organizations.map((org) => (
                 <tr key={org.id} className="border-b last:border-0">
-                  <td className="py-4 text-sm font-medium">
-                    {org.name}
-                  </td>
+                  <td className="py-4 text-sm font-medium">{org.name}</td>
                   <td className="py-4">
-                    <span className={`flex items-center gap-2 text-sm ${getStatusColor(org.status)}`}>
+                    <span
+                      className={`flex items-center gap-2 text-sm ${getStatusColor(org.status)}`}
+                    >
                       <span>{getStatusIcon(org.status)}</span>
                       {getStatusText(org.status)}
                     </span>
                   </td>
-                  <td className="py-4 text-sm">
-                    {getPlanText(org.plan)}
-                  </td>
+                  <td className="py-4 text-sm">{getPlanText(org.plan)}</td>
                   <td className="py-4 text-sm">
                     {org.userCount}/{org.maxUsers}
                   </td>
@@ -171,4 +157,3 @@ export function OrganizationsTable({ organizations }: OrganizationsTableProps) {
     </Card>
   )
 }
-

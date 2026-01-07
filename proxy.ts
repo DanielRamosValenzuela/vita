@@ -18,9 +18,6 @@ const publicRoutes = [
   '/',
 ]
 
-const protectedAdminRoutes = [
-  '/super-admin',
-]
 const authRoutes = ['/login', '/register']
 
 const isPublicCalendarRoute = (path: string): boolean => {
@@ -35,16 +32,12 @@ export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
   const pathnameWithoutLocale = pathname.replace(/^\/(es|en)/, '') || '/'
 
-  const isPublicRoute = publicRoutes.some((route) =>
-    pathnameWithoutLocale.startsWith(route)
-  )
-  const isAuthRoute = authRoutes.some((route) =>
-    pathnameWithoutLocale.startsWith(route)
-  )
+  const isPublicRoute = publicRoutes.some((route) => pathnameWithoutLocale.startsWith(route))
+  const isAuthRoute = authRoutes.some((route) => pathnameWithoutLocale.startsWith(route))
 
   const isPublicCalendar = isPublicCalendarRoute(pathnameWithoutLocale)
   const isPublicOrCalendar = isPublicOrCalendarRoute(pathnameWithoutLocale)
-  
+
   if (!isPublicRoute && !isPublicCalendar) {
     const token = await getToken({
       req: request,
@@ -62,7 +55,11 @@ export async function proxy(request: NextRequest) {
     const hasOrganization = !!token.organizationId
     const needsOnboarding = hasOrganization === false && userRole !== 'SUPER_ADMIN'
 
-    if (needsOnboarding && !isPublicOrCalendar && !pathnameWithoutLocale.startsWith('/onboarding')) {
+    if (
+      needsOnboarding &&
+      !isPublicOrCalendar &&
+      !pathnameWithoutLocale.startsWith('/onboarding')
+    ) {
       const locale = pathname.split('/')[1] || defaultLocale
       return NextResponse.redirect(new URL(`/${locale}/onboarding`, request.url))
     }
@@ -86,4 +83,3 @@ export async function proxy(request: NextRequest) {
 export const config = {
   matcher: ['/((?!api|_next|.*\\..*).*)'],
 }
-

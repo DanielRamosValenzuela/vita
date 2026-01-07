@@ -67,14 +67,10 @@ export async function findUserWithCredentials(email: string) {
       },
     },
   })
-  
+
   return user
 }
 
-export async function verifyPassword(
-  password: string,
-  hashedPassword: string
-): Promise<boolean> {
+export async function verifyPassword(password: string, hashedPassword: string): Promise<boolean> {
   return await bcrypt.compare(password, hashedPassword)
 }
-

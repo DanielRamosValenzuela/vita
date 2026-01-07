@@ -11,4 +11,3 @@ export interface CurrentUser {
   docType?: string
   docNumber?: string
 }
-

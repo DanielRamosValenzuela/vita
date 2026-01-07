@@ -1,5 +1,4 @@
 import { Role, Country, DocType } from '@prisma/client'
-import NextAuth from 'next-auth'
 
 declare module 'next-auth' {
   interface Session {
@@ -38,4 +37,3 @@ declare module 'next-auth/jwt' {
     docNumber?: string
   }
 }
-

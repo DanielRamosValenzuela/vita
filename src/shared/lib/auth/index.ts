@@ -1,10 +1,5 @@
 export { authOptions, prisma } from './config'
-export {
-  getCurrentUser,
-  requireAuth,
-  requireSuperAdmin,
-  getUserWithOrganization,
-} from './session'
+export { getCurrentUser, requireAuth, requireSuperAdmin, getUserWithOrganization } from './session'
 export {
   hasRole,
   isSuperAdmin,
@@ -18,4 +13,3 @@ export {
   canManageRates,
 } from './rbac'
 export type { CurrentUser } from './types'
-

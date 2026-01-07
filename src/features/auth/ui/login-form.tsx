@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { Link } from '@/i18n/navigation'
 import { loginAction } from '../api'
 
 export function LoginForm() {
@@ -45,9 +46,7 @@ export function LoginForm() {
         setErrors(validationResult.fieldErrors || {})
       }
     } catch (error) {
-      setGeneralError(
-        error instanceof Error ? error.message : 'Error inesperado'
-      )
+      setGeneralError(error instanceof Error ? error.message : 'Error inesperado')
     } finally {
       setLoading(false)
     }
@@ -56,9 +55,7 @@ export function LoginForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {generalError && (
-        <div className="rounded-md bg-red-50 p-4 text-sm text-red-800">
-          {generalError}
-        </div>
+        <div className="rounded-md bg-red-50 p-4 text-sm text-red-800">{generalError}</div>
       )}
 
       <div>
@@ -70,12 +67,10 @@ export function LoginForm() {
           id="email"
           name="email"
           required
-          className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
           placeholder="tu@email.com"
         />
-        {errors.email && (
-          <p className="mt-1 text-sm text-red-600">{errors.email[0]}</p>
-        )}
+        {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email[0]}</p>}
       </div>
 
       <div>
@@ -87,11 +82,9 @@ export function LoginForm() {
           id="password"
           name="password"
           required
-          className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
         />
-        {errors.password && (
-          <p className="mt-1 text-sm text-red-600">{errors.password[0]}</p>
-        )}
+        {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password[0]}</p>}
       </div>
 
       <div className="flex items-center justify-between">
@@ -107,16 +100,16 @@ export function LoginForm() {
           </label>
         </div>
         <div className="text-sm">
-          <a href="/es/forgot-password" className="text-blue-600 hover:text-blue-500">
+          <Link href="/forgot-password" className="text-blue-600 hover:text-blue-500">
             ¿Olvidaste tu contraseña?
-          </a>
+          </Link>
         </div>
       </div>
 
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
+        className="w-full rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-400"
       >
         {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
       </button>
@@ -133,7 +126,7 @@ export function LoginForm() {
       <button
         type="button"
         onClick={() => signIn('google', { callbackUrl })}
-        className="w-full cursor-pointer rounded-md border border-gray-300 bg-white px-4 py-2 text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        className="w-full cursor-pointer rounded-md border border-gray-300 bg-white px-4 py-2 text-gray-700 hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
       >
         <span className="flex items-center justify-center">
           <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24">
@@ -160,5 +153,3 @@ export function LoginForm() {
     </form>
   )
 }
-
-

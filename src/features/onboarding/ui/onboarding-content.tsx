@@ -13,10 +13,9 @@ import { useRouter } from '@/i18n/navigation'
 
 interface OnboardingContentProps {
   user: CurrentUser
-  locale: string
 }
 
-export function OnboardingContent({ user, locale }: OnboardingContentProps) {
+export function OnboardingContent({ user }: OnboardingContentProps) {
   const t = useTranslations('onboarding')
   const router = useRouter()
   const [linkingCode, setLinkingCode] = useState('')
@@ -55,13 +54,11 @@ export function OnboardingContent({ user, locale }: OnboardingContentProps) {
     return (
       <Card>
         <CardHeader className="text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-            <Building2 className="h-8 w-8 text-primary" />
+          <div className="bg-primary/10 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
+            <Building2 className="text-primary h-8 w-8" />
           </div>
           <CardTitle className="text-2xl">{t('superAdmin.title')}</CardTitle>
-          <CardDescription className="text-base">
-            {t('superAdmin.description')}
-          </CardDescription>
+          <CardDescription className="text-base">{t('superAdmin.description')}</CardDescription>
         </CardHeader>
         <CardContent>
           <Button onClick={handleCreateOrganization} className="w-full" size="lg">
@@ -80,12 +77,12 @@ export function OnboardingContent({ user, locale }: OnboardingContentProps) {
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-4">
-          <div className="rounded-lg border bg-card p-4">
+          <div className="bg-card rounded-lg border p-4">
             <div className="mb-3 flex items-center gap-3">
-              <Clock className="h-5 w-5 text-muted-foreground" />
+              <Clock className="text-muted-foreground h-5 w-5" />
               <h3 className="font-semibold">{t('otherRoles.options.wait.title')}</h3>
             </div>
-            <p className="mb-4 text-sm text-muted-foreground">
+            <p className="text-muted-foreground mb-4 text-sm">
               {t('otherRoles.options.wait.description')}
             </p>
             <Button variant="outline" className="w-full" onClick={handleSkip}>
@@ -93,12 +90,12 @@ export function OnboardingContent({ user, locale }: OnboardingContentProps) {
             </Button>
           </div>
 
-          <div className="rounded-lg border bg-card p-4">
+          <div className="bg-card rounded-lg border p-4">
             <div className="mb-3 flex items-center gap-3">
-              <Key className="h-5 w-5 text-muted-foreground" />
+              <Key className="text-muted-foreground h-5 w-5" />
               <h3 className="font-semibold">{t('otherRoles.options.code.title')}</h3>
             </div>
-            <p className="mb-4 text-sm text-muted-foreground">
+            <p className="text-muted-foreground mb-4 text-sm">
               {t('otherRoles.options.code.description')}
             </p>
             <div className="space-y-2">
@@ -113,7 +110,7 @@ export function OnboardingContent({ user, locale }: OnboardingContentProps) {
                 placeholder={t('otherRoles.options.code.placeholder')}
                 disabled={isLoading}
               />
-              {error && <p className="text-sm text-destructive">{error}</p>}
+              {error && <p className="text-destructive text-sm">{error}</p>}
               <Button
                 onClick={handleLinkWithCode}
                 disabled={isLoading || !linkingCode.trim()}
@@ -134,4 +131,3 @@ export function OnboardingContent({ user, locale }: OnboardingContentProps) {
     </Card>
   )
 }
-

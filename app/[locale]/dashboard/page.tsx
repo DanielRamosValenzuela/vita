@@ -1,11 +1,7 @@
 import { getCurrentUser } from '@/src/shared/lib/auth'
 import { CalendarView } from '@/src/widgets/calendar-view'
 
-interface DashboardPageProps {
-  params: Promise<{ locale: string }>
-}
-
-export default async function DashboardPage({ params }: DashboardPageProps) {
+export default async function DashboardPage() {
   const user = await getCurrentUser()
 
   return (

@@ -37,7 +37,7 @@ export { prisma }
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
-  
+
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -69,9 +69,7 @@ export const authOptions: NextAuthOptions = {
           return null
         }
 
-        const credentialsAccount = user.accounts.find(
-          (acc) => acc.provider === 'credentials'
-        )
+        const credentialsAccount = user.accounts.find((acc) => acc.provider === 'credentials')
 
         if (!credentialsAccount?.access_token) {
           return null
@@ -100,9 +98,9 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
-  
+
   callbacks: {
-    async jwt({ token, user, account }) {
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id
         token.role = user.role
@@ -121,12 +119,11 @@ export const authOptions: NextAuthOptions = {
       return session
     },
   },
-  
+
   session: {
     strategy: 'jwt',
     maxAge: 30 * 24 * 60 * 60,
   },
-  
+
   debug: process.env.NODE_ENV === 'development',
 }
-

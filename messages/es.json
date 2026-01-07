@@ -116,14 +116,219 @@
     "profile": "Perfil"
   },
   "superAdmin": {
-    "title": "Dashboard SUPER ADMIN",
+    "title": "Panel de Control SUPER ADMIN",
+    "organizations": {
+      "title": "Organizaciones",
+      "subtitle": "Gestiona todas las organizaciones del sistema",
+      "newOrganization": "Nueva Organización",
+      "new": "Nueva Organización",
+      "viewAll": "Ver Todas",
+      "name": "Nombre",
+      "status": "Estado",
+      "plan": "Plan",
+      "accounts": "Cuentas",
+      "view": "Ver",
+      "registerPayment": "Registrar Pago",
+      "reactivate": "Reactivar",
+      "status_active": "Activa",
+      "status_pending": "Pago Pendiente",
+      "status_suspended": "Suspendida",
+      "status_inactive": "Inactiva",
+      "plan_basic": "Básico",
+      "plan_pro": "Pro",
+      "plan_enterprise": "Enterprise",
+      "search": "Buscar por nombre, RUT o email...",
+      "filters": {
+        "all": "Todas",
+        "status": "Estado",
+        "plan": "Plan",
+        "country": "País",
+        "reset": "Limpiar filtros"
+      },
+      "table": {
+        "name": "Nombre",
+        "taxId": "RUT/ID Fiscal",
+        "plan": "Plan",
+        "status": "Estado",
+        "users": "Usuarios",
+        "userLimits": "Límites de Usuarios",
+        "monthlyFee": "Tarifa Mensual",
+        "nextPayment": "Próximo Pago",
+        "contact": "Contacto",
+        "actions": "Acciones",
+        "noResults": "No se encontraron organizaciones",
+        "loading": "Cargando organizaciones..."
+      },
+      "plans": {
+        "BASIC": "Básico",
+        "PRO": "Pro",
+        "ENTERPRISE": "Enterprise"
+      },
+      "statuses": {
+        "ACTIVE": "Activa",
+        "PENDING_PAYMENT": "Pago Pendiente",
+        "SUSPENDED": "Suspendida",
+        "INACTIVE": "Inactiva"
+      },
+      "countries": {
+        "CL": "Chile",
+        "AR": "Argentina",
+        "PE": "Perú",
+        "CO": "Colombia",
+        "MX": "México"
+      },
+      "actions": {
+        "view": "Ver detalles",
+        "edit": "Editar",
+        "suspend": "Suspender",
+        "reactivate": "Reactivar",
+        "delete": "Eliminar"
+      },
+      "pagination": {
+        "showing": "Mostrando {from} a {to} de {total} organizaciones",
+        "page": "Página {current} de {total}",
+        "previous": "Anterior",
+        "next": "Siguiente"
+      }
+    },
+    "createOrganization": {
+      "title": "Crear Nueva Organización",
+      "subtitle": "Ingresa los datos de la organización",
+      "form": {
+        "basicInfo": "Información Básica",
+        "contactInfo": "Información de Contacto",
+        "billingInfo": "Información de Facturación",
+        "name": {
+          "label": "Nombre de la Organización",
+          "placeholder": "Hospital San José"
+        },
+        "taxId": {
+          "label": "RUT/ID Fiscal",
+          "placeholder": "12.345.678-9"
+        },
+        "country": {
+          "label": "País",
+          "placeholder": "Selecciona un país"
+        },
+        "plan": {
+          "label": "Plan",
+          "placeholder": "Selecciona un plan",
+          "description": "El plan determina las funcionalidades disponibles"
+        },
+        "monthlyFee": {
+          "label": "Tarifa Mensual",
+          "placeholder": "28600",
+          "description": "Monto en la moneda local del país"
+        },
+        "maxAdminHR": {
+          "label": "Límite Admin HR",
+          "description": "Cuentas de administración RRHH (gratis)"
+        },
+        "maxChiefs": {
+          "label": "Límite Jefes",
+          "description": "Cuentas de jefes de área"
+        },
+        "maxStaff": {
+          "label": "Límite Staff",
+          "description": "Cuentas de personal médico"
+        },
+        "contactName": {
+          "label": "Nombre del Contacto",
+          "placeholder": "Juan Pérez"
+        },
+        "contactEmail": {
+          "label": "Email del Contacto",
+          "placeholder": "juan.perez@hospital.cl"
+        },
+        "contactPhone": {
+          "label": "Teléfono del Contacto",
+          "placeholder": "+56 9 1234 5678"
+        },
+        "address": {
+          "label": "Dirección (opcional)",
+          "placeholder": "Av. Principal 123, Santiago"
+        },
+        "submit": "Crear Organización",
+        "submitting": "Creando...",
+        "cancel": "Cancelar"
+      },
+      "success": "Organización creada exitosamente",
+      "error": "Error al crear la organización"
+    },
+    "organizationDetails": {
+      "title": "Detalles de la Organización",
+      "tabs": {
+        "overview": "Resumen",
+        "users": "Usuarios",
+        "billing": "Facturación",
+        "settings": "Configuración"
+      },
+      "overview": {
+        "info": "Información General",
+        "stats": "Estadísticas",
+        "totalUsers": "Total Usuarios",
+        "totalAreas": "Total Áreas",
+        "totalShifts": "Total Turnos",
+        "createdAt": "Fecha de Creación"
+      },
+      "users": {
+        "title": "Usuarios de la Organización",
+        "addUser": "Agregar Usuario",
+        "noUsers": "No hay usuarios en esta organización",
+        "columns": {
+          "name": "Nombre",
+          "email": "Email",
+          "role": "Rol",
+          "joinedAt": "Fecha de Ingreso"
+        }
+      },
+      "billing": {
+        "title": "Información de Facturación",
+        "currentPlan": "Plan Actual",
+        "monthlyFee": "Tarifa Mensual",
+        "nextPayment": "Próximo Pago",
+        "paymentHistory": "Historial de Pagos",
+        "noPayments": "No hay pagos registrados"
+      },
+      "actions": {
+        "edit": "Editar Organización",
+        "changeStatus": "Cambiar Estado",
+        "viewHistory": "Ver Historial"
+      }
+    },
+    "editOrganization": {
+      "title": "Editar Organización",
+      "subtitle": "Modifica los datos de la organización",
+      "success": "Organización actualizada exitosamente",
+      "error": "Error al actualizar la organización"
+    },
+    "deleteOrganization": {
+      "title": "Eliminar Organización",
+      "description": "¿Estás seguro de que deseas eliminar esta organización? Esta acción marcará la organización como inactiva.",
+      "reasonLabel": "Razón de la eliminación",
+      "reasonPlaceholder": "Explica por qué se está eliminando esta organización",
+      "confirm": "Sí, eliminar",
+      "cancel": "Cancelar",
+      "success": "Organización eliminada exitosamente",
+      "error": "Error al eliminar la organización"
+    },
+    "changeStatus": {
+      "title": "Cambiar Estado",
+      "description": "Selecciona el nuevo estado para esta organización",
+      "reasonLabel": "Razón del cambio (opcional)",
+      "reasonPlaceholder": "Explica por qué se está cambiando el estado",
+      "confirm": "Cambiar Estado",
+      "cancel": "Cancelar",
+      "success": "Estado cambiado exitosamente",
+      "error": "Error al cambiar el estado"
+    },
     "sidebar": {
       "title": "VITA",
       "role": "Super Administrador",
-      "dashboard": "Dashboard",
+      "dashboard": "Panel de Control",
       "organizations": "Organizaciones",
       "payments": "Pagos",
-      "analytics": "Analytics",
+      "analytics": "Analíticas",
       "settings": "Configuración"
     },
     "stats": {
@@ -136,25 +341,12 @@
       "thisMonth": "este mes",
       "inDays": "en {days} días"
     },
-    "organizations": {
-      "title": "Organizaciones Recientes",
-      "viewAll": "Ver Todas",
-      "new": "Nueva Organización",
-      "name": "Organización",
-      "status": "Estado",
-      "plan": "Plan",
-      "accounts": "Cuentas",
-      "actions": "Acciones",
-      "view": "Ver",
-      "registerPayment": "Registrar Pago",
-      "reactivate": "Reactivar",
-      "status_active": "Activa",
-      "status_pending": "Deuda",
-      "status_suspended": "Suspendida",
-      "status_inactive": "Inactiva",
-      "plan_basic": "BASIC",
-      "plan_pro": "PRO",
-      "plan_enterprise": "ENTERPRISE"
+    "dashboard": {
+      "recent": {
+        "title": "Organizaciones Recientes",
+        "viewAll": "Ver Todas",
+        "new": "Nueva Organización"
+      }
     },
     "alerts": {
       "title": "Alertas y Notificaciones",
@@ -164,4 +356,3 @@
     }
   }
 }
-

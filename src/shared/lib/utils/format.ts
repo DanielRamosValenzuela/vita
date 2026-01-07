@@ -16,4 +16,17 @@ export const formatPercentage = (value: number, total: number): string => {
   return `${((value / total) * 100).toFixed(1)}%`
 }
 
+export function formatRUT(rut: string): string {
+  if (!rut) return ''
 
+  const cleanRUT = rut.replace(/[.-]/g, '')
+
+  if (cleanRUT.length < 8) return cleanRUT
+
+  const body = cleanRUT.slice(0, -1)
+  const dv = cleanRUT.slice(-1).toUpperCase()
+
+  const formattedBody = body.replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+
+  return `${formattedBody}-${dv}`
+}

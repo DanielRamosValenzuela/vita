@@ -20,10 +20,10 @@ export default async function LoginPage({
   const { registered } = await searchParams
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12 sm:px-6 lg:px-8">
+    <div className="bg-background flex min-h-screen items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-foreground">
+          <h2 className="text-foreground mt-6 text-center text-3xl font-bold tracking-tight">
             Inicia sesión en tu cuenta
           </h2>
           {registered === 'true' && (
@@ -32,12 +32,10 @@ export default async function LoginPage({
             </p>
           )}
         </div>
-        <div className="rounded-lg bg-card px-8 py-8 shadow">
+        <div className="bg-card rounded-lg px-8 py-8 shadow">
           <LoginForm />
         </div>
       </div>
     </div>
   )
 }
-
-

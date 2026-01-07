@@ -30,9 +30,7 @@ export function canManageOrganization(user: CurrentUser | null): boolean {
 export function canManageShifts(user: CurrentUser | null): boolean {
   if (!user) return false
   return (
-    user.role === Role.SUPER_ADMIN ||
-    user.role === Role.ADMIN_HR ||
-    user.role === Role.CHIEF_AREA
+    user.role === Role.SUPER_ADMIN || user.role === Role.ADMIN_HR || user.role === Role.CHIEF_AREA
   )
 }
 
@@ -44,9 +42,7 @@ export function canViewShifts(user: CurrentUser | null): boolean {
 export function canManageStaff(user: CurrentUser | null): boolean {
   if (!user) return false
   return (
-    user.role === Role.SUPER_ADMIN ||
-    user.role === Role.ADMIN_HR ||
-    user.role === Role.CHIEF_AREA
+    user.role === Role.SUPER_ADMIN || user.role === Role.ADMIN_HR || user.role === Role.CHIEF_AREA
   )
 }
 
@@ -54,4 +50,3 @@ export function canManageRates(user: CurrentUser | null): boolean {
   if (!user) return false
   return user.role === Role.SUPER_ADMIN || user.role === Role.ADMIN_HR
 }
-

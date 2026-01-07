@@ -18,19 +18,30 @@ export function Logo({ className, showText = true, size = 'md', locale = 'es' }:
   return (
     <Link
       href={`/${locale}`}
-      className={cn('flex items-center gap-2 font-bold transition-opacity hover:opacity-80', className)}
+      className={cn(
+        'flex items-center gap-2 font-bold transition-opacity hover:opacity-80',
+        className
+      )}
       aria-label="VITA - Inicio"
     >
-      <span className={cn('flex items-center justify-center rounded-lg bg-primary text-primary-foreground', sizeClasses[size])}>
+      <span
+        className={cn(
+          'bg-primary text-primary-foreground flex items-center justify-center rounded-lg',
+          sizeClasses[size]
+        )}
+      >
         🏥
       </span>
       {showText && (
-        <span className={cn('font-semibold text-foreground', size === 'lg' ? 'text-2xl' : size === 'sm' ? 'text-base' : 'text-xl')}>
+        <span
+          className={cn(
+            'text-foreground font-semibold',
+            size === 'lg' ? 'text-2xl' : size === 'sm' ? 'text-base' : 'text-xl'
+          )}
+        >
           VITA
         </span>
       )}
     </Link>
   )
 }
-
-

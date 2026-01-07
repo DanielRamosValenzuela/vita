@@ -82,15 +82,9 @@ export function StatsCards({ data }: StatsCardsProps) {
             <CardContent className="p-6">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-muted-foreground">
-                    {stat.title}
-                  </p>
-                  <h3 className="mt-2 text-3xl font-bold">
-                    {stat.value}
-                  </h3>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    {stat.subtitle}
-                  </p>
+                  <p className="text-muted-foreground text-sm font-medium">{stat.title}</p>
+                  <h3 className="mt-2 text-3xl font-bold">{stat.value}</h3>
+                  <p className="text-muted-foreground mt-1 text-xs">{stat.subtitle}</p>
                 </div>
                 <div className={`rounded-lg p-3 ${stat.bg}`}>
                   <Icon className={`h-6 w-6 ${stat.color}`} />

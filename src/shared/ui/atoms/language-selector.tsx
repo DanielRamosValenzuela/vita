@@ -34,11 +34,17 @@ export function LanguageSelector() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-9 w-9 cursor-pointer" aria-label="Select language">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-9 w-9 cursor-pointer"
+          aria-label="Select language"
+          suppressHydrationWarning
+        >
           <Globe className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" suppressHydrationWarning>
         {locales.map((locale) => (
           <DropdownMenuItem
             key={locale}
@@ -52,4 +58,3 @@ export function LanguageSelector() {
     </DropdownMenu>
   )
 }
-

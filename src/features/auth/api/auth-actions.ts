@@ -10,17 +10,9 @@ import {
   findUserWithCredentials,
   verifyPassword,
 } from '../lib/user-helpers'
+import type { ActionResult, RegisterData } from '../lib/types'
 
-export interface ActionResult<T = unknown> {
-  success: boolean
-  data?: T
-  error?: string
-  fieldErrors?: Record<string, string[]>
-}
-
-export async function registerAction(
-  formData: FormData
-): Promise<ActionResult<{ email: string; name: string }>> {
+export async function registerAction(formData: FormData): Promise<ActionResult<RegisterData>> {
   try {
     const rawData = {
       name: formData.get('name') as string,
@@ -80,9 +72,7 @@ export async function registerAction(
   }
 }
 
-export async function loginAction(
-  formData: FormData
-): Promise<ActionResult<{ email: string }>> {
+export async function loginAction(formData: FormData): Promise<ActionResult<{ email: string }>> {
   try {
     const rawData = {
       email: formData.get('email') as string,
@@ -163,4 +153,3 @@ export async function logoutAction(): Promise<ActionResult> {
     }
   }
 }
-

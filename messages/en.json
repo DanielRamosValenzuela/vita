@@ -137,7 +137,78 @@
       "inDays": "in {days} days"
     },
     "organizations": {
-      "title": "Recent Organizations",
+      "title": "Organizations",
+      "subtitle": "Manage all system organizations",
+      "newOrganization": "New Organization",
+      "new": "New Organization",
+      "viewAll": "View All",
+      "name": "Name",
+      "status": "Status",
+      "plan": "Plan",
+      "accounts": "Accounts",
+      "view": "View",
+      "registerPayment": "Register Payment",
+      "reactivate": "Reactivate",
+      "status_active": "Active",
+      "status_pending": "Payment Pending",
+      "status_suspended": "Suspended",
+      "status_inactive": "Inactive",
+      "plan_basic": "Basic",
+      "plan_pro": "Pro",
+      "plan_enterprise": "Enterprise",
+      "search": "Search by name, Tax ID or email...",
+      "filters": {
+        "all": "All",
+        "status": "Status",
+        "plan": "Plan",
+        "country": "Country",
+        "reset": "Clear filters"
+      },
+      "table": {
+        "name": "Name",
+        "taxId": "Tax ID",
+        "plan": "Plan",
+        "status": "Status",
+        "users": "Users",
+        "userLimits": "User Limits",
+        "monthlyFee": "Monthly Fee",
+        "nextPayment": "Next Payment",
+        "contact": "Contact",
+        "actions": "Actions",
+        "noResults": "No organizations found",
+        "loading": "Loading organizations..."
+      },
+      "plans": {
+        "BASIC": "Basic",
+        "PRO": "Pro",
+        "ENTERPRISE": "Enterprise"
+      },
+      "statuses": {
+        "ACTIVE": "Active",
+        "PENDING_PAYMENT": "Pending Payment",
+        "SUSPENDED": "Suspended",
+        "INACTIVE": "Inactive"
+      },
+      "countries": {
+        "CL": "Chile",
+        "AR": "Argentina",
+        "PE": "Peru",
+        "CO": "Colombia",
+        "MX": "Mexico"
+      },
+      "actions": {
+        "view": "View details",
+        "edit": "Edit",
+        "suspend": "Suspend",
+        "reactivate": "Reactivate",
+        "delete": "Delete"
+      },
+      "pagination": {
+        "showing": "Showing {from} to {to} of {total} organizations",
+        "page": "Page {current} of {total}",
+        "previous": "Previous",
+        "next": "Next"
+      },
       "viewAll": "View All",
       "new": "New Organization",
       "name": "Organization",
@@ -156,6 +227,139 @@
       "plan_pro": "PRO",
       "plan_enterprise": "ENTERPRISE"
     },
+    "createOrganization": {
+      "title": "Create New Organization",
+      "subtitle": "Enter the organization details",
+      "form": {
+        "basicInfo": "Basic Information",
+        "contactInfo": "Contact Information",
+        "billingInfo": "Billing Information",
+        "name": {
+          "label": "Organization Name",
+          "placeholder": "St. Joseph Hospital"
+        },
+        "taxId": {
+          "label": "Tax ID",
+          "placeholder": "12-3456789"
+        },
+        "country": {
+          "label": "Country",
+          "placeholder": "Select a country"
+        },
+        "plan": {
+          "label": "Plan",
+          "placeholder": "Select a plan",
+          "description": "The plan determines available features"
+        },
+        "monthlyFee": {
+          "label": "Monthly Fee",
+          "placeholder": "28600",
+          "description": "Amount in local currency"
+        },
+        "maxAdminHR": {
+          "label": "Admin HR Limit",
+          "description": "HR admin accounts (free)"
+        },
+        "maxChiefs": {
+          "label": "Chiefs Limit",
+          "description": "Area chief accounts"
+        },
+        "maxStaff": {
+          "label": "Staff Limit",
+          "description": "Medical staff accounts"
+        },
+        "contactName": {
+          "label": "Contact Name",
+          "placeholder": "John Doe"
+        },
+        "contactEmail": {
+          "label": "Contact Email",
+          "placeholder": "john.doe@hospital.com"
+        },
+        "contactPhone": {
+          "label": "Contact Phone",
+          "placeholder": "+1 555 123 4567"
+        },
+        "address": {
+          "label": "Address (optional)",
+          "placeholder": "123 Main St, New York"
+        },
+        "submit": "Create Organization",
+        "submitting": "Creating...",
+        "cancel": "Cancel",
+        "phone": "Phone",
+        "address": "Address"
+      },
+      "success": "Organization created successfully",
+      "error": "Error creating organization"
+    },
+    "organizationDetails": {
+      "title": "Organization Details",
+      "tabs": {
+        "overview": "Overview",
+        "users": "Users",
+        "billing": "Billing",
+        "settings": "Settings"
+      },
+      "overview": {
+        "info": "General Information",
+        "stats": "Statistics",
+        "totalUsers": "Total Users",
+        "totalAreas": "Total Areas",
+        "totalShifts": "Total Shifts",
+        "createdAt": "Created At"
+      },
+      "users": {
+        "title": "Organization Users",
+        "addUser": "Add User",
+        "noUsers": "No users in this organization",
+        "columns": {
+          "name": "Name",
+          "email": "Email",
+          "role": "Role",
+          "joinedAt": "Joined At"
+        }
+      },
+      "billing": {
+        "title": "Billing Information",
+        "currentPlan": "Current Plan",
+        "monthlyFee": "Monthly Fee",
+        "nextPayment": "Next Payment",
+        "paymentHistory": "Payment History",
+        "noPayments": "No payments registered"
+      },
+      "actions": {
+        "edit": "Edit Organization",
+        "changeStatus": "Change Status",
+        "viewHistory": "View History"
+      }
+    },
+    "editOrganization": {
+      "title": "Edit Organization",
+      "subtitle": "Modify organization details",
+      "success": "Organization updated successfully",
+      "error": "Error updating organization"
+    },
+    "deleteOrganization": {
+      "title": "Delete Organization",
+      "description": "Are you sure you want to delete this organization? This action will mark the organization as inactive.",
+      "reasonLabel": "Reason for deletion",
+      "reasonPlaceholder": "Explain why this organization is being deleted",
+      "confirm": "Yes, delete",
+      "cancel": "Cancel",
+      "success": "Organization deleted successfully",
+      "error": "Error deleting organization"
+    },
+    "changeStatus": {
+      "title": "Change Status",
+      "description": "Select the new status for this organization",
+      "reasonLabel": "Reason for change (optional)",
+      "reasonPlaceholder": "Explain why the status is being changed",
+      "confirm": "Change Status",
+      "cancel": "Cancel",
+      "success": "Status changed successfully",
+      "error": "Error changing status"
+    },
     "alerts": {
       "title": "Alerts and Notifications",
       "upcomingPayments": "{count} organizations with payment due soon",
@@ -164,5 +368,3 @@
     }
   }
 }
-
-

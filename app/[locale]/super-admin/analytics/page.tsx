@@ -11,11 +11,7 @@ export default async function AnalyticsPage({ params }: AnalyticsPageProps) {
   return (
     <div>
       <h1 className="text-3xl font-bold">Analytics</h1>
-      <p className="text-muted-foreground mt-2">
-        Gráficos y reportes globales (En desarrollo)
-      </p>
+      <p className="text-muted-foreground mt-2">Gráficos y reportes globales (En desarrollo)</p>
     </div>
   )
 }
-
-

@@ -54,17 +54,19 @@ export function SuperAdminSidebar({ user, locale }: SuperAdminSidebarProps) {
   }
 
   return (
-    <div className="flex h-screen w-64 flex-col border-r bg-card">
+    <div className="bg-card flex h-screen w-64 flex-col border-r">
       <Link href={`/${locale}`} className="border-b p-6 transition-opacity hover:opacity-80">
-        <h2 className="text-xl font-bold text-primary">{t('title')}</h2>
-        <p className="text-sm text-muted-foreground">{t('role')}</p>
+        <h2 className="text-primary text-xl font-bold">{t('title')}</h2>
+        <p className="text-muted-foreground text-sm">{t('role')}</p>
       </Link>
 
       <nav className="flex-1 space-y-1 p-4">
         {navigation.map((item) => {
           const Icon = item.icon
-          const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
-          
+          const isActive =
+            pathname === item.href ||
+            (item.href !== `/${locale}/super-admin` && pathname.startsWith(item.href + '/'))
+
           return (
             <Link
               key={item.name}
@@ -88,26 +90,21 @@ export function SuperAdminSidebar({ user, locale }: SuperAdminSidebarProps) {
           <ThemeToggle />
           <LanguageSelector />
         </div>
-        
-        <div className="flex items-center gap-3 rounded-lg bg-accent p-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground">
+
+        <div className="bg-accent flex items-center gap-3 rounded-lg p-3">
+          <div className="bg-primary text-primary-foreground flex h-10 w-10 items-center justify-center rounded-full">
             {user.name.charAt(0).toUpperCase()}
           </div>
           <div className="flex-1 overflow-hidden">
             <p className="truncate text-sm font-medium">{user.name}</p>
-            <p className="truncate text-xs text-muted-foreground">{user.email}</p>
+            <p className="text-muted-foreground truncate text-xs">{user.email}</p>
           </div>
         </div>
 
-        <Button
-          onClick={handleLogout}
-          variant="outline"
-          className="w-full"
-        >
+        <Button onClick={handleLogout} variant="outline" className="w-full">
           {tCommon('logout')}
         </Button>
       </div>
     </div>
   )
 }
-

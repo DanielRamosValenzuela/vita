@@ -11,11 +11,7 @@ export default async function SettingsPage({ params }: SettingsPageProps) {
   return (
     <div>
       <h1 className="text-3xl font-bold">Configuración</h1>
-      <p className="text-muted-foreground mt-2">
-        Configuración del sistema (En desarrollo)
-      </p>
+      <p className="text-muted-foreground mt-2">Configuración del sistema (En desarrollo)</p>
     </div>
   )
 }
-
-

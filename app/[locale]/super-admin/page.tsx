@@ -14,11 +14,11 @@ export default async function SuperAdminDashboard({ params }: SuperAdminDashboar
   await requireSuperAdmin(locale)
 
   const totalOrgs = await prisma.organization.count()
-  
+
   const activeOrgs = await prisma.organization.count({
     where: { status: 'ACTIVE' },
   })
-  
+
   const suspendedOrgs = await prisma.organization.count({
     where: { status: 'SUSPENDED' },
   })
@@ -110,4 +110,3 @@ export default async function SuperAdminDashboard({ params }: SuperAdminDashboar
     </div>
   )
 }
-

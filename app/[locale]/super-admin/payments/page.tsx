@@ -11,11 +11,7 @@ export default async function PaymentsPage({ params }: PaymentsPageProps) {
   return (
     <div>
       <h1 className="text-3xl font-bold">Gestión de Pagos</h1>
-      <p className="text-muted-foreground mt-2">
-        Registro y gestión de pagos (En desarrollo)
-      </p>
+      <p className="text-muted-foreground mt-2">Registro y gestión de pagos (En desarrollo)</p>
     </div>
   )
 }
-
-

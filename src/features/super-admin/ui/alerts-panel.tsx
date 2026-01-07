@@ -58,10 +58,7 @@ export function AlertsPanel({ data }: AlertsPanelProps) {
           {visibleAlerts.map((alert, index) => {
             const Icon = alert.icon
             return (
-              <div
-                key={index}
-                className="flex items-center gap-3 rounded-lg border p-3"
-              >
+              <div key={index} className="flex items-center gap-3 rounded-lg border p-3">
                 <div className={`rounded-lg p-2 ${alert.bg}`}>
                   <Icon className={`h-5 w-5 ${alert.color}`} />
                 </div>

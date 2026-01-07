@@ -6,8 +6,7 @@ interface DashboardLayoutProps {
   params: Promise<{ locale: string }>
 }
 
-export default async function DashboardLayout({ children, params }: DashboardLayoutProps) {
-  const { locale } = await params
+export default async function DashboardLayout({ children }: DashboardLayoutProps) {
   const user = await getCurrentUser()
 
   if (!user) {

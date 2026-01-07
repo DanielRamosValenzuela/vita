@@ -11,7 +11,6 @@ import {
   Clock,
   DollarSign,
   User,
-  Settings,
   LayoutGrid,
 } from 'lucide-react'
 import { Role } from '@prisma/client'

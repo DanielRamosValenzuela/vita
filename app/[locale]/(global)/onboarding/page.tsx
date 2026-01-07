@@ -23,7 +23,7 @@ export default async function OnboardingPage({ params }: OnboardingPageProps) {
   return (
     <div className="bg-background flex min-h-screen items-center justify-center px-4 py-12">
       <div className="w-full max-w-2xl">
-        <OnboardingContent user={user} locale={locale} />
+        <OnboardingContent user={user} />
       </div>
     </div>
   )

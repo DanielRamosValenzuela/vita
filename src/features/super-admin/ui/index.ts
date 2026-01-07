@@ -1,5 +1,6 @@
 export { StatsCards } from './stats-cards'
 export { OrganizationsTable } from './organizations-table'
 export { AlertsPanel } from './alerts-panel'
-
-
+export { OrganizationsFilters } from './organizations-filters'
+export { OrganizationsTableClient } from './organizations-table-client'
+export { CreateOrganizationForm } from './create-organization-form'
