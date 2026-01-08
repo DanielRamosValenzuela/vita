@@ -142,6 +142,8 @@
       "newOrganization": "New Organization",
       "new": "New Organization",
       "viewAll": "View All",
+      "edit": "Edit Organization",
+      "editDescription": "Update organization information",
       "name": "Name",
       "status": "Status",
       "plan": "Plan",
@@ -162,7 +164,13 @@
         "status": "Status",
         "plan": "Plan",
         "country": "Country",
-        "reset": "Clear filters"
+        "reset": "Clear filters",
+        "filteringBy": "Filtering by",
+        "search": "Search",
+        "removeSearch": "Remove search",
+        "removeStatus": "Remove status filter",
+        "removePlan": "Remove plan filter",
+        "removeCountry": "Remove country filter"
       },
       "table": {
         "name": "Name",
@@ -194,7 +202,8 @@
         "AR": "Argentina",
         "PE": "Peru",
         "CO": "Colombia",
-        "MX": "Mexico"
+        "MX": "Mexico",
+        "US": "United States"
       },
       "actions": {
         "view": "View details",
@@ -203,6 +212,21 @@
         "reactivate": "Reactivate",
         "delete": "Delete"
       },
+      "confirmSuspend": "Are you sure you want to suspend the organization {name}?",
+      "confirmReactivate": "Are you sure you want to reactivate the organization {name}?",
+      "confirmDelete": "Are you sure you want to delete the organization {name}?",
+      "confirmDeleteWarning": "The organization will be marked as inactive and cannot be used, but the data will be preserved in the database (soft delete).",
+      "deleteWarning": "The organization will be marked as inactive and cannot be used, but the data will be preserved in the database.",
+      "deleteReasonPrompt": "Please enter the reason for deletion (minimum 10 characters):",
+      "deleteReasonPlaceholder": "E.g: Organization closed, change of business name, etc.",
+      "deleteReasonMinLength": "The reason must be at least 10 characters",
+      "suspendSuccess": "Organization suspended successfully",
+      "suspendError": "Error suspending organization",
+      "reactivateSuccess": "Organization reactivated successfully",
+      "reactivateError": "Error reactivating organization",
+      "deleteSuccess": "Organization deleted successfully",
+      "deleteError": "Error deleting organization",
+      "cancel": "Cancel",
       "pagination": {
         "showing": "Showing {from} to {to} of {total} organizations",
         "page": "Page {current} of {total}",
@@ -293,6 +317,64 @@
       "success": "Organization created successfully",
       "error": "Error creating organization"
     },
+    "editOrganization": {
+      "title": "Edit Organization",
+      "subtitle": "Update information for {name}",
+      "edit": "Edit Organization",
+      "editDescription": "Update organization information",
+      "back": "Back",
+      "form": {
+        "basicInfo": "Basic Information",
+        "billing": "Plan & Billing",
+        "accountLimits": "Account Limits",
+        "limitsWarning": "Limits cannot be lower than the current number of users in each role",
+        "contact": "Contact Information",
+        "name": {
+          "label": "Organization Name",
+          "placeholder": "St. Joseph Hospital"
+        },
+        "plan": {
+          "label": "Plan",
+          "placeholder": "Select a plan"
+        },
+        "monthlyFee": {
+          "label": "Monthly Fee",
+          "placeholder": "28600"
+        },
+        "maxAdminHR": {
+          "label": "Admin HR Limit",
+          "description": "HR admin accounts"
+        },
+        "maxChiefs": {
+          "label": "Chiefs Limit",
+          "description": "Area chief accounts"
+        },
+        "maxStaff": {
+          "label": "Staff Limit",
+          "description": "Medical staff accounts"
+        },
+        "contactName": {
+          "label": "Contact Name",
+          "placeholder": "John Doe"
+        },
+        "contactEmail": {
+          "label": "Contact Email",
+          "placeholder": "john.doe@hospital.com"
+        },
+        "contactPhone": {
+          "label": "Contact Phone",
+          "placeholder": "+1 555 123 4567"
+        },
+        "address": {
+          "label": "Address",
+          "placeholder": "123 Main St, New York"
+        },
+        "submit": "Save Changes",
+        "cancel": "Cancel"
+      },
+      "success": "Organization updated successfully",
+      "error": "Error updating organization"
+    },
     "organizationDetails": {
       "title": "Organization Details",
       "tabs": {
@@ -333,12 +415,6 @@
         "changeStatus": "Change Status",
         "viewHistory": "View History"
       }
-    },
-    "editOrganization": {
-      "title": "Edit Organization",
-      "subtitle": "Modify organization details",
-      "success": "Organization updated successfully",
-      "error": "Error updating organization"
     },
     "deleteOrganization": {
       "title": "Delete Organization",

@@ -137,6 +137,8 @@ export const updateOrganization = async (
   id: string,
   data: {
     name?: string
+    taxId?: string
+    country?: Country
     plan?: OrganizationPlan
     monthlyFee?: number
     maxAdminHR?: number
@@ -149,9 +151,58 @@ export const updateOrganization = async (
     address?: string
   }
 ) => {
+  if (data.taxId) {
+    const taxIdExists = await checkTaxIdExists(data.taxId, id)
+    if (taxIdExists) {
+      throw new Error('Ya existe una organización con ese RUT/Tax ID')
+    }
+  }
+
+  if (
+    data.maxAdminHR !== undefined ||
+    data.maxChiefs !== undefined ||
+    data.maxStaff !== undefined
+  ) {
+    const userCounts = await prisma.user.groupBy({
+      by: ['role'],
+      where: {
+        organizationId: id,
+      },
+      _count: {
+        id: true,
+      },
+    })
+
+    const currentAdminHR = userCounts.find((u) => u.role === 'ADMIN_HR')?._count.id || 0
+    const currentChiefs = userCounts.find((u) => u.role === 'CHIEF_AREA')?._count.id || 0
+    const currentStaff = userCounts.find((u) => u.role === 'STAFF_HEALTH')?._count.id || 0
+
+    if (data.maxAdminHR !== undefined && data.maxAdminHR < currentAdminHR) {
+      throw new Error(
+        `No puedes reducir el límite de Admin HR a ${data.maxAdminHR} porque ya tienes ${currentAdminHR} usuarios con ese rol`
+      )
+    }
+
+    if (data.maxChiefs !== undefined && data.maxChiefs < currentChiefs) {
+      throw new Error(
+        `No puedes reducir el límite de Jefes a ${data.maxChiefs} porque ya tienes ${currentChiefs} usuarios con ese rol`
+      )
+    }
+
+    if (data.maxStaff !== undefined && data.maxStaff < currentStaff) {
+      throw new Error(
+        `No puedes reducir el límite de Staff a ${data.maxStaff} porque ya tienes ${currentStaff} usuarios con ese rol`
+      )
+    }
+  }
+
+  const updateData = Object.fromEntries(
+    Object.entries(data).filter(([_, value]) => value !== undefined)
+  )
+
   const organization = await prisma.organization.update({
     where: { id },
-    data,
+    data: updateData,
   })
 
   return organization

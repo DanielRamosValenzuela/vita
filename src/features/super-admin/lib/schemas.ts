@@ -4,7 +4,7 @@ import type { Country } from '@prisma/client'
 
 export const OrganizationPlanEnum = z.enum(['BASIC', 'PRO', 'ENTERPRISE'])
 export const OrganizationStatusEnum = z.enum(['ACTIVE', 'PENDING_PAYMENT', 'SUSPENDED', 'INACTIVE'])
-export const CountryEnum = z.enum(['CL', 'AR', 'PE', 'CO', 'MX'])
+export const CountryEnum = z.enum(['CL', 'AR', 'PE', 'CO', 'MX', 'US'])
 
 export const PLAN_LIMITS = {
   BASIC: {
@@ -121,71 +121,123 @@ export const createOrganizationSchema = z
     }
   )
 
-export const updateOrganizationSchema = z.object({
-  id: z.string().cuid(),
+export const updateOrganizationSchema = z
+  .object({
+    id: z.string().cuid(),
 
-  name: z
-    .string()
-    .min(3, 'El nombre debe tener al menos 3 caracteres')
-    .max(100, 'El nombre no puede exceder 100 caracteres')
-    .optional(),
+    name: z
+      .string()
+      .min(3, 'El nombre debe tener al menos 3 caracteres')
+      .max(100, 'El nombre no puede exceder 100 caracteres')
+      .optional(),
 
-  plan: OrganizationPlanEnum.optional(),
+    taxId: z
+      .string()
+      .min(5, 'El RUT/Tax ID debe tener al menos 5 caracteres')
+      .max(20, 'El RUT/Tax ID no puede exceder 20 caracteres')
+      .optional(),
 
-  monthlyFee: z
-    .number()
-    .min(0, 'La tarifa mensual no puede ser negativa')
-    .max(1000000, 'La tarifa mensual no puede exceder $1,000,000')
-    .optional(),
+    country: CountryEnum.optional(),
 
-  maxAdminHR: z
-    .number()
-    .int('Debe ser un número entero')
-    .min(0, 'El límite no puede ser negativo')
-    .max(50, 'El límite no puede exceder 50')
-    .optional(),
+    plan: OrganizationPlanEnum.optional(),
 
-  maxChiefs: z
-    .number()
-    .int('Debe ser un número entero')
-    .min(0, 'El límite no puede ser negativo')
-    .max(100, 'El límite no puede exceder 100')
-    .optional(),
+    monthlyFee: z
+      .number()
+      .min(0, 'La tarifa mensual no puede ser negativa')
+      .max(1000000, 'La tarifa mensual no puede exceder $1,000,000')
+      .optional(),
 
-  maxStaff: z
-    .number()
-    .int('Debe ser un número entero')
-    .min(0, 'El límite no puede ser negativo')
-    .max(1000, 'El límite no puede exceder 1000')
-    .optional(),
+    maxAdminHR: z
+      .number()
+      .int('Debe ser un número entero')
+      .min(0, 'El límite no puede ser negativo')
+      .max(50, 'El límite no puede exceder 50')
+      .optional(),
 
-  status: OrganizationStatusEnum.optional(),
+    maxChiefs: z
+      .number()
+      .int('Debe ser un número entero')
+      .min(0, 'El límite no puede ser negativo')
+      .max(100, 'El límite no puede exceder 100')
+      .optional(),
 
-  contactName: z
-    .string()
-    .min(3, 'El nombre de contacto debe tener al menos 3 caracteres')
-    .max(100, 'El nombre de contacto no puede exceder 100 caracteres')
-    .optional(),
+    maxStaff: z
+      .number()
+      .int('Debe ser un número entero')
+      .min(0, 'El límite no puede ser negativo')
+      .max(1000, 'El límite no puede exceder 1000')
+      .optional(),
 
-  contactEmail: z
-    .string()
-    .email('Debe ser un email válido')
-    .max(100, 'El email no puede exceder 100 caracteres')
-    .optional(),
+    status: OrganizationStatusEnum.optional(),
 
-  contactPhone: z
-    .string()
-    .min(8, 'El teléfono debe tener al menos 8 caracteres')
-    .max(20, 'El teléfono no puede exceder 20 caracteres')
-    .optional()
-    .or(z.literal('')),
+    contactName: z
+      .string()
+      .min(3, 'El nombre de contacto debe tener al menos 3 caracteres')
+      .max(100, 'El nombre de contacto no puede exceder 100 caracteres')
+      .optional(),
 
-  address: z
-    .string()
-    .max(200, 'La dirección no puede exceder 200 caracteres')
-    .optional()
-    .or(z.literal('')),
-})
+    contactEmail: z
+      .string()
+      .email('Debe ser un email válido')
+      .max(100, 'El email no puede exceder 100 caracteres')
+      .optional(),
+
+    contactPhone: z
+      .string()
+      .min(8, 'El teléfono debe tener al menos 8 caracteres')
+      .max(20, 'El teléfono no puede exceder 20 caracteres')
+      .optional()
+      .or(z.literal('')),
+
+    address: z
+      .string()
+      .max(200, 'La dirección no puede exceder 200 caracteres')
+      .optional()
+      .or(z.literal('')),
+  })
+  .refine(
+    (data) => {
+      if (!data.taxId || !data.country) return true
+      return validateTaxId(data.taxId, data.country as Country)
+    },
+    {
+      message: 'El identificador fiscal no es válido para el país seleccionado',
+      path: ['taxId'],
+    }
+  )
+  .refine(
+    (data) => {
+      if (!data.plan || !data.maxAdminHR) return true
+      const planLimits = PLAN_LIMITS[data.plan]
+      return data.maxAdminHR <= planLimits.maxAdminHR
+    },
+    {
+      message: 'El límite de Admin HR excede el máximo permitido para este plan',
+      path: ['maxAdminHR'],
+    }
+  )
+  .refine(
+    (data) => {
+      if (!data.plan || !data.maxChiefs) return true
+      const planLimits = PLAN_LIMITS[data.plan]
+      return data.maxChiefs <= planLimits.maxChiefs
+    },
+    {
+      message: 'El límite de Jefes excede el máximo permitido para este plan',
+      path: ['maxChiefs'],
+    }
+  )
+  .refine(
+    (data) => {
+      if (!data.plan || !data.maxStaff) return true
+      const planLimits = PLAN_LIMITS[data.plan]
+      return data.maxStaff <= planLimits.maxStaff
+    },
+    {
+      message: 'El límite de Staff excede el máximo permitido para este plan',
+      path: ['maxStaff'],
+    }
+  )
 
 export const changeOrganizationStatusSchema = z.object({
   id: z.string().cuid(),

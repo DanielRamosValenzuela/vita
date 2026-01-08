@@ -2,17 +2,119 @@
 
 **Sistema de Gestión de Turnos Médicos Multi-Tenant SaaS B2B**
 
-**Última actualización:** 7 de enero de 2026 (Noche)
+**Última actualización:** 8 de enero de 2026
 
-**Versión:** 3.8.1
+**Versión:** 3.11.0
 
-**Estado:** FASE 2 completada - Dashboard SUPER_ADMIN + CRUD Organizations + Sistema de Traducciones Completo + Optimizaciones de Performance
+**Estado:** FASE 2 completada - Dashboard SUPER_ADMIN + CRUD Organizations Completo (RUT/Tax ID Editable) + Sistema Multi-idioma Completo + AlertDialogs para Acciones Críticas
 
 **Competidor Principal:** Rflex (análisis competitivo en sección de Negocio)
 
 ---
 
 ## 🎉 PROGRESO RECIENTE (Enero 2026)
+
+### ✅ Sesión del 8 de Enero 2026 - Edición de Organizaciones + Multi-idioma + RUT/Tax ID Editable
+
+**Completado:**
+
+- ✅ **Sistema de Edición de Organizaciones:**
+  - Página de edición `/super-admin/organizations/[id]/edit`
+  - Formulario prellenado con datos actuales
+  - Validación de límites >= usuarios actuales por rol
+  - Badges mostrando usuarios actuales (Admin HR: 0, Jefes: 0, Staff: 0)
+  - Server Action `updateOrganization` con validaciones robustas
+  - Navegación desde tabla con botón de editar directo
+- ✅ **Mejoras en Tabla de Organizaciones:**
+  - Botón de editar (icono) independiente del dropdown
+  - Mantiene menú de acciones secundarias (Ver, Suspender, Eliminar)
+  - UI más intuitiva y accesible
+- ✅ **Validaciones Backend:**
+  - Helper `updateOrganization` valida límites vs usuarios actuales
+  - Mensajes de error específicos por rol
+  - Prevención de pérdida de datos
+  - Query optimizada con conteo de usuarios por rol
+- ✅ **RUT/Tax ID Editable:**
+  - Campo RUT/Tax ID ahora es editable en formulario de edición
+  - Campo País editable (incluyendo US agregado al enum)
+  - Formateo automático según país seleccionado
+  - Validación dinámica según país (RUT, CUIT, RUC, NIT, RFC, EIN)
+  - Verificación de unicidad en BD al actualizar
+  - Helper `checkTaxIdExists` con exclusión por ID
+  - Validaciones en `updateOrganizationSchema` con `.refine()`
+- ✅ **Sistema Multi-idioma 100% Completo:**
+  - Página de edición traducida (ES/EN)
+  - Título y subtítulo con interpolación dinámica
+  - Formulario completamente traducido
+  - Botones de acción traducidos correctamente
+  - Dropdown de países generado dinámicamente desde traducciones
+  - Probado en ambos idiomas (español e inglés)
+  - Keys agregadas para formulario de edición (ES/EN)
+  - Eliminadas duplicaciones en archivos de traducciones
+  - Sistema consistente en toda la app
+- ✅ **Calidad de Código:**
+  - `npm run format` ✅ Sin cambios pendientes
+  - `npm run lint` ✅ 0 warnings, 0 errors
+  - `npm run build` ✅ Build exitoso
+  - Navegador ✅ Formulario funcional y 100% traducido en ES/EN
+
+### ✅ Sesión del 8 de Enero 2026 (Noche) - AlertDialogs para Acciones Críticas
+
+**Completado:**
+
+- ✅ **Componente AlertDialog de Shadcn UI:**
+  - Archivo: `src/shared/ui/alert-dialog.tsx`
+  - Basado en Radix UI (base de Shadcn UI)
+  - Componentes exportados: AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel
+  - Instalada dependencia: `@radix-ui/react-alert-dialog`
+- ✅ **Reemplazo de window.confirm y window.prompt:**
+  - Eliminado uso de `window.confirm` y `window.prompt` en toda la aplicación
+  - Implementados AlertDialogs personalizados para acciones críticas
+  - UI consistente con el diseño system de Shadcn UI
+  - Mejor experiencia de usuario con diálogos accesibles
+- ✅ **Diálogos Implementados en OrganizationsTable:**
+  - **Diálogo de Suspender:**
+    - Título: "Suspender Organización"
+    - Descripción con nombre de la organización
+    - Botón de acción con variante naranja (warning)
+    - Botón cancelar
+  - **Diálogo de Reactivar:**
+    - Título: "Reactivar Organización"
+    - Descripción con nombre de la organización
+    - Botón de acción con variante verde (success)
+    - Botón cancelar
+  - **Diálogo de Eliminar (Soft Delete):**
+    - Título: "Eliminar Organización"
+    - Descripción con advertencia de soft delete
+    - Input para razón de eliminación (mínimo 10 caracteres)
+    - Validación en tiempo real del input
+    - Botón de acción deshabilitado hasta cumplir mínimo de caracteres
+    - Botón de acción con variante destructive (rojo)
+    - Placeholder descriptivo para el input
+- ✅ **Mejoras en UX/UI:**
+  - Leyenda de filtros activos agregada a la izquierda de los dropdowns
+  - Badges con botones para remover filtros individuales
+  - Tooltips y colores en iconos de edición (azul)
+  - Layout responsive para leyenda de filtros
+- ✅ **Traducciones Completas:**
+  - Keys agregadas para AlertDialogs (ES/EN):
+    - `confirmSuspend`, `confirmReactivate`, `confirmDelete`
+    - `confirmDeleteWarning`
+    - `deleteReasonPrompt`, `deleteReasonPlaceholder`, `deleteReasonMinLength`
+    - `cancel`
+  - Todos los textos de los diálogos traducidos
+  - Mensajes de éxito/error traducidos
+- ✅ **Validaciones y Lógica:**
+  - Estado controlado para cada diálogo (`showSuspendDialog`, `showReactivateDialog`, `showDeleteDialog`)
+  - Estado para razón de eliminación con validación de longitud mínima
+  - Integración con Server Actions existentes (`changeOrganizationStatusAction`, `deleteOrganizationAction`)
+  - Manejo de errores con toast notifications
+- ✅ **Calidad de Código:**
+  - `npm run format` ✅ Sin cambios pendientes
+  - `npm run lint` ✅ 0 warnings, 0 errors
+  - `npm run build` ✅ Build exitoso
+  - Código sin comentarios (siguiendo best practices)
+  - Componentes accesibles con ARIA attributes
 
 ### ✅ Sesión del 7 de Enero 2026 (Noche) - Optimizaciones y Sistema de Traducciones
 
@@ -405,28 +507,71 @@ Organization {
   - [x] Componentes ThemeToggle y LanguageSelector optimizados
   - [x] Eliminados warnings de React Hooks
   - [x] Mejor manejo de hidratación SSR/CSR
+- [x] **Edición de Organizaciones** ✅ **COMPLETADO (8 ene)**
+  - [x] Implementar página de edición (`/organizations/[id]/edit`)
+  - [x] Formulario prellenado con datos actuales
+  - [x] Permitir actualizar límites de cuentas
+  - [x] Validar que límites no sean menores a usuarios actuales
+  - [x] Botón de editar directo en tabla
+  - [x] Server Action con validaciones robustas
 - [ ] **Vista de Detalles - Mejoras:**
   - [ ] Mostrar límites de cuentas en tarjetas visuales
   - [ ] Badges de advertencia cuando se acerquen al límite (80%, 100%)
   - [ ] Gráfico de uso de cuentas por rol (opcional)
   - [ ] Mostrar contador de usuarios activos por rol en tiempo real
-- [ ] **Edición de Organizaciones:**
-  - [ ] Implementar página de edición (`/organizations/[id]/edit`)
-  - [ ] Formulario prellenado con datos actuales
-  - [ ] Permitir actualizar límites de cuentas
-  - [ ] Validar que límites no sean menores a usuarios actuales
   - [ ] Usar helper de tax-id dinámico en edición
   - [ ] Server Action `updateOrganizationAction` (ya existe helper)
-- [ ] **Acciones de Gestión:**
-  - [ ] Diálogos de confirmación para acciones críticas
-  - [ ] Cambiar estado (Suspender/Reactivar/Desactivar)
-  - [ ] Eliminar organización (soft delete)
-  - [ ] Acciones funcionales desde la tabla (botones dropdown ya existe UI)
+- [x] **Acciones de Gestión:** ✅ **COMPLETADO (8 ene noche)**
+  - [x] Diálogos de confirmación con AlertDialog (Shadcn UI)
+  - [x] Cambiar estado (Suspender/Reactivar) con diálogos personalizados
+  - [x] Eliminar organización (soft delete) con input de razón
+  - [x] Reemplazo completo de window.confirm y window.prompt
+  - [x] Validación de razón de eliminación (mínimo 10 caracteres)
+  - [x] Traducciones completas para todos los diálogos
 - [ ] **Validación de Límites en Runtime:**
   - [ ] Al agregar usuario, verificar que no exceda límites
   - [ ] Mensaje de error claro cuando se alcance el límite
   - [ ] Sugerencia de upgrade automático
-- [ ] Testing manual completo de todo el flujo CRUD
+- [ ] **Testing manual completo de todo el flujo CRUD:**
+  - [ ] Crear organización con diferentes países y planes
+  - [ ] Editar organización (cambiar límites, RUT, país)
+  - [ ] Probar acciones: Suspender, Reactivar, Eliminar
+  - [ ] Verificar validaciones de límites vs usuarios actuales
+  - [ ] Probar en ambos idiomas (ES/EN)
+  - [ ] Verificar responsive design en mobile
+
+### 2. Siguientes Pasos Sugeridos (Post-CRUD Organizations)
+
+**Prioridad Alta:**
+- [ ] **Dashboard ADMIN_HR:**
+  - [ ] Layout y Sidebar específico para ADMIN_HR
+  - [ ] Protección de rutas con `requireAdminHR()`
+  - [ ] Dashboard principal con métricas básicas
+  - [ ] Gestión de Áreas (CRUD completo)
+  - [ ] Gestión de Tipos de Turno
+  - [ ] Gestión de Personal (Staff)
+  - [ ] Gestión de Tarifas
+
+**Prioridad Media:**
+- [ ] **Sistema de Pagos:**
+  - [ ] Integración con pasarela de pagos (Stripe/PayPal)
+  - [ ] Registro manual de pagos desde SUPER_ADMIN
+  - [ ] Historial de pagos por organización
+  - [ ] Notificaciones de pagos próximos
+  - [ ] Facturación automática
+
+- [ ] **Analytics y Reportes:**
+  - [ ] Dashboard de analytics para SUPER_ADMIN
+  - [ ] Métricas de uso por organización
+  - [ ] Reportes de ingresos
+  - [ ] Gráficos de crecimiento
+
+**Prioridad Baja:**
+- [ ] **Mejoras en UX:**
+  - [ ] Skeleton loaders para mejor UX
+  - [ ] Optimistic updates en acciones
+  - [ ] Notificaciones toast más informativas
+  - [ ] Confirmaciones de éxito más visuales
 
 ---
 
@@ -477,6 +622,21 @@ Organization {
 - ✅ **UI interactivo:** Client Components con `'use client'`
 - ✅ **Data fetching:** En Server Components, pasar data como props
 - ✅ **Server Actions:** En `features/*/api/` con `'use server'`
+
+### Diálogos de Confirmación y AlertDialogs
+
+**Problema:** Uso de `window.confirm` y `window.prompt` rompe la consistencia de UI
+
+- ❌ **Anti-pattern:** Usar `window.confirm()` y `window.prompt()` nativos del navegador
+- ❌ **Problema:** No son accesibles, no se pueden estilizar, rompen el flujo de la app
+- ✅ **Solución:** Usar AlertDialog de Shadcn UI (basado en Radix UI)
+- ✅ **Ventajas:** 
+  - Consistente con el design system
+  - Accesible (ARIA attributes)
+  - Personalizable (colores, variantes, contenido)
+  - Mejor UX (puede incluir inputs, validaciones, etc.)
+- ✅ **Buena práctica:** Para acciones destructivas, incluir input de confirmación (ej: razón de eliminación)
+- ✅ **Validación:** Validar inputs dentro del diálogo antes de habilitar el botón de acción
 
 ---
 

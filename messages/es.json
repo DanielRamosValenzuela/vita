@@ -123,6 +123,8 @@
       "newOrganization": "Nueva Organización",
       "new": "Nueva Organización",
       "viewAll": "Ver Todas",
+      "edit": "Editar Organización",
+      "editDescription": "Actualiza la información de la organización",
       "name": "Nombre",
       "status": "Estado",
       "plan": "Plan",
@@ -143,7 +145,13 @@
         "status": "Estado",
         "plan": "Plan",
         "country": "País",
-        "reset": "Limpiar filtros"
+        "reset": "Limpiar filtros",
+        "filteringBy": "Filtrando por",
+        "search": "Búsqueda",
+        "removeSearch": "Eliminar búsqueda",
+        "removeStatus": "Eliminar filtro de estado",
+        "removePlan": "Eliminar filtro de plan",
+        "removeCountry": "Eliminar filtro de país"
       },
       "table": {
         "name": "Nombre",
@@ -175,7 +183,8 @@
         "AR": "Argentina",
         "PE": "Perú",
         "CO": "Colombia",
-        "MX": "México"
+        "MX": "México",
+        "US": "Estados Unidos"
       },
       "actions": {
         "view": "Ver detalles",
@@ -184,6 +193,21 @@
         "reactivate": "Reactivar",
         "delete": "Eliminar"
       },
+      "confirmSuspend": "¿Estás seguro de que deseas suspender la organización {name}?",
+      "confirmReactivate": "¿Estás seguro de que deseas reactivar la organización {name}?",
+      "confirmDelete": "¿Estás seguro de que deseas eliminar la organización {name}?",
+      "confirmDeleteWarning": "La organización será marcada como inactiva y no podrá ser utilizada, pero los datos se conservarán en la base de datos (soft delete).",
+      "deleteWarning": "La organización será marcada como inactiva y no podrá ser utilizada, pero los datos se conservarán en la base de datos.",
+      "deleteReasonPrompt": "Por favor, ingresa la razón de la eliminación (mínimo 10 caracteres):",
+      "deleteReasonPlaceholder": "Ej: Organización cerrada, cambio de razón social, etc.",
+      "deleteReasonMinLength": "La razón debe tener al menos 10 caracteres",
+      "suspendSuccess": "Organización suspendida exitosamente",
+      "suspendError": "Error al suspender la organización",
+      "reactivateSuccess": "Organización reactivada exitosamente",
+      "reactivateError": "Error al reactivar la organización",
+      "deleteSuccess": "Organización eliminada exitosamente",
+      "deleteError": "Error al eliminar la organización",
+      "cancel": "Cancelar",
       "pagination": {
         "showing": "Mostrando {from} a {to} de {total} organizaciones",
         "page": "Página {current} de {total}",
@@ -255,6 +279,64 @@
       "success": "Organización creada exitosamente",
       "error": "Error al crear la organización"
     },
+    "editOrganization": {
+      "title": "Editar Organización",
+      "subtitle": "Actualiza la información de {name}",
+      "edit": "Editar Organización",
+      "editDescription": "Actualiza la información de la organización",
+      "back": "Volver",
+      "form": {
+        "basicInfo": "Información Básica",
+        "billing": "Plan y Facturación",
+        "accountLimits": "Límites de Cuentas",
+        "limitsWarning": "Los límites no pueden ser menores al número actual de usuarios en cada rol",
+        "contact": "Información de Contacto",
+        "name": {
+          "label": "Nombre de la Organización",
+          "placeholder": "Hospital San José"
+        },
+        "plan": {
+          "label": "Plan",
+          "placeholder": "Selecciona un plan"
+        },
+        "monthlyFee": {
+          "label": "Tarifa Mensual",
+          "placeholder": "28600"
+        },
+        "maxAdminHR": {
+          "label": "Límite Admin HR",
+          "description": "Cuentas de administración RRHH"
+        },
+        "maxChiefs": {
+          "label": "Límite Jefes",
+          "description": "Cuentas de jefes de área"
+        },
+        "maxStaff": {
+          "label": "Límite Staff",
+          "description": "Cuentas de personal médico"
+        },
+        "contactName": {
+          "label": "Nombre del Contacto",
+          "placeholder": "Juan Pérez"
+        },
+        "contactEmail": {
+          "label": "Email del Contacto",
+          "placeholder": "juan.perez@hospital.cl"
+        },
+        "contactPhone": {
+          "label": "Teléfono del Contacto",
+          "placeholder": "+56 9 1234 5678"
+        },
+        "address": {
+          "label": "Dirección",
+          "placeholder": "Av. Principal 123, Santiago"
+        },
+        "submit": "Guardar Cambios",
+        "cancel": "Cancelar"
+      },
+      "success": "Organización actualizada exitosamente",
+      "error": "Error al actualizar la organización"
+    },
     "organizationDetails": {
       "title": "Detalles de la Organización",
       "tabs": {
@@ -295,12 +377,6 @@
         "changeStatus": "Cambiar Estado",
         "viewHistory": "Ver Historial"
       }
-    },
-    "editOrganization": {
-      "title": "Editar Organización",
-      "subtitle": "Modifica los datos de la organización",
-      "success": "Organización actualizada exitosamente",
-      "error": "Error al actualizar la organización"
     },
     "deleteOrganization": {
       "title": "Eliminar Organización",

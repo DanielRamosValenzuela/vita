@@ -38,3 +38,5 @@ Clean up effects in useEffect to prevent leaks.
 
 Use guard clauses (early returns) for error handling.
 
+Do not place comments in the code.
+
