@@ -41,6 +41,36 @@ export async function requireSuperAdmin(locale: string = 'es'): Promise<CurrentU
   return user
 }
 
+export async function requireAdminHR(locale: string = 'es'): Promise<CurrentUser> {
+  const user = await requireAuth(locale)
+
+  if (user.role !== Role.ADMIN_HR) {
+    redirect(`/${locale}/dashboard`)
+  }
+
+  return user
+}
+
+export async function requireChiefArea(locale: string = 'es'): Promise<CurrentUser> {
+  const user = await requireAuth(locale)
+
+  if (user.role !== Role.CHIEF_AREA) {
+    redirect(`/${locale}/dashboard`)
+  }
+
+  return user
+}
+
+export async function requireStaffHealth(locale: string = 'es'): Promise<CurrentUser> {
+  const user = await requireAuth(locale)
+
+  if (user.role !== Role.STAFF_HEALTH) {
+    redirect(`/${locale}/dashboard`)
+  }
+
+  return user
+}
+
 export async function getUserWithOrganization(
   userId: string
 ): Promise<(CurrentUser & { organization: { id: string; name: string } | null }) | null> {

@@ -104,6 +104,7 @@
     }
   },
   "dashboard": {
+    "dashboard": "Panel de Control",
     "calendar": "Calendario",
     "organizations": "Organizaciones",
     "payments": "Pagos",
@@ -430,5 +431,33 @@
       "suspended": "{count} organizaciones suspendidas por falta de pago",
       "paymentsToday": "{count} pagos registrados hoy ({amount})"
     }
+  },
+  "adminHR": {
+    "dashboard": {
+      "title": "Panel de Control",
+      "description": "Bienvenido al panel de administración de recursos humanos"
+    },
+    "areas": {
+      "title": "Gestión de Áreas",
+      "description": "Administra las áreas de tu organización",
+      "comingSoon": "Próximamente: CRUD completo de áreas"
+    },
+    "shiftTypes": {
+      "title": "Tipos de Turno",
+      "description": "Gestiona los tipos de turno disponibles",
+      "comingSoon": "Próximamente: CRUD completo de tipos de turno"
+    },
+    "rates": {
+      "title": "Tarifas",
+      "description": "Configura las tarifas de turnos",
+      "comingSoon": "Próximamente: CRUD completo de tarifas"
+    }
+  },
+  "errors": {
+    "title": "Algo salió mal",
+    "description": "Ha ocurrido un error inesperado. Por favor, intenta nuevamente o regresa al inicio.",
+    "errorId": "Error ID",
+    "tryAgain": "Intentar de nuevo",
+    "goHome": "Ir al inicio"
   }
 }

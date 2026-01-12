@@ -68,7 +68,7 @@ export function MainNavbar() {
                         src={session.user.image}
                         alt={session.user.name || 'Usuario'}
                         fill
-                        className="object-cover"
+                        className="rounded-full object-cover"
                         sizes="36px"
                         unoptimized
                       />

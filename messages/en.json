@@ -104,6 +104,7 @@
     }
   },
   "dashboard": {
+    "dashboard": "Dashboard",
     "calendar": "Calendar",
     "organizations": "Organizations",
     "payments": "Payments",
@@ -442,5 +443,33 @@
       "suspended": "{count} organizations suspended for non-payment",
       "paymentsToday": "{count} payments registered today ({amount})"
     }
+  },
+  "adminHR": {
+    "dashboard": {
+      "title": "Control Panel",
+      "description": "Welcome to the human resources administration panel"
+    },
+    "areas": {
+      "title": "Area Management",
+      "description": "Manage your organization's areas",
+      "comingSoon": "Coming soon: Complete CRUD for areas"
+    },
+    "shiftTypes": {
+      "title": "Shift Types",
+      "description": "Manage available shift types",
+      "comingSoon": "Coming soon: Complete CRUD for shift types"
+    },
+    "rates": {
+      "title": "Rates",
+      "description": "Configure shift rates",
+      "comingSoon": "Coming soon: Complete CRUD for rates"
+    }
+  },
+  "errors": {
+    "title": "Something went wrong",
+    "description": "An unexpected error has occurred. Please try again or return to the home page.",
+    "errorId": "Error ID",
+    "tryAgain": "Try again",
+    "goHome": "Go home"
   }
 }

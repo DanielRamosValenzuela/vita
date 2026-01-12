@@ -2,11 +2,11 @@
 
 **Sistema de Gestión de Turnos Médicos Multi-Tenant SaaS B2B**
 
-**Última actualización:** 8 de enero de 2026
+**Última actualización:** 9 de enero de 2026
 
-**Versión:** 3.11.0
+**Versión:** 3.12.0
 
-**Estado:** FASE 2 completada - Dashboard SUPER_ADMIN + CRUD Organizations Completo (RUT/Tax ID Editable) + Sistema Multi-idioma Completo + AlertDialogs para Acciones Críticas
+**Estado:** FASE 2 completada - Dashboard SUPER_ADMIN + CRUD Organizations Completo + Sistema de Error Handling y Loading States + Dashboard ADMIN_HR Inicial
 
 **Competidor Principal:** Rflex (análisis competitivo en sección de Negocio)
 
@@ -57,6 +57,61 @@
   - `npm run lint` ✅ 0 warnings, 0 errors
   - `npm run build` ✅ Build exitoso
   - Navegador ✅ Formulario funcional y 100% traducido en ES/EN
+
+### ✅ Sesión del 9 de Enero 2026 - Error Boundaries y Loading States
+
+**Completado:**
+
+- ✅ **Sistema de Error Handling Completo:**
+  - Error boundary global (`app/global-error.tsx`) para errores en root layout
+  - Error boundaries específicos por sección:
+    - `app/[locale]/error.tsx` - Error boundary principal
+    - `app/[locale]/dashboard/error.tsx` - Error boundary dashboard
+    - `app/[locale]/super-admin/error.tsx` - Error boundary super-admin
+  - Implementación siguiendo [Next.js Error Handling docs](https://nextjs.org/docs/app/getting-started/error-handling)
+  - Todos los error boundaries son Client Components (`'use client'`)
+  - Logging de errores en `useEffect` para debugging
+  - UI consistente con Card de Shadcn UI
+  - Botones de acción: "Intentar de nuevo" (reset) y "Ir al inicio"
+  - Muestra `error.digest` si está disponible
+  - Traducciones completas (ES/EN) para todos los mensajes de error
+- ✅ **Sistema de Loading States:**
+  - Loading states globales:
+    - `app/[locale]/loading.tsx` - Loading state principal
+    - `app/[locale]/dashboard/loading.tsx` - Loading state dashboard
+    - `app/[locale]/super-admin/loading.tsx` - Loading state super-admin
+  - Loading states específicos:
+    - `app/[locale]/dashboard/admin-hr/loading.tsx` - Loading state específico ADMIN_HR con estructura de tarjetas
+  - Implementación siguiendo [Next.js Loading docs](https://nextjs.org/docs/app/api-reference/file-conventions/loading)
+  - Skeletons que coinciden con la estructura real de cada página
+  - Componente Skeleton de shadcn/ui (`src/shared/ui/skeleton.tsx`)
+  - Grid responsive para tarjetas de carga
+  - Iconos visibles durante la carga (mejor UX)
+- ✅ **Componente Skeleton:**
+  - Archivo: `src/shared/ui/skeleton.tsx`
+  - Basado en shadcn/ui v4
+  - Animación `animate-pulse` para efecto de carga
+  - Import de React corregido para evitar errores de módulos
+- ✅ **Traducciones para Errores:**
+  - Keys agregadas en `messages/es.json` y `messages/en.json`:
+    - `errors.title` - "Algo salió mal" / "Something went wrong"
+    - `errors.description` - Descripción del error
+    - `errors.errorId` - "Error ID"
+    - `errors.tryAgain` - "Intentar de nuevo" / "Try again"
+    - `errors.goHome` - "Ir al inicio" / "Go home"
+- ✅ **Mejoras en Dashboard ADMIN_HR:**
+  - Padding consistente con SUPER_ADMIN (`container mx-auto p-6 lg:p-8`)
+  - Sidebar mejorado con sección de perfil (igual que SUPER_ADMIN):
+    - ThemeToggle y LanguageSelector
+    - Card con información del usuario (avatar, nombre, email)
+    - Botón de logout
+  - Estilos consistentes con SUPER_ADMIN sidebar
+- ✅ **Calidad de Código:**
+  - `npm run format` ✅ Sin cambios pendientes
+  - `npm run lint` ✅ 0 warnings, 0 errors
+  - `npm run build` ✅ Build exitoso
+  - Caché de Next.js limpiada para resolver errores de módulos
+  - Todos los archivos siguen las mejores prácticas de Next.js
 
 ### ✅ Sesión del 8 de Enero 2026 (Noche) - AlertDialogs para Acciones Críticas
 
@@ -170,7 +225,8 @@
   - Form state management mejorado con `control` explícito
 - ✅ **Limpieza de Scripts:**
   - Eliminado `scripts/create-test-organizations.sql` (ya no necesario con UI funcional)
-  - Mantenido `scripts/set-superadmin.sql` (esencial para administración)
+  - Eliminado `scripts/set-superadmin.sql` (administración se hace directamente desde BD)
+  - Carpeta `scripts/` eliminada (ya no contiene archivos)
   - Actualizada documentación en `vita.plan.md` para reflejar cambios
 - ✅ **Calidad de Código:**
   - `npm run format` ✅ Sin cambios pendientes
@@ -543,6 +599,7 @@ Organization {
 ### 2. Siguientes Pasos Sugeridos (Post-CRUD Organizations)
 
 **Prioridad Alta:**
+
 - [ ] **Dashboard ADMIN_HR:**
   - [ ] Layout y Sidebar específico para ADMIN_HR
   - [ ] Protección de rutas con `requireAdminHR()`
@@ -553,6 +610,7 @@ Organization {
   - [ ] Gestión de Tarifas
 
 **Prioridad Media:**
+
 - [ ] **Sistema de Pagos:**
   - [ ] Integración con pasarela de pagos (Stripe/PayPal)
   - [ ] Registro manual de pagos desde SUPER_ADMIN
@@ -567,6 +625,7 @@ Organization {
   - [ ] Gráficos de crecimiento
 
 **Prioridad Baja:**
+
 - [ ] **Mejoras en UX:**
   - [ ] Skeleton loaders para mejor UX
   - [ ] Optimistic updates en acciones
@@ -630,7 +689,7 @@ Organization {
 - ❌ **Anti-pattern:** Usar `window.confirm()` y `window.prompt()` nativos del navegador
 - ❌ **Problema:** No son accesibles, no se pueden estilizar, rompen el flujo de la app
 - ✅ **Solución:** Usar AlertDialog de Shadcn UI (basado en Radix UI)
-- ✅ **Ventajas:** 
+- ✅ **Ventajas:**
   - Consistente con el design system
   - Accesible (ARIA attributes)
   - Personalizable (colores, variantes, contenido)
@@ -8446,13 +8505,13 @@ Agregadas en `messages/es.json` y `messages/en.json`:
 
 **Convertir usuario en SUPER_ADMIN:**
 
+Ejecutar directamente en la base de datos:
+
 ```sql
 UPDATE "User"
 SET role = 'SUPER_ADMIN'
 WHERE email = 'tu-email@example.com';
 ```
-
-O usar el script `scripts/set-superadmin.sql` (modificar el email antes de ejecutar).
 
 **Crear organizaciones de prueba:**
 Usar el formulario web en `http://localhost:3000/es/super-admin/organizations/new` para crear organizaciones desde el UI.
@@ -8497,30 +8556,36 @@ Usar el formulario web en `http://localhost:3000/es/super-admin/organizations/ne
 
 ## 🚀 PRÓXIMOS PASOS INMEDIATOS (Enero 2026)
 
-### Prioridad 1: Completar SUPER_ADMIN Dashboard
+### Prioridad 1: Completar Dashboard ADMIN_HR
 
-1. **Página de Organizaciones** (`/super-admin/organizations`)
-   - Tabla completa con todas las organizaciones
-   - Filtros por: estado, plan, país
-   - Búsqueda por nombre o taxId
-   - Paginación (20 por página)
-   - Botón "Nueva Organización"
+1. **Gestión de Áreas** (`/dashboard/areas`)
+   - CRUD completo de áreas (Emergencias, UCI, Pediatría, etc.)
+   - Crear modelo Prisma para `Area` si no existe
+   - Server Actions con validaciones Zod
+   - Tabla de áreas con acciones (editar, eliminar, activar/desactivar)
+   - Asignación de jefes de área
+   - Estado activo/inactivo
 
-2. **Crear Organización** (`/super-admin/organizations/new`)
-   - Formulario completo con validaciones Zod
-   - Campos: nombre, taxId, país, plan, contacto
-   - Validación de RUT chileno
-   - Creación de cuenta admin automática
-   - Envío de email de bienvenida
+2. **Gestión de Tipos de Turno** (`/dashboard/shift-types`)
+   - CRUD completo de tipos de turno
+   - Crear modelo Prisma para `ShiftType` si no existe
+   - Campos: nombre, duración, clasificación (DÍA, NOCHE, MIXTO), color
+   - Server Actions con validaciones Zod
+   - Tabla de tipos con acciones
 
-3. **Ver/Editar Organización** (`/super-admin/organizations/[id]`)
-   - Vista detallada con métricas
-   - Editar información básica
-   - Ver usuarios vinculados
-   - Historial de pagos
-   - Acciones: Suspender, Reactivar, Eliminar
+3. **Gestión de Tarifas** (`/dashboard/rates`)
+   - CRUD completo de tarifas
+   - Crear modelo Prisma para `Rate` si no existe
+   - Campos: nombre, tarifa horaria día, tarifa horaria noche, multiplicador fin de semana, multiplicador festivo
+   - Server Actions con validaciones Zod
+   - Tabla de tarifas con acciones
 
-### Prioridad 2: Dashboard ADMIN_HR
+4. **Dashboard Principal ADMIN_HR** (`/dashboard/admin-hr`)
+   - Reemplazar datos mock con datos reales de Prisma
+   - Estadísticas reales: total áreas, tipos de turno, personal, tarifas, turnos activos
+   - Gráficos o visualizaciones (opcional)
+
+### Prioridad 2: Completar SUPER_ADMIN Dashboard
 
 1. **Layout y Sidebar**
    - Sidebar con navegación específica del rol

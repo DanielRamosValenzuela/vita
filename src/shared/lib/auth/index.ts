@@ -1,5 +1,13 @@
 export { authOptions, prisma } from './config'
-export { getCurrentUser, requireAuth, requireSuperAdmin, getUserWithOrganization } from './session'
+export {
+  getCurrentUser,
+  requireAuth,
+  requireSuperAdmin,
+  requireAdminHR,
+  requireChiefArea,
+  requireStaffHealth,
+  getUserWithOrganization,
+} from './session'
 export {
   hasRole,
   isSuperAdmin,
