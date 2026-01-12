@@ -1,0 +1,111 @@
+'use server'
+
+import { revalidatePath } from 'next/cache'
+import { requireSuperAdmin } from '@/src/shared/lib/auth/session'
+import { prisma } from '@/src/shared/lib/auth/config'
+import {
+  searchUserByRUTOrEmail,
+  createAdminHRInvitation,
+  checkOrganizationAdminHRLimit,
+} from '../lib/admin-hr-invitation-helpers'
+import type { ActionResult } from '@/src/shared/lib/types'
+import type { Country } from '@prisma/client'
+
+export const searchUserAction = async (
+  search: string,
+  country?: Country
+): Promise<ActionResult<unknown>> => {
+  try {
+    await requireSuperAdmin()
+
+    if (!search || search.trim().length === 0) {
+      return {
+        success: false,
+        error: 'Debes ingresar un RUT o email para buscar',
+      }
+    }
+
+    const user = await searchUserByRUTOrEmail({ search: search.trim(), country })
+
+    if (!user) {
+      return {
+        success: false,
+        error: 'Usuario no encontrado. El usuario debe registrarse primero en la plataforma.',
+      }
+    }
+
+    return {
+      success: true,
+      data: user,
+    }
+  } catch (error) {
+    console.error('[searchUserAction] Error:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Error al buscar usuario',
+    }
+  }
+}
+
+export const inviteAdminHRAction = async (
+  organizationId: string,
+  userId: string
+): Promise<ActionResult<unknown>> => {
+  try {
+    const session = await requireSuperAdmin()
+
+    const limitCheck = await checkOrganizationAdminHRLimit(organizationId)
+    if (!limitCheck.success) {
+      return limitCheck
+    }
+
+    if (!limitCheck.canAddMore) {
+      return {
+        success: false,
+        error: `Se ha alcanzado el límite máximo de ${limitCheck.maxLimit} administradores RRHH para esta organización`,
+      }
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        role: true,
+        organizationId: true,
+      },
+    })
+
+    if (!user) {
+      return {
+        success: false,
+        error: 'Usuario no encontrado',
+      }
+    }
+
+    if (user.role === 'ADMIN_HR' && user.organizationId === organizationId) {
+      return {
+        success: false,
+        error: 'Este usuario ya es ADMIN_HR de esta organización',
+      }
+    }
+
+    const invitationResult = await createAdminHRInvitation(organizationId, userId, session.id)
+
+    if (!invitationResult.success) {
+      return invitationResult
+    }
+
+    revalidatePath(`/super-admin/organizations/${organizationId}`)
+    revalidatePath('/super-admin/organizations')
+
+    return {
+      success: true,
+      data: invitationResult.data,
+    }
+  } catch (error) {
+    console.error('[inviteAdminHRAction] Error:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Error al enviar invitación',
+    }
+  }
+}

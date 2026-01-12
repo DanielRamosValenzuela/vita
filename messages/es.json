@@ -116,6 +116,78 @@
     "shifts": "Turnos",
     "profile": "Perfil"
   },
+  "profile": {
+    "title": "Perfil",
+    "description": "Gestiona tu información personal y configuración",
+    "basicInfo": {
+      "title": "Información Básica",
+      "name": {
+        "label": "Nombre",
+        "placeholder": "Tu nombre completo"
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "tu@email.com"
+      },
+      "save": "Guardar Cambios",
+      "success": "Perfil actualizado exitosamente",
+      "error": "Error al actualizar el perfil"
+    },
+    "password": {
+      "title": "Cambiar Contraseña",
+      "currentPassword": {
+        "label": "Contraseña Actual",
+        "placeholder": "Ingresa tu contraseña actual"
+      },
+      "newPassword": {
+        "label": "Nueva Contraseña",
+        "placeholder": "Mínimo 8 caracteres, 1 mayúscula, 1 minúscula, 1 número"
+      },
+      "confirmPassword": {
+        "label": "Confirmar Nueva Contraseña",
+        "placeholder": "Confirma tu nueva contraseña"
+      },
+      "save": "Cambiar Contraseña",
+      "success": "Contraseña actualizada exitosamente",
+      "error": "Error al cambiar la contraseña"
+    },
+    "document": {
+      "title": "Número de Identificación",
+      "description": "Completa tu número de documento para poder aceptar invitaciones",
+      "warning": "⚠️ Debes completar este campo para poder aceptar invitaciones. Sin tu número de identificación, no podrás unirte a organizaciones.",
+      "country": {
+        "label": "País",
+        "placeholder": "Selecciona tu país"
+      },
+      "save": "Guardar Documento",
+      "success": "Número de documento actualizado exitosamente",
+      "error": "Error al actualizar el número de documento"
+    },
+    "invitations": {
+      "title": "Invitaciones Pendientes",
+      "description": "Tienes invitaciones pendientes para unirte a organizaciones",
+      "empty": "No tienes invitaciones pendientes",
+      "invitationFrom": "Invitación de",
+      "role": "Rol",
+      "accept": "Aceptar",
+      "reject": "Rechazar",
+      "acceptSuccess": "Invitación aceptada exitosamente",
+      "acceptError": "Error al aceptar la invitación",
+      "rejectSuccess": "Invitación rechazada",
+      "rejectError": "Error al rechazar la invitación"
+    },
+    "organizations": {
+      "title": "Mis Organizaciones",
+      "description": "Organizaciones a las que perteneces",
+      "empty": "No perteneces a ninguna organización",
+      "statuses": {
+        "ACTIVE": "Activa",
+        "PENDING_PAYMENT": "Pago Pendiente",
+        "SUSPENDED": "Suspendida",
+        "INACTIVE": "Inactiva"
+      }
+    }
+  },
   "superAdmin": {
     "title": "Panel de Control SUPER ADMIN",
     "organizations": {
@@ -352,7 +424,57 @@
         "totalUsers": "Total Usuarios",
         "totalAreas": "Total Áreas",
         "totalShifts": "Total Turnos",
-        "createdAt": "Fecha de Creación"
+        "createdAt": "Fecha de Creación",
+        "updatedAt": "Última Actualización"
+      },
+      "adminHR": {
+        "title": "Administradores RRHH",
+        "description": "{current} de {max} administradores asignados",
+        "invite": "Invitar Administrador",
+        "inviteFirst": "Invitar primer administrador",
+        "empty": "No hay administradores RRHH asignados",
+        "limitReached": "Se ha alcanzado el límite máximo de administradores RRHH para esta organización",
+        "deleteSuccess": "Administrador eliminado exitosamente",
+        "deleteError": "Error al eliminar el administrador",
+        "inviteForm": {
+          "title": "Invitar Administrador RRHH",
+          "description": "Busca un usuario por RUT o email para invitarlo como administrador de recursos humanos",
+          "emailLabel": "Email",
+          "emailPlaceholder": "usuario@ejemplo.com",
+          "emailInvalid": "Formato de email inválido",
+          "docInvalid": "Formato de documento inválido",
+          "or": "O",
+          "searchButton": "Buscar Usuario",
+          "searching": "Buscando...",
+          "searchRequired": "Debes ingresar un email o número de documento para buscar",
+          "searchError": "Error al buscar usuario",
+          "userFound": "Usuario Encontrado",
+          "userFoundDescription": "Revisa la información del usuario antes de enviar la invitación",
+          "name": "Nombre",
+          "email": "Email",
+          "currentRole": "Rol Actual",
+          "docNumber": "Número de Documento",
+          "noDocNumberWarning": "Este usuario no tiene número de documento registrado",
+          "inOtherOrg": "Este usuario ya está vinculado a otra organización: {orgName}",
+          "inviteWithoutDoc": "Se enviará la invitación, pero el usuario deberá completar su perfil con su número de documento antes de poder aceptarla",
+          "cancel": "Cancelar",
+          "inviting": "Enviando...",
+          "sendInvitation": "Enviar Invitación",
+          "inviteSuccess": "Invitación enviada exitosamente",
+          "inviteError": "Error al enviar invitación"
+        },
+        "table": {
+          "name": "Nombre",
+          "email": "Email",
+          "createdAt": "Fecha de Creación",
+          "actions": "Acciones"
+        },
+        "deleteConfirm": {
+          "title": "Eliminar Administrador RRHH",
+          "description": "¿Estás seguro de que deseas eliminar al administrador {name}? Esta acción no se puede deshacer.",
+          "confirm": "Eliminar",
+          "cancel": "Cancelar"
+        }
       },
       "users": {
         "title": "Usuarios de la Organización",
@@ -373,10 +495,32 @@
         "paymentHistory": "Historial de Pagos",
         "noPayments": "No hay pagos registrados"
       },
+      "contact": {
+        "phone": "Teléfono",
+        "address": "Dirección"
+      },
       "actions": {
         "edit": "Editar Organización",
         "changeStatus": "Cambiar Estado",
         "viewHistory": "Ver Historial"
+      },
+      "invitations": {
+        "title": "Historial de Invitaciones",
+        "description": "Todas las invitaciones enviadas para esta organización",
+        "empty": "No hay invitaciones registradas",
+        "columns": {
+          "user": "Usuario",
+          "email": "Email",
+          "status": "Estado",
+          "invitedAt": "Fecha de Invitación",
+          "acceptedAt": "Fecha de Aceptación"
+        },
+        "statuses": {
+          "PENDING": "Pendiente",
+          "ACCEPTED": "Aceptada",
+          "REJECTED": "Rechazada",
+          "EXPIRED": "Expirada"
+        }
       }
     },
     "deleteOrganization": {
@@ -399,6 +543,67 @@
       "success": "Estado cambiado exitosamente",
       "error": "Error al cambiar el estado"
     },
+    "adminHRUsers": {
+      "title": "Usuarios ADMIN HR",
+      "description": "Gestiona los usuarios con rol de Administrador de Recursos Humanos",
+      "new": "Nuevo Usuario",
+      "empty": "No hay usuarios ADMIN HR registrados",
+      "createFirst": "Crear primer usuario",
+      "deleteSuccess": "Usuario eliminado exitosamente",
+      "deleteError": "Error al eliminar el usuario",
+      "table": {
+        "name": "Nombre",
+        "email": "Email",
+        "organization": "Organización",
+        "createdAt": "Fecha de Creación",
+        "actions": "Acciones"
+      },
+      "deleteConfirm": {
+        "title": "Eliminar Usuario ADMIN HR",
+        "description": "¿Estás seguro de que deseas eliminar al usuario {name}? Esta acción no se puede deshacer.",
+        "confirm": "Eliminar",
+        "cancel": "Cancelar"
+      }
+    },
+    "createAdminHRUser": {
+      "title": "Crear Usuario ADMIN HR",
+      "description": "Crea un nuevo usuario con rol de Administrador de Recursos Humanos y vincúlalo a una organización",
+      "create": "Crear Usuario",
+      "cancel": "Cancelar",
+      "success": "Usuario ADMIN HR creado exitosamente",
+      "error": "Error al crear el usuario",
+      "form": {
+        "name": "Nombre Completo",
+        "namePlaceholder": "Ej: Juan Pérez",
+        "email": "Email",
+        "emailPlaceholder": "usuario@ejemplo.com",
+        "password": "Contraseña",
+        "passwordPlaceholder": "Mínimo 8 caracteres",
+        "passwordDescription": "La contraseña debe tener al menos 8 caracteres",
+        "organization": "Organización",
+        "organizationPlaceholder": "Selecciona una organización"
+      }
+    },
+    "editAdminHRUser": {
+      "title": "Editar Usuario ADMIN HR",
+      "subtitle": "Actualiza la información de {name}",
+      "description": "Modifica los datos del usuario ADMIN HR",
+      "save": "Guardar Cambios",
+      "cancel": "Cancelar",
+      "success": "Usuario ADMIN HR actualizado exitosamente",
+      "error": "Error al actualizar el usuario",
+      "form": {
+        "name": "Nombre Completo",
+        "namePlaceholder": "Ej: Juan Pérez",
+        "email": "Email",
+        "emailPlaceholder": "usuario@ejemplo.com",
+        "password": "Nueva Contraseña",
+        "passwordPlaceholder": "Dejar vacío para mantener la actual",
+        "passwordDescription": "Deja vacío si no deseas cambiar la contraseña",
+        "organization": "Organización",
+        "organizationPlaceholder": "Selecciona una organización"
+      }
+    },
     "sidebar": {
       "title": "VITA",
       "role": "Super Administrador",
@@ -406,7 +611,8 @@
       "organizations": "Organizaciones",
       "payments": "Pagos",
       "analytics": "Analíticas",
-      "settings": "Configuración"
+      "settings": "Configuración",
+      "profile": "Perfil"
     },
     "stats": {
       "totalOrgs": "Total Organizaciones",
@@ -440,7 +646,36 @@
     "areas": {
       "title": "Gestión de Áreas",
       "description": "Administra las áreas de tu organización",
-      "comingSoon": "Próximamente: CRUD completo de áreas"
+      "comingSoon": "Próximamente: CRUD completo de áreas",
+      "new": "Nueva Área",
+      "create": "Crear Área",
+      "createTitle": "Crear Nueva Área",
+      "createDescription": "Completa el formulario para crear una nueva área en tu organización",
+      "createSuccess": "Área creada exitosamente",
+      "createError": "Error al crear el área",
+      "empty": "No hay áreas registradas",
+      "createFirst": "Crear primera área",
+      "cancel": "Cancelar",
+      "noOrganization": "No estás vinculado a una organización",
+      "form": {
+        "name": "Nombre",
+        "namePlaceholder": "Ej: Emergencias, UCI, Pediatría",
+        "description": "Descripción",
+        "descriptionPlaceholder": "Descripción opcional del área",
+        "status": "Estado",
+        "statusDescription": "Activar o desactivar el área"
+      },
+      "table": {
+        "name": "Nombre",
+        "description": "Descripción",
+        "status": "Estado",
+        "actions": "Acciones"
+      },
+      "status": {
+        "active": "Activa",
+        "inactive": "Inactiva"
+      },
+      "delete": "Eliminar"
     },
     "shiftTypes": {
       "title": "Tipos de Turno",

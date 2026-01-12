@@ -22,12 +22,11 @@ export async function generateMetadata({ params }: EditOrganizationPageProps) {
 }
 
 export default async function EditOrganizationPage({ params }: EditOrganizationPageProps) {
+  const { id, locale } = await params
   const user = await requireSuperAdmin()
   if (!user) {
-    redirect('/login')
+    redirect(`/${locale}/login`)
   }
-
-  const { id, locale } = await params
   const t = await getTranslations({ locale, namespace: 'superAdmin.editOrganization' })
   const organization = await getOrganizationById(id)
 

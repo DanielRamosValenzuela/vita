@@ -1,6 +1,7 @@
 import { getTranslations } from 'next-intl/server'
 import { requireAdminHR } from '@/src/shared/lib/auth'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
+import { AreasTable } from '@/src/features/admin-hr/ui'
+import { getAreas } from '@/src/features/admin-hr/lib'
 
 interface AreasPageProps {
   params: Promise<{ locale: string }>
@@ -18,25 +19,33 @@ export async function generateMetadata({ params }: AreasPageProps) {
 
 export default async function AreasPage({ params }: AreasPageProps) {
   const { locale } = await params
-  await requireAdminHR(locale)
+  const user = await requireAdminHR(locale)
   const t = await getTranslations('adminHR.areas')
 
+  if (!user.organizationId) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
+          <p className="text-muted-foreground mt-2">{t('description')}</p>
+        </div>
+        <div className="bg-destructive/10 text-destructive border-destructive/20 rounded-lg border p-4">
+          {t('noOrganization')}
+        </div>
+      </div>
+    )
+  }
+
+  const areas = await getAreas(user.organizationId)
+
   return (
-    <div className="container mx-auto py-8">
-      <div className="mb-8">
+    <div className="space-y-6">
+      <div>
         <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
         <p className="text-muted-foreground mt-2">{t('description')}</p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('title')}</CardTitle>
-          <CardDescription>{t('description')}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">{t('comingSoon')}</p>
-        </CardContent>
-      </Card>
+      <AreasTable areas={areas} />
     </div>
   )
 }

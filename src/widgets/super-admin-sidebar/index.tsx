@@ -3,7 +3,15 @@
 import { useTranslations } from 'next-intl'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { Building2, LayoutDashboard, CreditCard, BarChart3, Settings } from 'lucide-react'
+import {
+  Building2,
+  LayoutDashboard,
+  CreditCard,
+  BarChart3,
+  Settings,
+  Users,
+  User,
+} from 'lucide-react'
 import { cn } from '@/src/shared/lib/utils'
 import { ThemeToggle } from '@/src/shared/ui/atoms/theme-toggle'
 import { LanguageSelector } from '@/src/shared/ui/atoms/language-selector'
@@ -47,6 +55,11 @@ export function SuperAdminSidebar({ user, locale }: SuperAdminSidebarProps) {
       href: `/${locale}/super-admin/settings`,
       icon: Settings,
     },
+    {
+      name: t('profile'),
+      href: `/${locale}/super-admin/profile`,
+      icon: User,
+    },
   ]
 
   const handleLogout = async () => {
@@ -63,9 +76,15 @@ export function SuperAdminSidebar({ user, locale }: SuperAdminSidebarProps) {
       <nav className="flex-1 space-y-1 p-4">
         {navigation.map((item) => {
           const Icon = item.icon
-          const isActive =
-            pathname === item.href ||
-            (item.href !== `/${locale}/super-admin` && pathname.startsWith(item.href + '/'))
+          let isActive = false
+
+          if (item.href === `/${locale}/super-admin`) {
+            isActive = pathname === item.href
+          } else if (item.href === `/${locale}/dashboard/profile`) {
+            isActive = pathname === item.href
+          } else {
+            isActive = pathname.startsWith(item.href + '/')
+          }
 
           return (
             <Link

@@ -15,7 +15,7 @@ export const TAX_ID_CONFIG: Record<Country, TaxIdConfig> = {
   CL: {
     label: 'RUT',
     placeholder: '77.888.999-7',
-    description: 'Rol Único Tributario (RUT) de la empresa',
+    description: 'Rol Único Tributario (RUT) de la persona',
     minLength: 8,
     maxLength: 12,
     pattern: /^[0-9]{1,2}\.[0-9]{3}\.[0-9]{3}-[0-9Kk]$/,
@@ -55,7 +55,7 @@ export const TAX_ID_CONFIG: Record<Country, TaxIdConfig> = {
   PE: {
     label: 'RUC',
     placeholder: '20123456789',
-    description: 'Registro Único de Contribuyentes (RUC)',
+    description: 'Registro Único de Contribuyentes (RUC) de la persona',
     minLength: 11,
     maxLength: 11,
     pattern: /^[12][0-9]{10}$/,
@@ -72,7 +72,7 @@ export const TAX_ID_CONFIG: Record<Country, TaxIdConfig> = {
   CO: {
     label: 'NIT',
     placeholder: '900123456-7',
-    description: 'Número de Identificación Tributaria (NIT)',
+    description: 'Número de Identificación Tributaria (NIT) de la persona',
     minLength: 9,
     maxLength: 12,
     pattern: /^[0-9]{6,9}-[0-9]$/,
@@ -109,7 +109,7 @@ export const TAX_ID_CONFIG: Record<Country, TaxIdConfig> = {
   AR: {
     label: 'CUIT',
     placeholder: '30-12345678-9',
-    description: 'Clave Única de Identificación Tributaria (CUIT)',
+    description: 'Clave Única de Identificación Tributaria (CUIT) de la persona',
     minLength: 11,
     maxLength: 13,
     pattern: /^[0-9]{2}-[0-9]{8}-[0-9]$/,
@@ -143,7 +143,7 @@ export const TAX_ID_CONFIG: Record<Country, TaxIdConfig> = {
   MX: {
     label: 'RFC',
     placeholder: 'ABC123456XYZ',
-    description: 'Registro Federal de Contribuyentes (RFC)',
+    description: 'Registro Federal de Contribuyentes (RFC) de la persona',
     minLength: 12,
     maxLength: 13,
     pattern: /^[A-ZÑ&]{3,4}[0-9]{6}[A-Z0-9]{3}$/,
@@ -171,7 +171,7 @@ export const TAX_ID_CONFIG: Record<Country, TaxIdConfig> = {
   US: {
     label: 'EIN',
     placeholder: '12-3456789',
-    description: 'Employer Identification Number (EIN)',
+    description: 'Employer Identification Number (EIN) de la persona',
     minLength: 9,
     maxLength: 10,
     pattern: /^[0-9]{2}-[0-9]{7}$/,

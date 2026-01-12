@@ -91,7 +91,7 @@ export function MainNavbar() {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link href={`/${locale}/profile`} className="w-full cursor-pointer">
+                  <Link href={`/${locale}/dashboard/profile`} className="w-full cursor-pointer">
                     {t('profile')}
                   </Link>
                 </DropdownMenuItem>

@@ -123,6 +123,7 @@ export function EditOrganizationForm({ organization }: EditOrganizationFormProps
             <Input
               id="taxId"
               placeholder={taxIdConfig.placeholder}
+              maxLength={taxIdConfig.maxLength}
               {...register('taxId', {
                 onChange: (e) => {
                   const formatted = formatTaxId(e.target.value, selectedCountry as Country)

@@ -1,8 +1,8 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { Link, usePathname } from '@/i18n/navigation'
 import { useParams } from 'next/navigation'
+import { Link, usePathname } from '@/i18n/navigation'
 import {
   Calendar,
   Building2,
@@ -118,7 +118,7 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
 
   return (
     <div className="bg-card flex h-screen w-64 flex-col border-r">
-      <Link href={`/${locale}`} className="border-b p-6 transition-opacity hover:opacity-80">
+      <Link href="/" className="border-b p-6 transition-opacity hover:opacity-80">
         <h2 className="text-primary text-xl font-bold">VITA</h2>
         <p className="text-muted-foreground text-sm">{user.role.replace('_', ' ')}</p>
       </Link>

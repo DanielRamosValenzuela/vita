@@ -19,6 +19,8 @@ import {
 import { getOrganizationById } from '@/src/features/super-admin/lib/organization-helpers'
 import { requireSuperAdmin } from '@/src/shared/lib/auth/session'
 import { formatCurrency } from '@/src/shared/lib/utils/format'
+import { OrganizationAdminHRSection } from '@/src/features/super-admin/ui/organization-admin-hr-section'
+import { InvitationsTable } from '@/src/features/super-admin/ui/invitations-table'
 
 interface PageProps {
   params: Promise<{
@@ -188,19 +190,28 @@ const OrganizationDetailsPage = async ({ params }: PageProps) => {
             </div>
             {organization.contactPhone && (
               <div>
-                <p className="text-muted-foreground text-sm font-medium">Teléfono</p>
+                <p className="text-muted-foreground text-sm font-medium">{t('contact.phone')}</p>
                 <p>{organization.contactPhone}</p>
               </div>
             )}
             {organization.address && (
               <div className="md:col-span-2">
-                <p className="text-muted-foreground text-sm font-medium">Dirección</p>
+                <p className="text-muted-foreground text-sm font-medium">{t('contact.address')}</p>
                 <p>{organization.address}</p>
               </div>
             )}
           </div>
         </CardContent>
       </Card>
+
+      <OrganizationAdminHRSection
+        organization={organization}
+        adminHRUsers={organization.users.filter((u) => u.role === 'ADMIN_HR')}
+        currentCount={organization.users.filter((u) => u.role === 'ADMIN_HR').length}
+        maxLimit={organization.maxAdminHR}
+      />
+
+      <InvitationsTable invitations={organization.invitations || []} />
 
       <Card>
         <CardHeader>
@@ -265,7 +276,7 @@ const OrganizationDetailsPage = async ({ params }: PageProps) => {
               <p>{format(new Date(organization.createdAt), 'dd MMMM yyyy', { locale: es })}</p>
             </div>
             <div>
-              <p className="text-muted-foreground text-sm font-medium">Última Actualización</p>
+              <p className="text-muted-foreground text-sm font-medium">{t('overview.updatedAt')}</p>
               <p>{format(new Date(organization.updatedAt), 'dd MMMM yyyy', { locale: es })}</p>
             </div>
           </div>

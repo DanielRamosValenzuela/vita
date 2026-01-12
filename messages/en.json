@@ -116,6 +116,78 @@
     "shifts": "Shifts",
     "profile": "Profile"
   },
+  "profile": {
+    "title": "Profile",
+    "description": "Manage your personal information and settings",
+    "basicInfo": {
+      "title": "Basic Information",
+      "name": {
+        "label": "Name",
+        "placeholder": "Your full name"
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "your@email.com"
+      },
+      "save": "Save Changes",
+      "success": "Profile updated successfully",
+      "error": "Error updating profile"
+    },
+    "password": {
+      "title": "Change Password",
+      "currentPassword": {
+        "label": "Current Password",
+        "placeholder": "Enter your current password"
+      },
+      "newPassword": {
+        "label": "New Password",
+        "placeholder": "Minimum 8 characters, 1 uppercase, 1 lowercase, 1 number"
+      },
+      "confirmPassword": {
+        "label": "Confirm New Password",
+        "placeholder": "Confirm your new password"
+      },
+      "save": "Change Password",
+      "success": "Password updated successfully",
+      "error": "Error changing password"
+    },
+    "document": {
+      "title": "Identification Number",
+      "description": "Complete your document number to be able to accept invitations",
+      "warning": "⚠️ You must complete this field to accept invitations. Without your identification number, you will not be able to join organizations.",
+      "country": {
+        "label": "Country",
+        "placeholder": "Select your country"
+      },
+      "save": "Save Document",
+      "success": "Document number updated successfully",
+      "error": "Error updating document number"
+    },
+    "invitations": {
+      "title": "Pending Invitations",
+      "description": "You have pending invitations to join organizations",
+      "empty": "You have no pending invitations",
+      "invitationFrom": "Invitation from",
+      "role": "Role",
+      "accept": "Accept",
+      "reject": "Reject",
+      "acceptSuccess": "Invitation accepted successfully",
+      "acceptError": "Error accepting invitation",
+      "rejectSuccess": "Invitation rejected",
+      "rejectError": "Error rejecting invitation"
+    },
+    "organizations": {
+      "title": "My Organizations",
+      "description": "Organizations you belong to",
+      "empty": "You don't belong to any organization",
+      "statuses": {
+        "ACTIVE": "Active",
+        "PENDING_PAYMENT": "Pending Payment",
+        "SUSPENDED": "Suspended",
+        "INACTIVE": "Inactive"
+      }
+    }
+  },
   "superAdmin": {
     "title": "SUPER ADMIN Dashboard",
     "sidebar": {
@@ -125,7 +197,8 @@
       "organizations": "Organizations",
       "payments": "Payments",
       "analytics": "Analytics",
-      "settings": "Settings"
+      "settings": "Settings",
+      "profile": "Profile"
     },
     "stats": {
       "totalOrgs": "Total Organizations",
@@ -205,6 +278,12 @@
         "CO": "Colombia",
         "MX": "Mexico",
         "US": "United States"
+      },
+      "roles": {
+        "SUPER_ADMIN": "Super Administrator",
+        "ADMIN_HR": "HR Administrator",
+        "CHIEF_AREA": "Area Chief",
+        "STAFF_HEALTH": "Health Staff"
       },
       "actions": {
         "view": "View details",
@@ -392,6 +471,55 @@
         "totalShifts": "Total Shifts",
         "createdAt": "Created At"
       },
+      "adminHR": {
+        "title": "HR Administrators",
+        "description": "{current} of {max} administrators assigned",
+        "invite": "Invite Administrator",
+        "inviteFirst": "Invite first administrator",
+        "empty": "No HR administrators assigned",
+        "limitReached": "Maximum limit of HR administrators for this organization has been reached",
+        "deleteSuccess": "Administrator deleted successfully",
+        "deleteError": "Error deleting administrator",
+        "inviteForm": {
+          "title": "Invite HR Administrator",
+          "description": "Search for a user by Tax ID or email to invite them as a human resources administrator",
+          "emailLabel": "Email",
+          "emailPlaceholder": "user@example.com",
+          "emailInvalid": "Invalid email format",
+          "docInvalid": "Invalid document format",
+          "or": "OR",
+          "searchButton": "Search User",
+          "searching": "Searching...",
+          "searchRequired": "You must enter an email or document number to search",
+          "searchError": "Error searching for user",
+          "userFound": "User Found",
+          "userFoundDescription": "Review the user information before sending the invitation",
+          "name": "Name",
+          "email": "Email",
+          "currentRole": "Current Role",
+          "docNumber": "Document Number",
+          "noDocNumberWarning": "This user does not have a registered document number",
+          "inOtherOrg": "This user is already linked to another organization: {orgName}",
+          "inviteWithoutDoc": "The invitation will be sent, but the user must complete their profile with their document number before they can accept it",
+          "cancel": "Cancel",
+          "inviting": "Sending...",
+          "sendInvitation": "Send Invitation",
+          "inviteSuccess": "Invitation sent successfully",
+          "inviteError": "Error sending invitation"
+        },
+        "table": {
+          "name": "Name",
+          "email": "Email",
+          "createdAt": "Created At",
+          "actions": "Actions"
+        },
+        "deleteConfirm": {
+          "title": "Delete HR Administrator",
+          "description": "Are you sure you want to delete administrator {name}? This action cannot be undone.",
+          "confirm": "Delete",
+          "cancel": "Cancel"
+        }
+      },
       "users": {
         "title": "Organization Users",
         "addUser": "Add User",
@@ -411,10 +539,32 @@
         "paymentHistory": "Payment History",
         "noPayments": "No payments registered"
       },
+      "contact": {
+        "phone": "Phone",
+        "address": "Address"
+      },
       "actions": {
         "edit": "Edit Organization",
         "changeStatus": "Change Status",
         "viewHistory": "View History"
+      },
+      "invitations": {
+        "title": "Invitations History",
+        "description": "All invitations sent for this organization",
+        "empty": "No invitations recorded",
+        "columns": {
+          "user": "User",
+          "email": "Email",
+          "status": "Status",
+          "invitedAt": "Invited At",
+          "acceptedAt": "Accepted At"
+        },
+        "statuses": {
+          "PENDING": "Pending",
+          "ACCEPTED": "Accepted",
+          "REJECTED": "Rejected",
+          "EXPIRED": "Expired"
+        }
       }
     },
     "deleteOrganization": {
@@ -437,6 +587,67 @@
       "success": "Status changed successfully",
       "error": "Error changing status"
     },
+    "adminHRUsers": {
+      "title": "ADMIN HR Users",
+      "description": "Manage users with Human Resources Administrator role",
+      "new": "New User",
+      "empty": "No ADMIN HR users registered",
+      "createFirst": "Create first user",
+      "deleteSuccess": "User deleted successfully",
+      "deleteError": "Error deleting user",
+      "table": {
+        "name": "Name",
+        "email": "Email",
+        "organization": "Organization",
+        "createdAt": "Created At",
+        "actions": "Actions"
+      },
+      "deleteConfirm": {
+        "title": "Delete ADMIN HR User",
+        "description": "Are you sure you want to delete user {name}? This action cannot be undone.",
+        "confirm": "Delete",
+        "cancel": "Cancel"
+      }
+    },
+    "createAdminHRUser": {
+      "title": "Create ADMIN HR User",
+      "description": "Create a new user with Human Resources Administrator role and link them to an organization",
+      "create": "Create User",
+      "cancel": "Cancel",
+      "success": "ADMIN HR user created successfully",
+      "error": "Error creating user",
+      "form": {
+        "name": "Full Name",
+        "namePlaceholder": "E.g: John Doe",
+        "email": "Email",
+        "emailPlaceholder": "user@example.com",
+        "password": "Password",
+        "passwordPlaceholder": "Minimum 8 characters",
+        "passwordDescription": "Password must be at least 8 characters long",
+        "organization": "Organization",
+        "organizationPlaceholder": "Select an organization"
+      }
+    },
+    "editAdminHRUser": {
+      "title": "Edit ADMIN HR User",
+      "subtitle": "Update information for {name}",
+      "description": "Modify ADMIN HR user data",
+      "save": "Save Changes",
+      "cancel": "Cancel",
+      "success": "ADMIN HR user updated successfully",
+      "error": "Error updating user",
+      "form": {
+        "name": "Full Name",
+        "namePlaceholder": "E.g: John Doe",
+        "email": "Email",
+        "emailPlaceholder": "user@example.com",
+        "password": "New Password",
+        "passwordPlaceholder": "Leave empty to keep current",
+        "passwordDescription": "Leave empty if you don't want to change the password",
+        "organization": "Organization",
+        "organizationPlaceholder": "Select an organization"
+      }
+    },
     "alerts": {
       "title": "Alerts and Notifications",
       "upcomingPayments": "{count} organizations with payment due soon",
@@ -452,7 +663,36 @@
     "areas": {
       "title": "Area Management",
       "description": "Manage your organization's areas",
-      "comingSoon": "Coming soon: Complete CRUD for areas"
+      "comingSoon": "Coming soon: Complete CRUD for areas",
+      "new": "New Area",
+      "create": "Create Area",
+      "createTitle": "Create New Area",
+      "createDescription": "Complete the form to create a new area in your organization",
+      "createSuccess": "Area created successfully",
+      "createError": "Error creating area",
+      "empty": "No areas registered",
+      "createFirst": "Create first area",
+      "cancel": "Cancel",
+      "noOrganization": "You are not linked to an organization",
+      "form": {
+        "name": "Name",
+        "namePlaceholder": "E.g: Emergency, ICU, Pediatrics",
+        "description": "Description",
+        "descriptionPlaceholder": "Optional area description",
+        "status": "Status",
+        "statusDescription": "Activate or deactivate the area"
+      },
+      "table": {
+        "name": "Name",
+        "description": "Description",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "delete": "Delete"
     },
     "shiftTypes": {
       "title": "Shift Types",

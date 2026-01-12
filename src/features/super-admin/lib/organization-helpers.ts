@@ -83,6 +83,18 @@ export const getOrganizationById = async (id: string) => {
         },
         orderBy: { createdAt: 'desc' },
       },
+      invitations: {
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+        },
+        orderBy: { createdAt: 'desc' },
+      },
       _count: {
         select: {
           users: true,

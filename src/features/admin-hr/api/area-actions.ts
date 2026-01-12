@@ -1,31 +1,119 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import {
+  createAreaSchema,
+  updateAreaSchema,
+  type CreateAreaInput,
+  type UpdateAreaInput,
+} from '../lib/schemas'
+import { createArea, updateArea, deleteArea } from '../lib/area-helpers'
+import { requireAdminHR } from '@/src/shared/lib/auth'
 
-export async function getAreasAction() {
-  return {
-    success: true,
-    data: [],
+export async function createAreaAction(data: CreateAreaInput) {
+  try {
+    const user = await requireAdminHR()
+
+    if (!user.organizationId) {
+      return {
+        success: false,
+        error: 'No estás vinculado a una organización',
+      }
+    }
+
+    const validatedData = createAreaSchema.parse(data)
+    const area = await createArea(validatedData, user.organizationId)
+
+    revalidatePath('/dashboard/areas')
+    revalidatePath('/dashboard/admin-hr')
+
+    return {
+      success: true,
+      data: area,
+      message: 'Área creada exitosamente',
+    }
+  } catch (error) {
+    console.error('[createAreaAction] Error:', error)
+
+    if (error instanceof Error && 'name' in error && error.name === 'ZodError') {
+      return {
+        success: false,
+        error: 'Datos inválidos',
+      }
+    }
+
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Error al crear el área',
+    }
   }
 }
 
-export async function createAreaAction() {
-  revalidatePath('/dashboard/areas')
-  return {
-    success: true,
+export async function updateAreaAction(id: string, data: UpdateAreaInput) {
+  try {
+    const user = await requireAdminHR()
+
+    if (!user.organizationId) {
+      return {
+        success: false,
+        error: 'No estás vinculado a una organización',
+      }
+    }
+
+    const validatedData = updateAreaSchema.parse(data)
+    const area = await updateArea(id, validatedData, user.organizationId)
+
+    revalidatePath('/dashboard/areas')
+    revalidatePath('/dashboard/admin-hr')
+
+    return {
+      success: true,
+      data: area,
+      message: 'Área actualizada exitosamente',
+    }
+  } catch (error) {
+    console.error('[updateAreaAction] Error:', error)
+
+    if (error instanceof Error && 'name' in error && error.name === 'ZodError') {
+      return {
+        success: false,
+        error: 'Datos inválidos',
+      }
+    }
+
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Error al actualizar el área',
+    }
   }
 }
 
-export async function updateAreaAction() {
-  revalidatePath('/dashboard/areas')
-  return {
-    success: true,
-  }
-}
+export async function deleteAreaAction(id: string) {
+  try {
+    const user = await requireAdminHR()
 
-export async function deleteAreaAction() {
-  revalidatePath('/dashboard/areas')
-  return {
-    success: true,
+    if (!user.organizationId) {
+      return {
+        success: false,
+        error: 'No estás vinculado a una organización',
+      }
+    }
+
+    await deleteArea(id, user.organizationId)
+
+    revalidatePath('/dashboard/areas')
+    revalidatePath('/dashboard/admin-hr')
+
+    return {
+      success: true,
+      message: 'Área eliminada exitosamente',
+    }
+  } catch (error) {
+    console.error('[deleteAreaAction] Error:', error)
+
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Error al eliminar el área',
+    }
   }
 }
