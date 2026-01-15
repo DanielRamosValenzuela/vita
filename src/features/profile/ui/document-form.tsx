@@ -1,11 +1,17 @@
 'use client'
 
-import { useState, useTransition, useMemo } from 'react'
+import { useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Loader2, AlertTriangle } from 'lucide-react'
+import { Country } from '@prisma/client'
+import { Loader2 } from 'lucide-react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+
+import { formatTaxId, getTaxIdConfig } from '@/src/shared/lib/utils/tax-id-config'
+import { Alert, AlertDescription } from '@/src/shared/ui/alert'
 import { Button } from '@/src/shared/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
 import { Input } from '@/src/shared/ui/input'
 import { Label } from '@/src/shared/ui/label'
 import {
@@ -15,13 +21,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/src/shared/ui/select'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/src/shared/ui/card'
-import { Alert, AlertDescription } from '@/src/shared/ui/alert'
+
 import { updateDocumentAction } from '../api/profile-actions'
-import { updateDocumentSchema, type UpdateDocumentInput } from '../lib/schemas'
-import { getTaxIdConfig, formatTaxId } from '@/src/shared/lib/utils/tax-id-config'
-import type { Country } from '@prisma/client'
-import { toast } from 'sonner'
+import { useUpdateDocumentSchema, type UpdateDocumentInput } from '../lib/schemas'
 
 interface DocumentFormProps {
   initialData?: {
@@ -40,8 +42,10 @@ export function DocumentForm({ initialData }: DocumentFormProps) {
     initialData?.country || null
   )
 
+  const updateDocumentSchema = useUpdateDocumentSchema(selectedCountry || Country.CL)
+
   const form = useForm<UpdateDocumentInput>({
-    resolver: selectedCountry ? zodResolver(updateDocumentSchema(selectedCountry)) : undefined,
+    resolver: selectedCountry ? zodResolver(updateDocumentSchema) : undefined,
     defaultValues: {
       country: selectedCountry || undefined,
       docNumber: initialData?.docNumber || '',

@@ -2,25 +2,29 @@
 
 import { useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
-import { useRouter } from '@/i18n/navigation'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Loader2 } from 'lucide-react'
+import { useForm, useWatch } from 'react-hook-form'
+import { toast } from 'sonner'
+
 import { Button } from '@/src/shared/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
 import { Input } from '@/src/shared/ui/input'
 import { Label } from '@/src/shared/ui/label'
-import { Textarea } from '@/src/shared/ui/textarea'
 import { Switch } from '@/src/shared/ui/switch'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
+import { Textarea } from '@/src/shared/ui/textarea'
+
+import { useRouter } from '@/i18n/navigation'
+
 import { createAreaAction } from '../api/area-actions'
-import { createAreaSchema, type CreateAreaInput } from '../lib/schemas'
-import { toast } from 'sonner'
+import { useCreateAreaSchema, type CreateAreaInput } from '../lib/schemas'
 
 export function CreateAreaForm() {
   const t = useTranslations('adminHR.areas')
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
+  const createAreaSchema = useCreateAreaSchema()
 
   const form = useForm<CreateAreaInput>({
     resolver: zodResolver(createAreaSchema),
@@ -35,11 +39,11 @@ export function CreateAreaForm() {
     register,
     handleSubmit,
     formState: { errors },
-    watch,
     setValue,
+    control,
   } = form
 
-  const isActive = watch('isActive')
+  const isActive = useWatch({ control, name: 'isActive' })
 
   const onSubmit = async (data: CreateAreaInput) => {
     setError(null)

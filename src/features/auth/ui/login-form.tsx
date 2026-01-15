@@ -3,7 +3,9 @@
 import { useState } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
+
 import { Link } from '@/i18n/navigation'
+
 import { loginAction } from '../api'
 
 export function LoginForm() {
@@ -22,6 +24,9 @@ export function LoginForm() {
     setGeneralError(null)
 
     const formData = new FormData(e.currentTarget)
+    const locale = window.location.pathname.split('/')[1] || 'es'
+    formData.set('locale', locale)
+
     const email = formData.get('email') as string
     const password = formData.get('password') as string
 

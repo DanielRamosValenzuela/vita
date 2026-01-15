@@ -1,6 +1,7 @@
-import { Skeleton } from '@/src/shared/ui/skeleton'
+import { Calendar, Clock, DollarSign, LayoutGrid, Users } from 'lucide-react'
+
 import { Card, CardContent, CardHeader } from '@/src/shared/ui/card'
-import { LayoutGrid, Clock, Users, DollarSign, Calendar } from 'lucide-react'
+import { Skeleton } from '@/src/shared/ui/skeleton'
 
 export default function AdminHRDashboardLoading() {
   const cards = [

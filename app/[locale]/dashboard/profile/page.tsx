@@ -1,14 +1,15 @@
-import { getCurrentUser } from '@/src/shared/lib/auth/session'
-import { redirect } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
+import { redirect } from 'next/navigation'
+import type { Country } from '@prisma/client'
+
+import { getCurrentUser } from '@/src/shared/lib/auth/session'
 import {
-  ProfileForm,
   ChangePasswordForm,
   DocumentForm,
   InvitationsSection,
   OrganizationsSection,
+  ProfileForm,
 } from '@/src/features/profile/ui'
-import type { Country } from '@prisma/client'
 
 interface ProfilePageProps {
   params: Promise<{ locale: string }>

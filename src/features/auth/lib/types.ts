@@ -18,3 +18,18 @@ export interface LoginData {
     role: string
   }
 }
+
+export type RegisterInput = {
+  name: string
+  email: string
+  docNumber: string
+  password: string
+  confirmPassword: string
+  country: string
+  docType: string
+}
+
+export type LoginInput = {
+  email: string
+  password: string
+}

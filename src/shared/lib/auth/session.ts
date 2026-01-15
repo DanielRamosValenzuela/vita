@@ -1,8 +1,8 @@
 import { getServerSession } from 'next-auth/next'
 import { redirect } from 'next/navigation'
 import { Role } from '@prisma/client'
-import { authOptions } from './config'
-import { prisma } from './config'
+
+import { authOptions, prisma } from './config'
 import type { CurrentUser } from './types'
 
 export async function getCurrentUser(): Promise<CurrentUser | null> {

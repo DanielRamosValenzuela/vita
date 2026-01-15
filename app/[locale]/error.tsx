@@ -2,6 +2,8 @@
 
 import { useEffect } from 'react'
 import { useTranslations } from 'next-intl'
+import { AlertCircle, Home, RefreshCw } from 'lucide-react'
+
 import { Button } from '@/src/shared/ui/button'
 import {
   Card,
@@ -11,7 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/src/shared/ui/card'
-import { AlertCircle, Home, RefreshCw } from 'lucide-react'
+
 import { useRouter } from '@/i18n/navigation'
 
 export default function Error({

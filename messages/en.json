@@ -114,7 +114,11 @@
     "rates": "Rates",
     "staff": "Staff",
     "shifts": "Shifts",
-    "profile": "Profile"
+    "profile": "Profile",
+    "calendarTitle": "Calendar",
+    "calendarDescription": "View the shift calendar. Sign in to manage your shifts.",
+    "calendarWelcome": "Welcome, {name}. Here you can view all your shifts.",
+    "calendarWelcomePlaceholder": "Welcome, {name}. Here you can view all your shifts."
   },
   "profile": {
     "title": "Profile",
@@ -648,6 +652,20 @@
         "organizationPlaceholder": "Select an organization"
       }
     },
+    "dashboard": {
+      "title": "SUPER ADMIN Dashboard",
+      "subtitle": "Overview of all organizations and metrics",
+      "recent": {
+        "title": "Recent Organizations",
+        "viewAll": "View All",
+        "new": "New Organization"
+      },
+      "stats": {
+        "orgGrowth": "+{count} this month",
+        "revenueGrowth": "+{amount} ↑",
+        "userGrowth": "+{count} this month"
+      }
+    },
     "alerts": {
       "title": "Alerts and Notifications",
       "upcomingPayments": "{count} organizations with payment due soon",
@@ -711,5 +729,99 @@
     "errorId": "Error ID",
     "tryAgain": "Try again",
     "goHome": "Go home"
+  },
+  "validation": {
+    "email": {
+      "required": "Email is required",
+      "invalid": "Email is not valid"
+    },
+    "password": {
+      "required": "Password is required",
+      "minLength": "Password must be at least 8 characters",
+      "maxLength": "Password cannot exceed 100 characters",
+      "uppercase": "Password must contain at least one uppercase letter",
+      "lowercase": "Password must contain at least one lowercase letter",
+      "number": "Password must contain at least one number"
+    },
+    "name": {
+      "required": "Name is required",
+      "minLength": "Name must be at least 2 characters",
+      "maxLength": "Name cannot exceed 100 characters"
+    },
+    "docNumber": {
+      "required": "Document is required",
+      "minLength": "Document must be at least {min} characters",
+      "maxLength": "Document cannot exceed {max} characters",
+      "invalid": "The {label} entered is not valid"
+    },
+    "confirmPassword": {
+      "required": "You must confirm your password",
+      "mismatch": "Passwords do not match"
+    },
+    "docType": {
+      "mismatch": "Document type must be {expected} for {country}"
+    },
+    "description": {
+      "maxLength": "Description cannot exceed {max} characters"
+    },
+    "phone": {
+      "minLength": "Phone must be at least {min} characters",
+      "maxLength": "Phone cannot exceed {max} characters"
+    },
+    "address": {
+      "maxLength": "Address cannot exceed {max} characters"
+    },
+    "taxId": {
+      "required": "Tax ID is required",
+      "invalid": "Tax ID is not valid for the selected country"
+    },
+    "number": {
+      "integer": "Must be an integer",
+      "min": "Value cannot be negative",
+      "max": "Value cannot exceed {max}",
+      "monthlyFeeMax": "Monthly fee cannot exceed $1,000,000"
+    },
+    "organization": {
+      "required": "Organization is required"
+    },
+    "reason": {
+      "minLength": "Reason must be at least {min} characters",
+      "maxLength": "Reason cannot exceed {max} characters"
+    },
+    "currentPassword": {
+      "required": "Current password is required"
+    },
+    "document": {
+      "required": "Document number is required",
+      "invalid": "Invalid document number for the selected country"
+    },
+    "area": {
+      "nameMinLength": "Name must be at least {min} characters",
+      "nameMaxLength": "Name cannot exceed {max} characters",
+      "descriptionMaxLength": "Description cannot exceed {max} characters"
+    },
+    "organization": {
+      "nameMinLength": "Name must be at least {min} characters",
+      "nameMaxLength": "Name cannot exceed {max} characters",
+      "contactNameMinLength": "Contact name must be at least {min} characters",
+      "contactNameMaxLength": "Contact name cannot exceed {max} characters",
+      "contactEmailMaxLength": "Email cannot exceed {max} characters",
+      "contactPhoneMinLength": "Phone must be at least {min} characters",
+      "contactPhoneMaxLength": "Phone cannot exceed {max} characters",
+      "addressMaxLength": "Address cannot exceed {max} characters",
+      "monthlyFeeMin": "Monthly fee cannot be negative",
+      "monthlyFeeMax": "Monthly fee cannot exceed $1,000,000",
+      "limitInteger": "Must be an integer",
+      "limitMin": "Limit cannot be negative",
+      "limitMax": "Limit cannot exceed {max}",
+      "planLimitMaxAdminHRExceeded": "Admin HR limit exceeds the maximum allowed for this plan",
+      "planLimitMaxChiefsExceeded": "Chiefs limit exceeds the maximum allowed for this plan",
+      "planLimitMaxStaffExceeded": "Staff limit exceeds the maximum allowed for this plan",
+      "taxIdMinLength": "Tax ID must be at least {min} characters",
+      "taxIdMaxLength": "Tax ID cannot exceed {max} characters"
+    },
+    "adminHRUser": {
+      "emailInvalid": "Invalid email"
+    }
   }
 }

@@ -16,6 +16,113 @@
 
 ## 🎉 PROGRESO RECIENTE (Enero 2026)
 
+### ✅ Sesión del 10 de Enero 2026 - Reorganización de Estructura `lib/` según FSD
+
+**Completado:**
+
+- ✅ **Reorganización Completa de `lib/` en todos los Features:**
+  - Implementada estructura FSD con separación por dominio y tecnología
+  - Agrupación por dominio primero (`validation/`, `helpers/`)
+  - Separación por tecnología usando carpetas (`server/`, `client/`)
+  - Funcionalidad separada en archivos individuales con nombres descriptivos
+  - Todos los `index.ts` solo exportan (barrel exports)
+- ✅ **Estructura Final Implementada:**
+  ```
+  lib/
+  ├── validation/
+  │   ├── server/
+  │   │   ├── {domain}-messages.ts    # Mensajes de validación server-side
+  │   │   └── index.ts                # Solo exports
+  │   ├── client/
+  │   │   ├── {domain}-messages.ts    # Hooks de validación client-side
+  │   │   └── index.ts                # Solo exports
+  │   └── index.ts                    # Public API
+  ├── helpers/
+  │   ├── server/
+  │   │   ├── {domain}-schemas.ts     # Schemas server-side
+  │   │   └── index.ts                # Solo exports
+  │   ├── client/
+  │   │   ├── {domain}-schemas.ts     # Schemas client-side
+  │   │   └── index.ts                # Solo exports
+  │   └── index.ts                    # Public API
+  ├── schemas/                        # Schemas Zod
+  ├── types.ts                        # Tipos TypeScript
+  ├── constants.ts                    # Constantes
+  └── index.ts                        # Public API del feature
+  ```
+- ✅ **Features Reorganizados:**
+  - `super-admin/lib`: `organization-messages.ts`, `admin-hr-user-messages.ts`, `organization-schemas.ts`, `admin-hr-user-schemas.ts` (server y client)
+  - `auth/lib`: `auth-messages.ts`, `auth-schemas.ts` (solo server)
+  - `profile/lib`: `profile-messages.ts`, `profile-schemas.ts` (server y client)
+  - `admin-hr/lib`: `area-messages.ts`, `area-schemas.ts` (server y client)
+- ✅ **Ventajas de la Nueva Estructura:**
+  - **Mejor Encapsulación:** Cada carpeta `server/` o `client/` puede contener múltiples archivos sin mezclar responsabilidades
+  - **Escalabilidad:** Fácil agregar más archivos dentro de cada carpeta sin afectar otros
+  - **Claridad:** Separación server/client es explícita por carpeta, no por sufijo en nombre de archivo
+  - **Mantenibilidad:** Estructura más clara y fácil de navegar
+  - **Alineado con FSD:** Agrupa por dominio primero, luego por tecnología
+  - **Nombres Descriptivos:** Archivos nombrados según su función (`organization-messages.ts`, `auth-schemas.ts`)
+- ✅ **Calidad de Código:**
+  - `npm run lint` ✅ Sin errores reales (solo caché de linter sobre archivo inexistente)
+  - Estructura consistente en todos los features
+  - Imports actualizados correctamente
+  - Public API bien definida a través de `index.ts`
+
+### ✅ Sesión del 10 de Enero 2026 - Sistema de Temas Personalizados + Correcciones UI
+
+**Completado:**
+
+- ✅ **Sistema de Temas Personalizados:**
+  - Implementado sistema de temas con CSS variables dinámicas
+  - Separación de lógica y constantes en `src/shared/lib/themes/`:
+    - `themes-types.ts`: Interfaces TypeScript
+    - `themes-constants.ts`: Temas predefinidos (Aurora, Soleil, Lavande)
+    - `themes-utils.ts`: Utilidades para localStorage
+    - `index.ts`: Barrel exports
+  - `CustomThemeProvider` para gestión de temas con contexto React
+  - `ThemeSelector` en navbar con dropdown de selección
+  - Temas predefinidos con nombres artísticos (Aurora, Soleil, Lavande)
+  - Persistencia de tema seleccionado en localStorage
+  - Integración con `next-themes` para dark/light mode
+  - Tema "Aurora" (default) limpia variables CSS para usar estilos de `globals.css`
+- ✅ **Correcciones UI:**
+  - Eliminado checkmark duplicado en `ThemeSelector` (solo muestra el nativo del componente Select)
+  - Ajustado ancho del selector para mostrar nombres completos de temas
+  - Icono `Palette` con `shrink-0` para evitar compresión
+- ✅ **Calidad de Código:**
+  - `npm run build` ✅ Build exitoso
+  - Estructura modular y mantenible
+  - Sin lógica de importación de temas (solo predefinidos)
+
+### ✅ Sesión del 10 de Enero 2026 - Refactorización: Patrón Repository en todos los Features
+
+**Completado:**
+
+- ✅ **Implementación del Patrón Repository:**
+  - Creada carpeta `data/` en todos los features (`profile`, `auth`, `admin-hr`, `super-admin`)
+  - Movidos todos los helpers que acceden directamente a Prisma a repositorios
+  - Separación clara entre lógica de negocio (`lib/`) y acceso a datos (`data/`)
+  - Estructura consistente: `data/{entity}-repository.ts` y `data/index.ts`
+- ✅ **Features Refactorizados:**
+  - `profile`: `profile-helpers.ts` → `data/profile-repository.ts`
+  - `auth`: `user-helpers.ts` → `data/user-repository.ts`
+  - `admin-hr`: `area-helpers.ts` → `data/area-repository.ts`
+  - `super-admin`: Ya tenía estructura `data/` (organizations, admin-hr-users, invitations)
+- ✅ **Actualización de Imports:**
+  - Server Actions actualizados para usar repositorios en lugar de helpers
+  - Páginas actualizadas para importar desde `data/` en lugar de `lib/`
+  - `index.ts` de `lib/` actualizados con comentarios indicando la migración
+- ✅ **Beneficios de la Refactorización:**
+  - Mejor separación de responsabilidades (SRP)
+  - Facilita futuras migraciones (cambio de ORM, microservicios)
+  - Código más testeable y mantenible
+  - Preparado para escalabilidad futura
+- ✅ **Calidad de Código:**
+  - `npm run build` ✅ Build exitoso
+  - `npm run lint` ✅ Sin errores (solo warnings menores)
+  - Estructura consistente en todos los features
+  - Comentarios documentando el patrón Repository
+
 ### ✅ Sesión del 10 de Enero 2026 - Correcciones UI/UX Perfil + Sección de Organizaciones
 
 **Completado:**
@@ -841,16 +948,18 @@ Organization {
 ## 📖 ÍNDICE
 
 ### 📋 Información General
+
 1. [🎉 Progreso Reciente](#-progreso-reciente-enero-2026)
 2. [🎯 ¿Qué es VITA?](#-qué-es-vita)
-4. [💰 Modelo de Negocio](#-modelo-de-negocio)
-5. [💼 Modelo de Negocio: Límites de Cuentas](#-modelo-de-negocio-límites-de-cuentas)
-6. [🎯 Análisis Competitivo](#-análisis-competitivo)
-7. [👥 Sistema de Roles](#-sistema-de-roles)
-8. [📊 Casos de Uso](#-casos-de-uso)
-9. [🗺️ Mapas de Procesos](#️-mapas-de-procesos)
+3. [💰 Modelo de Negocio](#-modelo-de-negocio)
+4. [💼 Modelo de Negocio: Límites de Cuentas](#-modelo-de-negocio-límites-de-cuentas)
+5. [🎯 Análisis Competitivo](#-análisis-competitivo)
+6. [👥 Sistema de Roles](#-sistema-de-roles)
+7. [📊 Casos de Uso](#-casos-de-uso)
+8. [🗺️ Mapas de Procesos](#️-mapas-de-procesos)
 
 ### 🏗️ Arquitectura y Tecnología
+
 10. [🏗️ Stack Tecnológico](#️-stack-tecnológico)
 11. [🌍 Internacionalización (i18n)](#-internacionalización-i18n)
 12. [💾 Arquitectura de Datos](#-arquitectura-de-datos)
@@ -860,6 +969,7 @@ Organization {
 16. [🏛️ Arquitectura de Código y Mejores Prácticas](#️-arquitectura-de-código-y-mejores-prácticas)
 
 ### 🎨 Diseño y UX
+
 17. [🎨 Paleta de Colores](#-paleta-de-colores-healthcare-modern-theme)
 18. [🖥️ Dashboards por Rol](#️-dashboards-por-rol---especificación-visual)
 19. [📱 Adaptación Responsive](#-adaptación-responsive)
@@ -867,6 +977,7 @@ Organization {
 21. [🎨 Diseño y UX](#-diseño-y-ux)
 
 ### 📋 Plan de Desarrollo
+
 22. [📋 Plan de Desarrollo Paso a Paso](#-plan-de-desarrollo-paso-a-paso)
 23. [🎯 MVP1 Completado](#-mvp1-completado)
 24. [🔮 MVP2 - Funcionalidades Avanzadas](#-mvp2---funcionalidades-avanzadas)
@@ -874,17 +985,19 @@ Organization {
 26. [🚀 Próximos Pasos Inmediatos (Enero 2026)](#-próximos-pasos-inmediatos-enero-2026)
 
 ### 📚 Referencias y Utilidades
+
 27. [📚 Lecciones Aprendidas y Mejores Prácticas](#-lecciones-aprendidas-y-mejores-prácticas)
 28. [📦 Dependencias del Proyecto](#-dependencias-del-proyecto)
 29. [🛠️ Comandos Útiles](#️-comandos-útiles)
 30. [📱 Preparación para Capacitor (MVP2)](#-preparación-para-capacitor-mvp2)
-31. [❗ Decisiones Importantes](#-decisiones-importantes)
-32. [📚 Referencias](#-referencias)
-33. [❌ Cosas que Evitar](#-cosas-que-evitar)
-34. [🎯 Próximo Paso Inmediato](#-próximo-paso-inmediato)
-35. [❓ Preguntas Pendientes](#-preguntas-pendientes)
-36. [📝 Decisiones y Arquitectura Definida](#-decisiones-y-arquitectura-definida)
-37. [🔐 SUPER_ADMIN Dashboard - Implementación Completada](#-super_admin-dashboard---implementación-completada-enero-2026)
+31. [🔄 Migraciones y Escalabilidad Futura](#-migraciones-y-escalabilidad-futura)
+32. [❗ Decisiones Importantes](#-decisiones-importantes)
+33. [📚 Referencias](#-referencias)
+34. [❌ Cosas que Evitar](#-cosas-que-evitar)
+35. [🎯 Próximo Paso Inmediato](#-próximo-paso-inmediato)
+36. [❓ Preguntas Pendientes](#-preguntas-pendientes)
+37. [📝 Decisiones y Arquitectura Definida](#-decisiones-y-arquitectura-definida)
+38. [🔐 SUPER_ADMIN Dashboard - Implementación Completada](#-super_admin-dashboard---implementación-completada-enero-2026)
 
 ---
 
@@ -2826,6 +2939,9 @@ export const isWithinCheckInRadius = (userLat: number, userLng: number): boolean
 **Implementación:**
 
 ```typescript
+// En la app: Escanear con Capacitor Barcode Scanner
+import { BarcodeScanner } from '@capacitor-community/barcode-scanner'
+
 // actions/attendance/generate-qr-action.ts
 export async function generateQRCodeAction(shiftId: string) {
   const token = await generateSecureToken() // JWT con expiración
@@ -2840,9 +2956,6 @@ export async function generateQRCodeAction(shiftId: string) {
   const qrCodeUrl = await QRCode.toDataURL(JSON.stringify(qrData))
   return { success: true, qrCodeUrl }
 }
-
-// En la app: Escanear con Capacitor Barcode Scanner
-import { BarcodeScanner } from '@capacitor-community/barcode-scanner'
 
 const handleScan = async () => {
   const result = await BarcodeScanner.startScan()
@@ -4027,6 +4140,9 @@ export interface PaginationParams {
 **Ejemplo Real del Proyecto:**
 
 ```typescript
+// src/features/auth/api/auth-actions.ts
+import type { ActionResult } from '../lib/types'
+
 // ✅ CORRECTO
 // src/features/auth/lib/types.ts
 export interface ActionResult<T = unknown> {
@@ -4034,9 +4150,6 @@ export interface ActionResult<T = unknown> {
   data?: T
   error?: string
 }
-
-// src/features/auth/api/auth-actions.ts
-import type { ActionResult } from '../lib/types'
 
 export async function registerAction(data: FormData): Promise<ActionResult<RegisterData>> {
   // ...
@@ -4073,10 +4186,11 @@ export interface ActionResult<T = unknown> {
 // src/features/shifts/api/shift-actions.ts
 'use server'
 
-import { z } from 'zod'
-import { prisma } from '@/lib/db/prisma'
-import { requireAuth } from '@/lib/auth/session'
 import { revalidatePath } from 'next/cache'
+import { z } from 'zod'
+
+import { requireAuth } from '@/lib/auth/session'
+import { prisma } from '@/lib/db/prisma'
 
 const createShiftSchema = z.object({
   date: z.string(),
@@ -4291,7 +4405,7 @@ export default function DashboardError({ error, reset }: ErrorProps) {
 
 ```typescript
 // lib/utils.ts
-import { type ClassValue, clsx } from 'clsx'
+import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 
 export const cn = (...inputs: ClassValue[]) => {
@@ -4626,15 +4740,18 @@ Depende de abstracciones, no de implementaciones concretas.
 ✅ **Ejemplo: Servicios abstractos**
 
 ```typescript
+// lib/logger/pino-logger.ts
+import pino from 'pino'
+
+// Uso: No depende de la implementación concreta
+import { logger } from '@/lib/logger'
+
 // lib/logger/types.ts
 interface Logger {
   info(message: string, meta?: Record<string, unknown>): void
   error(message: string, error?: Error): void
   warn(message: string, meta?: Record<string, unknown>): void
 }
-
-// lib/logger/pino-logger.ts
-import pino from 'pino'
 
 export class PinoLogger implements Logger {
   private logger = pino()
@@ -4672,9 +4789,6 @@ const logger: Logger =
   process.env.NODE_ENV === 'production' ? new PinoLogger() : new ConsoleLogger()
 
 export { logger }
-
-// Uso: No depende de la implementación concreta
-import { logger } from '@/lib/logger'
 
 logger.info('Usuario creado', { userId: '123' })
 ```
@@ -4938,7 +5052,7 @@ const handleSubmit = (data: unknown) => {
 
 ```typescript
 // hooks/use-debounce.ts
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 export const useDebounce = <T>(value: T, delay: number = 500): T => {
   const [debouncedValue, setDebouncedValue] = useState<T>(value)
@@ -5288,6 +5402,9 @@ components/shifts/
 **Facilita imports con archivos index.ts.**
 
 ```typescript
+// Uso:
+import { Badge, Button, Card } from '@/components/ui'
+
 // components/ui/index.ts
 export { Button } from './button'
 export { Input } from './input'
@@ -5295,9 +5412,6 @@ export { Label } from './label'
 export { Card, CardHeader, CardContent, CardFooter } from './card'
 export { Dialog, DialogTrigger, DialogContent } from './dialog'
 export { Badge } from './badge'
-
-// Uso:
-import { Button, Card, Badge } from '@/components/ui'
 ```
 
 ---
@@ -6259,6 +6373,7 @@ export async function GET() {
 'use server'
 
 import { createClient } from '@supabase/supabase-js'
+
 import { auth } from '@/auth'
 
 const supabase = createClient(
@@ -6351,8 +6466,8 @@ npm install react-big-calendar date-fns date-fns-tz
 - [ ] `lib/utils/date.ts`
 
 ```typescript
-import { zonedTimeToUtc, utcToZonedTime } from 'date-fns-tz'
 import { format } from 'date-fns'
+import { utcToZonedTime, zonedTimeToUtc } from 'date-fns-tz'
 import { es } from 'date-fns/locale'
 
 const CHILE_TZ = 'America/Santiago'
@@ -7892,11 +8007,11 @@ headers: [
 #### **Problema 2: LocalStorage/Cookies**
 
 ```typescript
-// Web: localStorage funciona
-localStorage.setItem('theme', 'dark')
-
 // Capacitor: Mejor usar Preferences (persiste mejor)
 import { Preferences } from '@capacitor/preferences'
+
+// Web: localStorage funciona
+localStorage.setItem('theme', 'dark')
 
 export const storage = {
   async set(key: string, value: string) {
@@ -8159,6 +8274,352 @@ session: {
 - ✅ Textos centralizados en `lib/i18n/messages.ts`
 - ✅ Fácil migrar a multi-idioma en MVP2
 - ✅ Preparado para expansión (inglés, portugués Brasil)
+
+---
+
+## 🔄 MIGRACIONES Y ESCALABILIDAD FUTURA
+
+**⚠️ IMPORTANTE:** Esta sección es planificación a futuro. Solo se ejecutará si:
+
+- ✅ La aplicación funciona correctamente
+- ✅ Hay ventas y usuarios pagando
+- ✅ Se alcanzan límites de rendimiento reales
+- ✅ Hay necesidad de escalar más allá de lo que Next.js monolito puede ofrecer
+
+**Filosofía:** Optimizar solo cuando sea necesario, no prematuramente.
+
+---
+
+### 🎯 Cuándo Considerar Migraciones
+
+**Indicadores de que necesitas migrar:**
+
+1. **Rendimiento:**
+   - Tiempo de respuesta > 2 segundos en operaciones críticas
+   - Más de 10,000 usuarios activos simultáneos
+   - Base de datos con > 1M registros y queries lentas
+   - CPU/Memoria del servidor constantemente > 80%
+
+2. **Negocio:**
+   - Ingresos recurrentes > $10K USD/mes
+   - Crecimiento sostenido > 20% mes a mes
+   - Necesidad de exponer API pública para integraciones
+   - Requisitos de SLA específicos (99.9% uptime)
+
+3. **Técnico:**
+   - Necesidad de escalar backend y frontend independientemente
+   - Equipos separados (frontend/backend)
+   - Microservicios para features específicas (pagos, notificaciones)
+   - Integraciones con sistemas externos complejos
+
+**Si no cumples estos criterios:** Mantén Next.js monolito. Es más simple y suficiente.
+
+---
+
+### 📊 Qué Migrar para Mejorar Tiempos de Respuesta
+
+#### 1. Optimizaciones Inmediatas (Sin Migración Completa)
+
+**Antes de separar backend/frontend, optimiza:**
+
+- [ ] **Caché de Queries Frecuentes:**
+
+  ```typescript
+  // Usar Next.js unstable_cache o Redis
+  import { unstable_cache } from 'next/cache'
+
+  export const getCachedOrganizations = unstable_cache(
+    async () => await getOrganizations(),
+    ['organizations'],
+    { revalidate: 60 } // 60 segundos
+  )
+  ```
+
+- [ ] **Database Indexing:**
+
+  ```prisma
+  model Organization {
+    // Agregar índices en campos de búsqueda frecuente
+    @@index([status])
+    @@index([country])
+    @@index([taxId])
+    @@index([createdAt])
+  }
+  ```
+
+- [ ] **Connection Pooling:**
+  - Supabase ya lo maneja ✅
+  - Verificar configuración de pool size
+
+- [ ] **Paginación Eficiente:**
+  - Ya implementada ✅
+  - Considerar cursor-based pagination para grandes datasets
+
+- [ ] **Lazy Loading de Componentes:**
+
+  ```typescript
+  const HeavyComponent = dynamic(() => import('./HeavyComponent'), {
+    loading: () => <Skeleton />,
+    ssr: false // Si no necesita SSR
+  })
+  ```
+
+- [ ] **CDN para Assets:**
+  - Vercel lo maneja automáticamente ✅
+  - Optimizar imágenes con next/image
+
+- [ ] **Background Jobs:**
+  - Mover tareas pesadas fuera del request cycle
+  - Usar queues (BullMQ, Inngest) para emails, reportes, etc.
+
+**Impacto esperado:** 50-70% mejora en tiempos de respuesta sin migración completa.
+
+---
+
+#### 2. Migración a Backend Separado
+
+**Cuándo:** Si optimizaciones no son suficientes y necesitas escalar backend independientemente.
+
+**Estrategia Gradual:**
+
+**Fase 1: API Híbrida (2-3 semanas)**
+
+```
+┌──────────────┐      ┌──────────────┐
+│  Next.js     │─────▶│  API Routes  │
+│  (Frontend)  │      │  (Backend)   │
+│              │      │  Express/    │
+│              │      │  Fastify     │
+└──────────────┘      └──────┬───────┘
+                             │
+                        ┌────▼────┐
+                        │ PostgreSQL│
+                        └──────────┘
+```
+
+**Qué migrar:**
+
+- [ ] Server Actions → API Routes (Express/Fastify)
+- [ ] Helpers se mantienen igual (solo cambiar import path)
+- [ ] Prisma se mantiene igual
+- [ ] Frontend usa fetch/axios en lugar de Server Actions
+
+**Ventajas:**
+
+- ✅ Escalabilidad independiente
+- ✅ Puedes usar múltiples instancias del backend
+- ✅ Frontend puede ser CDN (más rápido)
+- ✅ API reutilizable para móvil, integraciones
+
+**Desventajas:**
+
+- ❌ Más complejidad (2 deploys)
+- ❌ Necesitas manejar CORS
+- ❌ Autenticación más compleja (JWT tokens)
+
+**Tiempo estimado:** 2-3 semanas para migración completa
+
+---
+
+#### 3. Microservicios (Solo si Realmente Necesitas)
+
+**Cuándo:** Si tienes features que requieren escalado independiente o tienen diferentes requisitos técnicos.
+
+**Candidatos para Microservicios:**
+
+- [ ] **Servicio de Pagos:**
+  - Integración con Stripe/PayPal
+  - Webhooks de pagos
+  - Procesamiento asíncrono
+  - Escalado independiente en picos de facturación
+
+- [ ] **Servicio de Notificaciones:**
+  - Emails (Resend/SendGrid)
+  - Push notifications (FCM/APNs)
+  - SMS (Twilio)
+  - Webhooks a sistemas externos
+  - Cola de mensajes (BullMQ, RabbitMQ)
+
+- [ ] **Servicio de Reportes:**
+  - Generación de PDFs (liquidaciones)
+  - Cálculos pesados (horas trabajadas, tarifas)
+  - Exportación a Excel
+  - Background jobs intensivos
+
+- [ ] **Servicio de Calendario:**
+  - Cálculos de turnos
+  - Validaciones legales complejas
+  - Sincronización con Google Calendar
+  - Optimizaciones específicas para queries de calendario
+
+**Arquitectura Propuesta:**
+
+```
+┌──────────────┐
+│  Next.js     │
+│  (Frontend)  │
+└──────┬───────┘
+       │
+   ┌───▼──────────────────────────┐
+   │  API Gateway                 │
+   │  (Routing + Auth)             │
+   └───┬──────────────────────────┘
+       │
+   ┌───┼──────────────────────────┐
+   │   │                          │
+┌──▼───▼──┐  ┌──────────┐  ┌─────▼─────┐
+│ Core    │  │ Payments │  │ Notifications│
+│ Service │  │ Service  │  │ Service     │
+│ (CRUD)  │  │          │  │             │
+└────┬────┘  └──────────┘  └─────────────┘
+     │
+┌────▼────┐
+│PostgreSQL│
+└──────────┘
+```
+
+**Ventajas:**
+
+- ✅ Escalado independiente por servicio
+- ✅ Tecnologías diferentes por servicio (si es necesario)
+- ✅ Equipos pueden trabajar independientemente
+- ✅ Fallos aislados (si cae notificaciones, core sigue funcionando)
+
+**Desventajas:**
+
+- ❌ Mucha más complejidad
+- ❌ Necesitas service discovery, API gateway
+- ❌ Debugging más difícil (trazas distribuidas)
+- ❌ Posible sobre-ingeniería si no lo necesitas
+
+**Tiempo estimado:** 2-3 meses para setup completo
+
+**Recomendación:** Solo si tienes > 50K usuarios y problemas reales de escalabilidad.
+
+---
+
+#### 4. Micro Frontends (Opcional, Avanzado)
+
+**Cuándo:** Si tienes múltiples equipos frontend o necesitas desplegar features independientemente.
+
+**Arquitectura:**
+
+```
+┌──────────────┐  ┌──────────────┐  ┌──────────────┐
+│  Super Admin │  │  Admin HR    │  │  Staff App   │
+│  (Next.js)   │  │  (Next.js)  │  │  (Capacitor)│
+└──────────────┘  └──────────────┘  └──────────────┘
+       │                 │                 │
+       └─────────────────┼─────────────────┘
+                         │
+                    ┌────▼────┐
+                    │  API     │
+                    │  Gateway │
+                    └──────────┘
+```
+
+**Ventajas:**
+
+- ✅ Equipos pueden trabajar en módulos independientes
+- ✅ Deploy independiente de cada módulo
+- ✅ Tecnologías diferentes por módulo (si es necesario)
+
+**Desventajas:**
+
+- ❌ Complejidad alta
+- ❌ Duplicación de código compartido
+- ❌ Bundle size puede aumentar
+- ❌ Probablemente innecesario para tu caso
+
+**Recomendación:** Solo si tienes > 3 equipos frontend trabajando simultáneamente.
+
+---
+
+### 🎯 Estrategia de Migración Recomendada
+
+**Orden de Prioridad:**
+
+1. **Optimizaciones (Ahora - Siempre):**
+   - Caché, índices, lazy loading
+   - Mejoras continuas sin migración
+
+2. **Backend Separado (Si > 10K usuarios):**
+   - Migración gradual
+   - Mantener helpers y Prisma
+   - Solo cambiar capa de API
+
+3. **Microservicios (Si > 50K usuarios):**
+   - Empezar con servicios aislados (pagos, notificaciones)
+   - Mantener core como monolito
+   - Migrar gradualmente
+
+4. **Micro Frontends (Solo si múltiples equipos):**
+   - Última opción
+   - Solo si realmente lo necesitas
+
+---
+
+### 📋 Checklist de Migración a Backend Separado
+
+**Preparación:**
+
+- [ ] Documentar todas las Server Actions actuales
+- [ ] Identificar dependencias de Next.js (revalidatePath, etc.)
+- [ ] Crear cliente API abstracto en frontend
+- [ ] Setup de proyecto backend (Express/Fastify)
+
+**Migración:**
+
+- [ ] Copiar helpers (sin cambios)
+- [ ] Copiar schemas (sin cambios)
+- [ ] Copiar Prisma config (sin cambios)
+- [ ] Convertir Server Actions a API Routes
+- [ ] Implementar autenticación JWT
+- [ ] Actualizar frontend para usar API
+- [ ] Testing completo
+
+**Post-Migración:**
+
+- [ ] Monitoreo de performance
+- [ ] Documentación de API
+- [ ] Rate limiting
+- [ ] CORS configurado
+- [ ] Health checks
+
+---
+
+### 💡 Alternativa: Next.js Optimizado (Recomendado Primero)
+
+**En lugar de migrar, optimiza Next.js:**
+
+- [ ] **Edge Functions** para endpoints críticos
+- [ ] **Incremental Static Regeneration (ISR)** para páginas estáticas
+- [ ] **Streaming SSR** para mejor tiempo de respuesta
+- [ ] **React Server Components** optimizados
+- [ ] **Database Read Replicas** para queries de lectura
+- [ ] **Redis Cache** para datos frecuentes
+
+**Puede soportar hasta 50K-100K usuarios sin separar backend.**
+
+---
+
+### 🎯 Decisión Final
+
+**Migrar solo si:**
+
+1. ✅ App funciona y genera ventas
+2. ✅ Optimizaciones no son suficientes
+3. ✅ Tienes problemas reales de rendimiento
+4. ✅ Necesitas escalar más allá de Next.js monolito
+
+**No migrar si:**
+
+- ❌ Solo tienes cientos de usuarios
+- ❌ No hay problemas de rendimiento
+- ❌ No hay ventas suficientes
+- ❌ Es "por si acaso" (premature optimization)
+
+**Regla de oro:** Optimiza primero, migra después.
 
 ---
 
@@ -8462,6 +8923,16 @@ session: {
 
 - ✅ **Feature-Sliced Design (FSD)** - Arquitectura frontend moderna implementada
 - ✅ Server Components + Client Components + Server Actions
+- ✅ **Repository Pattern** - Separación de acceso a datos (`data/`) de lógica de negocio (`lib/`)
+  - Todos los helpers que acceden a Prisma están en `data/{entity}-repository.ts`
+  - Facilita futuras migraciones (cambio de ORM, microservicios)
+  - Mejor testabilidad y mantenibilidad
+- ✅ **Separación Server/Client en `lib/`** - Estructura FSD con carpetas `server/` y `client/` dentro de cada dominio:
+  - Agrupación por dominio primero (`validation/`, `helpers/`)
+  - Separación por tecnología usando carpetas (`server/`, `client/`)
+  - Funcionalidad en archivos individuales con nombres descriptivos (`{domain}-messages.ts`, `{domain}-schemas.ts`)
+  - Todos los `index.ts` solo exportan (barrel exports)
+  - Aplicado a todos los features: `super-admin`, `auth`, `profile`, `admin-hr`
 - ✅ Atomic Design Pattern (en `shared/ui/atoms`)
 - ✅ SOLID principles
 - ✅ Custom Hooks para lógica reutilizable
@@ -8547,11 +9018,38 @@ Se ha implementado el dashboard completo de SUPER_ADMIN con las siguientes carac
 src/
 ├── features/
 │   └── super-admin/
-│       └── ui/
-│           ├── stats-cards.tsx          # 6 tarjetas de métricas
-│           ├── organizations-table.tsx  # Tabla de organizaciones
-│           ├── alerts-panel.tsx         # Panel de alertas
-│           └── index.ts
+│       ├── ui/
+│       │   ├── stats-cards.tsx          # 6 tarjetas de métricas
+│       │   ├── organizations-table.tsx  # Tabla de organizaciones
+│       │   ├── alerts-panel.tsx         # Panel de alertas
+│       │   └── index.ts
+│       ├── lib/
+│       │   ├── validation/
+│       │   │   ├── server/
+│       │   │   │   ├── organization-messages.ts
+│       │   │   │   ├── admin-hr-user-messages.ts
+│       │   │   │   └── index.ts
+│       │   │   ├── client/
+│       │   │   │   ├── organization-messages.ts
+│       │   │   │   ├── admin-hr-user-messages.ts
+│       │   │   │   └── index.ts
+│       │   │   └── index.ts
+│       │   ├── helpers/
+│       │   │   ├── server/
+│       │   │   │   ├── organization-schemas.ts
+│       │   │   │   ├── admin-hr-user-schemas.ts
+│       │   │   │   └── index.ts
+│       │   │   ├── client/
+│       │   │   │   ├── organization-schemas.ts
+│       │   │   │   ├── admin-hr-user-schemas.ts
+│       │   │   │   └── index.ts
+│       │   │   └── index.ts
+│       │   ├── schemas/
+│       │   ├── types.ts
+│       │   ├── constants.ts
+│       │   └── index.ts
+│       └── data/
+│           └── {entity}-repository.ts
 │
 ├── widgets/
 │   ├── super-admin-sidebar/

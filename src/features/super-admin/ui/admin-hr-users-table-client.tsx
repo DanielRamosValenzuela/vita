@@ -2,18 +2,10 @@
 
 import { useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
-import { useRouter } from '@/i18n/navigation'
-import { Edit, Trash2, Plus } from 'lucide-react'
-import { Button } from '@/src/shared/ui/button'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/src/shared/ui/table'
-import { Badge } from '@/src/shared/ui/badge'
+import type { Organization, User } from '@prisma/client'
+import { Edit, Plus, Trash2 } from 'lucide-react'
+import { toast } from 'sonner'
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,9 +16,20 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/src/shared/ui/alert-dialog'
+import { Badge } from '@/src/shared/ui/badge'
+import { Button } from '@/src/shared/ui/button'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/src/shared/ui/table'
+
+import { useRouter } from '@/i18n/navigation'
+
 import { deleteAdminHRUserAction } from '../api/admin-hr-user-actions'
-import { toast } from 'sonner'
-import type { User, Organization } from '@prisma/client'
 
 interface AdminHRUserWithOrganization extends User {
   organization: Organization | null
@@ -73,7 +76,7 @@ export function AdminHRUsersTableClient({ users }: AdminHRUsersTableClientProps)
             <h2 className="text-2xl font-bold tracking-tight">{t('title')}</h2>
             <p className="text-muted-foreground mt-1">{t('description')}</p>
           </div>
-          <Button onClick={() => router.push('/super-admin/admin-hr-users/new')}>
+          <Button onClick={() => router.push('/dashboard/admin-hr-users/new')}>
             <Plus className="mr-2 h-4 w-4" />
             {t('new')}
           </Button>
@@ -82,10 +85,7 @@ export function AdminHRUsersTableClient({ users }: AdminHRUsersTableClientProps)
         {users.length === 0 ? (
           <div className="text-muted-foreground rounded-lg border p-8 text-center">
             <p className="mb-4">{t('empty')}</p>
-            <Button
-              variant="outline"
-              onClick={() => router.push('/super-admin/admin-hr-users/new')}
-            >
+            <Button variant="outline" onClick={() => router.push('/dashboard/admin-hr-users/new')}>
               {t('createFirst')}
             </Button>
           </div>
@@ -125,7 +125,7 @@ export function AdminHRUsersTableClient({ users }: AdminHRUsersTableClientProps)
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => router.push(`/super-admin/admin-hr-users/${user.id}/edit`)}
+                          onClick={() => router.push(`/dashboard/admin-hr-users/${user.id}/edit`)}
                         >
                           <Edit className="h-4 w-4" />
                         </Button>

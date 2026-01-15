@@ -1,8 +1,8 @@
 'use client'
 
-import { Globe } from 'lucide-react'
 import { useParams } from 'next/navigation'
-import { usePathname, useRouter } from '@/i18n/navigation'
+import { Globe } from 'lucide-react'
+
 import { Button } from '@/src/shared/ui/button'
 import {
   DropdownMenu,
@@ -10,6 +10,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/src/shared/ui/dropdown-menu'
+
+import { usePathname, useRouter } from '@/i18n/navigation'
 import { routing } from '@/i18n/routing'
 
 const locales = routing.locales

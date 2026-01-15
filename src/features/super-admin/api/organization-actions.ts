@@ -1,29 +1,34 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import {
-  createOrganizationSchema,
-  updateOrganizationSchema,
-  changeOrganizationStatusSchema,
-  deleteOrganizationSchema,
-  type CreateOrganizationInput,
-  type UpdateOrganizationInput,
-  type ChangeOrganizationStatusInput,
-  type DeleteOrganizationInput,
-} from '../lib/schemas'
-import {
-  createOrganization,
-  updateOrganization,
-  changeOrganizationStatus,
-  deleteOrganization,
-  checkTaxIdExists,
-} from '../lib/organization-helpers'
+
 import { requireSuperAdmin } from '@/src/shared/lib/auth/session'
+import { getLocaleFromHeaders } from '@/src/shared/lib/utils/get-locale'
+
+import {
+  changeOrganizationStatus,
+  checkTaxIdExists,
+  createOrganization,
+  deleteOrganization,
+  updateOrganization,
+} from '../data/organization-repository'
+import {
+  getChangeOrganizationStatusSchema,
+  getCreateOrganizationSchema,
+  getDeleteOrganizationSchema,
+  getUpdateOrganizationSchema,
+  type ChangeOrganizationStatusInput,
+  type CreateOrganizationInput,
+  type DeleteOrganizationInput,
+  type UpdateOrganizationInput,
+} from '../lib'
 
 export const createOrganizationAction = async (data: CreateOrganizationInput) => {
   try {
     await requireSuperAdmin()
 
+    const locale = await getLocaleFromHeaders()
+    const createOrganizationSchema = await getCreateOrganizationSchema(locale)
     const validatedData = createOrganizationSchema.parse(data)
 
     const taxIdExists = await checkTaxIdExists(validatedData.taxId)
@@ -36,8 +41,8 @@ export const createOrganizationAction = async (data: CreateOrganizationInput) =>
 
     const organization = await createOrganization(validatedData)
 
-    revalidatePath('/super-admin/organizations')
-    revalidatePath('/super-admin')
+    revalidatePath('/dashboard/organizations')
+    revalidatePath('/dashboard')
 
     return {
       success: true,
@@ -66,14 +71,16 @@ export const updateOrganizationAction = async (data: UpdateOrganizationInput) =>
   try {
     await requireSuperAdmin()
 
+    const locale = await getLocaleFromHeaders()
+    const updateOrganizationSchema = await getUpdateOrganizationSchema(locale)
     const validatedData = updateOrganizationSchema.parse(data)
     const { id, ...updateData } = validatedData
 
     const organization = await updateOrganization(id, updateData)
 
-    revalidatePath('/super-admin/organizations')
-    revalidatePath(`/super-admin/organizations/${id}`)
-    revalidatePath('/super-admin')
+    revalidatePath('/dashboard/organizations')
+    revalidatePath(`/dashboard/organizations/${id}`)
+    revalidatePath('/dashboard')
 
     return {
       success: true,
@@ -102,14 +109,16 @@ export const changeOrganizationStatusAction = async (data: ChangeOrganizationSta
   try {
     await requireSuperAdmin()
 
+    const locale = await getLocaleFromHeaders()
+    const changeOrganizationStatusSchema = await getChangeOrganizationStatusSchema(locale)
     const validatedData = changeOrganizationStatusSchema.parse(data)
     const { id, status } = validatedData
 
     const organization = await changeOrganizationStatus(id, status)
 
-    revalidatePath('/super-admin/organizations')
-    revalidatePath(`/super-admin/organizations/${id}`)
-    revalidatePath('/super-admin')
+    revalidatePath('/dashboard/organizations')
+    revalidatePath(`/dashboard/organizations/${id}`)
+    revalidatePath('/dashboard')
 
     return {
       success: true,
@@ -138,13 +147,15 @@ export const deleteOrganizationAction = async (data: DeleteOrganizationInput) =>
   try {
     await requireSuperAdmin()
 
+    const locale = await getLocaleFromHeaders()
+    const deleteOrganizationSchema = await getDeleteOrganizationSchema(locale)
     const validatedData = deleteOrganizationSchema.parse(data)
     const { id } = validatedData
 
     const organization = await deleteOrganization(id)
 
-    revalidatePath('/super-admin/organizations')
-    revalidatePath('/super-admin')
+    revalidatePath('/dashboard/organizations')
+    revalidatePath('/dashboard')
 
     return {
       success: true,

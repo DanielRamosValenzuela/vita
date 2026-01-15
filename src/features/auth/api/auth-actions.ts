@@ -1,23 +1,27 @@
 'use server'
 
-import { registerSchema, loginSchema } from '../lib/schemas'
 import { Country, DocType } from '@prisma/client'
-import { formatZodErrors } from '../lib/validation-helpers'
+
 import {
-  checkEmailExists,
   checkDocExists,
+  checkEmailExists,
   createUserWithAccount,
   findUserWithCredentials,
   verifyPassword,
-} from '../lib/user-helpers'
+} from '../data/user-repository'
+import { getLoginSchema, getRegisterSchema } from '../lib/schemas'
 import type { ActionResult, RegisterData } from '../lib/types'
+import { formatZodErrors } from '@/src/shared/lib/utils'
 
 export async function registerAction(formData: FormData): Promise<ActionResult<RegisterData>> {
   try {
+    const locale = (formData.get('locale') as string) || 'es'
+    const registerSchema = await getRegisterSchema(locale)
+
     const rawData = {
       name: formData.get('name') as string,
       email: formData.get('email') as string,
-      rut: formData.get('rut') as string,
+      docNumber: formData.get('docNumber') as string,
       password: formData.get('password') as string,
       confirmPassword: formData.get('confirmPassword') as string,
       country: (formData.get('country') as Country) || Country.CL,
@@ -46,13 +50,13 @@ export async function registerAction(formData: FormData): Promise<ActionResult<R
       }
     }
 
-    const cleanDocNumber = data.rut.replace(/[.-]/g, '')
+    const cleanDocNumber = data.docNumber.replace(/[^a-zA-Z0-9]/g, '')
     if (await checkDocExists(data.country, data.docType, cleanDocNumber)) {
       return {
         success: false,
-        error: 'Este RUT ya está registrado',
+        error: 'Este documento ya está registrado',
         fieldErrors: {
-          rut: ['Este RUT ya está registrado'],
+          docNumber: ['Este documento ya está registrado'],
         },
       }
     }
@@ -74,6 +78,9 @@ export async function registerAction(formData: FormData): Promise<ActionResult<R
 
 export async function loginAction(formData: FormData): Promise<ActionResult<{ email: string }>> {
   try {
+    const locale = (formData.get('locale') as string) || 'es'
+    const loginSchema = await getLoginSchema(locale)
+
     const rawData = {
       email: formData.get('email') as string,
       password: formData.get('password') as string,

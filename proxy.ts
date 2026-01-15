@@ -1,7 +1,7 @@
-import type { NextRequest } from 'next/server'
-import { NextResponse } from 'next/server'
-import createMiddleware from 'next-intl/middleware'
 import { getToken } from 'next-auth/jwt'
+import createMiddleware from 'next-intl/middleware'
+import { NextResponse, type NextRequest } from 'next/server'
+
 import { routing } from './i18n/routing'
 
 const { defaultLocale } = routing

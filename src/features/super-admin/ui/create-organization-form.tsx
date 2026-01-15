@@ -2,11 +2,15 @@
 
 import { useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
-import { useRouter } from '@/i18n/navigation'
-import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import type { Country } from '@prisma/client'
 import { Loader2 } from 'lucide-react'
+import { useForm, useWatch } from 'react-hook-form'
+import { toast } from 'sonner'
+
+import { formatTaxId, getTaxIdConfig } from '@/src/shared/lib/utils/tax-id-config'
 import { Button } from '@/src/shared/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/src/shared/ui/card'
 import { Input } from '@/src/shared/ui/input'
 import { Label } from '@/src/shared/ui/label'
 import {
@@ -16,18 +20,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/src/shared/ui/select'
-import { Card, CardContent, CardHeader, CardTitle } from '@/src/shared/ui/card'
+
+import { useRouter } from '@/i18n/navigation'
+
 import { createOrganizationAction } from '../api/organization-actions'
-import { createOrganizationSchema, PLAN_LIMITS, type CreateOrganizationInput } from '../lib/schemas'
-import { toast } from 'sonner'
-import { getTaxIdConfig, formatTaxId } from '@/src/shared/lib/utils/tax-id-config'
-import type { Country } from '@prisma/client'
+import {
+  PLAN_LIMITS,
+  useCreateOrganizationSchema,
+  type CreateOrganizationInput,
+} from '../lib/schemas'
 
 export function CreateOrganizationForm() {
   const t = useTranslations('superAdmin.createOrganization')
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
+  const createOrganizationSchema = useCreateOrganizationSchema()
 
   const form = useForm<CreateOrganizationInput>({
     resolver: zodResolver(createOrganizationSchema),
@@ -62,7 +70,7 @@ export function CreateOrganizationForm() {
 
       if (result.success) {
         toast.success(t('success'))
-        router.push('/super-admin/organizations')
+        router.push('/dashboard/organizations')
       } else {
         setError(result.error || t('error'))
         toast.error(result.error || t('error'))

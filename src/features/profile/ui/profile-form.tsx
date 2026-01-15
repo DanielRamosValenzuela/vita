@@ -2,16 +2,18 @@
 
 import { useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Loader2 } from 'lucide-react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+
 import { Button } from '@/src/shared/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/src/shared/ui/card'
 import { Input } from '@/src/shared/ui/input'
 import { Label } from '@/src/shared/ui/label'
-import { Card, CardContent, CardHeader, CardTitle } from '@/src/shared/ui/card'
+
 import { updateProfileAction } from '../api/profile-actions'
-import { updateProfileSchema, type UpdateProfileInput } from '../lib/schemas'
-import { toast } from 'sonner'
+import { useUpdateProfileSchema, type UpdateProfileInput } from '../lib/schemas'
 
 interface ProfileFormProps {
   initialData: {
@@ -24,6 +26,7 @@ export function ProfileForm({ initialData }: ProfileFormProps) {
   const t = useTranslations('profile.basicInfo')
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
+  const updateProfileSchema = useUpdateProfileSchema()
 
   const {
     register,

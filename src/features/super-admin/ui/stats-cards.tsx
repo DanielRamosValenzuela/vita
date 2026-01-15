@@ -1,6 +1,7 @@
-import { Building2, CheckCircle2, DollarSign, Users, Clock, AlertTriangle } from 'lucide-react'
-import { Card, CardContent } from '@/src/shared/ui/card'
 import { useTranslations } from 'next-intl'
+import { AlertTriangle, Building2, CheckCircle2, Clock, DollarSign, Users } from 'lucide-react'
+
+import { Card, CardContent } from '@/src/shared/ui/card'
 
 interface StatsData {
   totalOrgs: string

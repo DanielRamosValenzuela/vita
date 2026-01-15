@@ -2,29 +2,13 @@
 
 import { useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
-import { useRouter, usePathname } from '@/i18n/navigation'
-import { MoreHorizontal, Eye, Edit, Ban, CheckCircle, Trash2 } from 'lucide-react'
+import type { Country, OrganizationPlan, OrganizationStatus } from '@prisma/client'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
-import { Button } from '@/src/shared/ui/button'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/src/shared/ui/table'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/src/shared/ui/dropdown-menu'
-import { Badge } from '@/src/shared/ui/badge'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/src/shared/ui/tooltip'
+import { Ban, CheckCircle, Edit, Eye, MoreHorizontal, Trash2 } from 'lucide-react'
+import { toast } from 'sonner'
+
+import { formatCurrency } from '@/src/shared/lib/utils/format'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -35,17 +19,36 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/src/shared/ui/alert-dialog'
+import { Badge } from '@/src/shared/ui/badge'
+import { Button } from '@/src/shared/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/src/shared/ui/dropdown-menu'
 import { Input } from '@/src/shared/ui/input'
 import { Label } from '@/src/shared/ui/label'
-import { OrganizationsFilters } from './organizations-filters'
-import { formatCurrency } from '@/src/shared/lib/utils/format'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/src/shared/ui/table'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/src/shared/ui/tooltip'
+
+import { usePathname, useRouter } from '@/i18n/navigation'
+
 import {
   changeOrganizationStatusAction,
   deleteOrganizationAction,
 } from '../api/organization-actions'
-import { toast } from 'sonner'
-import type { OrganizationStatus, OrganizationPlan, Country } from '@prisma/client'
 import type { OrganizationsTableProps } from '../lib/types'
+import { OrganizationsFilters } from './organizations-filters'
 
 type OrganizationsTableClientProps = OrganizationsTableProps
 
@@ -329,9 +332,7 @@ export function OrganizationsTableClient({
                               variant="ghost"
                               size="sm"
                               className="h-8 w-8 p-0 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-950 dark:hover:text-blue-400"
-                              onClick={() =>
-                                router.push(`/super-admin/organizations/${org.id}/edit`)
-                              }
+                              onClick={() => router.push(`/dashboard/organizations/${org.id}/edit`)}
                             >
                               <span className="sr-only">{t('actions.edit')}</span>
                               <Edit className="h-4 w-4 text-blue-600 dark:text-blue-400" />
@@ -352,7 +353,7 @@ export function OrganizationsTableClient({
                             <DropdownMenuLabel>{t('table.actions')}</DropdownMenuLabel>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
-                              onClick={() => router.push(`/super-admin/organizations/${org.id}`)}
+                              onClick={() => router.push(`/dashboard/organizations/${org.id}`)}
                               className="cursor-pointer"
                             >
                               <Eye className="mr-2 h-4 w-4" />

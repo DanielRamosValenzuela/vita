@@ -1,14 +1,17 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+
+import { requireAdminHR } from '@/src/shared/lib/auth'
+import { getLocaleFromHeaders } from '@/src/shared/lib/utils/get-locale'
+
+import { createArea, deleteArea, updateArea } from '../data/area-repository'
 import {
-  createAreaSchema,
-  updateAreaSchema,
+  getCreateAreaSchema,
+  getUpdateAreaSchema,
   type CreateAreaInput,
   type UpdateAreaInput,
 } from '../lib/schemas'
-import { createArea, updateArea, deleteArea } from '../lib/area-helpers'
-import { requireAdminHR } from '@/src/shared/lib/auth'
 
 export async function createAreaAction(data: CreateAreaInput) {
   try {
@@ -21,6 +24,8 @@ export async function createAreaAction(data: CreateAreaInput) {
       }
     }
 
+    const locale = await getLocaleFromHeaders()
+    const createAreaSchema = await getCreateAreaSchema(locale)
     const validatedData = createAreaSchema.parse(data)
     const area = await createArea(validatedData, user.organizationId)
 
@@ -60,6 +65,8 @@ export async function updateAreaAction(id: string, data: UpdateAreaInput) {
       }
     }
 
+    const locale = await getLocaleFromHeaders()
+    const updateAreaSchema = await getUpdateAreaSchema(locale)
     const validatedData = updateAreaSchema.parse(data)
     const area = await updateArea(id, validatedData, user.organizationId)
 

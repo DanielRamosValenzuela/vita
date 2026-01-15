@@ -1,14 +1,15 @@
 'use client'
 
-import { Menu, User } from 'lucide-react'
-import { useSession, signOut } from 'next-auth/react'
+import { useState } from 'react'
+import { signOut, useSession } from 'next-auth/react'
+import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { useState } from 'react'
-import { useTranslations } from 'next-intl'
+import { Menu, User } from 'lucide-react'
+
+import { LanguageSelector, Logo, ThemeSelector, ThemeToggle } from '@/src/shared/ui/atoms'
 import { Button } from '@/src/shared/ui/button'
-import { Sheet, SheetContent, SheetTrigger } from '@/src/shared/ui/sheet'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,7 +18,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/src/shared/ui/dropdown-menu'
-import { Logo, ThemeToggle, LanguageSelector } from '@/src/shared/ui/atoms'
+import { Sheet, SheetContent, SheetTrigger } from '@/src/shared/ui/sheet'
+
+import { getNavLinks } from './constants'
 
 export function MainNavbar() {
   const { data: session, status } = useSession()
@@ -28,11 +31,7 @@ export function MainNavbar() {
 
   const isLoading = status === 'loading'
   const isAuthenticated = !!session
-
-  const navLinks = [
-    { href: `/${locale}/support`, label: t('support') },
-    { href: `/${locale}/contact`, label: t('contact') },
-  ]
+  const navLinks = getNavLinks(t, locale)
 
   return (
     <header className="bg-background/95 supports-backdrop-filter:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">
@@ -53,6 +52,7 @@ export function MainNavbar() {
         </div>
 
         <div className="flex items-center gap-2">
+          <ThemeSelector />
           <ThemeToggle />
           <LanguageSelector />
 

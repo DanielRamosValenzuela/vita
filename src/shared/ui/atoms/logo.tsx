@@ -1,4 +1,5 @@
 import Link from 'next/link'
+
 import { cn } from '@/src/shared/lib/utils'
 
 interface LogoProps {

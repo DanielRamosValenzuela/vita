@@ -1,9 +1,12 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
+import type { InvitationStatus, OrganizationInvitation } from '@prisma/client'
 import { format } from 'date-fns'
-import { es, enUS } from 'date-fns/locale'
-import { useLocale } from 'next-intl'
+import { enUS, es } from 'date-fns/locale'
+
+import { Badge } from '@/src/shared/ui/badge'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
 import {
   Table,
   TableBody,
@@ -12,9 +15,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/src/shared/ui/table'
-import { Badge } from '@/src/shared/ui/badge'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
-import type { OrganizationInvitation, InvitationStatus } from '@prisma/client'
 
 interface InvitationWithUser extends OrganizationInvitation {
   user: {

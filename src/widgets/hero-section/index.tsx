@@ -1,21 +1,24 @@
 'use client'
 
-import { ArrowRight, Calendar, Shield, Users } from 'lucide-react'
 import { useSession } from 'next-auth/react'
+import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { useTranslations } from 'next-intl'
+import { ArrowRight, Calendar, Shield, Users } from 'lucide-react'
+
 import { Button } from '@/src/shared/ui/button'
+import { Skeleton } from '@/src/shared/ui/skeleton'
 
 interface HeroSectionProps {
   locale?: string
 }
 
 export function HeroSection({ locale }: HeroSectionProps) {
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
   const params = useParams()
   const currentLocale = locale || (params?.locale as string) || 'es'
   const t = useTranslations('hero')
+  const isLoading = status === 'loading'
   const isAuthenticated = !!session
 
   const features = [
@@ -51,7 +54,14 @@ export function HeroSection({ locale }: HeroSectionProps) {
             {t('description')}
           </p>
 
-          {!isAuthenticated && (
+          {isLoading && (
+            <div className="mb-12 flex flex-col gap-4 sm:flex-row">
+              <Skeleton className="h-12 w-48" />
+              <Skeleton className="h-12 w-32" />
+            </div>
+          )}
+
+          {!isLoading && !isAuthenticated && (
             <div className="mb-12 flex flex-col gap-4 sm:flex-row">
               <Button asChild size="lg" className="text-base">
                 <Link href={`/${currentLocale}/register`}>
@@ -64,7 +74,8 @@ export function HeroSection({ locale }: HeroSectionProps) {
               </Button>
             </div>
           )}
-          {isAuthenticated && (
+
+          {!isLoading && isAuthenticated && (
             <div className="mb-12 flex flex-col gap-4 sm:flex-row">
               <Button asChild size="lg" className="text-base">
                 <Link href={`/${currentLocale}/dashboard`}>

@@ -1,18 +1,20 @@
 'use client'
 
-import { useState, useTransition, useEffect } from 'react'
+import { useEffect, useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
-import { Loader2, CheckCircle2, XCircle } from 'lucide-react'
-import { Button } from '@/src/shared/ui/button'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/src/shared/ui/card'
+import { CheckCircle2, Loader2, XCircle } from 'lucide-react'
+import { toast } from 'sonner'
+
 import { Alert, AlertDescription } from '@/src/shared/ui/alert'
 import { Badge } from '@/src/shared/ui/badge'
+import { Button } from '@/src/shared/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
+
 import {
   acceptInvitationAction,
-  rejectInvitationAction,
   getPendingInvitationsAction,
+  rejectInvitationAction,
 } from '../api/profile-actions'
-import { toast } from 'sonner'
 
 interface Invitation {
   id: string

@@ -1,7 +1,9 @@
 'use client'
 
+import { Calendar, Clock, DollarSign, LayoutGrid, Users } from 'lucide-react'
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/src/shared/ui/card'
-import { LayoutGrid, Clock, Users, DollarSign, Calendar } from 'lucide-react'
+
 import type { AdminHRDashboardStats } from '../lib'
 
 interface DashboardStatsCardsProps {

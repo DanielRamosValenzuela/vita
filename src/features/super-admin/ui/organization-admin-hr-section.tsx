@@ -2,19 +2,12 @@
 
 import { useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
-import { useRouter } from '@/i18n/navigation'
-import { Plus, Edit, Trash2, UserPlus } from 'lucide-react'
-import { Button } from '@/src/shared/ui/button'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/src/shared/ui/table'
-import { Badge } from '@/src/shared/ui/badge'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
+import type { Organization } from '@prisma/client'
+import { format } from 'date-fns'
+import { es } from 'date-fns/locale'
+import { Edit, Plus, Trash2, UserPlus } from 'lucide-react'
+import { toast } from 'sonner'
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,6 +18,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/src/shared/ui/alert-dialog'
+import { Button } from '@/src/shared/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
 import {
   Dialog,
   DialogContent,
@@ -33,12 +28,19 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/src/shared/ui/dialog'
-import { InviteAdminHRForm } from './invite-admin-hr-form'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/src/shared/ui/table'
+
+import { useRouter } from '@/i18n/navigation'
+
 import { deleteAdminHRUserAction } from '../api/admin-hr-user-actions'
-import { toast } from 'sonner'
-import { format } from 'date-fns'
-import { es } from 'date-fns/locale'
-import type { User, Organization } from '@prisma/client'
+import { InviteAdminHRForm } from './invite-admin-hr-form'
 
 interface OrganizationAdminHRSectionProps {
   organization: Organization
@@ -163,9 +165,7 @@ export function OrganizationAdminHRSection({
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() =>
-                              router.push(`/super-admin/admin-hr-users/${user.id}/edit`)
-                            }
+                            onClick={() => router.push(`/dashboard/admin-hr-users/${user.id}/edit`)}
                           >
                             <Edit className="h-4 w-4" />
                           </Button>

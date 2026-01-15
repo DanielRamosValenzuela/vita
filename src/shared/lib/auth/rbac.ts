@@ -1,4 +1,5 @@
 import { Role } from '@prisma/client'
+
 import type { CurrentUser } from './types'
 
 export function hasRole(user: CurrentUser | null, role: Role): boolean {

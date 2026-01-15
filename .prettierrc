@@ -6,5 +6,23 @@
   "printWidth": 100,
   "arrowParens": "always",
   "endOfLine": "lf",
-  "plugins": ["prettier-plugin-tailwindcss"]
+  "plugins": ["prettier-plugin-tailwindcss", "@ianvs/prettier-plugin-sort-imports"],
+  "importOrder": [
+    "^react$",
+    "^next",
+    "<THIRD_PARTY_MODULES>",
+    "",
+    "^@/src/shared",
+    "^@/src/widgets",
+    "^@/src/features",
+    "",
+    "^@/",
+    "",
+    "^[./]",
+    "",
+    "^types$",
+    "^type"
+  ],
+  "importOrderParserPlugins": ["typescript", "jsx", "decorators-legacy"],
+  "importOrderTypeScriptVersion": "5.0.0"
 }

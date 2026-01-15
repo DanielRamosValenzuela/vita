@@ -1,4 +1,5 @@
 import { getTranslations } from 'next-intl/server'
+
 import { requireAdminHR } from '@/src/shared/lib/auth'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
 

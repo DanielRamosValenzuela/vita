@@ -2,11 +2,16 @@
 
 import { useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
-import { useRouter } from '@/i18n/navigation'
-import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Loader2, ArrowLeft } from 'lucide-react'
+import type { Country, Organization } from '@prisma/client'
+import { ArrowLeft, Loader2 } from 'lucide-react'
+import { useForm, useWatch } from 'react-hook-form'
+import { toast } from 'sonner'
+
+import { formatTaxId, getTaxIdConfig } from '@/src/shared/lib/utils/tax-id-config'
+import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
 import { Input } from '@/src/shared/ui/input'
 import { Label } from '@/src/shared/ui/label'
 import {
@@ -16,13 +21,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/src/shared/ui/select'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/src/shared/ui/card'
-import { Badge } from '@/src/shared/ui/badge'
+
+import { useRouter } from '@/i18n/navigation'
+
 import { updateOrganizationAction } from '../api/organization-actions'
-import { updateOrganizationSchema, PLAN_LIMITS, type UpdateOrganizationInput } from '../lib/schemas'
-import { toast } from 'sonner'
-import { getTaxIdConfig, formatTaxId } from '@/src/shared/lib/utils/tax-id-config'
-import type { Organization, Country } from '@prisma/client'
+import {
+  PLAN_LIMITS,
+  useUpdateOrganizationSchema,
+  type UpdateOrganizationInput,
+} from '../lib/schemas'
 
 interface EditOrganizationFormProps {
   organization: Organization & {
@@ -37,6 +44,7 @@ export function EditOrganizationForm({ organization }: EditOrganizationFormProps
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
+  const updateOrganizationSchema = useUpdateOrganizationSchema()
 
   const currentAdminHR = organization.users.filter((u) => u.role === 'ADMIN_HR').length
   const currentChiefs = organization.users.filter((u) => u.role === 'CHIEF_AREA').length
@@ -82,7 +90,7 @@ export function EditOrganizationForm({ organization }: EditOrganizationFormProps
 
       if (result.success) {
         toast.success(t('success'))
-        router.push(`/super-admin/organizations/${organization.id}`)
+        router.push(`/dashboard/organizations/${organization.id}`)
       } else {
         setError(result.error || t('error'))
         toast.error(result.error || t('error'))
@@ -95,7 +103,7 @@ export function EditOrganizationForm({ organization }: EditOrganizationFormProps
       <Button
         type="button"
         variant="ghost"
-        onClick={() => router.push(`/super-admin/organizations/${organization.id}`)}
+        onClick={() => router.push(`/dashboard/organizations/${organization.id}`)}
         className="mb-4"
       >
         <ArrowLeft className="mr-2 h-4 w-4" />
@@ -355,7 +363,7 @@ export function EditOrganizationForm({ organization }: EditOrganizationFormProps
         <Button
           type="button"
           variant="outline"
-          onClick={() => router.push(`/super-admin/organizations/${organization.id}`)}
+          onClick={() => router.push(`/dashboard/organizations/${organization.id}`)}
           disabled={isPending}
         >
           {t('form.cancel')}

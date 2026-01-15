@@ -1,6 +1,7 @@
 import { useTranslations } from 'next-intl'
-import { Card, CardContent, CardHeader, CardTitle } from '@/src/shared/ui/card'
 import { AlertTriangle, CheckCircle, Clock } from 'lucide-react'
+
+import { Card, CardContent, CardHeader, CardTitle } from '@/src/shared/ui/card'
 
 interface AlertsData {
   upcomingPaymentsText: string

@@ -1,19 +1,26 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { requireAuth } from '@/src/shared/lib/auth/session'
-import {
-  updateUserProfile,
-  changeUserPassword,
-  updateUserDocument,
-  getPendingInvitations,
-  acceptInvitation,
-  rejectInvitation,
-  getUserOrganizations,
-} from '../lib/profile-helpers'
-import { updateProfileSchema, changePasswordSchema, updateDocumentSchema } from '../lib/schemas'
-import type { ActionResult } from '@/src/shared/lib/types'
 import type { Country } from '@prisma/client'
+
+import { requireAuth } from '@/src/shared/lib/auth/session'
+import type { ActionResult } from '@/src/shared/lib/types'
+import { getLocaleFromHeaders } from '@/src/shared/lib/utils/get-locale'
+
+import {
+  acceptInvitation,
+  changeUserPassword,
+  getPendingInvitations,
+  getUserOrganizations,
+  rejectInvitation,
+  updateUserDocument,
+  updateUserProfile,
+} from '../data/profile-repository'
+import {
+  getChangePasswordSchema,
+  getUpdateDocumentSchema,
+  getUpdateProfileSchema,
+} from '../lib/schemas'
 
 export async function updateProfileAction(data: {
   name: string
@@ -21,6 +28,8 @@ export async function updateProfileAction(data: {
 }): Promise<ActionResult<unknown>> {
   try {
     const user = await requireAuth()
+    const locale = await getLocaleFromHeaders()
+    const updateProfileSchema = await getUpdateProfileSchema(locale)
 
     const validation = updateProfileSchema.safeParse(data)
     if (!validation.success) {
@@ -53,6 +62,8 @@ export async function changePasswordAction(data: {
 }): Promise<ActionResult<unknown>> {
   try {
     const user = await requireAuth()
+    const locale = await getLocaleFromHeaders()
+    const changePasswordSchema = await getChangePasswordSchema(locale)
 
     const validation = changePasswordSchema.safeParse(data)
     if (!validation.success) {
@@ -82,8 +93,10 @@ export async function updateDocumentAction(data: {
 }): Promise<ActionResult<unknown>> {
   try {
     const user = await requireAuth()
+    const locale = await getLocaleFromHeaders()
+    const updateDocumentSchema = await getUpdateDocumentSchema(locale, data.country)
 
-    const validation = updateDocumentSchema(data.country).safeParse(data)
+    const validation = updateDocumentSchema.safeParse(data)
     if (!validation.success) {
       return {
         success: false,

@@ -1,6 +1,8 @@
 'use client'
 
 import { useEffect } from 'react'
+import { AlertCircle, Home } from 'lucide-react'
+
 import { Button } from '@/src/shared/ui/button'
 import {
   Card,
@@ -10,7 +12,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/src/shared/ui/card'
-import { AlertCircle, Home } from 'lucide-react'
 
 export default function GlobalError({
   error,

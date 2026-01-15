@@ -1,24 +1,29 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+
+import { requireSuperAdmin } from '@/src/shared/lib/auth/session'
+import { getLocaleFromHeaders } from '@/src/shared/lib/utils/get-locale'
+
 import {
-  createAdminHRUserSchema,
-  updateAdminHRUserSchema,
+  checkEmailExists,
+  createAdminHRUser,
+  deleteAdminHRUser,
+  updateAdminHRUser,
+} from '../data/admin-hr-user-repository'
+import {
+  getCreateAdminHRUserSchema,
+  getUpdateAdminHRUserSchema,
   type CreateAdminHRUserInput,
   type UpdateAdminHRUserInput,
-} from '../lib/admin-hr-user-schemas'
-import {
-  createAdminHRUser,
-  updateAdminHRUser,
-  deleteAdminHRUser,
-  checkEmailExists,
-} from '../lib/admin-hr-user-helpers'
-import { requireSuperAdmin } from '@/src/shared/lib/auth/session'
+} from '../lib/schemas'
 
 export async function createAdminHRUserAction(data: CreateAdminHRUserInput) {
   try {
     await requireSuperAdmin()
 
+    const locale = await getLocaleFromHeaders()
+    const createAdminHRUserSchema = await getCreateAdminHRUserSchema(locale)
     const validatedData = createAdminHRUserSchema.parse(data)
 
     const emailExists = await checkEmailExists(validatedData.email)
@@ -31,8 +36,8 @@ export async function createAdminHRUserAction(data: CreateAdminHRUserInput) {
 
     const user = await createAdminHRUser(validatedData)
 
-    revalidatePath('/super-admin/admin-hr-users')
-    revalidatePath('/super-admin')
+    revalidatePath('/dashboard/admin-hr-users')
+    revalidatePath('/dashboard')
 
     return {
       success: true,
@@ -60,6 +65,8 @@ export async function updateAdminHRUserAction(id: string, data: UpdateAdminHRUse
   try {
     await requireSuperAdmin()
 
+    const locale = await getLocaleFromHeaders()
+    const updateAdminHRUserSchema = await getUpdateAdminHRUserSchema(locale)
     const validatedData = updateAdminHRUserSchema.parse(data)
 
     if (validatedData.email) {
@@ -74,8 +81,8 @@ export async function updateAdminHRUserAction(id: string, data: UpdateAdminHRUse
 
     const user = await updateAdminHRUser(id, validatedData)
 
-    revalidatePath('/super-admin/admin-hr-users')
-    revalidatePath('/super-admin')
+    revalidatePath('/dashboard/admin-hr-users')
+    revalidatePath('/dashboard')
 
     return {
       success: true,
@@ -105,8 +112,8 @@ export async function deleteAdminHRUserAction(id: string) {
 
     await deleteAdminHRUser(id)
 
-    revalidatePath('/super-admin/admin-hr-users')
-    revalidatePath('/super-admin')
+    revalidatePath('/dashboard/admin-hr-users')
+    revalidatePath('/dashboard')
 
     return {
       success: true,

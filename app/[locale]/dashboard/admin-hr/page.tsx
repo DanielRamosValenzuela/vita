@@ -1,7 +1,8 @@
 import { getTranslations } from 'next-intl/server'
+
 import { requireAdminHR } from '@/src/shared/lib/auth'
-import { DashboardStatsCards } from '@/src/features/admin-hr/ui'
 import type { AdminHRDashboardStats } from '@/src/features/admin-hr/lib'
+import { DashboardStatsCards } from '@/src/features/admin-hr/ui'
 
 interface AdminHRDashboardPageProps {
   params: Promise<{ locale: string }>

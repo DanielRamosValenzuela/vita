@@ -1,5 +1,5 @@
-import { MainNavbar } from '@/src/widgets/main-navbar'
 import { Footer } from '@/src/widgets/footer'
+import { MainNavbar } from '@/src/widgets/main-navbar'
 
 interface GlobalLayoutProps {
   children: React.ReactNode

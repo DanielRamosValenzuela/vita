@@ -1,11 +1,13 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
-import { Button } from '@/src/shared/ui/button'
-import { Eye, CreditCard, Unlock } from 'lucide-react'
-import { OrganizationPlan, OrganizationStatus } from '@prisma/client'
 import Link from 'next/link'
+import { OrganizationPlan, OrganizationStatus } from '@prisma/client'
+import { CreditCard, Eye, Unlock } from 'lucide-react'
+
+import { Button } from '@/src/shared/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
+
 import type { OrganizationSummary } from '../lib/types'
 
 interface OrganizationsTableProps {
@@ -72,10 +74,10 @@ export function OrganizationsTable({ organizations }: OrganizationsTableProps) {
           </div>
           <div className="flex gap-2">
             <Button asChild variant="outline">
-              <Link href="/super-admin/organizations/new">{t('new')}</Link>
+              <Link href="/dashboard/organizations/new">{t('new')}</Link>
             </Button>
             <Button asChild variant="ghost">
-              <Link href="/super-admin/organizations">{t('viewAll')}</Link>
+              <Link href="/dashboard/organizations">{t('viewAll')}</Link>
             </Button>
           </div>
         </div>
@@ -126,7 +128,7 @@ export function OrganizationsTable({ organizations }: OrganizationsTableProps) {
                         size="sm"
                         aria-label={`${t('view')} ${org.name}`}
                       >
-                        <Link href={`/super-admin/organizations/${org.id}`}>
+                        <Link href={`/dashboard/organizations/${org.id}`}>
                           <Eye className="h-4 w-4" />
                         </Link>
                       </Button>

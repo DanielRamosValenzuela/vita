@@ -1,13 +1,14 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
-import { Building2 } from 'lucide-react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
-import { Badge } from '@/src/shared/ui/badge'
-import { Loader2 } from 'lucide-react'
-import { getUserOrganizationsAction } from '../api/profile-actions'
+import { Building2, Loader2 } from 'lucide-react'
+
 import type { ActionResult } from '@/src/shared/lib/types'
+import { Badge } from '@/src/shared/ui/badge'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
+
+import { getUserOrganizationsAction } from '../api/profile-actions'
 
 interface Organization {
   id: string

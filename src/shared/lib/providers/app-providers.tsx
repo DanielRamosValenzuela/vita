@@ -3,6 +3,8 @@
 import { SessionProvider } from 'next-auth/react'
 import { ThemeProvider as NextThemesProvider } from 'next-themes'
 
+import { CustomThemeProvider } from './custom-theme-provider'
+
 interface AppProvidersProps {
   children: React.ReactNode
 }
@@ -15,7 +17,9 @@ export function AppProviders({ children }: AppProvidersProps) {
       enableSystem
       disableTransitionOnChange
     >
-      <SessionProvider>{children}</SessionProvider>
+      <CustomThemeProvider>
+        <SessionProvider>{children}</SessionProvider>
+      </CustomThemeProvider>
     </NextThemesProvider>
   )
 }

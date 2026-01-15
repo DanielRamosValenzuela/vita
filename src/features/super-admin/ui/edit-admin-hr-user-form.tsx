@@ -2,11 +2,14 @@
 
 import { useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
-import { useRouter } from '@/i18n/navigation'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import type { Organization, User } from '@prisma/client'
 import { Loader2 } from 'lucide-react'
+import { useForm, useWatch } from 'react-hook-form'
+import { toast } from 'sonner'
+
 import { Button } from '@/src/shared/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
 import { Input } from '@/src/shared/ui/input'
 import { Label } from '@/src/shared/ui/label'
 import {
@@ -16,11 +19,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/src/shared/ui/select'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
+
+import { useRouter } from '@/i18n/navigation'
+
 import { updateAdminHRUserAction } from '../api/admin-hr-user-actions'
-import { updateAdminHRUserSchema, type UpdateAdminHRUserInput } from '../lib/admin-hr-user-schemas'
-import { toast } from 'sonner'
-import type { User, Organization } from '@prisma/client'
+import { useUpdateAdminHRUserSchema, type UpdateAdminHRUserInput } from '../lib/schemas'
 
 interface EditAdminHRUserFormProps {
   user: User & { organization: Organization | null }
@@ -32,6 +35,7 @@ export function EditAdminHRUserForm({ user, organizations }: EditAdminHRUserForm
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
+  const updateAdminHRUserSchema = useUpdateAdminHRUserSchema()
 
   const form = useForm<UpdateAdminHRUserInput>({
     resolver: zodResolver(updateAdminHRUserSchema),
@@ -48,10 +52,10 @@ export function EditAdminHRUserForm({ user, organizations }: EditAdminHRUserForm
     handleSubmit,
     formState: { errors },
     setValue,
-    watch,
+    control,
   } = form
 
-  const selectedOrganizationId = watch('organizationId')
+  const selectedOrganizationId = useWatch({ control, name: 'organizationId' })
 
   const onSubmit = async (data: UpdateAdminHRUserInput) => {
     setError(null)
@@ -65,7 +69,7 @@ export function EditAdminHRUserForm({ user, organizations }: EditAdminHRUserForm
 
       if (result.success) {
         toast.success(t('success'))
-        router.push('/super-admin/admin-hr-users')
+        router.push('/dashboard/admin-hr-users')
       } else {
         setError(result.error || t('error'))
         toast.error(result.error || t('error'))
@@ -155,7 +159,7 @@ export function EditAdminHRUserForm({ user, organizations }: EditAdminHRUserForm
             <Button
               type="button"
               variant="outline"
-              onClick={() => router.push('/super-admin/admin-hr-users')}
+              onClick={() => router.push('/dashboard/admin-hr-users')}
             >
               {t('cancel')}
             </Button>

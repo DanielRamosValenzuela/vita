@@ -1,11 +1,13 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
+import type { Country, OrganizationPlan, OrganizationStatus } from '@prisma/client'
 import { Search, X } from 'lucide-react'
+
+import { Badge } from '@/src/shared/ui/badge'
+import { Button } from '@/src/shared/ui/button'
 import { Input } from '@/src/shared/ui/input'
 import { Label } from '@/src/shared/ui/label'
-import { Button } from '@/src/shared/ui/button'
-import { Badge } from '@/src/shared/ui/badge'
 import {
   Select,
   SelectContent,
@@ -13,7 +15,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/src/shared/ui/select'
-import type { OrganizationStatus, OrganizationPlan, Country } from '@prisma/client'
 
 interface OrganizationsFiltersProps {
   search: string

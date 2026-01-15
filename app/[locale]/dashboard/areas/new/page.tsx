@@ -1,4 +1,5 @@
 import { getTranslations } from 'next-intl/server'
+
 import { requireAdminHR } from '@/src/shared/lib/auth'
 import { CreateAreaForm } from '@/src/features/admin-hr/ui'
 

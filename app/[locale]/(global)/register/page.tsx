@@ -1,5 +1,6 @@
 import { getServerSession } from 'next-auth/next'
 import { redirect } from 'next/navigation'
+
 import { authOptions } from '@/src/shared/lib/auth'
 import { RegisterForm } from '@/src/features/auth/ui'
 

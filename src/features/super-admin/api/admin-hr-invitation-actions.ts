@@ -1,15 +1,17 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { requireSuperAdmin } from '@/src/shared/lib/auth/session'
-import { prisma } from '@/src/shared/lib/auth/config'
-import {
-  searchUserByRUTOrEmail,
-  createAdminHRInvitation,
-  checkOrganizationAdminHRLimit,
-} from '../lib/admin-hr-invitation-helpers'
-import type { ActionResult } from '@/src/shared/lib/types'
 import type { Country } from '@prisma/client'
+
+import { prisma } from '@/src/shared/lib/auth/config'
+import { requireSuperAdmin } from '@/src/shared/lib/auth/session'
+import type { ActionResult } from '@/src/shared/lib/types'
+
+import {
+  checkOrganizationAdminHRLimit,
+  createAdminHRInvitation,
+  searchUserByRUTOrEmail,
+} from '../data/admin-hr-invitation-repository'
 
 export const searchUserAction = async (
   search: string,
@@ -94,8 +96,8 @@ export const inviteAdminHRAction = async (
       return invitationResult
     }
 
-    revalidatePath(`/super-admin/organizations/${organizationId}`)
-    revalidatePath('/super-admin/organizations')
+    revalidatePath(`/dashboard/organizations/${organizationId}`)
+    revalidatePath('/dashboard/organizations')
 
     return {
       success: true,

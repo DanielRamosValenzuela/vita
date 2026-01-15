@@ -2,26 +2,45 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { Country } from '@prisma/client'
+import { HelpCircle } from 'lucide-react'
+
+import { getDocTypeForCountry } from '@/src/shared/lib/utils/doc-type-mapper'
+import { formatTaxId, getTaxIdConfig, validateTaxId } from '@/src/shared/lib/utils/tax-id-config'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/src/shared/ui/tooltip'
+
 import { Link } from '@/i18n/navigation'
+
 import { registerAction } from '../api'
-import { validateRUT } from '@/src/shared/lib/functions/rut'
 
 export function RegisterForm() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState<Record<string, string[]>>({})
   const [generalError, setGeneralError] = useState<string | null>(null)
-  const [rutValue, setRutValue] = useState('')
-  const [rutError, setRutError] = useState<string | null>(null)
+  const [country, setCountry] = useState<Country>(Country.CL)
+  const [docNumberValue, setDocNumberValue] = useState('')
+  const [docNumberError, setDocNumberError] = useState<string | null>(null)
 
-  const handleRutChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const taxIdConfig = getTaxIdConfig(country)
+  const docType = getDocTypeForCountry(country)
+
+  const handleCountryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newCountry = e.target.value as Country
+    setCountry(newCountry)
+    setDocNumberValue('')
+    setDocNumberError(null)
+  }
+
+  const handleDocNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
-    setRutValue(value)
+    const formatted = formatTaxId(value, country)
+    setDocNumberValue(formatted)
 
-    if (value && !validateRUT(value)) {
-      setRutError('El RUT ingresado no es válido')
+    if (formatted && !validateTaxId(formatted, country)) {
+      setDocNumberError(`El ${taxIdConfig.label} ingresado no es válido`)
     } else {
-      setRutError(null)
+      setDocNumberError(null)
     }
   }
 
@@ -32,6 +51,11 @@ export function RegisterForm() {
     setGeneralError(null)
 
     const formData = new FormData(e.currentTarget)
+    formData.set('docType', docType)
+    formData.set('country', country)
+
+    const locale = window.location.pathname.split('/')[1] || 'es'
+    formData.set('locale', locale)
 
     try {
       const result = await registerAction(formData)
@@ -86,35 +110,83 @@ export function RegisterForm() {
       </div>
 
       <div>
-        <label htmlFor="rut" className="block text-sm font-medium text-gray-700">
-          RUT
+        <label htmlFor="country" className="block text-sm font-medium text-gray-700">
+          País
         </label>
-        <input
-          type="text"
-          id="rut"
-          name="rut"
-          value={rutValue}
-          onChange={handleRutChange}
+        <select
+          id="country"
+          name="country"
+          value={country}
+          onChange={handleCountryChange}
           required
-          maxLength={12}
           className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
-          placeholder="12.345.678-9"
-        />
-        {rutError && <p className="mt-1 text-sm text-red-600">{rutError}</p>}
-        {errors.rut && !rutError && <p className="mt-1 text-sm text-red-600">{errors.rut[0]}</p>}
+        >
+          <option value={Country.CL}>Chile</option>
+          <option value={Country.PE}>Perú</option>
+          <option value={Country.CO}>Colombia</option>
+          <option value={Country.AR}>Argentina</option>
+          <option value={Country.MX}>México</option>
+          <option value={Country.US}>Estados Unidos</option>
+        </select>
+        {errors.country && <p className="mt-1 text-sm text-red-600">{errors.country[0]}</p>}
       </div>
 
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-          Contraseña
+        <label htmlFor="docNumber" className="block text-sm font-medium text-gray-700">
+          {taxIdConfig.label}
         </label>
+        <input
+          type="text"
+          id="docNumber"
+          name="docNumber"
+          value={docNumberValue}
+          onChange={handleDocNumberChange}
+          required
+          maxLength={taxIdConfig.maxLength}
+          className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+          placeholder={taxIdConfig.placeholder}
+        />
+        {taxIdConfig.description && (
+          <p className="mt-1 text-xs text-gray-500">{taxIdConfig.description}</p>
+        )}
+        {docNumberError && <p className="mt-1 text-sm text-red-600">{docNumberError}</p>}
+        {errors.docNumber && !docNumberError && (
+          <p className="mt-1 text-sm text-red-600">{errors.docNumber[0]}</p>
+        )}
+      </div>
+
+      <div>
+        <div className="flex items-center gap-2">
+          <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+            Contraseña
+          </label>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                className="text-muted-foreground hover:text-foreground focus:outline-none"
+                aria-label="Requisitos de contraseña"
+              >
+                <HelpCircle className="h-4 w-4" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="right" className="max-w-xs">
+              <ul className="space-y-1 text-xs">
+                <li>• Mínimo 8 caracteres</li>
+                <li>• Al menos 1 mayúscula</li>
+                <li>• Al menos 1 minúscula</li>
+                <li>• Al menos 1 número</li>
+              </ul>
+            </TooltipContent>
+          </Tooltip>
+        </div>
         <input
           type="password"
           id="password"
           name="password"
           required
           className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
-          placeholder="Mínimo 8 caracteres, 1 mayúscula, 1 minúscula, 1 número"
+          placeholder="••••••••"
         />
         {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password[0]}</p>}
       </div>
@@ -137,7 +209,7 @@ export function RegisterForm() {
 
       <button
         type="submit"
-        disabled={loading || !!rutError}
+        disabled={loading || !!docNumberError}
         className="w-full rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-400"
       >
         {loading ? 'Registrando...' : 'Registrarse'}

@@ -1,4 +1,4 @@
-import { Role, Country, DocType } from '@prisma/client'
+import { Country, DocType, Role } from '@prisma/client'
 
 declare module 'next-auth' {
   interface Session {

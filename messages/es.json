@@ -114,7 +114,11 @@
     "rates": "Tarifas",
     "staff": "Personal",
     "shifts": "Turnos",
-    "profile": "Perfil"
+    "profile": "Perfil",
+    "calendarTitle": "Calendario",
+    "calendarDescription": "Visualiza el calendario de turnos. Inicia sesión para gestionar tus turnos.",
+    "calendarWelcome": "Bienvenido, {name}. Aquí puedes ver todos tus turnos.",
+    "calendarWelcomePlaceholder": "Bienvenido, {name}. Aquí puedes ver todos tus turnos."
   },
   "profile": {
     "title": "Perfil",
@@ -625,10 +629,17 @@
       "inDays": "en {days} días"
     },
     "dashboard": {
+      "title": "Dashboard SUPER ADMIN",
+      "subtitle": "Vista general de todas las organizaciones y métricas",
       "recent": {
         "title": "Organizaciones Recientes",
         "viewAll": "Ver Todas",
         "new": "Nueva Organización"
+      },
+      "stats": {
+        "orgGrowth": "+{count} este mes",
+        "revenueGrowth": "+{amount} ↑",
+        "userGrowth": "+{count} este mes"
       }
     },
     "alerts": {
@@ -694,5 +705,99 @@
     "errorId": "Error ID",
     "tryAgain": "Intentar de nuevo",
     "goHome": "Ir al inicio"
+  },
+  "validation": {
+    "email": {
+      "required": "El email es requerido",
+      "invalid": "El email no es válido"
+    },
+    "password": {
+      "required": "La contraseña es requerida",
+      "minLength": "La contraseña debe tener al menos 8 caracteres",
+      "maxLength": "La contraseña no puede exceder 100 caracteres",
+      "uppercase": "La contraseña debe contener al menos una mayúscula",
+      "lowercase": "La contraseña debe contener al menos una minúscula",
+      "number": "La contraseña debe contener al menos un número"
+    },
+    "name": {
+      "required": "El nombre es requerido",
+      "minLength": "El nombre debe tener al menos 2 caracteres",
+      "maxLength": "El nombre no puede exceder 100 caracteres"
+    },
+    "docNumber": {
+      "required": "El documento es requerido",
+      "minLength": "El documento debe tener al menos {min} caracteres",
+      "maxLength": "El documento no puede exceder {max} caracteres",
+      "invalid": "El {label} ingresado no es válido"
+    },
+    "confirmPassword": {
+      "required": "Debes confirmar tu contraseña",
+      "mismatch": "Las contraseñas no coinciden"
+    },
+    "docType": {
+      "mismatch": "El tipo de documento debe ser {expected} para {country}"
+    },
+    "description": {
+      "maxLength": "La descripción no puede exceder {max} caracteres"
+    },
+    "phone": {
+      "minLength": "El teléfono debe tener al menos {min} caracteres",
+      "maxLength": "El teléfono no puede exceder {max} caracteres"
+    },
+    "address": {
+      "maxLength": "La dirección no puede exceder {max} caracteres"
+    },
+    "taxId": {
+      "required": "El identificador fiscal es obligatorio",
+      "invalid": "El identificador fiscal no es válido para el país seleccionado"
+    },
+    "number": {
+      "integer": "Debe ser un número entero",
+      "min": "El valor no puede ser negativo",
+      "max": "El valor no puede exceder {max}",
+      "monthlyFeeMax": "La tarifa mensual no puede exceder $1,000,000"
+    },
+    "organization": {
+      "required": "La organización es obligatoria"
+    },
+    "reason": {
+      "minLength": "La razón debe tener al menos {min} caracteres",
+      "maxLength": "La razón no puede exceder {max} caracteres"
+    },
+    "currentPassword": {
+      "required": "La contraseña actual es requerida"
+    },
+    "document": {
+      "required": "El número de documento es requerido",
+      "invalid": "Número de documento inválido para el país seleccionado"
+    },
+    "area": {
+      "nameMinLength": "El nombre debe tener al menos {min} caracteres",
+      "nameMaxLength": "El nombre no puede exceder {max} caracteres",
+      "descriptionMaxLength": "La descripción no puede exceder {max} caracteres"
+    },
+    "organization": {
+      "nameMinLength": "El nombre debe tener al menos {min} caracteres",
+      "nameMaxLength": "El nombre no puede exceder {max} caracteres",
+      "contactNameMinLength": "El nombre de contacto debe tener al menos {min} caracteres",
+      "contactNameMaxLength": "El nombre de contacto no puede exceder {max} caracteres",
+      "contactEmailMaxLength": "El email no puede exceder {max} caracteres",
+      "contactPhoneMinLength": "El teléfono debe tener al menos {min} caracteres",
+      "contactPhoneMaxLength": "El teléfono no puede exceder {max} caracteres",
+      "addressMaxLength": "La dirección no puede exceder {max} caracteres",
+      "monthlyFeeMin": "La tarifa mensual no puede ser negativa",
+      "monthlyFeeMax": "La tarifa mensual no puede exceder $1,000,000",
+      "limitInteger": "Debe ser un número entero",
+      "limitMin": "El límite no puede ser negativo",
+      "limitMax": "El límite no puede exceder {max}",
+      "planLimitMaxAdminHRExceeded": "El límite de Admin HR excede el máximo permitido para este plan",
+      "planLimitMaxChiefsExceeded": "El límite de Jefes excede el máximo permitido para este plan",
+      "planLimitMaxStaffExceeded": "El límite de Staff excede el máximo permitido para este plan",
+      "taxIdMinLength": "El RUT/Tax ID debe tener al menos {min} caracteres",
+      "taxIdMaxLength": "El RUT/Tax ID no puede exceder {max} caracteres"
+    },
+    "adminHRUser": {
+      "emailInvalid": "Email inválido"
+    }
   }
 }

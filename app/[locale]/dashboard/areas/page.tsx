@@ -1,7 +1,8 @@
 import { getTranslations } from 'next-intl/server'
+
 import { requireAdminHR } from '@/src/shared/lib/auth'
+import { getAreas } from '@/src/features/admin-hr/data/area-repository'
 import { AreasTable } from '@/src/features/admin-hr/ui'
-import { getAreas } from '@/src/features/admin-hr/lib'
 
 interface AreasPageProps {
   params: Promise<{ locale: string }>

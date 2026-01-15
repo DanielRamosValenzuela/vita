@@ -1,12 +1,13 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
-import { Button } from '@/src/shared/ui/button'
-import { Badge } from '@/src/shared/ui/badge'
-import { Edit, Trash2, Plus } from 'lucide-react'
 import Link from 'next/link'
+import { Edit, Plus, Trash2 } from 'lucide-react'
+
 import type { Area } from '@/src/shared/lib/types'
+import { Badge } from '@/src/shared/ui/badge'
+import { Button } from '@/src/shared/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
 
 interface AreasTableProps {
   areas: Area[]
