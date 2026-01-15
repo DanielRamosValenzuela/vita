@@ -2,9 +2,9 @@ import { getTranslations } from 'next-intl/server'
 import { redirect } from 'next/navigation'
 import { Role } from '@prisma/client'
 
-import { getCurrentUser, prisma } from '@/src/shared/lib/auth'
+import { getCurrentUser } from '@/src/shared/lib/auth'
 import { requireSuperAdmin } from '@/src/shared/lib/auth/session'
-import { formatCurrency, formatPercentage } from '@/src/shared/lib/utils/format'
+import { formatAlertsData, formatStatsData, getDashboardData } from '@/src/features/super-admin/lib/helpers/server/dashboard-helpers'
 import { CalendarView } from '@/src/widgets/calendar-view'
 import { AlertsPanel } from '@/src/features/super-admin/ui/alerts-panel'
 import { OrganizationsTable } from '@/src/features/super-admin/ui/organizations-table'
@@ -37,80 +37,10 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
   if (user.role === Role.SUPER_ADMIN) {
     await requireSuperAdmin(locale)
 
-    const totalOrgs = await prisma.organization.count()
-    const activeOrgs = await prisma.organization.count({
-      where: { status: 'ACTIVE' },
-    })
-    const suspendedOrgs = await prisma.organization.count({
-      where: { status: 'SUSPENDED' },
-    })
-    const totalUsers = await prisma.user.count({
-      where: {
-        organizationId: { not: null },
-      },
-    })
+    const { stats, recentOrganizations } = await getDashboardData()
 
-    const sevenDaysFromNow = new Date()
-    sevenDaysFromNow.setDate(sevenDaysFromNow.getDate() + 7)
-
-    const upcomingPayments = await prisma.organization.count({
-      where: {
-        status: 'ACTIVE',
-        nextPayment: {
-          lte: sevenDaysFromNow,
-          gte: new Date(),
-        },
-      },
-    })
-
-    const recentOrganizations = await prisma.organization.findMany({
-      take: 5,
-      orderBy: { createdAt: 'desc' },
-      select: {
-        id: true,
-        name: true,
-        status: true,
-        plan: true,
-        maxStaff: true,
-        _count: {
-          select: { users: true },
-        },
-      },
-    })
-
-    const organizationsWithUserCount = recentOrganizations.map((org) => ({
-      id: org.id,
-      name: org.name,
-      status: org.status,
-      plan: org.plan,
-      userCount: org._count.users,
-      maxUsers: org.maxStaff,
-    }))
-
-    const statsData = {
-      totalOrgs: totalOrgs.toString(),
-      activeOrgs: formatPercentage(activeOrgs, totalOrgs),
-      suspendedOrgs: formatPercentage(suspendedOrgs, totalOrgs),
-      monthlyRevenue: formatCurrency(28600),
-      totalUsers: totalUsers.toString(),
-      upcomingPayments: upcomingPayments.toString(),
-      orgGrowth: tSuperAdmin('stats.orgGrowth', { count: 3 }),
-      revenueGrowth: tSuperAdmin('stats.revenueGrowth', { amount: '$2,400' }),
-      userGrowth: tSuperAdmin('stats.userGrowth', { count: 45 }),
-      upcomingPaymentsDays: tStats('inDays', { days: 7 }),
-    }
-
-    const alertsData = {
-      upcomingPaymentsText: tAlerts('upcomingPayments', { count: upcomingPayments }),
-      suspendedText: tAlerts('suspended', { count: suspendedOrgs }),
-      paymentsTodayText: tAlerts('paymentsToday', {
-        count: 3,
-        amount: formatCurrency(8200),
-      }),
-      showUpcoming: upcomingPayments > 0,
-      showSuspended: suspendedOrgs > 0,
-      showToday: true,
-    }
+    const statsData = formatStatsData(stats, tSuperAdmin, tStats)
+    const alertsData = formatAlertsData(stats, tAlerts)
 
     return (
       <div className="space-y-8">
@@ -123,7 +53,7 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
 
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2">
-            <OrganizationsTable organizations={organizationsWithUserCount} />
+            <OrganizationsTable organizations={recentOrganizations} />
           </div>
           <div>
             <AlertsPanel data={alertsData} />

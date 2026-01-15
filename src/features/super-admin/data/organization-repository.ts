@@ -258,3 +258,65 @@ export const getOrganizationStats = async () => {
     pendingPaymentCount,
   }
 }
+
+export const getDashboardStats = async () => {
+  const totalOrgs = await prisma.organization.count()
+  const activeOrgs = await prisma.organization.count({
+    where: { status: 'ACTIVE' },
+  })
+  const suspendedOrgs = await prisma.organization.count({
+    where: { status: 'SUSPENDED' },
+  })
+  const totalUsers = await prisma.user.count({
+    where: {
+      organizationId: { not: null },
+    },
+  })
+
+  const sevenDaysFromNow = new Date()
+  sevenDaysFromNow.setDate(sevenDaysFromNow.getDate() + 7)
+
+  const upcomingPayments = await prisma.organization.count({
+    where: {
+      status: 'ACTIVE',
+      nextPayment: {
+        lte: sevenDaysFromNow,
+        gte: new Date(),
+      },
+    },
+  })
+
+  return {
+    totalOrgs,
+    activeOrgs,
+    suspendedOrgs,
+    totalUsers,
+    upcomingPayments,
+  }
+}
+
+export const getRecentOrganizations = async (limit = 5) => {
+  const organizations = await prisma.organization.findMany({
+    take: limit,
+    orderBy: { createdAt: 'desc' },
+    select: {
+      id: true,
+      name: true,
+      status: true,
+      plan: true,
+      maxStaff: true,
+      _count: {
+        select: { users: true },
+      },
+    },
+  })
+
+  return organizations.map((org) => ({
+    id: org.id,
+    name: org.name,
+    status: org.status,
+    plan: org.plan,
+    userCount: org._count.users,
+    maxUsers: org.maxStaff,
+  }))
+}
