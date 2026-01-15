@@ -1,7 +1,6 @@
 import { formatCurrency, formatPercentage } from '@/src/shared/lib/utils/format'
 
 import { getDashboardStats, getRecentOrganizations } from '../../../data/organization-repository'
-import type { OrganizationSummary } from '../../types'
 
 interface DashboardStatsRaw {
   totalOrgs: number

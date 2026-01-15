@@ -1,3 +1,3 @@
 export * from './themes-types'
-export * from './themes-constants'
+export * from './themes-list'
 export * from './themes-utils'

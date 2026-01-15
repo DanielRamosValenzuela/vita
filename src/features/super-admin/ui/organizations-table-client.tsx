@@ -325,7 +325,24 @@ export function OrganizationsTableClient({
                         : '-'}
                     </TableCell>
                     <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-2">
+                      {/*Desktop: Iconos individuales con tooltips*/}
+                      <div className="hidden md:flex items-center justify-end gap-2">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-950 dark:hover:text-blue-400"
+                              onClick={() => router.push(`/dashboard/organizations/${org.id}`)}
+                            >
+                              <span className="sr-only">{t('actions.view')}</span>
+                              <Eye className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>{t('actions.view')}</p>
+                          </TooltipContent>
+                        </Tooltip>
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Button
@@ -342,6 +359,66 @@ export function OrganizationsTableClient({
                             <p>{t('actions.edit')}</p>
                           </TooltipContent>
                         </Tooltip>
+                        {org.status === 'ACTIVE' && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0 hover:bg-orange-50 hover:text-orange-600 dark:hover:bg-orange-950 dark:hover:text-orange-400"
+                                onClick={() => handleSuspend(org.id, org.name)}
+                              >
+                                <span className="sr-only">{t('actions.suspend')}</span>
+                                <Ban className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>{t('actions.suspend')}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        )}
+                        {(org.status === 'SUSPENDED' ||
+                          org.status === 'PENDING_PAYMENT' ||
+                          org.status === 'INACTIVE') && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0 hover:bg-green-50 hover:text-green-600 dark:hover:bg-green-950 dark:hover:text-green-400"
+                                onClick={() => handleReactivate(org.id, org.name)}
+                              >
+                                <span className="sr-only">{t('actions.reactivate')}</span>
+                                <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>{t('actions.reactivate')}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        )}
+                        {org.status !== 'INACTIVE' && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive dark:hover:bg-destructive/20"
+                                onClick={() => handleDelete(org.id, org.name)}
+                              >
+                                <span className="sr-only">{t('actions.delete')}</span>
+                                <Trash2 className="h-4 w-4 text-destructive" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>{t('actions.delete')}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        )}
+                      </div>
+
+                      {/*Mobile: Dropdown menu*/}
+                      <div className="flex md:hidden items-center justify-end">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" className="h-8 w-8 p-0">
@@ -358,6 +435,13 @@ export function OrganizationsTableClient({
                             >
                               <Eye className="mr-2 h-4 w-4" />
                               {t('actions.view')}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => router.push(`/dashboard/organizations/${org.id}/edit`)}
+                              className="cursor-pointer"
+                            >
+                              <Edit className="mr-2 h-4 w-4" />
+                              {t('actions.edit')}
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             {org.status === 'ACTIVE' && (

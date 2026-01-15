@@ -20,8 +20,15 @@ export function validateRUT(rut: string): boolean {
   }
 
   const remainder = sum % 11
-  const calculatedDV = remainder < 2 ? remainder.toString() : (11 - remainder).toString()
-  const expectedDV = calculatedDV === '10' ? 'K' : calculatedDV
+  const dvNum = 11 - remainder
+  let expectedDV: string
+  if (dvNum === 11) {
+    expectedDV = '0'
+  } else if (dvNum === 10) {
+    expectedDV = 'K'
+  } else {
+    expectedDV = dvNum.toString()
+  }
 
   return dv === expectedDV
 }

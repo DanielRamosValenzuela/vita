@@ -1,4 +1,5 @@
 import { getServerSession } from 'next-auth/next'
+import { getTranslations } from 'next-intl/server'
 import { redirect } from 'next/navigation'
 
 import { authOptions } from '@/src/shared/lib/auth'
@@ -13,6 +14,7 @@ export default async function LoginPage({
 }) {
   const { locale } = await params
   const session = await getServerSession(authOptions)
+  const t = await getTranslations({ locale, namespace: 'auth' })
 
   if (session) {
     redirect(`/${locale}`)
@@ -21,22 +23,28 @@ export default async function LoginPage({
   const { registered } = await searchParams
 
   return (
-    <div className="bg-background flex min-h-screen items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md space-y-8">
-        <div>
-          <h2 className="text-foreground mt-6 text-center text-3xl font-bold tracking-tight">
-            Inicia sesión en tu cuenta
-          </h2>
-          {registered === 'true' && (
-            <p className="mt-2 text-center text-sm text-green-600">
-              ✅ Registro exitoso. Por favor, inicia sesión.
-            </p>
-          )}
-        </div>
-        <div className="bg-card rounded-lg px-8 py-8 shadow">
-          <LoginForm />
-        </div>
-      </div>
-    </div>
+    <main className="bg-background fixed inset-0 overflow-y-auto font-sans">
+      <section className="flex min-h-full items-start justify-center px-4 pt-16 pb-20 sm:px-6 lg:px-8">
+        <article className="w-full max-w-md space-y-8 py-8">
+          <header>
+            <h1 className="text-foreground mt-6 text-center text-3xl font-bold tracking-tight">
+              {t('signInTitle')}
+            </h1>
+            {registered === 'true' && (
+              <p
+                className="mt-2 text-center text-sm text-green-600"
+                role="status"
+                aria-live="polite"
+              >
+                {t('registrationSuccess')}
+              </p>
+            )}
+          </header>
+          <section className="bg-card rounded-lg px-8 py-8 shadow">
+            <LoginForm />
+          </section>
+        </article>
+      </section>
+    </main>
   )
 }

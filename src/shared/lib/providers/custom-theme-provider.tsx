@@ -1,9 +1,8 @@
 'use client'
 
 import { createContext, useCallback, useContext, useEffect, useState } from 'react'
-import { useTheme } from 'next-themes'
 
-import { getStoredThemeId, predefinedThemes, setStoredThemeId, type Theme } from '../themes'
+import { getStoredThemeId, setStoredThemeId, themesList, type Theme } from '../themes'
 
 interface CustomThemeContextType {
   currentTheme: Theme | null
@@ -14,41 +13,34 @@ interface CustomThemeContextType {
 const CustomThemeContext = createContext<CustomThemeContextType | undefined>(undefined)
 
 export function CustomThemeProvider({ children }: { children: React.ReactNode }) {
-  const { resolvedTheme } = useTheme()
-  const [themes] = useState<Theme[]>(predefinedThemes)
+  const [themes] = useState<Theme[]>(themesList)
   const [currentThemeId, setCurrentThemeId] = useState<string>('default')
+
+  const applyThemeClass = useCallback((themeId: string) => {
+    if (typeof document === 'undefined') return
+
+    const root = document.documentElement
+    themesList.forEach((theme) => {
+      if (theme.id !== 'default') {
+        root.classList.remove(`theme-${theme.id}`)
+      }
+    })
+
+    if (themeId !== 'default') {
+      const themeClass = `theme-${themeId}`
+      root.classList.add(themeClass)
+    }
+  }, [])
 
   useEffect(() => {
     const stored = getStoredThemeId()
-    if (stored) setCurrentThemeId(stored)
-  }, [])
+    if (stored) {
+      setCurrentThemeId(stored)
+      applyThemeClass(stored)
+    }
+  }, [applyThemeClass])
 
-  const currentTheme = themes.find((t) => t.id === currentThemeId) || predefinedThemes[0]
-
-  const applyTheme = useCallback(
-    (theme: Theme) => {
-      if (typeof document === 'undefined') return
-
-      const root = document.documentElement
-      const isDark = resolvedTheme === 'dark'
-      const vars = isDark ? theme.dark : theme.light
-
-      if (theme.id === 'default') {
-        Object.keys(vars).forEach((key) => {
-          root.style.removeProperty(key)
-        })
-      } else {
-        Object.entries(vars).forEach(([key, value]) => {
-          root.style.setProperty(key, value)
-        })
-      }
-    },
-    [resolvedTheme]
-  )
-
-  useEffect(() => {
-    applyTheme(currentTheme)
-  }, [currentTheme, applyTheme])
+  const currentTheme = themes.find((t) => t.id === currentThemeId) || themesList[0]
 
   const setTheme = useCallback(
     (themeId: string) => {
@@ -56,10 +48,10 @@ export function CustomThemeProvider({ children }: { children: React.ReactNode })
       if (theme) {
         setCurrentThemeId(themeId)
         setStoredThemeId(themeId)
-        applyTheme(theme)
+        applyThemeClass(themeId)
       }
     },
-    [themes, applyTheme]
+    [themes, applyThemeClass]
   )
 
   return (

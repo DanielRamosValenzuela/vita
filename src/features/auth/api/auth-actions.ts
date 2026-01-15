@@ -2,6 +2,8 @@
 
 import { Country, DocType } from '@prisma/client'
 
+import { formatZodErrors } from '@/src/shared/lib/utils'
+
 import {
   checkDocExists,
   checkEmailExists,
@@ -11,7 +13,6 @@ import {
 } from '../data/user-repository'
 import { getLoginSchema, getRegisterSchema } from '../lib/schemas'
 import type { ActionResult, RegisterData } from '../lib/types'
-import { formatZodErrors } from '@/src/shared/lib/utils'
 
 export async function registerAction(formData: FormData): Promise<ActionResult<RegisterData>> {
   try {

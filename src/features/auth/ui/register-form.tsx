@@ -1,12 +1,23 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { Country } from '@prisma/client'
 import { HelpCircle } from 'lucide-react'
 
 import { getDocTypeForCountry } from '@/src/shared/lib/utils/doc-type-mapper'
 import { formatTaxId, getTaxIdConfig, validateTaxId } from '@/src/shared/lib/utils/tax-id-config'
+import { Button } from '@/src/shared/ui/button'
+import { Input } from '@/src/shared/ui/input'
+import { Label } from '@/src/shared/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/src/shared/ui/select'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/src/shared/ui/tooltip'
 
 import { Link } from '@/i18n/navigation'
@@ -14,6 +25,7 @@ import { Link } from '@/i18n/navigation'
 import { registerAction } from '../api'
 
 export function RegisterForm() {
+  const t = useTranslations('auth')
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState<Record<string, string[]>>({})
@@ -21,12 +33,48 @@ export function RegisterForm() {
   const [country, setCountry] = useState<Country>(Country.CL)
   const [docNumberValue, setDocNumberValue] = useState('')
   const [docNumberError, setDocNumberError] = useState<string | null>(null)
+  const generalErrorRef = useRef<HTMLElement>(null)
+  const formRef = useRef<HTMLFormElement>(null)
 
   const taxIdConfig = getTaxIdConfig(country)
   const docType = getDocTypeForCountry(country)
 
-  const handleCountryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newCountry = e.target.value as Country
+  useEffect(() => {
+    if (generalError || Object.keys(errors).length > 0 || docNumberError) {
+      setTimeout(() => {
+        if (generalError && generalErrorRef.current) {
+          generalErrorRef.current.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+          })
+        } else {
+          const firstErrorField = Object.keys(errors)[0]
+          if (firstErrorField) {
+            const errorElement = document.getElementById(firstErrorField)
+            if (errorElement) {
+              errorElement.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center',
+              })
+              errorElement.focus()
+            }
+          } else if (docNumberError) {
+            const docNumberElement = document.getElementById('docNumber')
+            if (docNumberElement) {
+              docNumberElement.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center',
+              })
+              docNumberElement.focus()
+            }
+          }
+        }
+      }, 100)
+    }
+  }, [generalError, errors, docNumberError])
+
+  const handleCountryChange = (value: string) => {
+    const newCountry = value as Country
     setCountry(newCountry)
     setDocNumberValue('')
     setDocNumberError(null)
@@ -38,7 +86,7 @@ export function RegisterForm() {
     setDocNumberValue(formatted)
 
     if (formatted && !validateTaxId(formatted, country)) {
-      setDocNumberError(`El ${taxIdConfig.label} ingresado no es válido`)
+      setDocNumberError(t('taxIdInvalid', { label: taxIdConfig.label }))
     } else {
       setDocNumberError(null)
     }
@@ -63,79 +111,75 @@ export function RegisterForm() {
       if (result.success) {
         router.push('/es/login?registered=true')
       } else {
-        setGeneralError(result.error || 'Error desconocido')
+        setGeneralError(result.error || t('unknownError'))
         setErrors(result.fieldErrors || {})
       }
     } catch (error) {
-      setGeneralError(error instanceof Error ? error.message : 'Error inesperado')
+      setGeneralError(error instanceof Error ? error.message : t('unexpectedError'))
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
       {generalError && (
-        <div className="rounded-md bg-red-50 p-4 text-sm text-red-800">{generalError}</div>
+        <section
+          ref={generalErrorRef}
+          role="alert"
+          aria-live="assertive"
+          className="rounded-md bg-destructive/10 p-4 text-sm text-destructive"
+        >
+          {generalError}
+        </section>
       )}
 
-      <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-          Nombre Completo
-        </label>
-        <input
-          type="text"
-          id="name"
-          name="name"
-          required
-          className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
-          placeholder="Juan Pérez"
-        />
-        {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name[0]}</p>}
+      <div className="space-y-2">
+        <Label htmlFor="name">{t('fullName')}</Label>
+        <Input type="text" id="name" name="name" required placeholder={t('namePlaceholder')} />
+        {errors.name && (
+          <p className="text-destructive text-sm" role="alert">
+            {errors.name[0]}
+          </p>
+        )}
       </div>
 
-      <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-          Email
-        </label>
-        <input
-          type="email"
-          id="email"
-          name="email"
-          required
-          className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
-          placeholder="tu@email.com"
-        />
-        {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email[0]}</p>}
+      <div className="space-y-2">
+        <Label htmlFor="email">{t('email')}</Label>
+        <Input type="email" id="email" name="email" required placeholder={t('emailPlaceholder')} />
+        {errors.email && (
+          <p className="text-destructive text-sm" role="alert">
+            {errors.email[0]}
+          </p>
+        )}
       </div>
 
-      <div>
-        <label htmlFor="country" className="block text-sm font-medium text-gray-700">
-          País
-        </label>
-        <select
-          id="country"
-          name="country"
-          value={country}
-          onChange={handleCountryChange}
-          required
-          className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
-        >
-          <option value={Country.CL}>Chile</option>
-          <option value={Country.PE}>Perú</option>
-          <option value={Country.CO}>Colombia</option>
-          <option value={Country.AR}>Argentina</option>
-          <option value={Country.MX}>México</option>
-          <option value={Country.US}>Estados Unidos</option>
-        </select>
-        {errors.country && <p className="mt-1 text-sm text-red-600">{errors.country[0]}</p>}
+      <div className="space-y-2">
+        <Label htmlFor="country">{t('country')}</Label>
+        <input type="hidden" name="country" value={country} />
+        <Select value={country} onValueChange={handleCountryChange} required>
+          <SelectTrigger id="country" className="w-full">
+            <SelectValue placeholder={t('selectCountryPlaceholder')} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value={Country.CL}>{t('countries.CL')}</SelectItem>
+            <SelectItem value={Country.PE}>{t('countries.PE')}</SelectItem>
+            <SelectItem value={Country.CO}>{t('countries.CO')}</SelectItem>
+            <SelectItem value={Country.AR}>{t('countries.AR')}</SelectItem>
+            <SelectItem value={Country.MX}>{t('countries.MX')}</SelectItem>
+            <SelectItem value={Country.US}>{t('countries.US')}</SelectItem>
+          </SelectContent>
+        </Select>
+        {errors.country && (
+          <p className="text-destructive text-sm" role="alert">
+            {errors.country[0]}
+          </p>
+        )}
       </div>
 
-      <div>
-        <label htmlFor="docNumber" className="block text-sm font-medium text-gray-700">
-          {taxIdConfig.label}
-        </label>
-        <input
+      <div className="space-y-2">
+        <Label htmlFor="docNumber">{taxIdConfig.label}</Label>
+        <Input
           type="text"
           id="docNumber"
           name="docNumber"
@@ -143,82 +187,73 @@ export function RegisterForm() {
           onChange={handleDocNumberChange}
           required
           maxLength={taxIdConfig.maxLength}
-          className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
           placeholder={taxIdConfig.placeholder}
         />
         {taxIdConfig.description && (
-          <p className="mt-1 text-xs text-gray-500">{taxIdConfig.description}</p>
+          <p className="text-muted-foreground text-xs">{taxIdConfig.description}</p>
         )}
-        {docNumberError && <p className="mt-1 text-sm text-red-600">{docNumberError}</p>}
+        {docNumberError && (
+          <p className="text-destructive text-sm" role="alert">
+            {docNumberError}
+          </p>
+        )}
         {errors.docNumber && !docNumberError && (
-          <p className="mt-1 text-sm text-red-600">{errors.docNumber[0]}</p>
+          <p className="text-destructive text-sm" role="alert">
+            {errors.docNumber[0]}
+          </p>
         )}
       </div>
 
-      <div>
+      <fieldset className="space-y-2">
+        <legend className="sr-only">{t('password')}</legend>
         <div className="flex items-center gap-2">
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-            Contraseña
-          </label>
+          <Label htmlFor="password">{t('password')}</Label>
           <Tooltip>
             <TooltipTrigger asChild>
               <button
                 type="button"
                 className="text-muted-foreground hover:text-foreground focus:outline-none"
-                aria-label="Requisitos de contraseña"
+                aria-label={t('passwordRequirements')}
               >
                 <HelpCircle className="h-4 w-4" />
               </button>
             </TooltipTrigger>
             <TooltipContent side="right" className="max-w-xs">
               <ul className="space-y-1 text-xs">
-                <li>• Mínimo 8 caracteres</li>
-                <li>• Al menos 1 mayúscula</li>
-                <li>• Al menos 1 minúscula</li>
-                <li>• Al menos 1 número</li>
+                <li>• {t('passwordMinLength')}</li>
+                <li>• {t('passwordUppercase')}</li>
+                <li>• {t('passwordLowercase')}</li>
+                <li>• {t('passwordNumber')}</li>
               </ul>
             </TooltipContent>
           </Tooltip>
         </div>
-        <input
-          type="password"
-          id="password"
-          name="password"
-          required
-          className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
-          placeholder="••••••••"
-        />
-        {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password[0]}</p>}
-      </div>
+        <Input type="password" id="password" name="password" required placeholder="••••••••" />
+        {errors.password && (
+          <p className="text-destructive text-sm" role="alert">
+            {errors.password[0]}
+          </p>
+        )}
+      </fieldset>
 
-      <div>
-        <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-          Confirmar Contraseña
-        </label>
-        <input
-          type="password"
-          id="confirmPassword"
-          name="confirmPassword"
-          required
-          className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
-        />
+      <div className="space-y-2">
+        <Label htmlFor="confirmPassword">{t('confirmPassword')}</Label>
+        <Input type="password" id="confirmPassword" name="confirmPassword" required />
         {errors.confirmPassword && (
-          <p className="mt-1 text-sm text-red-600">{errors.confirmPassword[0]}</p>
+          <p className="text-destructive text-sm" role="alert">
+            {errors.confirmPassword[0]}
+          </p>
         )}
       </div>
 
-      <button
-        type="submit"
-        disabled={loading || !!docNumberError}
-        className="w-full rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-400"
-      >
-        {loading ? 'Registrando...' : 'Registrarse'}
-      </button>
+      <Button type="submit" disabled={loading || !!docNumberError} className="w-full">
+        {loading ? t('registering') : t('register')}
+      </Button>
 
-      <p className="text-center text-sm text-gray-600">
-        ¿Ya tienes una cuenta?{' '}
-        <Link href="/login" className="text-blue-600 hover:text-blue-500">
-          Inicia sesión
+      <p className="text-center text-sm text-muted-foreground">
+        {t('alreadyHaveAccount')}{' '}
+        <Link href="/login" className="text-primary hover:underline">
+          {t('signInLink')}
         </Link>
       </p>
     </form>

@@ -4,8 +4,12 @@ import { Role } from '@prisma/client'
 
 import { getCurrentUser } from '@/src/shared/lib/auth'
 import { requireSuperAdmin } from '@/src/shared/lib/auth/session'
-import { formatAlertsData, formatStatsData, getDashboardData } from '@/src/features/super-admin/lib/helpers/server/dashboard-helpers'
 import { CalendarView } from '@/src/widgets/calendar-view'
+import {
+  formatAlertsData,
+  formatStatsData,
+  getDashboardData,
+} from '@/src/features/super-admin/lib/helpers/server/dashboard-helpers'
 import { AlertsPanel } from '@/src/features/super-admin/ui/alerts-panel'
 import { OrganizationsTable } from '@/src/features/super-admin/ui/organizations-table'
 import { StatsCards } from '@/src/features/super-admin/ui/stats-cards'

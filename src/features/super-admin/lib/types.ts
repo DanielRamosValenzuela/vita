@@ -1,4 +1,10 @@
-import { Country, DocType, type Organization, type OrganizationPlan, type OrganizationStatus } from '@prisma/client'
+import {
+  Country,
+  DocType,
+  type Organization,
+  type OrganizationPlan,
+  type OrganizationStatus,
+} from '@prisma/client'
 
 export interface OrganizationWithCount extends Organization {
   _count: {
