@@ -15,7 +15,6 @@ import { Link, usePathname } from '@/i18n/navigation'
 
 import { getNavItems } from './constants'
 import type { DashboardSidebarProps } from './types'
-import { isActiveRoute } from './utils'
 
 export function DashboardSidebar({ user }: DashboardSidebarProps) {
   const t = useTranslations('dashboard')
@@ -41,7 +40,15 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
       <nav className="flex-1 space-y-1 p-4">
         {filteredNavItems.map((item) => {
           const Icon = item.icon
-          const active = isActiveRoute(item.href, pathname)
+          const isExactMatch = pathname === item.href
+          const isNestedRoute = pathname.startsWith(`${item.href}/`)
+          const hasMoreSpecificMatch = filteredNavItems.some(
+            (otherItem) =>
+              otherItem.href !== item.href &&
+              otherItem.href.length > item.href.length &&
+              (pathname === otherItem.href || pathname.startsWith(`${otherItem.href}/`))
+          )
+          const active = (isExactMatch || isNestedRoute) && !hasMoreSpecificMatch
           return (
             <Link
               key={item.href}

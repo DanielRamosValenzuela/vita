@@ -2,6 +2,7 @@ import { Country, DocType } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
 import { prisma } from '@/src/shared/lib/auth/config'
+import { ROLES } from '@/src/shared/lib/constants'
 
 import type { RegisterInput } from '../lib/schemas'
 
@@ -38,7 +39,7 @@ export async function createUserWithAccount(data: RegisterInput) {
       country: data.country as Country,
       docType: data.docType as DocType,
       docNumber: cleanDocNumber,
-      role: 'STAFF_HEALTH',
+      role: ROLES.STAFF_HEALTH,
     },
   })
 

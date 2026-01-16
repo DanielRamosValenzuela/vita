@@ -2,9 +2,9 @@
 
 **Sistema de Gestión de Turnos Médicos Multi-Tenant SaaS B2B**
 
-**Última actualización:** 11 de enero de 2026
+**Última actualización:** 11 de enero de 2026 (Tarde)
 
-**Versión:** 3.17.0
+**Versión:** 3.18.0
 
 **Estado:** FASE 2 completada - Dashboard SUPER_ADMIN + CRUD Organizations Completo + Sistema de Error Handling y Loading States + Dashboard ADMIN_HR Inicial + Página de Perfil de Usuario Completa + Correcciones de UI/UX + Sistema de Invitaciones y Vista de Organización ADMIN_HR + Migración a Entities (FSD) + Refactorización de Colores + Integración de Invitaciones en Mi Organización
 
@@ -63,6 +63,60 @@
   - `npm run build` ✅ Build exitoso
   - Navegador ✅ Sin errores en consola
   - Todas las URLs funcionando correctamente
+
+### ✅ Sesión del 11 de Enero 2026 (Tarde) - Eliminación de Magic Strings y Reorganización de Componentes
+
+**Completado:**
+
+- ✅ **Eliminación de Magic Strings:**
+  - Creadas constantes tipadas para Roles en `src/shared/lib/constants/roles.ts`:
+    - `ROLES.SUPER_ADMIN`
+    - `ROLES.ADMIN_HR`
+    - `ROLES.CHIEF_AREA`
+    - `ROLES.STAFF_HEALTH`
+  - Creadas constantes tipadas para InvitationStatus en `src/shared/lib/constants/invitation-status.ts`:
+    - `INVITATION_STATUS.PENDING`
+    - `INVITATION_STATUS.ACCEPTED`
+    - `INVITATION_STATUS.REJECTED`
+    - `INVITATION_STATUS.EXPIRED`
+  - Actualizado `src/shared/lib/constants.ts` para exportar desde `./constants/`
+  - Reemplazados todos los magic strings hardcodeados (`'CHIEF_AREA'`, `'PENDING'`, etc.) por constantes tipadas
+  - Actualizados todos los archivos que usaban magic strings:
+    - Server actions (`invitation-actions.ts`, `admin-hr-invitation-actions.ts`)
+    - Repositorios (`organization-repository.ts`, `invitation-repository.ts`, `user-repository.ts`, etc.)
+    - Componentes UI (`invite-user-form.tsx`, `edit-organization-form.tsx`, `organizations-table-client.tsx`)
+    - Entities (`organization-limits.ts`, `invitation-repository.ts`)
+    - Páginas (`organization/page.tsx`, `organizations/[id]/page.tsx`)
+  - **Beneficios:**
+    - Type safety mejorado (TypeScript detecta errores de tipeo)
+    - Refactoring más seguro (renombrar constante actualiza todos los usos)
+    - Mejor autocompletado en IDEs
+    - Código más mantenible y menos propenso a errores
+
+- ✅ **Reorganización de Componentes UI según Atomic Design:**
+  - Creada carpeta `src/shared/ui/molecules/` para componentes complejos
+  - Movidos componentes base a `molecules/`:
+    - `invitations-table-base.tsx` → `molecules/invitations-table-base.tsx`
+    - `invite-user-form-base.tsx` → `molecules/invite-user-form-base.tsx`
+  - Creado `molecules/index.ts` para barrel exports
+  - Estructura de UI más clara:
+    - `ui/` - Componentes básicos de shadcn/ui (atoms)
+    - `ui/atoms/` - Componentes atómicos propios (button-skeleton, theme-selector, etc.)
+    - `ui/icons/` - Iconos
+    - `ui/molecules/` - Componentes que combinan múltiples atoms (forms, tables complejas)
+  - Actualizados todos los imports para usar `@/src/shared/ui/molecules`
+  - **Justificación:**
+    - Separa componentes básicos de shadcn/ui de componentes complejos propios
+    - Sigue principios de Atomic Design (atoms → molecules → organisms)
+    - Facilita mantenimiento y escalabilidad
+    - Mejor organización del código UI
+
+- ✅ **Calidad de Código:**
+  - `npm run lint` ✅ 0 errors, 0 warnings
+  - `npm run build` ✅ Build exitoso
+  - Todos los magic strings eliminados
+  - Estructura UI más organizada y escalable
+  - Type safety mejorado con constantes tipadas
 
 ### ✅ Sesión del 11 de Enero 2026 - Migración a Entities y Refactorización de Colores
 
@@ -1037,6 +1091,57 @@ Organization {
   - Mejor UX (puede incluir inputs, validaciones, etc.)
 - ✅ **Buena práctica:** Para acciones destructivas, incluir input de confirmación (ej: razón de eliminación)
 - ✅ **Validación:** Validar inputs dentro del diálogo antes de habilitar el botón de acción
+
+### Eliminación de Magic Strings y Uso de Constantes
+
+**Problema:** Magic strings hardcodeados causan errores de tipeo y dificultan el mantenimiento
+
+- ❌ **Anti-pattern:** Usar strings hardcodeados como `'CHIEF_AREA'`, `'PENDING'`, `'ADMIN_HR'`
+- ❌ **Problema:**
+  - Errores de tipeo no detectados por TypeScript
+  - Refactoring difícil (buscar/reemplazar manual)
+  - Sin autocompletado en IDEs
+  - Inconsistencias entre archivos
+- ✅ **Solución:** Crear constantes tipadas en `src/shared/lib/constants/`
+  - `roles.ts`: `ROLES.SUPER_ADMIN`, `ROLES.ADMIN_HR`, `ROLES.CHIEF_AREA`, `ROLES.STAFF_HEALTH`
+  - `invitation-status.ts`: `INVITATION_STATUS.PENDING`, `INVITATION_STATUS.ACCEPTED`, etc.
+  - Exportar desde `constants/index.ts` para barrel exports
+- ✅ **Ventajas:**
+  - Type safety: TypeScript detecta errores de tipeo
+  - Refactoring seguro: renombrar constante actualiza todos los usos
+  - Autocompletado en IDEs
+  - Código más mantenible y menos propenso a errores
+  - Mejor documentación implícita (constantes documentan valores válidos)
+- ✅ **Buena práctica:**
+  - Constantes para valores de enums de Prisma (Roles, InvitationStatus, etc.)
+  - Usar `as const` para inferencia de tipos más estricta
+  - Tipar las constantes con los tipos de Prisma (`as Role`, `as InvitationStatus`)
+  - Agrupar constantes relacionadas en archivos separados (`roles.ts`, `invitation-status.ts`)
+
+### Organización de Componentes UI según Atomic Design
+
+**Problema:** Mezclar componentes básicos de shadcn/ui con componentes complejos propios
+
+- ❌ **Anti-pattern:** Colocar todos los componentes en `src/shared/ui/` sin organización
+- ❌ **Problema:**
+  - Difícil distinguir componentes de shadcn/ui vs componentes propios
+  - Mezcla de niveles de complejidad (atoms con molecules)
+  - Escalabilidad limitada
+- ✅ **Solución:** Organizar según principios de Atomic Design:
+  - `ui/` - Componentes básicos de shadcn/ui (atoms: `button.tsx`, `input.tsx`, `card.tsx`)
+  - `ui/atoms/` - Componentes atómicos propios (`button-skeleton.tsx`, `theme-selector.tsx`)
+  - `ui/icons/` - Iconos (`google-icon.tsx`, etc.)
+  - `ui/molecules/` - Componentes que combinan múltiples atoms (`invitations-table-base.tsx`, `invite-user-form-base.tsx`)
+  - (Futuro: `ui/organisms/` - Componentes aún más complejos)
+- ✅ **Ventajas:**
+  - Separación clara entre componentes de shadcn/ui y propios
+  - Escalabilidad mejorada (fácil agregar más niveles)
+  - Mejor mantenibilidad (cada carpeta tiene un propósito claro)
+  - Sigue principios establecidos de Atomic Design
+- ✅ **Buena práctica:**
+  - Barrel exports (`index.ts`) para facilitar imports
+  - Componentes base reutilizables en `molecules/` o `organisms/`
+  - Feature-specific components en `features/*/ui/` usando componentes base
 
 ---
 

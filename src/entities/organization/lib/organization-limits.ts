@@ -1,6 +1,7 @@
 import type { Role } from '@prisma/client'
 
 import { prisma } from '@/src/shared/lib/auth/config'
+import { ROLES } from '@/src/shared/lib/constants'
 
 interface LimitCheckResult {
   success: boolean
@@ -38,13 +39,13 @@ export async function checkOrganizationRoleLimit(
 
   let maxLimit: number
   switch (role) {
-    case 'ADMIN_HR':
+    case ROLES.ADMIN_HR:
       maxLimit = organization.maxAdminHR
       break
-    case 'CHIEF_AREA':
+    case ROLES.CHIEF_AREA:
       maxLimit = organization.maxChiefs
       break
-    case 'STAFF_HEALTH':
+    case ROLES.STAFF_HEALTH:
       maxLimit = organization.maxStaff
       break
     default:

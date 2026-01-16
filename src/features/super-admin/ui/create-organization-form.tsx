@@ -69,11 +69,12 @@ export function CreateOrganizationForm() {
       const result = await createOrganizationAction(data)
 
       if (result.success) {
-        toast.success(t('success'))
+        toast.success(result.message || t('success'))
         router.push('/dashboard/organizations')
       } else {
-        setError(result.error || t('error'))
-        toast.error(result.error || t('error'))
+        const errorMessage = result.error || t('error')
+        setError(errorMessage)
+        toast.error(errorMessage)
       }
     })
   }

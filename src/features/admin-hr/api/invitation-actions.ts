@@ -6,6 +6,7 @@ import type { Country } from '@prisma/client'
 import { prisma } from '@/src/shared/lib/auth/config'
 import { requireAdminHR } from '@/src/shared/lib/auth/session'
 import type { ActionResult } from '@/src/shared/lib/types'
+import { ROLES } from '@/src/shared/lib/constants'
 
 import {
   checkOrganizationLimit,
@@ -64,7 +65,7 @@ export const inviteChiefAction = async (
       }
     }
 
-    const limitCheck = await checkOrganizationLimit(organizationId, 'CHIEF_AREA')
+    const limitCheck = await checkOrganizationLimit(organizationId, ROLES.CHIEF_AREA)
     if (!limitCheck.success) {
       return limitCheck
     }
@@ -91,7 +92,7 @@ export const inviteChiefAction = async (
       }
     }
 
-    if (user.role === 'CHIEF_AREA' && user.organizationId === organizationId) {
+    if (user.role === ROLES.CHIEF_AREA && user.organizationId === organizationId) {
       return {
         success: false,
         error: 'Este usuario ya es jefe de esta organización',
@@ -101,7 +102,7 @@ export const inviteChiefAction = async (
     const invitationResult = await createInvitation(
       organizationId,
       userId,
-      'CHIEF_AREA',
+      ROLES.CHIEF_AREA,
       session.id
     )
 
@@ -115,6 +116,7 @@ export const inviteChiefAction = async (
     return {
       success: true,
       data: invitationResult.data,
+      message: 'Invitación enviada exitosamente',
     }
   } catch (error) {
     console.error('[inviteChiefAction] Error:', error)
@@ -139,7 +141,7 @@ export const inviteStaffAction = async (
       }
     }
 
-    const limitCheck = await checkOrganizationLimit(organizationId, 'STAFF_HEALTH')
+    const limitCheck = await checkOrganizationLimit(organizationId, ROLES.STAFF_HEALTH)
     if (!limitCheck.success) {
       return limitCheck
     }
@@ -166,7 +168,7 @@ export const inviteStaffAction = async (
       }
     }
 
-    if (user.role === 'STAFF_HEALTH' && user.organizationId === organizationId) {
+    if (user.role === ROLES.STAFF_HEALTH && user.organizationId === organizationId) {
       return {
         success: false,
         error: 'Este usuario ya es staff de esta organización',
@@ -176,7 +178,7 @@ export const inviteStaffAction = async (
     const invitationResult = await createInvitation(
       organizationId,
       userId,
-      'STAFF_HEALTH',
+      ROLES.STAFF_HEALTH,
       session.id
     )
 
@@ -190,6 +192,7 @@ export const inviteStaffAction = async (
     return {
       success: true,
       data: invitationResult.data,
+      message: 'Invitación enviada exitosamente',
     }
   } catch (error) {
     console.error('[inviteStaffAction] Error:', error)
@@ -222,6 +225,7 @@ export const cancelInvitationAction = async (
 
     return {
       success: true,
+      message: 'Invitación cancelada exitosamente',
     }
   } catch (error) {
     console.error('[cancelInvitationAction] Error:', error)

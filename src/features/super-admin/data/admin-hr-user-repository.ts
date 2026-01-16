@@ -2,6 +2,7 @@ import { Country, DocType, type Prisma } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
 import { prisma } from '@/src/shared/lib/auth/config'
+import { ROLES } from '@/src/shared/lib/constants'
 
 import type { CreateAdminHRUserInput, UpdateAdminHRUserInput } from '../lib/schemas'
 
@@ -18,7 +19,7 @@ export async function getAdminHRUsers(params: GetAdminHRUsersParams = {}) {
   const skip = (page - 1) * pageSize
 
   const where: Prisma.UserWhereInput = {
-    role: 'ADMIN_HR',
+    role: ROLES.ADMIN_HR,
   }
 
   if (search) {
@@ -61,7 +62,7 @@ export async function getAdminHRUsers(params: GetAdminHRUsersParams = {}) {
 
 export async function getAdminHRUserById(id: string) {
   return await prisma.user.findFirst({
-    where: { id, role: 'ADMIN_HR' },
+    where: { id, role: ROLES.ADMIN_HR },
     include: {
       organization: true,
     },
@@ -77,7 +78,7 @@ export async function createAdminHRUser(data: CreateAdminHRUserInput) {
     data: {
       name: data.name,
       email: data.email,
-      role: 'ADMIN_HR',
+      role: ROLES.ADMIN_HR,
       organizationId: data.organizationId,
       country: (data.country as Country) || null,
       docType: (data.docType as DocType) || null,

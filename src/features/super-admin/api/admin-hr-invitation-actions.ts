@@ -6,6 +6,7 @@ import type { Country } from '@prisma/client'
 import { prisma } from '@/src/shared/lib/auth/config'
 import { requireSuperAdmin } from '@/src/shared/lib/auth/session'
 import type { ActionResult } from '@/src/shared/lib/types'
+import { ROLES } from '@/src/shared/lib/constants'
 
 import {
   checkOrganizationAdminHRLimit,
@@ -84,7 +85,7 @@ export const inviteAdminHRAction = async (
       }
     }
 
-    if (user.role === 'ADMIN_HR' && user.organizationId === organizationId) {
+    if (user.role === ROLES.ADMIN_HR && user.organizationId === organizationId) {
       return {
         success: false,
         error: 'Este usuario ya es ADMIN_HR de esta organización',
@@ -103,6 +104,7 @@ export const inviteAdminHRAction = async (
     return {
       success: true,
       data: invitationResult.data,
+      message: 'Invitación enviada exitosamente',
     }
   } catch (error) {
     console.error('[inviteAdminHRAction] Error:', error)
@@ -135,6 +137,7 @@ export const cancelInvitationAction = async (
 
     return {
       success: true,
+      message: 'Invitación cancelada exitosamente',
     }
   } catch (error) {
     console.error('[cancelInvitationAction] Error:', error)

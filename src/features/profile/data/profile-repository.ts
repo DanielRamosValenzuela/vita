@@ -2,6 +2,7 @@ import { Country } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
 import { prisma } from '@/src/shared/lib/auth/config'
+import { INVITATION_STATUS } from '@/src/shared/lib/constants'
 import type { ActionResult } from '@/src/shared/lib/types'
 import {
   acceptInvitation as acceptInvitationEntity,
@@ -162,7 +163,7 @@ export async function getUserOrganizations(userId: string) {
       },
       invitations: {
         where: {
-          status: 'ACCEPTED',
+          status: INVITATION_STATUS.ACCEPTED,
         },
         include: {
           organization: {

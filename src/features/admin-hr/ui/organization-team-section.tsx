@@ -27,7 +27,7 @@ import {
   TableRow,
 } from '@/src/shared/ui/table'
 
-import { InviteUserForm } from '@/src/widgets/invitations'
+import { InviteUserForm } from './invite-user-form'
 
 interface OrganizationTeamSectionProps {
   organizationId: string
@@ -86,8 +86,7 @@ export function OrganizationTeamSection({
               <InviteUserForm
                 organizationId={organizationId}
                 organizationCountry={organizationCountry}
-                translationNamespace={`${translationNamespace}.inviteForm`}
-                actionContext="admin-hr"
+                translationNamespace="adminHR.invitations.inviteForm"
                 allowedRoles={allowedRoles}
                 defaultRole={defaultRole}
                 onSuccess={() => {

@@ -1,6 +1,7 @@
 import type { OrganizationInvitation, Role } from '@prisma/client'
 
 import { prisma } from '@/src/shared/lib/auth/config'
+import { INVITATION_STATUS } from '@/src/shared/lib/constants'
 import type { ActionResult } from '@/src/shared/lib/types'
 
 interface InvitationWithUser extends OrganizationInvitation {
@@ -53,7 +54,7 @@ export async function getPendingInvitationsForOrganization(
     where: {
       organizationId,
       role: role || undefined,
-      status: 'PENDING',
+      status: INVITATION_STATUS.PENDING,
     },
     include: {
       user: {
@@ -81,7 +82,7 @@ export async function getPendingInvitationsForUser(
   return await prisma.organizationInvitation.findMany({
     where: {
       userId,
-      status: 'PENDING',
+      status: INVITATION_STATUS.PENDING,
     },
     include: {
       organization: {
@@ -123,13 +124,13 @@ export async function createInvitation(
     })
 
     if (existingInvitation) {
-      if (existingInvitation.status === 'PENDING') {
+      if (existingInvitation.status === INVITATION_STATUS.PENDING) {
         return {
           success: false,
           error: 'Ya existe una invitación pendiente para este usuario',
         }
       }
-      if (existingInvitation.status === 'ACCEPTED') {
+      if (existingInvitation.status === INVITATION_STATUS.ACCEPTED) {
         return {
           success: false,
           error: 'Este usuario ya tiene este rol en esta organización',
@@ -162,7 +163,7 @@ export async function createInvitation(
         userId,
         role,
         invitedBy,
-        status: 'PENDING',
+        status: INVITATION_STATUS.PENDING,
       },
     })
 
@@ -189,7 +190,7 @@ export async function deleteInvitation(
       return { success: false, error: 'Invitación no encontrada' }
     }
 
-    if (invitation.status === 'ACCEPTED') {
+    if (invitation.status === INVITATION_STATUS.ACCEPTED) {
       return { success: false, error: 'No se puede cancelar una invitación ya aceptada' }
     }
 
@@ -224,7 +225,7 @@ export async function acceptInvitation(
       return { success: false, error: 'No tienes permiso para aceptar esta invitación' }
     }
 
-    if (invitation.status !== 'PENDING') {
+    if (invitation.status !== INVITATION_STATUS.PENDING) {
       return { success: false, error: 'Esta invitación ya fue procesada' }
     }
 
@@ -251,7 +252,7 @@ export async function acceptInvitation(
       prisma.organizationInvitation.update({
         where: { id: invitationId },
         data: {
-          status: 'ACCEPTED',
+          status: INVITATION_STATUS.ACCEPTED,
           acceptedAt: new Date(),
         },
       }),
@@ -284,14 +285,14 @@ export async function rejectInvitation(
       return { success: false, error: 'No tienes permiso para rechazar esta invitación' }
     }
 
-    if (invitation.status !== 'PENDING') {
+    if (invitation.status !== INVITATION_STATUS.PENDING) {
       return { success: false, error: 'Esta invitación ya fue procesada' }
     }
 
     await prisma.organizationInvitation.update({
       where: { id: invitationId },
       data: {
-        status: 'REJECTED',
+        status: INVITATION_STATUS.REJECTED,
       },
     })
 

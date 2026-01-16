@@ -9,6 +9,7 @@ import { Ban, CheckCircle, Edit, Eye, MoreHorizontal, Trash2 } from 'lucide-reac
 import { toast } from 'sonner'
 
 import { formatCurrency } from '@/src/shared/lib/utils/format'
+import { ROLES } from '@/src/shared/lib/constants'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -221,9 +222,9 @@ export function OrganizationsTableClient({
     }
 
     users.forEach((user) => {
-      if (user.role === 'ADMIN_HR') counts.ADMIN_HR++
-      else if (user.role === 'CHIEF') counts.CHIEF++
-      else if (user.role === 'STAFF') counts.STAFF++
+      if (user.role === ROLES.ADMIN_HR) counts.ADMIN_HR++
+      else if (user.role === ROLES.CHIEF_AREA) counts.CHIEF++
+      else if (user.role === ROLES.STAFF_HEALTH) counts.STAFF++
     })
 
     return counts

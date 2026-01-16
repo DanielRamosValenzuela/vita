@@ -5,10 +5,11 @@ import {
   getAllInvitationsForOrganization as getAllInvitationsForOrganizationEntity,
 } from '@/src/entities/invitation'
 import { checkOrganizationRoleLimit } from '@/src/entities/organization'
+import { ROLES } from '@/src/shared/lib/constants'
 
 export async function checkOrganizationLimit(
   organizationId: string,
-  role: 'CHIEF_AREA' | 'STAFF_HEALTH'
+  role: typeof ROLES.CHIEF_AREA | typeof ROLES.STAFF_HEALTH
 ) {
   return await checkOrganizationRoleLimit(organizationId, role)
 }
@@ -16,7 +17,7 @@ export async function checkOrganizationLimit(
 export async function createInvitation(
   organizationId: string,
   userId: string,
-  role: 'CHIEF_AREA' | 'STAFF_HEALTH',
+  role: typeof ROLES.CHIEF_AREA | typeof ROLES.STAFF_HEALTH,
   invitedBy: string
 ) {
   return await createInvitationEntity(organizationId, userId, role, invitedBy)

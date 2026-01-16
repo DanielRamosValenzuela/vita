@@ -1,11 +1,11 @@
 import { getTranslations } from 'next-intl/server'
-import type { Role } from '@prisma/client'
 
 import { requireAdminHR } from '@/src/shared/lib/auth'
+import { ROLES } from '@/src/shared/lib/constants'
 import { getAdminHROrganization } from '@/src/features/admin-hr/data'
 import { OrganizationView } from '@/src/features/admin-hr/ui/organization-view'
 import { OrganizationTeamSection } from '@/src/features/admin-hr/ui/organization-team-section'
-import { InvitationsTable } from '@/src/widgets/invitations'
+import { InvitationsTable } from '@/src/features/admin-hr/ui/invitations-table'
 
 interface AdminHROrganizationPageProps {
   params: Promise<{ locale: string }>
@@ -68,9 +68,9 @@ export default async function AdminHROrganizationPage({ params }: AdminHROrganiz
         maxLimit={organization.maxChiefs}
         translationNamespace="adminHR.organization.chiefs"
         allowedRoles={[
-          { value: 'CHIEF_AREA' as Role, label: tInvitations('inviteForm.roleChief') },
+          { value: ROLES.CHIEF_AREA, label: tInvitations('inviteForm.roleChief') },
         ]}
-        defaultRole="CHIEF_AREA"
+        defaultRole={ROLES.CHIEF_AREA}
       />
 
       <OrganizationTeamSection
@@ -81,19 +81,18 @@ export default async function AdminHROrganizationPage({ params }: AdminHROrganiz
         maxLimit={organization.maxStaff}
         translationNamespace="adminHR.organization.staff"
         allowedRoles={[
-          { value: 'STAFF_HEALTH' as Role, label: tInvitations('inviteForm.roleStaff') },
+          { value: ROLES.STAFF_HEALTH, label: tInvitations('inviteForm.roleStaff') },
         ]}
-        defaultRole="STAFF_HEALTH"
+        defaultRole={ROLES.STAFF_HEALTH}
       />
 
       <InvitationsTable
         invitations={organization.invitations}
         translationNamespace="adminHR.invitations.table"
-        actionContext="admin-hr"
         showRoleColumn={true}
         roleLabels={{
-          CHIEF_AREA: tInvitations('table.roleChief'),
-          STAFF_HEALTH: tInvitations('table.roleStaff'),
+          [ROLES.CHIEF_AREA]: tInvitations('table.roleChief'),
+          [ROLES.STAFF_HEALTH]: tInvitations('table.roleStaff'),
         }}
       />
     </div>

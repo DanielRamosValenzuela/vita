@@ -1,11 +1,9 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState } from 'react'
 import { useTranslations } from 'next-intl'
-import { useRouter } from 'next/navigation'
-import type { Country, Role } from '@prisma/client'
+import type { Role } from '@prisma/client'
 import { AlertCircle, CheckCircle2, Loader2, Mail, Search, User } from 'lucide-react'
-import { toast } from 'sonner'
 
 import { formatTaxId, getTaxIdConfig, validateTaxId } from '@/src/shared/lib/utils/tax-id-config'
 import { Alert, AlertDescription } from '@/src/shared/ui/alert'
@@ -22,7 +20,9 @@ import {
   SelectValue,
 } from '@/src/shared/ui/select'
 
-interface FoundUser {
+import { validateEmail } from '@/src/shared/lib/validation'
+
+export interface FoundUser {
   id: string
   name: string
   email: string
@@ -37,43 +37,41 @@ interface FoundUser {
   } | null
 }
 
-type ActionContext = 'admin-hr' | 'super-admin'
-
-interface InviteUserFormProps {
-  organizationId: string
-  organizationCountry: Country
+export interface InviteUserFormBaseProps {
+  organizationCountry: import('@prisma/client').Country
   translationNamespace: string
-  actionContext: ActionContext
   allowedRoles?: Array<{ value: Role; label: string }>
   defaultRole?: Role
-  onSuccess?: () => void
+  isSearching?: boolean
+  isPending?: boolean
+  foundUser: FoundUser | null
+  error: string | null
+  onEmailChange: (value: string) => void
+  onDocChange: (value: string) => void
+  onSearch: () => void
+  onInvite: (selectedRole?: Role) => void
+  onCancel: () => void
 }
 
-const validateEmail = (email: string): boolean => {
-  if (!email.trim()) return false
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  return emailRegex.test(email.trim())
-}
-
-export function InviteUserForm({
-  organizationId,
+export function InviteUserFormBase({
   organizationCountry,
   translationNamespace,
-  actionContext,
   allowedRoles,
   defaultRole,
-  onSuccess,
-}: InviteUserFormProps) {
+  isSearching = false,
+  isPending = false,
+  foundUser,
+  error,
+  onEmailChange,
+  onDocChange,
+  onSearch,
+  onInvite,
+  onCancel,
+}: InviteUserFormBaseProps) {
   const t = useTranslations(translationNamespace)
-  const router = useRouter()
-  const [isPending, startTransition] = useTransition()
-  const [isSearching, setIsSearching] = useState(false)
   const [selectedRole, setSelectedRole] = useState<Role | undefined>(defaultRole)
   const [emailValue, setEmailValue] = useState('')
   const [docValue, setDocValue] = useState('')
-  const [foundUser, setFoundUser] = useState<FoundUser | null>(null)
-  const [error, setError] = useState<string | null>(null)
-
 
   const taxIdConfig = getTaxIdConfig(organizationCountry)
   const isValidEmail = emailValue.trim() ? validateEmail(emailValue) : false
@@ -82,107 +80,34 @@ export function InviteUserForm({
 
   const handleEmailChange = (value: string) => {
     setEmailValue(value)
-    setDocValue('')
-    setFoundUser(null)
-    setError(null)
+    onEmailChange(value)
   }
 
   const handleDocChange = (value: string) => {
     const formatted = formatTaxId(value, organizationCountry)
     setDocValue(formatted)
-    setEmailValue('')
-    setFoundUser(null)
-    setError(null)
+    onDocChange(formatted)
   }
 
-  const handleSearch = () => {
-    const searchTerm = emailValue.trim() || docValue.trim()
-
-    if (!searchTerm) {
-      setError(t('searchRequired'))
-      return
-    }
-
-    setIsSearching(true)
-    setError(null)
-    setFoundUser(null)
-
-    startTransition(async () => {
-      const actions =
-        actionContext === 'admin-hr'
-          ? await import('@/src/features/admin-hr/api/invitation-actions')
-          : await import('@/src/features/super-admin/api/admin-hr-invitation-actions')
-      const result = await actions.searchUserAction(searchTerm, organizationCountry)
-
-      setIsSearching(false)
-
-      if (result.success && result.data) {
-        setFoundUser(result.data as FoundUser)
-      } else {
-        setError(result.error || t('searchError'))
-        setFoundUser(null)
-      }
-    })
-  }
-
-  const handleInvite = () => {
-    if (!foundUser) return
-    if (allowedRoles && allowedRoles.length > 0 && !selectedRole) {
-      setError(t('roleRequired') || 'Debes seleccionar un rol')
-      return
-    }
-
-    startTransition(async () => {
-      let result
-      if (actionContext === 'admin-hr') {
-        const actions = await import('@/src/features/admin-hr/api/invitation-actions')
-        if (selectedRole === 'CHIEF_AREA') {
-          result = await actions.inviteChiefAction(organizationId, foundUser.id)
-        } else if (selectedRole === 'STAFF_HEALTH') {
-          result = await actions.inviteStaffAction(organizationId, foundUser.id)
-        } else {
-          throw new Error('Rol no válido')
-        }
-      } else {
-        const actions = await import('@/src/features/super-admin/api/admin-hr-invitation-actions')
-        result = await actions.inviteAdminHRAction(organizationId, foundUser.id)
-      }
-
-      if (result.success) {
-        toast.success(t('inviteSuccess'))
-        setEmailValue('')
-        setDocValue('')
-        setFoundUser(null)
-        setError(null)
-        router.refresh()
-        if (onSuccess) {
-          onSuccess()
-        }
-      } else {
-        toast.error(result.error || t('inviteError'))
-        setError(result.error || t('inviteError'))
-      }
-    })
+  const handleRoleChange = (value: string) => {
+    setSelectedRole(value as Role)
+    onEmailChange('')
+    onDocChange('')
   }
 
   const hasDocNumber = foundUser?.docNumber !== null && foundUser?.docNumber !== undefined
   const isAlreadyInRole =
-    foundUser?.role === selectedRole && foundUser?.organizationId === organizationId
-  const isInOtherOrg = foundUser?.organizationId && foundUser.organizationId !== organizationId
+    foundUser?.role === selectedRole && foundUser?.organizationId !== undefined && foundUser?.organizationId !== null
 
   return (
-    <div className="space-y-4">
-      <div className="space-y-4">
+    <section className="space-y-4">
+      <fieldset className="space-y-4" disabled={isPending || isSearching}>
         {allowedRoles && allowedRoles.length > 0 && (
           <div className="space-y-2">
             <Label htmlFor="role">{t('roleLabel')}</Label>
             <Select
               value={selectedRole}
-              onValueChange={(value) => {
-                setSelectedRole(value as Role)
-                setFoundUser(null)
-                setError(null)
-              }}
+              onValueChange={handleRoleChange}
               disabled={isPending || isSearching}
             >
               <SelectTrigger>
@@ -211,7 +136,7 @@ export function InviteUserForm({
               onChange={(e) => handleEmailChange(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && canSearch && !isSearching) {
-                  handleSearch()
+                  onSearch()
                 }
               }}
               disabled={isSearching || isPending || !!docValue}
@@ -221,11 +146,13 @@ export function InviteUserForm({
             />
           </div>
           {emailValue && !isValidEmail && (
-            <p className="text-destructive text-xs">{t('emailInvalid')}</p>
+            <p className="text-destructive text-xs" role="alert">
+              {t('emailInvalid')}
+            </p>
           )}
         </div>
 
-        <div className="relative">
+        <div className="relative" role="separator" aria-label={t('or')}>
           <div className="absolute inset-0 flex items-center">
             <span className="w-full border-t" />
           </div>
@@ -243,7 +170,7 @@ export function InviteUserForm({
             onChange={(e) => handleDocChange(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === 'Enter' && canSearch && !isSearching) {
-                handleSearch()
+                onSearch()
               }
             }}
             disabled={isSearching || isPending || !!emailValue}
@@ -251,11 +178,15 @@ export function InviteUserForm({
             maxLength={taxIdConfig.maxLength}
           />
           <p className="text-muted-foreground text-xs">{taxIdConfig.description}</p>
-          {docValue && !isValidDoc && <p className="text-destructive text-xs">{t('docInvalid')}</p>}
+          {docValue && !isValidDoc && (
+            <p className="text-destructive text-xs" role="alert">
+              {t('docInvalid')}
+            </p>
+          )}
         </div>
 
         <Button
-          onClick={handleSearch}
+          onClick={onSearch}
           disabled={!canSearch || isSearching || isPending}
           type="button"
           className="w-full"
@@ -272,7 +203,7 @@ export function InviteUserForm({
             </>
           )}
         </Button>
-      </div>
+      </fieldset>
 
       {error && (
         <Alert variant="destructive">
@@ -291,23 +222,25 @@ export function InviteUserForm({
             <CardDescription>{t('userFoundDescription')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid gap-2">
+            <dl className="grid gap-2">
               <div className="flex justify-between">
-                <span className="text-muted-foreground text-sm">{t('name')}:</span>
-                <span className="font-medium">{foundUser.name}</span>
+                <dt className="text-muted-foreground text-sm">{t('name')}:</dt>
+                <dd className="font-medium">{foundUser.name}</dd>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground text-sm">{t('email')}:</span>
-                <span>{foundUser.email}</span>
+                <dt className="text-muted-foreground text-sm">{t('email')}:</dt>
+                <dd>{foundUser.email}</dd>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground text-sm">{t('currentRole')}:</span>
-                <Badge variant="outline">{foundUser.role}</Badge>
+                <dt className="text-muted-foreground text-sm">{t('currentRole')}:</dt>
+                <dd>
+                  <Badge variant="outline">{foundUser.role}</Badge>
+                </dd>
               </div>
               {foundUser.docNumber ? (
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground text-sm">{t('docNumber')}:</span>
-                  <span>{foundUser.docNumber}</span>
+                  <dt className="text-muted-foreground text-sm">{t('docNumber')}:</dt>
+                  <dd>{foundUser.docNumber}</dd>
                 </div>
               ) : (
                 <Alert>
@@ -315,7 +248,7 @@ export function InviteUserForm({
                   <AlertDescription>{t('noDocNumberWarning')}</AlertDescription>
                 </Alert>
               )}
-              {isInOtherOrg && (
+              {foundUser.organizationId && (
                 <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
                   <AlertDescription>
@@ -323,7 +256,7 @@ export function InviteUserForm({
                   </AlertDescription>
                 </Alert>
               )}
-            </div>
+            </dl>
 
             {!hasDocNumber && (
               <Alert>
@@ -332,20 +265,11 @@ export function InviteUserForm({
               </Alert>
             )}
 
-            <div className="flex justify-end gap-2">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setFoundUser(null)
-                  setEmailValue('')
-                  setDocValue('')
-                  setError(null)
-                }}
-                disabled={isPending}
-              >
+            <nav className="flex justify-end gap-2" aria-label={t('actions')}>
+              <Button variant="outline" onClick={onCancel} disabled={isPending}>
                 {t('cancel')}
               </Button>
-              <Button onClick={handleInvite} disabled={isPending || isAlreadyInRole}>
+              <Button onClick={() => onInvite(selectedRole)} disabled={isPending || isAlreadyInRole}>
                 {isPending ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -355,10 +279,10 @@ export function InviteUserForm({
                   t('sendInvitation')
                 )}
               </Button>
-            </div>
+            </nav>
           </CardContent>
         </Card>
       )}
-    </div>
+    </section>
   )
 }

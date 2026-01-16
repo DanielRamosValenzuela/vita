@@ -7,6 +7,7 @@ import { ArrowLeft, Calendar, DollarSign, Edit, Users } from 'lucide-react'
 
 import { requireSuperAdmin } from '@/src/shared/lib/auth/session'
 import { formatCurrency } from '@/src/shared/lib/utils/format'
+import { ROLES } from '@/src/shared/lib/constants'
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
@@ -19,7 +20,7 @@ import {
   TableRow,
 } from '@/src/shared/ui/table'
 import { getOrganizationById } from '@/src/features/super-admin/data/organization-repository'
-import { InvitationsTable } from '@/src/widgets/invitations'
+import { InvitationsTable } from '@/src/features/super-admin/ui/invitations-table'
 import { OrganizationAdminHRSection } from '@/src/features/super-admin/ui/organization-admin-hr-section'
 
 import { Link } from '@/i18n/navigation'
@@ -208,16 +209,14 @@ const OrganizationDetailsPage = async ({ params }: PageProps) => {
 
       <OrganizationAdminHRSection
         organization={organization}
-        adminHRUsers={organization.users.filter((u) => u.role === 'ADMIN_HR')}
-        currentCount={organization.users.filter((u) => u.role === 'ADMIN_HR').length}
+        adminHRUsers={organization.users.filter((u) => u.role === ROLES.ADMIN_HR)}
+        currentCount={organization.users.filter((u) => u.role === ROLES.ADMIN_HR).length}
         maxLimit={organization.maxAdminHR}
       />
 
       <InvitationsTable
         invitations={organization.invitations || []}
         translationNamespace="superAdmin.organizationDetails.invitations"
-        actionContext="super-admin"
-        showRoleColumn={false}
       />
 
       <Card>

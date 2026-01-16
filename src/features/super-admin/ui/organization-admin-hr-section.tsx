@@ -40,7 +40,7 @@ import {
 import { useRouter } from '@/i18n/navigation'
 
 import { deleteAdminHRUserAction } from '../api/admin-hr-user-actions'
-import { InviteUserForm } from '@/src/widgets/invitations'
+import { InviteAdminHRForm } from './invite-admin-hr-form'
 
 interface OrganizationAdminHRSectionProps {
   organization: Organization
@@ -113,12 +113,10 @@ export function OrganizationAdminHRSection({
                   <DialogTitle>{t('inviteForm.title')}</DialogTitle>
                   <DialogDescription>{t('inviteForm.description')}</DialogDescription>
                 </DialogHeader>
-                <InviteUserForm
+                <InviteAdminHRForm
                   organizationId={organization.id}
                   organizationCountry={organization.country}
                   translationNamespace="superAdmin.organizationDetails.adminHR.inviteForm"
-                  actionContext="super-admin"
-                  defaultRole="ADMIN_HR"
                   onSuccess={() => {
                     setCreateDialogOpen(false)
                     router.refresh()

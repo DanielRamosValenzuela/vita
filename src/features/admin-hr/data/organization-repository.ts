@@ -1,14 +1,10 @@
-import type { Country, OrganizationInvitation } from '@prisma/client'
+import type { Country } from '@prisma/client'
 
 import { prisma } from '@/src/shared/lib/auth/config'
+import { ROLES, INVITATION_STATUS } from '@/src/shared/lib/constants'
+import type { InvitationWithUser } from '@/src/shared/ui/molecules'
 
-export interface InvitationWithUser extends OrganizationInvitation {
-  user: {
-    id: string
-    name: string
-    email: string
-  } | null
-}
+export type { InvitationWithUser }
 
 export interface OrganizationStats {
   id: string
@@ -55,7 +51,7 @@ export async function getAdminHROrganization(organizationId: string): Promise<Or
         select: {
           users: {
             where: {
-              role: 'ADMIN_HR',
+              role: ROLES.ADMIN_HR,
             },
           },
         },
@@ -79,34 +75,34 @@ export async function getAdminHROrganization(organizationId: string): Promise<Or
     prisma.user.count({
       where: {
         organizationId,
-        role: 'CHIEF_AREA',
+        role: ROLES.CHIEF_AREA,
       },
     }),
     prisma.user.count({
       where: {
         organizationId,
-        role: 'STAFF_HEALTH',
+        role: ROLES.STAFF_HEALTH,
       },
     }),
     prisma.organizationInvitation.count({
       where: {
         organizationId,
-        role: 'CHIEF_AREA',
-        status: 'PENDING',
+        role: ROLES.CHIEF_AREA,
+        status: INVITATION_STATUS.PENDING,
       },
     }),
     prisma.organizationInvitation.count({
       where: {
         organizationId,
-        role: 'STAFF_HEALTH',
-        status: 'PENDING',
+        role: ROLES.STAFF_HEALTH,
+        status: INVITATION_STATUS.PENDING,
       },
     }),
     prisma.organizationInvitation.findMany({
       where: {
         organizationId,
         role: {
-          in: ['CHIEF_AREA', 'STAFF_HEALTH'],
+          in: [ROLES.CHIEF_AREA, ROLES.STAFF_HEALTH],
         },
       },
       include: {
@@ -123,7 +119,7 @@ export async function getAdminHROrganization(organizationId: string): Promise<Or
     prisma.user.findMany({
       where: {
         organizationId,
-        role: 'CHIEF_AREA',
+        role: ROLES.CHIEF_AREA,
       },
       select: {
         id: true,
@@ -136,7 +132,7 @@ export async function getAdminHROrganization(organizationId: string): Promise<Or
     prisma.user.findMany({
       where: {
         organizationId,
-        role: 'STAFF_HEALTH',
+        role: ROLES.STAFF_HEALTH,
       },
       select: {
         id: true,

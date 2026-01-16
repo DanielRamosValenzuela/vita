@@ -9,6 +9,7 @@ import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 
 import { formatTaxId, getTaxIdConfig } from '@/src/shared/lib/utils/tax-id-config'
+import { ROLES } from '@/src/shared/lib/constants'
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
@@ -46,9 +47,9 @@ export function EditOrganizationForm({ organization }: EditOrganizationFormProps
   const [error, setError] = useState<string | null>(null)
   const updateOrganizationSchema = useUpdateOrganizationSchema()
 
-  const currentAdminHR = organization.users.filter((u) => u.role === 'ADMIN_HR').length
-  const currentChiefs = organization.users.filter((u) => u.role === 'CHIEF_AREA').length
-  const currentStaff = organization.users.filter((u) => u.role === 'STAFF_HEALTH').length
+  const currentAdminHR = organization.users.filter((u) => u.role === ROLES.ADMIN_HR).length
+  const currentChiefs = organization.users.filter((u) => u.role === ROLES.CHIEF_AREA).length
+  const currentStaff = organization.users.filter((u) => u.role === ROLES.STAFF_HEALTH).length
 
   const form = useForm<UpdateOrganizationInput>({
     resolver: zodResolver(updateOrganizationSchema),
@@ -89,11 +90,12 @@ export function EditOrganizationForm({ organization }: EditOrganizationFormProps
       const result = await updateOrganizationAction(data)
 
       if (result.success) {
-        toast.success(t('success'))
+        toast.success(result.message || t('success'))
         router.push(`/dashboard/organizations/${organization.id}`)
       } else {
-        setError(result.error || t('error'))
-        toast.error(result.error || t('error'))
+        const errorMessage = result.error || t('error')
+        setError(errorMessage)
+        toast.error(errorMessage)
       }
     })
   }

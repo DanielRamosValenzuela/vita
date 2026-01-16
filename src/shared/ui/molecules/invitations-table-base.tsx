@@ -1,23 +1,12 @@
 'use client'
 
-import { useState, useTransition } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
-import type { InvitationStatus, OrganizationInvitation, Role } from '@prisma/client'
+import type { InvitationStatus, Role } from '@prisma/client'
 import { format } from 'date-fns'
 import { enUS, es } from 'date-fns/locale'
 import { Ban } from 'lucide-react'
-import { toast } from 'sonner'
 
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/src/shared/ui/alert-dialog'
+import { INVITATION_STATUS } from '@/src/shared/lib/constants'
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
@@ -35,9 +24,12 @@ import {
   TooltipTrigger,
 } from '@/src/shared/ui/tooltip'
 
-import { useRouter } from '@/i18n/navigation'
-
-interface InvitationWithUser extends OrganizationInvitation {
+export interface InvitationWithUser {
+  id: string
+  role: Role
+  status: InvitationStatus
+  createdAt: Date
+  acceptedAt: Date | null
   user: {
     id: string
     name: string
@@ -45,60 +37,26 @@ interface InvitationWithUser extends OrganizationInvitation {
   } | null
 }
 
-type ActionContext = 'admin-hr' | 'super-admin'
-
-interface InvitationsTableProps {
+export interface InvitationsTableBaseProps {
   invitations: InvitationWithUser[]
   translationNamespace: string
-  actionContext: ActionContext
   showRoleColumn?: boolean
   roleLabels?: Partial<Record<Role, string>>
+  onCancel: (id: string, name: string) => void
+  isPending?: boolean
 }
 
-export function InvitationsTable({
+export function InvitationsTableBase({
   invitations,
   translationNamespace,
-  actionContext,
   showRoleColumn = false,
   roleLabels,
-}: InvitationsTableProps) {
+  onCancel,
+  isPending = false,
+}: InvitationsTableBaseProps) {
   const t = useTranslations(translationNamespace)
   const locale = useLocale()
   const dateLocale = locale === 'es' ? es : enUS
-  const router = useRouter()
-  const [isPending, startTransition] = useTransition()
-  const [cancelDialog, setCancelDialog] = useState<{
-    open: boolean
-    id: string
-    name: string
-  }>({
-    open: false,
-    id: '',
-    name: '',
-  })
-
-  const handleCancel = (id: string, name: string) => {
-    setCancelDialog({ open: true, id, name })
-  }
-
-  const confirmCancel = () => {
-    startTransition(async () => {
-      const actions =
-        actionContext === 'admin-hr'
-          ? await import('@/src/features/admin-hr/api/invitation-actions')
-          : await import('@/src/features/super-admin/api/admin-hr-invitation-actions')
-
-      const result = await actions.cancelInvitationAction(cancelDialog.id)
-
-      if (result.success) {
-        toast.success(t('cancelSuccess'))
-        setCancelDialog({ open: false, id: '', name: '' })
-        router.refresh()
-      } else {
-        toast.error(result.error || t('cancelError'))
-      }
-    })
-  }
 
   const getStatusBadge = (status: InvitationStatus) => {
     const variants: Record<InvitationStatus, 'default' | 'secondary' | 'destructive' | 'outline'> =
@@ -181,15 +139,13 @@ export function InvitationsTable({
                     : '-'}
                 </TableCell>
                 <TableCell className="text-right">
-                  {invitation.status === 'PENDING' && (
+                  {invitation.status === INVITATION_STATUS.PENDING && (
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() =>
-                            handleCancel(invitation.id, invitation.user?.name || 'Usuario')
-                          }
+                          onClick={() => onCancel(invitation.id, invitation.user?.name || 'Usuario')}
                           disabled={isPending}
                           className="hover:bg-destructive/10 hover:text-destructive dark:hover:bg-destructive/20"
                         >
@@ -207,29 +163,6 @@ export function InvitationsTable({
           </TableBody>
         </Table>
       </CardContent>
-      <AlertDialog
-        open={cancelDialog.open}
-        onOpenChange={(open) => setCancelDialog({ ...cancelDialog, open })}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{t('cancelConfirm.title')}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t('cancelConfirm.description', { name: cancelDialog.name })}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>{t('cancelConfirm.cancel')}</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={confirmCancel}
-              disabled={isPending}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              {t('cancelConfirm.confirm')}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </Card>
   )
 }

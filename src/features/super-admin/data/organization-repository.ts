@@ -1,6 +1,7 @@
 import type { Country, OrganizationPlan, OrganizationStatus, Prisma } from '@prisma/client'
 
 import { prisma } from '@/src/shared/lib/auth/config'
+import { ROLES } from '@/src/shared/lib/constants'
 
 interface GetOrganizationsParams {
   search?: string
@@ -185,9 +186,9 @@ export const updateOrganization = async (
       },
     })
 
-    const currentAdminHR = userCounts.find((u) => u.role === 'ADMIN_HR')?._count.id || 0
-    const currentChiefs = userCounts.find((u) => u.role === 'CHIEF_AREA')?._count.id || 0
-    const currentStaff = userCounts.find((u) => u.role === 'STAFF_HEALTH')?._count.id || 0
+    const currentAdminHR = userCounts.find((u) => u.role === ROLES.ADMIN_HR)?._count.id || 0
+    const currentChiefs = userCounts.find((u) => u.role === ROLES.CHIEF_AREA)?._count.id || 0
+    const currentStaff = userCounts.find((u) => u.role === ROLES.STAFF_HEALTH)?._count.id || 0
 
     if (data.maxAdminHR !== undefined && data.maxAdminHR < currentAdminHR) {
       throw new Error(
