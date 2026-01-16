@@ -146,9 +146,9 @@ export function OrganizationsTableClient({
       if (result.success) {
         toast.success(result.message || t('suspendSuccess'))
         router.refresh()
-      } else {
+      } else 
         toast.error(result.error || t('suspendError'))
-      }
+      
       setSuspendDialog({ open: false, id: '', name: '' })
     })
   }
@@ -163,9 +163,9 @@ export function OrganizationsTableClient({
       if (result.success) {
         toast.success(result.message || t('reactivateSuccess'))
         router.refresh()
-      } else {
+      } else 
         toast.error(result.error || t('reactivateError'))
-      }
+      
       setReactivateDialog({ open: false, id: '', name: '' })
     })
   }
@@ -185,9 +185,9 @@ export function OrganizationsTableClient({
       if (result.success) {
         toast.success(result.message || t('deleteSuccess'))
         router.refresh()
-      } else {
+      } else 
         toast.error(result.error || t('deleteError'))
-      }
+      
       setDeleteDialog({ open: false, id: '', name: '' })
       setDeleteReason('')
     })

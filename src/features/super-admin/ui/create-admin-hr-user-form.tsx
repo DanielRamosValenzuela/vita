@@ -65,11 +65,11 @@ export function CreateAdminHRUserForm({ organizations, onSuccess }: CreateAdminH
 
       if (result.success) {
         toast.success(t('success'))
-        if (onSuccess) {
+        if (onSuccess) 
           onSuccess()
-        } else {
+         else 
           router.push('/dashboard/admin-hr-users')
-        }
+        
       } else {
         setError(result.error || t('error'))
         toast.error(result.error || t('error'))

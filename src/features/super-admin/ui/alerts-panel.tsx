@@ -45,9 +45,9 @@ export function AlertsPanel({ data }: AlertsPanelProps) {
 
   const visibleAlerts = alerts.filter((alert) => alert.show)
 
-  if (visibleAlerts.length === 0) {
+  if (visibleAlerts.length === 0) 
     return null
-  }
+  
 
   return (
     <Card>

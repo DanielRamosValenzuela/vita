@@ -35,6 +35,7 @@ const eslintConfig = defineConfig([
       'react-hooks/set-state-in-effect': 'off',
       'no-console': ['warn', { allow: ['warn', 'error'] }],
       'spaced-comment': ['error', 'never', { block: { exceptions: ['*'], balanced: true } }],
+      curly: ['error', 'multi'],
     },
   },
 ])

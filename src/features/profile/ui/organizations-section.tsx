@@ -39,14 +39,14 @@ export function OrganizationsSection() {
         const orgs: Organization[] = []
         const data = result.data as UserOrganizationsData
 
-        if (data.organization) {
+        if (data.organization) 
           orgs.push(data.organization)
-        }
+        
 
         data.invitations.forEach((inv) => {
-          if (!orgs.find((o) => o.id === inv.organization.id)) {
+          if (!orgs.find((o) => o.id === inv.organization.id)) 
             orgs.push(inv.organization)
-          }
+          
         })
 
         setOrganizations(orgs)
@@ -56,7 +56,7 @@ export function OrganizationsSection() {
     loadOrganizations()
   }, [])
 
-  if (loading) {
+  if (loading) 
     return (
       <Card>
         <CardHeader>
@@ -69,9 +69,9 @@ export function OrganizationsSection() {
         </CardContent>
       </Card>
     )
-  }
+  
 
-  if (organizations.length === 0) {
+  if (organizations.length === 0) 
     return (
       <Card>
         <CardHeader>
@@ -83,7 +83,7 @@ export function OrganizationsSection() {
         </CardContent>
       </Card>
     )
-  }
+  
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {

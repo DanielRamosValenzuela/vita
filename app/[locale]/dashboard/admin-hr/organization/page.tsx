@@ -27,7 +27,7 @@ export default async function AdminHROrganizationPage({ params }: AdminHROrganiz
   const t = await getTranslations('adminHR.organization')
   const tInvitations = await getTranslations('adminHR.invitations')
 
-  if (!user.organizationId) {
+  if (!user.organizationId) 
     return (
       <div className="space-y-8">
         <div>
@@ -36,11 +36,11 @@ export default async function AdminHROrganizationPage({ params }: AdminHROrganiz
         </div>
       </div>
     )
-  }
+  
 
   const organization = await getAdminHROrganization(user.organizationId)
 
-  if (!organization) {
+  if (!organization) 
     return (
       <div className="space-y-8">
         <div>
@@ -49,7 +49,7 @@ export default async function AdminHROrganizationPage({ params }: AdminHROrganiz
         </div>
       </div>
     )
-  }
+  
 
   return (
     <div className="space-y-8">

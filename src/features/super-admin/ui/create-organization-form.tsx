@@ -184,10 +184,14 @@ export function CreateOrganizationForm() {
               <Label htmlFor="maxAdminHR">{t('form.maxAdminHR.label')}</Label>
               <Input
                 id="maxAdminHR"
-                type="number"
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
                 placeholder="5"
-                max={planLimits.maxAdminHR}
-                {...register('maxAdminHR', { valueAsNumber: true })}
+                maxLength={4}
+                {...register('maxAdminHR', {
+                  setValueAs: (v) => (v === '' ? undefined : Number(v)),
+                })}
                 aria-invalid={!!errors.maxAdminHR}
               />
               <p className="text-muted-foreground text-xs">
@@ -202,10 +206,14 @@ export function CreateOrganizationForm() {
               <Label htmlFor="maxChiefs">{t('form.maxChiefs.label')}</Label>
               <Input
                 id="maxChiefs"
-                type="number"
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
                 placeholder="10"
-                max={planLimits.maxChiefs}
-                {...register('maxChiefs', { valueAsNumber: true })}
+                maxLength={4}
+                {...register('maxChiefs', {
+                  setValueAs: (v) => (v === '' ? undefined : Number(v)),
+                })}
                 aria-invalid={!!errors.maxChiefs}
               />
               <p className="text-muted-foreground text-xs">
@@ -220,10 +228,14 @@ export function CreateOrganizationForm() {
               <Label htmlFor="maxStaff">{t('form.maxStaff.label')}</Label>
               <Input
                 id="maxStaff"
-                type="number"
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
                 placeholder="50"
-                max={planLimits.maxStaff}
-                {...register('maxStaff', { valueAsNumber: true })}
+                maxLength={4}
+                {...register('maxStaff', {
+                  setValueAs: (v) => (v === '' ? undefined : Number(v)),
+                })}
                 aria-invalid={!!errors.maxStaff}
               />
               <p className="text-muted-foreground text-xs">

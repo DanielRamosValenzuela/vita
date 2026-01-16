@@ -32,18 +32,18 @@ export async function updateProfileAction(data: {
     const updateProfileSchema = await getUpdateProfileSchema(locale)
 
     const validation = updateProfileSchema.safeParse(data)
-    if (!validation.success) {
+    if (!validation.success) 
       return {
         success: false,
         error: validation.error.issues[0].message,
       }
-    }
+    
 
     const result = await updateUserProfile(user.id, validation.data)
 
-    if (result.success) {
+    if (result.success) 
       revalidatePath('/dashboard/profile')
-    }
+    
 
     return result
   } catch (error) {
@@ -66,12 +66,12 @@ export async function changePasswordAction(data: {
     const changePasswordSchema = await getChangePasswordSchema(locale)
 
     const validation = changePasswordSchema.safeParse(data)
-    if (!validation.success) {
+    if (!validation.success) 
       return {
         success: false,
         error: validation.error.issues[0].message,
       }
-    }
+    
 
     return await changeUserPassword(
       user.id,
@@ -97,12 +97,12 @@ export async function updateDocumentAction(data: {
     const updateDocumentSchema = await getUpdateDocumentSchema(locale, data.country)
 
     const validation = updateDocumentSchema.safeParse(data)
-    if (!validation.success) {
+    if (!validation.success) 
       return {
         success: false,
         error: validation.error.issues[0].message,
       }
-    }
+    
 
     const result = await updateUserDocument(
       user.id,
@@ -110,9 +110,9 @@ export async function updateDocumentAction(data: {
       validation.data.docNumber
     )
 
-    if (result.success) {
+    if (result.success) 
       revalidatePath('/dashboard/profile')
-    }
+    
 
     return result
   } catch (error) {
@@ -162,9 +162,9 @@ export async function rejectInvitationAction(invitationId: string): Promise<Acti
 
     const result = await rejectInvitation(invitationId, user.id)
 
-    if (result.success) {
+    if (result.success) 
       revalidatePath('/dashboard/profile')
-    }
+    
 
     return result
   } catch (error) {

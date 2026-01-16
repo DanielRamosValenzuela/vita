@@ -82,9 +82,9 @@ export function OrganizationAdminHRSection({
         toast.success(t('deleteSuccess'))
         setDeleteDialog({ open: false, id: '', name: '' })
         router.refresh()
-      } else {
+      } else 
         toast.error(result.error || t('deleteError'))
-      }
+      
     })
   }
 

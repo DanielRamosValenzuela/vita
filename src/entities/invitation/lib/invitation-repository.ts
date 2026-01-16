@@ -124,18 +124,18 @@ export async function createInvitation(
     })
 
     if (existingInvitation) {
-      if (existingInvitation.status === INVITATION_STATUS.PENDING) {
+      if (existingInvitation.status === INVITATION_STATUS.PENDING) 
         return {
           success: false,
           error: 'Ya existe una invitación pendiente para este usuario',
         }
-      }
-      if (existingInvitation.status === INVITATION_STATUS.ACCEPTED) {
+      
+      if (existingInvitation.status === INVITATION_STATUS.ACCEPTED) 
         return {
           success: false,
           error: 'Este usuario ya tiene este rol en esta organización',
         }
-      }
+      
     }
 
     const user = await prisma.user.findUnique({
@@ -146,16 +146,16 @@ export async function createInvitation(
       },
     })
 
-    if (!user) {
+    if (!user) 
       return { success: false, error: 'Usuario no encontrado' }
-    }
+    
 
-    if (user.role === role && user.organizationId === organizationId) {
+    if (user.role === role && user.organizationId === organizationId) 
       return {
         success: false,
         error: 'Este usuario ya tiene este rol en esta organización',
       }
-    }
+    
 
     const invitation = await prisma.organizationInvitation.create({
       data: {
@@ -186,13 +186,13 @@ export async function deleteInvitation(
       select: { status: true, organizationId: true },
     })
 
-    if (!invitation) {
+    if (!invitation) 
       return { success: false, error: 'Invitación no encontrada' }
-    }
+    
 
-    if (invitation.status === INVITATION_STATUS.ACCEPTED) {
+    if (invitation.status === INVITATION_STATUS.ACCEPTED) 
       return { success: false, error: 'No se puede cancelar una invitación ya aceptada' }
-    }
+    
 
     await prisma.organizationInvitation.delete({
       where: { id: invitationId },
@@ -217,29 +217,29 @@ export async function acceptInvitation(
       where: { id: invitationId },
     })
 
-    if (!invitation) {
+    if (!invitation) 
       return { success: false, error: 'Invitación no encontrada' }
-    }
+    
 
-    if (invitation.userId !== userId) {
+    if (invitation.userId !== userId) 
       return { success: false, error: 'No tienes permiso para aceptar esta invitación' }
-    }
+    
 
-    if (invitation.status !== INVITATION_STATUS.PENDING) {
+    if (invitation.status !== INVITATION_STATUS.PENDING) 
       return { success: false, error: 'Esta invitación ya fue procesada' }
-    }
+    
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
       select: { docNumber: true, country: true },
     })
 
-    if (!user?.docNumber || !user?.country) {
+    if (!user?.docNumber || !user?.country) 
       return {
         success: false,
         error: 'Debes completar tu número de documento antes de aceptar la invitación',
       }
-    }
+    
 
     await prisma.$transaction([
       prisma.user.update({
@@ -277,17 +277,17 @@ export async function rejectInvitation(
       where: { id: invitationId },
     })
 
-    if (!invitation) {
+    if (!invitation) 
       return { success: false, error: 'Invitación no encontrada' }
-    }
+    
 
-    if (invitation.userId !== userId) {
+    if (invitation.userId !== userId) 
       return { success: false, error: 'No tienes permiso para rechazar esta invitación' }
-    }
+    
 
-    if (invitation.status !== INVITATION_STATUS.PENDING) {
+    if (invitation.status !== INVITATION_STATUS.PENDING) 
       return { success: false, error: 'Esta invitación ya fue procesada' }
-    }
+    
 
     await prisma.organizationInvitation.update({
       where: { id: invitationId },

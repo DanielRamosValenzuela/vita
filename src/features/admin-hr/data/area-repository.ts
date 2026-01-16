@@ -41,9 +41,9 @@ export async function updateArea(
   } = {}
 
   if (data.name !== undefined) updateData.name = data.name
-  if (data.description !== undefined) {
+  if (data.description !== undefined) 
     updateData.description = data.description === '' ? null : data.description
-  }
+  
   if (data.isActive !== undefined) updateData.isActive = data.isActive
 
   const area = await prisma.area.update({

@@ -15,7 +15,7 @@ export function ThemeToggle() {
     setMounted(true)
   }, [])
 
-  if (!mounted) {
+  if (!mounted) 
     return (
       <div className="flex items-center gap-2" suppressHydrationWarning>
         <Sun className="h-4 w-4 opacity-50" suppressHydrationWarning />
@@ -23,7 +23,7 @@ export function ThemeToggle() {
         <Moon className="h-4 w-4 opacity-50" suppressHydrationWarning />
       </div>
     )
-  }
+  
 
   const isDark = resolvedTheme === 'dark'
 

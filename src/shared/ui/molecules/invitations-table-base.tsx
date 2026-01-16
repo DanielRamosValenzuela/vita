@@ -80,7 +80,7 @@ export function InvitationsTableBase({
     )
   }
 
-  if (invitations.length === 0) {
+  if (invitations.length === 0) 
     return (
       <Card>
         <CardHeader>
@@ -92,7 +92,7 @@ export function InvitationsTableBase({
         </CardContent>
       </Card>
     )
-  }
+  
 
   return (
     <Card>

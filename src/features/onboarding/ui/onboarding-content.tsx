@@ -52,7 +52,7 @@ export function OnboardingContent({ user }: OnboardingContentProps) {
     router.push('/')
   }
 
-  if (isSuperAdmin) {
+  if (isSuperAdmin) 
     return (
       <Card>
         <CardHeader className="text-center">
@@ -69,7 +69,7 @@ export function OnboardingContent({ user }: OnboardingContentProps) {
         </CardContent>
       </Card>
     )
-  }
+  
 
   return (
     <Card>

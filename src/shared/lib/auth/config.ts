@@ -11,9 +11,9 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
 }
 
-if (!process.env.DATABASE_URL) {
+if (!process.env.DATABASE_URL) 
   throw new Error('DATABASE_URL is not set in environment variables')
-}
+
 
 let prisma: PrismaClient
 
@@ -50,9 +50,9 @@ export const authOptions: NextAuthOptions = {
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
+        if (!credentials?.email || !credentials?.password) 
           return null
-        }
+        
 
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
@@ -65,24 +65,24 @@ export const authOptions: NextAuthOptions = {
           },
         })
 
-        if (!user) {
+        if (!user) 
           return null
-        }
+        
 
         const credentialsAccount = user.accounts.find((acc) => acc.provider === 'credentials')
 
-        if (!credentialsAccount?.access_token) {
+        if (!credentialsAccount?.access_token) 
           return null
-        }
+        
 
         const isValidPassword = await bcrypt.compare(
           credentials.password,
           credentialsAccount.access_token
         )
 
-        if (!isValidPassword) {
+        if (!isValidPassword) 
           return null
-        }
+        
 
         return {
           id: user.id,

@@ -50,9 +50,9 @@ export function LoginForm() {
         if (signInResult?.ok) {
           router.push(callbackUrl)
           router.refresh()
-        } else {
+        } else 
           setGeneralError(signInResult?.error || t('signInError'))
-        }
+        
       } else {
         setGeneralError(validationResult.error || t('validationError'))
         setErrors(validationResult.fieldErrors || {})

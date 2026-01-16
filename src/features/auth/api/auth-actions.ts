@@ -34,17 +34,17 @@ export async function registerAction(formData: FormData): Promise<ActionResult<R
 
     const validationResult = registerSchema.safeParse(rawData)
 
-    if (!validationResult.success) {
+    if (!validationResult.success) 
       return {
         success: false,
         error: t('validationError'),
         fieldErrors: formatZodErrors(validationResult.error),
       }
-    }
+    
 
     const data = validationResult.data
 
-    if (await checkEmailExists(data.email)) {
+    if (await checkEmailExists(data.email)) 
       return {
         success: false,
         error: t('emailExists'),
@@ -52,10 +52,10 @@ export async function registerAction(formData: FormData): Promise<ActionResult<R
           email: [t('emailExists')],
         },
       }
-    }
+    
 
     const cleanDocNumber = data.docNumber.replace(/[^a-zA-Z0-9]/g, '')
-    if (await checkDocExists(data.country, data.docType, cleanDocNumber)) {
+    if (await checkDocExists(data.country, data.docType, cleanDocNumber)) 
       return {
         success: false,
         error: t('documentExists'),
@@ -63,7 +63,7 @@ export async function registerAction(formData: FormData): Promise<ActionResult<R
           docNumber: [t('documentExists')],
         },
       }
-    }
+    
 
     const userData = await createUserWithAccount(data)
 
@@ -76,11 +76,11 @@ export async function registerAction(formData: FormData): Promise<ActionResult<R
 
     const t = await getTranslations({ locale, namespace: 'auth' })
 
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) 
       if (error.code === 'P2002') {
         const target = error.meta?.target as string[] | undefined
 
-        if (target?.includes('email')) {
+        if (target?.includes('email')) 
           return {
             success: false,
             error: t('emailExists'),
@@ -88,9 +88,9 @@ export async function registerAction(formData: FormData): Promise<ActionResult<R
               email: [t('emailExists')],
             },
           }
-        }
+        
 
-        if (target?.includes('docNumber') || target?.includes('country')) {
+        if (target?.includes('docNumber') || target?.includes('country')) 
           return {
             success: false,
             error: t('documentExists'),
@@ -98,9 +98,9 @@ export async function registerAction(formData: FormData): Promise<ActionResult<R
               docNumber: [t('documentExists')],
             },
           }
-        }
+        
       }
-    }
+    
 
     return {
       success: false,
@@ -121,18 +121,18 @@ export async function loginAction(formData: FormData): Promise<ActionResult<{ em
 
     const validationResult = loginSchema.safeParse(rawData)
 
-    if (!validationResult.success) {
+    if (!validationResult.success) 
       return {
         success: false,
         error: 'Error de validación',
         fieldErrors: formatZodErrors(validationResult.error),
       }
-    }
+    
 
     const data = validationResult.data
     const user = await findUserWithCredentials(data.email)
 
-    if (!user || !user.accounts || user.accounts.length === 0) {
+    if (!user || !user.accounts || user.accounts.length === 0) 
       return {
         success: false,
         error: 'Credenciales inválidas',
@@ -140,10 +140,10 @@ export async function loginAction(formData: FormData): Promise<ActionResult<{ em
           email: ['Email o contraseña incorrectos'],
         },
       }
-    }
+    
 
     const hashedPassword = user.accounts[0].access_token
-    if (!hashedPassword) {
+    if (!hashedPassword) 
       return {
         success: false,
         error: 'Credenciales inválidas',
@@ -151,11 +151,11 @@ export async function loginAction(formData: FormData): Promise<ActionResult<{ em
           email: ['Email o contraseña incorrectos'],
         },
       }
-    }
+    
 
     const isValidPassword = await verifyPassword(data.password, hashedPassword)
 
-    if (!isValidPassword) {
+    if (!isValidPassword) 
       return {
         success: false,
         error: 'Credenciales inválidas',
@@ -163,7 +163,7 @@ export async function loginAction(formData: FormData): Promise<ActionResult<{ em
           password: ['Email o contraseña incorrectos'],
         },
       }
-    }
+    
 
     return {
       success: true,

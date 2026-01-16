@@ -9,13 +9,13 @@ interface DashboardLayoutProps {
 export default async function DashboardLayout({ children }: DashboardLayoutProps) {
   const user = await getCurrentUser()
 
-  if (!user) {
+  if (!user) 
     return (
       <div className="flex min-h-screen">
         <main className="flex-1">{children}</main>
       </div>
     )
-  }
+  
 
   return (
     <div className="flex h-screen overflow-hidden">

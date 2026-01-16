@@ -27,12 +27,12 @@ export async function createAdminHRUserAction(data: CreateAdminHRUserInput) {
     const validatedData = createAdminHRUserSchema.parse(data)
 
     const emailExists = await checkEmailExists(validatedData.email)
-    if (emailExists) {
+    if (emailExists) 
       return {
         success: false,
         error: 'Ya existe un usuario con este email',
       }
-    }
+    
 
     const user = await createAdminHRUser(validatedData)
 
@@ -47,12 +47,12 @@ export async function createAdminHRUserAction(data: CreateAdminHRUserInput) {
   } catch (error) {
     console.error('[createAdminHRUserAction] Error:', error)
 
-    if (error instanceof Error && 'name' in error && error.name === 'ZodError') {
+    if (error instanceof Error && 'name' in error && error.name === 'ZodError') 
       return {
         success: false,
         error: 'Datos inválidos',
       }
-    }
+    
 
     return {
       success: false,
@@ -71,12 +71,12 @@ export async function updateAdminHRUserAction(id: string, data: UpdateAdminHRUse
 
     if (validatedData.email) {
       const emailExists = await checkEmailExists(validatedData.email, id)
-      if (emailExists) {
+      if (emailExists) 
         return {
           success: false,
           error: 'Ya existe un usuario con este email',
         }
-      }
+      
     }
 
     const user = await updateAdminHRUser(id, validatedData)
@@ -92,12 +92,12 @@ export async function updateAdminHRUserAction(id: string, data: UpdateAdminHRUse
   } catch (error) {
     console.error('[updateAdminHRUserAction] Error:', error)
 
-    if (error instanceof Error && 'name' in error && error.name === 'ZodError') {
+    if (error instanceof Error && 'name' in error && error.name === 'ZodError') 
       return {
         success: false,
         error: 'Datos inválidos',
       }
-    }
+    
 
     return {
       success: false,

@@ -53,9 +53,9 @@ interface LocaleLayoutProps {
 export default async function LocaleLayout({ children, params }: LocaleLayoutProps) {
   const { locale } = await params
 
-  if (!hasLocale(routing.locales, locale)) {
+  if (!hasLocale(routing.locales, locale)) 
     notFound()
-  }
+  
 
   const messages = await getMessages()
 

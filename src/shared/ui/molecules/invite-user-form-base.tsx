@@ -135,9 +135,9 @@ export function InviteUserFormBase({
               value={emailValue}
               onChange={(e) => handleEmailChange(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === 'Enter' && canSearch && !isSearching) {
+                if (e.key === 'Enter' && canSearch && !isSearching) 
                   onSearch()
-                }
+                
               }}
               disabled={isSearching || isPending || !!docValue}
               className={
@@ -169,9 +169,9 @@ export function InviteUserFormBase({
             value={docValue}
             onChange={(e) => handleDocChange(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === 'Enter' && canSearch && !isSearching) {
+              if (e.key === 'Enter' && canSearch && !isSearching) 
                 onSearch()
-              }
+              
             }}
             disabled={isSearching || isPending || !!emailValue}
             className={docValue ? (isValidDoc ? '' : 'border-destructive') : ''}

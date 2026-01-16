@@ -17,12 +17,12 @@ export async function createAreaAction(data: CreateAreaInput) {
   try {
     const user = await requireAdminHR()
 
-    if (!user.organizationId) {
+    if (!user.organizationId) 
       return {
         success: false,
         error: 'No estás vinculado a una organización',
       }
-    }
+    
 
     const locale = await getLocaleFromHeaders()
     const createAreaSchema = await getCreateAreaSchema(locale)
@@ -40,12 +40,12 @@ export async function createAreaAction(data: CreateAreaInput) {
   } catch (error) {
     console.error('[createAreaAction] Error:', error)
 
-    if (error instanceof Error && 'name' in error && error.name === 'ZodError') {
+    if (error instanceof Error && 'name' in error && error.name === 'ZodError') 
       return {
         success: false,
         error: 'Datos inválidos',
       }
-    }
+    
 
     return {
       success: false,
@@ -58,12 +58,12 @@ export async function updateAreaAction(id: string, data: UpdateAreaInput) {
   try {
     const user = await requireAdminHR()
 
-    if (!user.organizationId) {
+    if (!user.organizationId) 
       return {
         success: false,
         error: 'No estás vinculado a una organización',
       }
-    }
+    
 
     const locale = await getLocaleFromHeaders()
     const updateAreaSchema = await getUpdateAreaSchema(locale)
@@ -81,12 +81,12 @@ export async function updateAreaAction(id: string, data: UpdateAreaInput) {
   } catch (error) {
     console.error('[updateAreaAction] Error:', error)
 
-    if (error instanceof Error && 'name' in error && error.name === 'ZodError') {
+    if (error instanceof Error && 'name' in error && error.name === 'ZodError') 
       return {
         success: false,
         error: 'Datos inválidos',
       }
-    }
+    
 
     return {
       success: false,
@@ -99,12 +99,12 @@ export async function deleteAreaAction(id: string) {
   try {
     const user = await requireAdminHR()
 
-    if (!user.organizationId) {
+    if (!user.organizationId) 
       return {
         success: false,
         error: 'No estás vinculado a una organización',
       }
-    }
+    
 
     await deleteArea(id, user.organizationId)
 

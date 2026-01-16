@@ -34,9 +34,9 @@ export async function requireAuth(locale: string = 'es'): Promise<CurrentUser> {
 export async function requireSuperAdmin(locale: string = 'es'): Promise<CurrentUser> {
   const user = await requireAuth(locale)
 
-  if (user.role !== Role.SUPER_ADMIN) {
+  if (user.role !== Role.SUPER_ADMIN) 
     redirect(`/${locale}/dashboard`)
-  }
+  
 
   return user
 }
@@ -44,9 +44,9 @@ export async function requireSuperAdmin(locale: string = 'es'): Promise<CurrentU
 export async function requireAdminHR(locale: string = 'es'): Promise<CurrentUser> {
   const user = await requireAuth(locale)
 
-  if (user.role !== Role.ADMIN_HR) {
+  if (user.role !== Role.ADMIN_HR) 
     redirect(`/${locale}/dashboard`)
-  }
+  
 
   return user
 }
@@ -54,9 +54,9 @@ export async function requireAdminHR(locale: string = 'es'): Promise<CurrentUser
 export async function requireChiefArea(locale: string = 'es'): Promise<CurrentUser> {
   const user = await requireAuth(locale)
 
-  if (user.role !== Role.CHIEF_AREA) {
+  if (user.role !== Role.CHIEF_AREA) 
     redirect(`/${locale}/dashboard`)
-  }
+  
 
   return user
 }
@@ -64,9 +64,9 @@ export async function requireChiefArea(locale: string = 'es'): Promise<CurrentUs
 export async function requireStaffHealth(locale: string = 'es'): Promise<CurrentUser> {
   const user = await requireAuth(locale)
 
-  if (user.role !== Role.STAFF_HEALTH) {
+  if (user.role !== Role.STAFF_HEALTH) 
     redirect(`/${locale}/dashboard`)
-  }
+  
 
   return user
 }

@@ -32,12 +32,12 @@ export const createOrganizationAction = async (data: CreateOrganizationInput) =>
     const validatedData = createOrganizationSchema.parse(data)
 
     const taxIdExists = await checkTaxIdExists(validatedData.taxId)
-    if (taxIdExists) {
+    if (taxIdExists) 
       return {
         success: false,
         error: 'Ya existe una organización con este RUT/ID fiscal',
       }
-    }
+    
 
     const organization = await createOrganization(validatedData)
 
@@ -52,13 +52,13 @@ export const createOrganizationAction = async (data: CreateOrganizationInput) =>
   } catch (error) {
     console.error('[createOrganizationAction] Error:', error)
 
-    if (error instanceof Error && 'name' in error && error.name === 'ZodError') {
+    if (error instanceof Error && 'name' in error && error.name === 'ZodError') 
       return {
         success: false,
         error: 'Datos inválidos',
         errors: 'errors' in error ? error.errors : [],
       }
-    }
+    
 
     return {
       success: false,
@@ -90,13 +90,13 @@ export const updateOrganizationAction = async (data: UpdateOrganizationInput) =>
   } catch (error) {
     console.error('[updateOrganizationAction] Error:', error)
 
-    if (error instanceof Error && 'name' in error && error.name === 'ZodError') {
+    if (error instanceof Error && 'name' in error && error.name === 'ZodError') 
       return {
         success: false,
         error: 'Datos inválidos',
         errors: 'errors' in error ? error.errors : [],
       }
-    }
+    
 
     return {
       success: false,
@@ -128,13 +128,13 @@ export const changeOrganizationStatusAction = async (data: ChangeOrganizationSta
   } catch (error) {
     console.error('[changeOrganizationStatusAction] Error:', error)
 
-    if (error instanceof Error && 'name' in error && error.name === 'ZodError') {
+    if (error instanceof Error && 'name' in error && error.name === 'ZodError') 
       return {
         success: false,
         error: 'Datos inválidos',
         errors: 'errors' in error ? error.errors : [],
       }
-    }
+    
 
     return {
       success: false,
@@ -165,13 +165,13 @@ export const deleteOrganizationAction = async (data: DeleteOrganizationInput) =>
   } catch (error) {
     console.error('[deleteOrganizationAction] Error:', error)
 
-    if (error instanceof Error && 'name' in error && error.name === 'ZodError') {
+    if (error instanceof Error && 'name' in error && error.name === 'ZodError') 
       return {
         success: false,
         error: 'Datos inválidos',
         errors: 'errors' in error ? error.errors : [],
       }
-    }
+    
 
     return {
       success: false,

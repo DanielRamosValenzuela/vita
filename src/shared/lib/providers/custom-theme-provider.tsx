@@ -21,9 +21,9 @@ export function CustomThemeProvider({ children }: { children: React.ReactNode })
 
     const root = document.documentElement
     themesList.forEach((theme) => {
-      if (theme.id !== 'default') {
+      if (theme.id !== 'default') 
         root.classList.remove(`theme-${theme.id}`)
-      }
+      
     })
 
     if (themeId !== 'default') {

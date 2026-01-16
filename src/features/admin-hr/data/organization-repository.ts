@@ -59,9 +59,9 @@ export async function getAdminHROrganization(organizationId: string): Promise<Or
     },
   })
 
-  if (!organization) {
+  if (!organization) 
     return null
-  }
+  
 
   const [
     chiefsCount,

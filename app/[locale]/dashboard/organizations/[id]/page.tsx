@@ -45,9 +45,9 @@ const OrganizationDetailsPage = async ({ params }: PageProps) => {
   const { id } = await params
   const organization = await getOrganizationById(id)
 
-  if (!organization) {
+  if (!organization) 
     notFound()
-  }
+  
 
   const t = await getTranslations('superAdmin.organizationDetails')
   const tOrg = await getTranslations('superAdmin.organizations')

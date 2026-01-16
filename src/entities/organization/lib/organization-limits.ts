@@ -33,9 +33,9 @@ export async function checkOrganizationRoleLimit(
     },
   })
 
-  if (!organization) {
+  if (!organization) 
     return { success: false, error: 'Organización no encontrada' }
-  }
+  
 
   let maxLimit: number
   switch (role) {

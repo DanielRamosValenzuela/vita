@@ -85,7 +85,7 @@ export function createRegisterSchema(messages: ValidationMessages) {
     .superRefine((data, ctx) => {
       const docNumberSchema = createDocNumberSchema(data.country, messages.docNumber)
       const result = docNumberSchema.safeParse(data.docNumber)
-      if (!result.success) {
+      if (!result.success) 
         result.error.issues.forEach((issue) => {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
@@ -93,16 +93,16 @@ export function createRegisterSchema(messages: ValidationMessages) {
             path: ['docNumber'],
           })
         })
-      }
+      
 
       const expectedDocType = getDocTypeForCountry(data.country)
-      if (data.docType !== expectedDocType) {
+      if (data.docType !== expectedDocType) 
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: messages.docType.mismatch(expectedDocType, data.country),
           path: ['docType'],
         })
-      }
+      
     })
 }
 

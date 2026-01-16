@@ -23,7 +23,7 @@ export default async function AreasPage({ params }: AreasPageProps) {
   const user = await requireAdminHR(locale)
   const t = await getTranslations('adminHR.areas')
 
-  if (!user.organizationId) {
+  if (!user.organizationId) 
     return (
       <div className="space-y-6">
         <div>
@@ -35,7 +35,7 @@ export default async function AreasPage({ params }: AreasPageProps) {
         </div>
       </div>
     )
-  }
+  
 
   const areas = await getAreas(user.organizationId)
 

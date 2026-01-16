@@ -22,13 +22,13 @@ export function validateRUT(rut: string): boolean {
   const remainder = sum % 11
   const dvNum = 11 - remainder
   let expectedDV: string
-  if (dvNum === 11) {
+  if (dvNum === 11) 
     expectedDV = '0'
-  } else if (dvNum === 10) {
+   else if (dvNum === 10) 
     expectedDV = 'K'
-  } else {
+   else 
     expectedDV = dvNum.toString()
-  }
+  
 
   return dv === expectedDV
 }

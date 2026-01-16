@@ -75,9 +75,9 @@ export function InviteUserForm({
 
       setIsSearching(false)
 
-      if (result.success && result.data) {
+      if (result.success && result.data) 
         setFoundUser(result.data as FoundUser)
-      } else {
+       else {
         setError(result.error || t('searchError'))
         setFoundUser(null)
       }
@@ -94,11 +94,11 @@ export function InviteUserForm({
 
     startTransition(async () => {
       let result
-      if (role === ROLES.CHIEF_AREA) {
+      if (role === ROLES.CHIEF_AREA) 
         result = await inviteChiefAction(organizationId, foundUser.id)
-      } else if (role === ROLES.STAFF_HEALTH) {
+       else if (role === ROLES.STAFF_HEALTH) 
         result = await inviteStaffAction(organizationId, foundUser.id)
-      } else {
+       else {
         setError('Rol no válido')
         return
       }
@@ -110,9 +110,9 @@ export function InviteUserForm({
         setFoundUser(null)
         setError(null)
         router.refresh()
-        if (onSuccess) {
+        if (onSuccess) 
           onSuccess()
-        }
+        
       } else {
         const errorMessage = result.error || t('inviteError')
         toast.error(errorMessage)

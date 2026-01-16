@@ -68,9 +68,9 @@ export function InviteAdminHRForm({
 
       setIsSearching(false)
 
-      if (result.success && result.data) {
+      if (result.success && result.data) 
         setFoundUser(result.data as FoundUser)
-      } else {
+       else {
         setError(result.error || t('searchError'))
         setFoundUser(null)
       }
@@ -90,9 +90,9 @@ export function InviteAdminHRForm({
         setFoundUser(null)
         setError(null)
         router.refresh()
-        if (onSuccess) {
+        if (onSuccess) 
           onSuccess()
-        }
+        
       } else {
         const errorMessage = result.error || t('inviteError')
         toast.error(errorMessage)

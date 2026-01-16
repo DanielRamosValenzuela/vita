@@ -26,7 +26,7 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
   const tAlerts = await getTranslations({ locale, namespace: 'superAdmin.alerts' })
   const tStats = await getTranslations({ locale, namespace: 'superAdmin.stats' })
 
-  if (!user) {
+  if (!user) 
     return (
       <div className="p-6">
         <div className="mb-6">
@@ -36,7 +36,7 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
         <CalendarView user={null} />
       </div>
     )
-  }
+  
 
   if (user.role === Role.SUPER_ADMIN) {
     await requireSuperAdmin(locale)
@@ -67,9 +67,9 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
     )
   }
 
-  if (user.role === Role.ADMIN_HR) {
+  if (user.role === Role.ADMIN_HR) 
     redirect(`/${locale}/dashboard/admin-hr`)
-  }
+  
 
   return (
     <div className="p-6">

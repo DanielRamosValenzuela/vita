@@ -13,9 +13,9 @@ export async function searchUserByDocumentOrEmail({
 }: SearchUserByDocumentOrEmailParams) {
   const cleanSearch = search.trim()
 
-  if (!cleanSearch) {
+  if (!cleanSearch) 
     return null
-  }
+  
 
   const cleanDocNumber = cleanSearch.replace(/[.-]/g, '')
 
@@ -25,9 +25,9 @@ export async function searchUserByDocumentOrEmail({
 
   if (cleanDocNumber) {
     const docCondition: Prisma.UserWhereInput = { docNumber: cleanDocNumber }
-    if (country) {
+    if (country) 
       docCondition.country = country
-    }
+    
     whereConditions.push(docCondition)
   }
 

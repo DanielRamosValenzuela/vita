@@ -25,9 +25,9 @@ export default async function EditAdminHRUserPage({ params }: EditAdminHRUserPag
   const { id } = await params
   const user = await getAdminHRUserById(id)
 
-  if (!user) {
+  if (!user) 
     notFound()
-  }
+  
 
   const organizations = await prisma.organization.findMany({
     where: { status: 'ACTIVE' },

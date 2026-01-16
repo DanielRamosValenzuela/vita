@@ -22,21 +22,21 @@ export const searchUserAction = async (
   try {
     await requireSuperAdmin()
 
-    if (!search || search.trim().length === 0) {
+    if (!search || search.trim().length === 0) 
       return {
         success: false,
         error: 'Debes ingresar un RUT o email para buscar',
       }
-    }
+    
 
     const user = await searchUserByDocumentOrEmail({ search: search.trim(), country })
 
-    if (!user) {
+    if (!user) 
       return {
         success: false,
         error: 'Usuario no encontrado. El usuario debe registrarse primero en la plataforma.',
       }
-    }
+    
 
     return {
       success: true,
@@ -59,16 +59,16 @@ export const inviteAdminHRAction = async (
     const session = await requireSuperAdmin()
 
     const limitCheck = await checkOrganizationAdminHRLimit(organizationId)
-    if (!limitCheck.success) {
+    if (!limitCheck.success) 
       return limitCheck
-    }
+    
 
-    if (!limitCheck.canAddMore) {
+    if (!limitCheck.canAddMore) 
       return {
         success: false,
         error: `Se ha alcanzado el límite máximo de ${limitCheck.maxLimit} administradores RRHH para esta organización`,
       }
-    }
+    
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -78,25 +78,25 @@ export const inviteAdminHRAction = async (
       },
     })
 
-    if (!user) {
+    if (!user) 
       return {
         success: false,
         error: 'Usuario no encontrado',
       }
-    }
+    
 
-    if (user.role === ROLES.ADMIN_HR && user.organizationId === organizationId) {
+    if (user.role === ROLES.ADMIN_HR && user.organizationId === organizationId) 
       return {
         success: false,
         error: 'Este usuario ya es ADMIN_HR de esta organización',
       }
-    }
+    
 
     const invitationResult = await createAdminHRInvitation(organizationId, userId, session.id)
 
-    if (!invitationResult.success) {
+    if (!invitationResult.success) 
       return invitationResult
-    }
+    
 
     revalidatePath(`/dashboard/organizations/${organizationId}`)
     revalidatePath('/dashboard/organizations')
@@ -123,16 +123,16 @@ export const cancelInvitationAction = async (
 
     const result = await deleteInvitation(invitationId)
 
-    if (!result.success) {
+    if (!result.success) 
       return {
         success: false,
         error: result.error,
       }
-    }
+    
 
-    if (result.data?.organizationId) {
+    if (result.data?.organizationId) 
       revalidatePath(`/dashboard/organizations/${result.data.organizationId}`)
-    }
+    
     revalidatePath('/dashboard/organizations')
 
     return {

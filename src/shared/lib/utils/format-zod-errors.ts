@@ -5,9 +5,9 @@ export function formatZodErrors(error: ZodError): Record<string, string[]> {
 
   error.issues.forEach((issue) => {
     const path = issue.path.join('.')
-    if (!fieldErrors[path]) {
+    if (!fieldErrors[path]) 
       fieldErrors[path] = []
-    }
+    
     fieldErrors[path].push(issue.message)
   })
 

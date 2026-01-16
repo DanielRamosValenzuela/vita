@@ -20,9 +20,9 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   const user = await getCurrentUser()
   const t = await getTranslations('profile')
 
-  if (!user) {
+  if (!user) 
     redirect(`/${locale}/login`)
-  }
+  
 
   return (
     <div className="space-y-6 pb-6">

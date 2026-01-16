@@ -22,21 +22,21 @@ export const searchUserAction = async (
   try {
     await requireAdminHR()
 
-    if (!search || search.trim().length === 0) {
+    if (!search || search.trim().length === 0) 
       return {
         success: false,
         error: 'Debes ingresar un RUT o email para buscar',
       }
-    }
+    
 
     const user = await searchUserByDocumentOrEmail({ search: search.trim(), country })
 
-    if (!user) {
+    if (!user) 
       return {
         success: false,
         error: 'Usuario no encontrado. El usuario debe registrarse primero en la plataforma.',
       }
-    }
+    
 
     return {
       success: true,
@@ -58,24 +58,24 @@ export const inviteChiefAction = async (
   try {
     const session = await requireAdminHR()
 
-    if (session.organizationId !== organizationId) {
+    if (session.organizationId !== organizationId) 
       return {
         success: false,
         error: 'No tienes permisos para invitar a esta organización',
       }
-    }
+    
 
     const limitCheck = await checkOrganizationLimit(organizationId, ROLES.CHIEF_AREA)
-    if (!limitCheck.success) {
+    if (!limitCheck.success) 
       return limitCheck
-    }
+    
 
-    if (!limitCheck.canAddMore) {
+    if (!limitCheck.canAddMore) 
       return {
         success: false,
         error: `Se ha alcanzado el límite máximo de ${limitCheck.maxLimit} jefes para esta organización`,
       }
-    }
+    
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -85,19 +85,19 @@ export const inviteChiefAction = async (
       },
     })
 
-    if (!user) {
+    if (!user) 
       return {
         success: false,
         error: 'Usuario no encontrado',
       }
-    }
+    
 
-    if (user.role === ROLES.CHIEF_AREA && user.organizationId === organizationId) {
+    if (user.role === ROLES.CHIEF_AREA && user.organizationId === organizationId) 
       return {
         success: false,
         error: 'Este usuario ya es jefe de esta organización',
       }
-    }
+    
 
     const invitationResult = await createInvitation(
       organizationId,
@@ -106,9 +106,9 @@ export const inviteChiefAction = async (
       session.id
     )
 
-    if (!invitationResult.success) {
+    if (!invitationResult.success) 
       return invitationResult
-    }
+    
 
     revalidatePath(`/dashboard/admin-hr/organization`)
     revalidatePath('/dashboard/admin-hr/invitations')
@@ -134,24 +134,24 @@ export const inviteStaffAction = async (
   try {
     const session = await requireAdminHR()
 
-    if (session.organizationId !== organizationId) {
+    if (session.organizationId !== organizationId) 
       return {
         success: false,
         error: 'No tienes permisos para invitar a esta organización',
       }
-    }
+    
 
     const limitCheck = await checkOrganizationLimit(organizationId, ROLES.STAFF_HEALTH)
-    if (!limitCheck.success) {
+    if (!limitCheck.success) 
       return limitCheck
-    }
+    
 
-    if (!limitCheck.canAddMore) {
+    if (!limitCheck.canAddMore) 
       return {
         success: false,
         error: `Se ha alcanzado el límite máximo de ${limitCheck.maxLimit} staff para esta organización`,
       }
-    }
+    
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -161,19 +161,19 @@ export const inviteStaffAction = async (
       },
     })
 
-    if (!user) {
+    if (!user) 
       return {
         success: false,
         error: 'Usuario no encontrado',
       }
-    }
+    
 
-    if (user.role === ROLES.STAFF_HEALTH && user.organizationId === organizationId) {
+    if (user.role === ROLES.STAFF_HEALTH && user.organizationId === organizationId) 
       return {
         success: false,
         error: 'Este usuario ya es staff de esta organización',
       }
-    }
+    
 
     const invitationResult = await createInvitation(
       organizationId,
@@ -182,9 +182,9 @@ export const inviteStaffAction = async (
       session.id
     )
 
-    if (!invitationResult.success) {
+    if (!invitationResult.success) 
       return invitationResult
-    }
+    
 
     revalidatePath(`/dashboard/admin-hr/organization`)
     revalidatePath('/dashboard/admin-hr/invitations')
@@ -211,16 +211,16 @@ export const cancelInvitationAction = async (
 
     const result = await deleteInvitation(invitationId)
 
-    if (!result.success) {
+    if (!result.success) 
       return {
         success: false,
         error: result.error,
       }
-    }
+    
 
-    if (result.data?.organizationId) {
+    if (result.data?.organizationId) 
       revalidatePath(`/dashboard/admin-hr/organization`)
-    }
+    
     revalidatePath('/dashboard/admin-hr/invitations')
 
     return {

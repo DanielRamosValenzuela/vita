@@ -8,9 +8,9 @@ export async function getLocaleFromHeaders(): Promise<string> {
     const pathname = headersList.get('x-pathname') || headersList.get('referer') || ''
 
     const localeMatch = pathname.match(/\/(es|en)(\/|$)/)
-    if (localeMatch) {
+    if (localeMatch) 
       return localeMatch[1]
-    }
+    
 
     return routing.defaultLocale
   } catch {

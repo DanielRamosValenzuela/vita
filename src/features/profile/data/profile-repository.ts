@@ -19,18 +19,18 @@ export async function updateUserProfile(
       where: { id: userId },
     })
 
-    if (!existingUser) {
+    if (!existingUser) 
       return { success: false, error: 'Usuario no encontrado' }
-    }
+    
 
     if (data.email !== existingUser.email) {
       const emailExists = await prisma.user.findUnique({
         where: { email: data.email },
       })
 
-      if (emailExists) {
+      if (emailExists) 
         return { success: false, error: 'Este email ya está en uso' }
-      }
+      
     }
 
     await prisma.user.update({
@@ -63,28 +63,28 @@ export async function changeUserPassword(
       },
     })
 
-    if (!user) {
+    if (!user) 
       return { success: false, error: 'Usuario no encontrado' }
-    }
+    
 
     const credentialsAccount = user.accounts[0]
 
-    if (!credentialsAccount) {
+    if (!credentialsAccount) 
       return { success: false, error: 'No se encontró cuenta con credenciales' }
-    }
+    
 
-    if (!credentialsAccount.access_token) {
+    if (!credentialsAccount.access_token) 
       return { success: false, error: 'No se encontró contraseña almacenada' }
-    }
+    
 
     const isCurrentPasswordValid = await bcrypt.compare(
       currentPassword,
       credentialsAccount.access_token
     )
 
-    if (!isCurrentPasswordValid) {
+    if (!isCurrentPasswordValid) 
       return { success: false, error: 'La contraseña actual es incorrecta' }
-    }
+    
 
     const hashedPassword = await bcrypt.hash(newPassword, 10)
 
@@ -118,9 +118,9 @@ export async function updateUserDocument(
       },
     })
 
-    if (existingDoc) {
+    if (existingDoc) 
       return { success: false, error: 'Este número de documento ya está en uso' }
-    }
+    
 
     await prisma.user.update({
       where: { id: userId },

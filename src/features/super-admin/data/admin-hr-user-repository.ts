@@ -22,16 +22,16 @@ export async function getAdminHRUsers(params: GetAdminHRUsersParams = {}) {
     role: ROLES.ADMIN_HR,
   }
 
-  if (search) {
+  if (search) 
     where.OR = [
       { name: { contains: search, mode: 'insensitive' } },
       { email: { contains: search, mode: 'insensitive' } },
     ]
-  }
+  
 
-  if (organizationId) {
+  if (organizationId) 
     where.organizationId = organizationId
-  }
+  
 
   const [users, total] = await Promise.all([
     prisma.user.findMany({
@@ -112,11 +112,11 @@ export async function updateAdminHRUser(id: string, data: UpdateAdminHRUserInput
 
   if (data.name !== undefined) updateData.name = data.name
   if (data.email !== undefined) updateData.email = data.email
-  if (data.organizationId !== undefined) {
+  if (data.organizationId !== undefined) 
     updateData.organization = data.organizationId
       ? { connect: { id: data.organizationId } }
       : { disconnect: true }
-  }
+  
 
   if (data.password) {
     const hashedPassword = await bcrypt.hash(data.password, 12)
