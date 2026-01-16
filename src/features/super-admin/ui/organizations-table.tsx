@@ -20,13 +20,13 @@ export function OrganizationsTable({ organizations }: OrganizationsTableProps) {
   const getStatusColor = (status: OrganizationStatus) => {
     switch (status) {
       case 'ACTIVE':
-        return 'text-green-600 dark:text-green-400'
+        return 'text-primary'
       case 'PENDING_PAYMENT':
-        return 'text-yellow-600 dark:text-yellow-400'
+        return 'text-muted-foreground'
       case 'SUSPENDED':
-        return 'text-red-600 dark:text-red-400'
+        return 'text-destructive'
       case 'INACTIVE':
-        return 'text-gray-600 dark:text-gray-400'
+        return 'text-muted-foreground'
     }
   }
 

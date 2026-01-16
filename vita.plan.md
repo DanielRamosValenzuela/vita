@@ -2,19 +2,166 @@
 
 **Sistema de Gestión de Turnos Médicos Multi-Tenant SaaS B2B**
 
-**Última actualización:** 10 de enero de 2026
+**Última actualización:** 11 de enero de 2026
 
-**Versión:** 3.14.0
+**Versión:** 3.17.0
 
-**Estado:** FASE 2 completada - Dashboard SUPER_ADMIN + CRUD Organizations Completo + Sistema de Error Handling y Loading States + Dashboard ADMIN_HR Inicial + Página de Perfil de Usuario Completa + Correcciones de UI/UX
+**Estado:** FASE 2 completada - Dashboard SUPER_ADMIN + CRUD Organizations Completo + Sistema de Error Handling y Loading States + Dashboard ADMIN_HR Inicial + Página de Perfil de Usuario Completa + Correcciones de UI/UX + Sistema de Invitaciones y Vista de Organización ADMIN_HR + Migración a Entities (FSD) + Refactorización de Colores + Integración de Invitaciones en Mi Organización
 
-**📊 Progreso General:** 95 tareas completadas de 896 totales (10.6% completado)
+**📊 Progreso General:** 115 tareas completadas de 896 totales (12.8% completado)
 
 **Competidor Principal:** Rflex (análisis competitivo en sección de Negocio)
 
 ---
 
 ## 🎉 PROGRESO RECIENTE (Enero 2026)
+
+### ✅ Sesión del 11 de Enero 2026 - Integración de Invitaciones en Mi Organización
+
+**Completado:**
+
+- ✅ **Reorganización de Invitaciones ADMIN_HR:**
+  - Eliminada ruta separada `/dashboard/admin-hr/invitations`
+  - Integrada funcionalidad de invitaciones en página "Mi Organización"
+  - Estructura similar a SUPER_ADMIN para consistencia UX
+  - Eliminado enlace "Invitaciones" del sidebar de ADMIN_HR
+
+- ✅ **Componente OrganizationTeamSection:**
+  - Creado componente reutilizable para gestionar Chiefs y Staff
+  - Similar a `OrganizationAdminHRSection` de SUPER_ADMIN
+  - Incluye modal para invitar usuarios con formulario integrado
+  - Muestra tabla de usuarios existentes con información relevante
+  - Validación de límites y mensajes informativos
+
+- ✅ **Actualización de Repositorio:**
+  - `getAdminHROrganization` ahora incluye:
+    - Invitaciones completas con información de usuario
+    - Lista de Chiefs con datos completos
+    - Lista de Staff con datos completos
+    - Estadísticas actualizadas en tiempo real
+
+- ✅ **Página Mi Organización Completa:**
+  - Vista de estadísticas (OrganizationView)
+  - Sección de Jefes de Área con modal de invitación
+  - Sección de Personal de Salud con modal de invitación
+  - Tabla de historial de invitaciones (similar a SUPER_ADMIN)
+  - Estructura consistente y profesional
+
+- ✅ **Widgets Reutilizables:**
+  - `InviteUserForm` y `InvitationsTable` funcionan con `actionContext`
+  - Importación dinámica de server actions según contexto
+  - Manejo correcto de tipos (user puede ser null)
+  - Sin errores de serialización de Next.js
+
+- ✅ **Traducciones:**
+  - Agregadas keys para `adminHR.organization.chiefs.*` (ES/EN)
+  - Agregadas keys para `adminHR.organization.staff.*` (ES/EN)
+  - Traducciones completas para modales y tablas
+
+- ✅ **Calidad de Código:**
+  - `npm run lint` ✅ 0 errors, 0 warnings
+  - `npm run build` ✅ Build exitoso
+  - Navegador ✅ Sin errores en consola
+  - Todas las URLs funcionando correctamente
+
+### ✅ Sesión del 11 de Enero 2026 - Migración a Entities y Refactorización de Colores
+
+**Completado:**
+
+- ✅ **Migración a Entities según FSD:**
+  - **Entity `user`:**
+    - Creada `entities/user/lib/search-user.ts` con función genérica `searchUserByDocumentOrEmail`
+    - Renombrada función de `searchUserByRUTOrEmail` a `searchUserByDocumentOrEmail` (genérica, no solo RUT)
+    - Removida duplicación: función compartida desde `entities/user` en lugar de duplicada en features
+    - Actualizados imports en `super-admin` y `admin-hr` para usar `entities/user`
+  - **Entity `invitation`:**
+    - Creada `entities/invitation/lib/invitation-repository.ts` con todas las funciones compartidas:
+      - `getAllInvitationsForOrganization` - Obtener todas las invitaciones de una organización
+      - `getPendingInvitationsForOrganization` - Obtener invitaciones pendientes
+      - `getPendingInvitationsForUser` - Obtener invitaciones pendientes de un usuario
+      - `createInvitation` - Crear invitación (genérica para cualquier rol)
+      - `deleteInvitation` - Eliminar/cancelar invitación
+      - `acceptInvitation` - Aceptar invitación
+      - `rejectInvitation` - Rechazar invitación
+    - Removida duplicación entre `super-admin`, `admin-hr` y `profile`
+    - Repositorios de features ahora son wrappers que llaman a entities
+  - **Entity `organization`:**
+    - Creada `entities/organization/lib/organization-limits.ts` con función genérica:
+      - `checkOrganizationRoleLimit` - Verificar límites por rol (genérica para cualquier rol)
+    - Removida duplicación entre `super-admin` y `admin-hr`
+    - `checkOrganizationAdminHRLimit` y `checkOrganizationLimit` ahora usan la función genérica
+  - **Separación clara:** Entidades compartidas en `entities/`, lógica de feature en `features/`
+  - **Arquitectura FSD:** Código reutilizable migrado a entities, features mantienen su lógica específica
+
+- ✅ **Reemplazo de Colores Hardcodeados:**
+  - Eliminados todos los colores hardcodeados (`text-orange-600`, `text-red-600`, `bg-orange-100`, etc.)
+  - Reemplazados por variables semánticas existentes:
+    - `text-orange-*` → `text-muted-foreground` (warnings/advertencias)
+    - `text-red-*` → `text-destructive` (errores/destructivos)
+    - `text-green-*` → `text-primary` (éxito/acciones positivas)
+    - `bg-orange-*` → `bg-muted` o `bg-destructive/10`
+    - `bg-red-*` → `bg-destructive/10`
+    - `bg-green-*` → `bg-primary/10`
+  - Colores ahora se adaptan automáticamente a temas personalizados
+  - Archivos actualizados: `organization-view.tsx`, `alerts-panel.tsx`, `stats-cards.tsx`, `organizations-table.tsx`, `organizations-table-client.tsx`
+
+- ✅ **Sistema de Cancelación de Invitaciones (SUPER_ADMIN):**
+  - Agregada funcionalidad para cancelar invitaciones pendientes
+  - Implementado `deleteInvitation` en `admin-hr-invitation-repository.ts`
+  - Server action `cancelInvitationAction` con validaciones
+  - Componente `InvitationsTable` actualizado con botón de cancelar (icono `Ban`)
+  - Tooltip informativo en botón de cancelar
+  - AlertDialog de confirmación antes de cancelar
+  - Toast de éxito al cancelar exitosamente
+  - Validación: solo permite cancelar invitaciones `PENDING`, no aceptadas
+  - Revalidación automática de páginas después de cancelar
+  - Traducciones completas (ES/EN) para cancelación
+
+- ✅ **Mejoras UI Avatar Navbar:**
+  - Actualizado avatar en `main-navbar` para mostrar primera letra del nombre
+  - Estilo consistente con `dashboard-sidebar`
+  - Muestra imagen del usuario si existe, sino muestra inicial en círculo con fondo primario
+  - Mejor UX y consistencia visual en toda la aplicación
+
+- ✅ **Dashboard ADMIN_HR - Vista de Organización:**
+  - Creado repositorio `organization-repository.ts` para obtener estadísticas
+  - Página `/dashboard/admin-hr/organization` implementada
+  - Componente `OrganizationView` con tarjetas de estadísticas:
+    - Administradores RRHH (actuales / límite)
+    - Jefes de Área (actuales / límite) con invitaciones pendientes
+    - Personal de Salud (actuales / límite) con invitaciones pendientes
+  - Muestra estado de la organización con badges
+  - Integración con sistema de temas
+
+- ✅ **Sistema de Invitaciones ADMIN_HR (Base):**
+  - Repositorio `invitation-repository.ts` para gestionar invitaciones
+  - Server actions para buscar usuarios, invitar jefes y staff
+  - Validaciones de límites por rol (CHIEF_AREA, STAFF_HEALTH)
+  - Separación clara: SUPER_ADMIN gestiona ADMIN_HR, ADMIN_HR gestiona CHIEF_AREA y STAFF_HEALTH
+  - Navegación agregada: "Mi Organización" e "Invitaciones" en sidebar
+
+- ✅ **Traducciones ADMIN_HR:**
+  - Agregadas traducciones para `adminHR.organization.*` (ES/EN)
+  - Agregadas traducciones para `adminHR.invitations.*` (ES/EN)
+  - Agregadas traducciones para `dashboard.organization` y `dashboard.invitations`
+
+- ✅ **Sistema de Colores y Temas:**
+  - Eliminados todos los colores hardcodeados (`text-orange-600`, `text-red-600`, etc.)
+  - Reemplazados por variables semánticas existentes (`text-destructive`, `text-muted-foreground`, `text-primary`)
+  - Los colores ahora se adaptan automáticamente a temas personalizados
+  - Usando solo variables CSS del sistema de diseño (`--destructive`, `--muted-foreground`, `--primary`, etc.)
+
+- ✅ **Arquitectura FSD:**
+  - Mantenida separación estricta entre features
+  - `super-admin` y `admin-hr` tienen sus propios repositorios de invitaciones
+  - Lógica de negocio separada por contexto (SUPER_ADMIN vs ADMIN_HR)
+  - Consideración futura: compartir función pura `searchUserByRUTOrEmail` en `shared/lib/functions/`
+
+- ✅ **Calidad de Código:**
+  - `npm run lint` ✅ Sin errores
+  - `npm run build` ✅ Build exitoso
+  - Estructura consistente con arquitectura FSD
+  - Separación clara de responsabilidades
 
 ### ✅ Sesión del 10 de Enero 2026 - Reorganización de Estructura `lib/` según FSD
 
@@ -432,6 +579,13 @@
 - ✅ **Migración a Feature-Sliced Design (FSD):**
   - Arquitectura frontend moderna y escalable
   - Estructura: `app/`, `shared/`, `entities/`, `features/`, `widgets/`
+  - **Entities (`src/entities/`):** Entidades de negocio compartidas entre múltiples features
+    - `entities/user/` - Funciones de búsqueda y gestión de usuarios
+    - `entities/invitation/` - Repositorio completo de invitaciones (crear, aceptar, rechazar, eliminar)
+    - `entities/organization/` - Funciones de organización (límites, estadísticas)
+  - **Features (`src/features/`):** Lógica de negocio específica de cada feature
+    - Repositorios de features son wrappers que llaman a entities cuando es necesario
+    - Mantienen lógica específica de cada contexto (SUPER_ADMIN vs ADMIN_HR)
   - Public APIs con `index.ts` en cada slice
   - Server Actions en `features/*/api/`
   - Componentes UI en `features/*/ui/` y `widgets/`
@@ -857,6 +1011,18 @@ Organization {
 - ✅ **Data fetching:** En Server Components, pasar data como props
 - ✅ **Server Actions:** En `features/*/api/` con `'use server'`
 
+**Sistema de Colores y Temas:**
+
+- ✅ **Variables CSS Semánticas:** Usar `--primary`, `--destructive`, `--muted`, `--accent`, etc.
+- ✅ **Colores Hardcodeados Eliminados:** Ya no se usan `text-orange-600`, `text-red-600`, `bg-orange-100`
+  - Todos los colores se adaptan automáticamente a temas personalizados
+  - Reemplazados por variables semánticas: `text-destructive`, `text-muted-foreground`, `text-primary`
+- ✅ **Clases Tailwind Semánticas:** Usar `text-destructive`, `bg-primary`, `text-muted-foreground`, `bg-muted`
+- ✅ **Mapeo de Colores:**
+  - Warnings/Advertencias (orange) → `text-muted-foreground`, `bg-muted`
+  - Errores/Destructivos (red) → `text-destructive`, `bg-destructive/10`
+  - Éxito/Positivos (green) → `text-primary`, `bg-primary/10`
+
 ### Diálogos de Confirmación y AlertDialogs
 
 **Problema:** Uso de `window.confirm` y `window.prompt` rompe la consistencia de UI
@@ -891,10 +1057,21 @@ Organization {
 
 ### 3. Sistema de Gestión de Usuarios (ADMIN_HR)
 
+- [x] **Vista de Organización:** Página `/dashboard/admin-hr/organization` con estadísticas
+  - Muestra límites y usuarios activos por rol
+  - Invitaciones pendientes por tipo (jefes/staff)
+  - Estado de la organización
+- [x] **Base de Sistema de Invitaciones:** Repositorios y server actions implementados
+  - Búsqueda de usuarios por RUT o email
+  - Invitaciones para jefes (CHIEF_AREA) y staff (STAFF_HEALTH)
+  - Validación de límites por rol
+- [ ] **Página de Invitaciones:** `/dashboard/admin-hr/invitations` (UI completa)
+  - Formulario para invitar jefes y staff
+  - Tabla de invitaciones enviadas
+  - Historial de invitaciones
 - [ ] CRUD de usuarios dentro de una organización
 - [ ] Asignación de roles
-- [ ] Invitaciones por email
-- [ ] Códigos de vinculación
+- [ ] Códigos de vinculación (para jefes vincular staff)
 - [ ] Gestión de estados (activo, inactivo, suspendido)
 
 ### 4. Sistema de Áreas y Turnos (Core Business Logic)
@@ -3764,13 +3941,14 @@ vita/
 │   │   │   ├── payments/page.tsx        # Registrar pagos
 │   │   │   └── analytics/page.tsx       # Métricas globales
 │   │   │
-│   │   ├── hr/                          # Dashboard ADMIN_HR
+│   │   ├── admin-hr/                     # Dashboard ADMIN_HR
 │   │   │   ├── layout.tsx               # Layout con Sidebar
-│   │   │   ├── page.tsx                 # Resumen HR (/hr)
+│   │   │   ├── page.tsx                 # Resumen HR (/admin-hr)
+│   │   │   ├── organization/page.tsx    # Vista de organización y estadísticas
+│   │   │   ├── invitations/page.tsx     # Gestionar invitaciones (jefes/staff)
 │   │   │   ├── areas/page.tsx           # CRUD Áreas
 │   │   │   ├── shift-types/page.tsx     # CRUD Tipos de Turno
-│   │   │   ├── rates/page.tsx           # CRUD Tarifas
-│   │   │   └── chiefs/page.tsx          # Gestionar jefes y límites
+│   │   │   └── rates/page.tsx           # CRUD Tarifas
 │   │   │
 │   │   ├── chief/                       # Dashboard CHIEF_AREA
 │   │   │   ├── layout.tsx               # Layout con Sidebar

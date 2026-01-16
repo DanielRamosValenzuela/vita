@@ -60,6 +60,12 @@ export function getNavItems(t: (key: string) => string, userRole: Role): NavItem
       roles: [Role.ADMIN_HR],
     },
     {
+      href: '/dashboard/admin-hr/organization',
+      label: t('organization'),
+      icon: Building2,
+      roles: [Role.ADMIN_HR],
+    },
+    {
       href: '/dashboard/staff',
       label: t('staff'),
       icon: Users,

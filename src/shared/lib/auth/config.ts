@@ -107,6 +107,23 @@ export const authOptions: NextAuthOptions = {
         token.organizationId = user.organizationId
         token.country = user.country
         token.docNumber = user.docNumber
+      } else if (token.id) {
+        const currentUser = await prisma.user.findUnique({
+          where: { id: token.id as string },
+          select: {
+            role: true,
+            organizationId: true,
+            country: true,
+            docNumber: true,
+          },
+        })
+
+        if (currentUser) {
+          token.role = currentUser.role
+          token.organizationId = currentUser.organizationId || undefined
+          token.country = currentUser.country || undefined
+          token.docNumber = currentUser.docNumber || undefined
+        }
       }
       return token
     },

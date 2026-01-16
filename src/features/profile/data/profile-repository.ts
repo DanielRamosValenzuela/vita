@@ -3,6 +3,11 @@ import bcrypt from 'bcryptjs'
 
 import { prisma } from '@/src/shared/lib/auth/config'
 import type { ActionResult } from '@/src/shared/lib/types'
+import {
+  acceptInvitation as acceptInvitationEntity,
+  getPendingInvitationsForUser,
+  rejectInvitation as rejectInvitationEntity,
+} from '@/src/entities/invitation'
 
 export async function updateUserProfile(
   userId: string,
@@ -132,115 +137,15 @@ export async function updateUserDocument(
 }
 
 export async function getPendingInvitations(userId: string) {
-  return await prisma.organizationInvitation.findMany({
-    where: {
-      userId,
-      status: 'PENDING',
-    },
-    include: {
-      organization: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
-    },
-    orderBy: {
-      createdAt: 'desc',
-    },
-  })
+  return await getPendingInvitationsForUser(userId)
 }
 
-export async function acceptInvitation(
-  invitationId: string,
-  userId: string
-): Promise<ActionResult<unknown>> {
-  try {
-    const invitation = await prisma.organizationInvitation.findUnique({
-      where: { id: invitationId },
-    })
-
-    if (!invitation) {
-      return { success: false, error: 'Invitación no encontrada' }
-    }
-
-    if (invitation.userId !== userId) {
-      return { success: false, error: 'No tienes permiso para aceptar esta invitación' }
-    }
-
-    if (invitation.status !== 'PENDING') {
-      return { success: false, error: 'Esta invitación ya fue procesada' }
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { docNumber: true, country: true },
-    })
-
-    if (!user?.docNumber || !user?.country) {
-      return {
-        success: false,
-        error: 'Debes completar tu número de documento antes de aceptar la invitación',
-      }
-    }
-
-    await prisma.$transaction([
-      prisma.user.update({
-        where: { id: userId },
-        data: {
-          role: invitation.role,
-          organizationId: invitation.organizationId,
-        },
-      }),
-      prisma.organizationInvitation.update({
-        where: { id: invitationId },
-        data: {
-          status: 'ACCEPTED',
-          acceptedAt: new Date(),
-        },
-      }),
-    ])
-
-    return { success: true }
-  } catch (error) {
-    console.error('[acceptInvitation] Error:', error)
-    return { success: false, error: 'Error al aceptar la invitación' }
-  }
+export async function acceptInvitation(invitationId: string, userId: string) {
+  return await acceptInvitationEntity(invitationId, userId)
 }
 
-export async function rejectInvitation(
-  invitationId: string,
-  userId: string
-): Promise<ActionResult<unknown>> {
-  try {
-    const invitation = await prisma.organizationInvitation.findUnique({
-      where: { id: invitationId },
-    })
-
-    if (!invitation) {
-      return { success: false, error: 'Invitación no encontrada' }
-    }
-
-    if (invitation.userId !== userId) {
-      return { success: false, error: 'No tienes permiso para rechazar esta invitación' }
-    }
-
-    if (invitation.status !== 'PENDING') {
-      return { success: false, error: 'Esta invitación ya fue procesada' }
-    }
-
-    await prisma.organizationInvitation.update({
-      where: { id: invitationId },
-      data: {
-        status: 'REJECTED',
-      },
-    })
-
-    return { success: true }
-  } catch (error) {
-    console.error('[rejectInvitation] Error:', error)
-    return { success: false, error: 'Error al rechazar la invitación' }
-  }
+export async function rejectInvitation(invitationId: string, userId: string) {
+  return await rejectInvitationEntity(invitationId, userId)
 }
 
 export async function getUserOrganizations(userId: string) {

@@ -37,16 +37,16 @@ export function StatsCards({ data }: StatsCardsProps) {
       value: data.activeOrgs,
       subtitle: 'De todas las organizaciones',
       icon: CheckCircle2,
-      color: 'text-green-600 dark:text-green-400',
-      bg: 'bg-green-100 dark:bg-green-900/20',
+      color: 'text-primary',
+      bg: 'bg-primary/10',
     },
     {
       title: t('suspendedOrgs'),
       value: data.suspendedOrgs,
       subtitle: 'Requieren atención',
       icon: AlertTriangle,
-      color: 'text-red-600 dark:text-red-400',
-      bg: 'bg-red-100 dark:bg-red-900/20',
+      color: 'text-destructive',
+      bg: 'bg-destructive/10',
     },
     {
       title: t('monthlyRevenue'),
@@ -69,8 +69,8 @@ export function StatsCards({ data }: StatsCardsProps) {
       value: data.upcomingPayments,
       subtitle: data.upcomingPaymentsDays,
       icon: Clock,
-      color: 'text-orange-600 dark:text-orange-400',
-      bg: 'bg-orange-100 dark:bg-orange-900/20',
+      color: 'text-muted-foreground',
+      bg: 'bg-muted',
     },
   ]
 

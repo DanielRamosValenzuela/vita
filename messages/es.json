@@ -8,7 +8,11 @@
     "loading": "Cargando...",
     "error": "Error",
     "success": "Éxito",
-    "logout": "Cerrar Sesión"
+    "logout": "Cerrar Sesión",
+    "languages": {
+      "es": "Español",
+      "en": "Inglés"
+    }
   },
   "nav": {
     "login": "Iniciar Sesión",
@@ -96,6 +100,8 @@
     "passwordLowercase": "Al menos 1 minúscula",
     "passwordNumber": "Al menos 1 número",
     "taxIdInvalid": "El {label} ingresado no es válido",
+    "emailExists": "Este email ya está registrado",
+    "documentExists": "Este documento ya está registrado",
     "unknownError": "Error desconocido",
     "unexpectedError": "Error inesperado",
     "signInError": "Error al iniciar sesión",
@@ -143,6 +149,8 @@
   },
   "dashboard": {
     "dashboard": "Panel de Control",
+    "organization": "Mi Organización",
+    "invitations": "Invitaciones",
     "calendar": "Calendario",
     "organizations": "Organizaciones",
     "payments": "Pagos",
@@ -555,14 +563,24 @@
           "email": "Email",
           "status": "Estado",
           "invitedAt": "Fecha de Invitación",
-          "acceptedAt": "Fecha de Aceptación"
+          "acceptedAt": "Fecha de Aceptación",
+          "actions": "Acciones"
         },
         "statuses": {
           "PENDING": "Pendiente",
           "ACCEPTED": "Aceptada",
           "REJECTED": "Rechazada",
           "EXPIRED": "Expirada"
-        }
+        },
+        "cancel": "Cancelar",
+        "cancelConfirm": {
+          "title": "Cancelar Invitación",
+          "description": "¿Estás seguro de que deseas cancelar la invitación para {name}? Esta acción no se puede deshacer.",
+          "confirm": "Sí, cancelar",
+          "cancel": "No, mantener"
+        },
+        "cancelSuccess": "Invitación cancelada exitosamente",
+        "cancelError": "Error al cancelar la invitación"
       }
     },
     "deleteOrganization": {
@@ -691,6 +709,134 @@
     "dashboard": {
       "title": "Panel de Control",
       "description": "Bienvenido al panel de administración de recursos humanos"
+    },
+    "organization": {
+      "title": "Mi Organización",
+      "description": "Información y estadísticas de tu organización",
+      "noOrganization": "No tienes una organización asignada",
+      "organizationNotFound": "Organización no encontrada",
+      "organizationInfo": "Información de la organización",
+      "pending": "pendientes",
+      "statuses": {
+        "ACTIVE": "Activa",
+        "SUSPENDED": "Suspendida",
+        "PENDING_PAYMENT": "Pago Pendiente",
+        "INACTIVE": "Inactiva"
+      },
+      "stats": {
+        "adminHR": {
+          "title": "Administradores RRHH",
+          "description": "Administradores activos en la organización"
+        },
+        "chiefs": {
+          "title": "Jefes de Área",
+          "description": "Jefes de área activos"
+        },
+        "staff": {
+          "title": "Personal de Salud",
+          "description": "Personal de salud activo"
+        }
+      },
+      "chiefs": {
+        "title": "Jefes de Área",
+        "description": "Gestiona los jefes de área de tu organización ({current} / {max})",
+        "invite": "Invitar Jefe",
+        "limitReached": "Has alcanzado el límite de jefes de área permitidos",
+        "empty": "No hay jefes de área registrados",
+        "inviteFirst": "Invitar primer jefe",
+        "inviteForm": {
+          "title": "Invitar Jefe de Área",
+          "description": "Busca un usuario por email o documento para invitarlo como jefe de área"
+        },
+        "table": {
+          "name": "Nombre",
+          "email": "Email",
+          "createdAt": "Fecha de Registro"
+        }
+      },
+      "staff": {
+        "title": "Personal de Salud",
+        "description": "Gestiona el personal de salud de tu organización ({current} / {max})",
+        "invite": "Invitar Personal",
+        "limitReached": "Has alcanzado el límite de personal de salud permitido",
+        "empty": "No hay personal de salud registrado",
+        "inviteFirst": "Invitar primer personal",
+        "inviteForm": {
+          "title": "Invitar Personal de Salud",
+          "description": "Busca un usuario por email o documento para invitarlo como personal de salud"
+        },
+        "table": {
+          "name": "Nombre",
+          "email": "Email",
+          "createdAt": "Fecha de Registro"
+        }
+      }
+    },
+    "invitations": {
+      "title": "Invitaciones",
+      "description": "Gestiona las invitaciones para jefes y personal",
+      "noOrganization": "No tienes una organización asignada",
+      "empty": "No hay invitaciones",
+      "inviteForm": {
+        "title": "Invitar Usuario",
+        "roleLabel": "Rol a Invitar",
+        "roleChief": "Jefe de Área",
+        "roleStaff": "Personal de Salud",
+        "emailLabel": "Email",
+        "emailPlaceholder": "ejemplo@email.com",
+        "emailInvalid": "Email inválido",
+        "or": "O",
+        "searchRequired": "Debes ingresar un email o documento",
+        "searchError": "Error al buscar usuario",
+        "searching": "Buscando...",
+        "searchButton": "Buscar Usuario",
+        "userFound": "Usuario Encontrado",
+        "userFoundDescription": "Revisa la información del usuario antes de enviar la invitación",
+        "name": "Nombre",
+        "email": "Email",
+        "currentRole": "Rol Actual",
+        "docNumber": "Número de Documento",
+        "noDocNumberWarning": "Este usuario no tiene número de documento registrado",
+        "inOtherOrg": "Este usuario pertenece a otra organización: {orgName}",
+        "inviteWithoutDoc": "Puedes invitar al usuario aunque no tenga documento. Deberá completarlo antes de aceptar la invitación.",
+        "cancel": "Cancelar",
+        "inviting": "Enviando...",
+        "sendInvitation": "Enviar Invitación",
+        "inviteSuccess": "Invitación enviada exitosamente",
+        "inviteError": "Error al enviar la invitación",
+        "docInvalid": "Documento inválido"
+      },
+      "table": {
+        "title": "Historial de Invitaciones",
+        "description": "Lista de todas las invitaciones enviadas",
+        "empty": "No hay invitaciones registradas",
+        "cancel": "Cancelar",
+        "cancelSuccess": "Invitación cancelada exitosamente",
+        "cancelError": "Error al cancelar la invitación",
+        "roleChief": "Jefe de Área",
+        "roleStaff": "Personal de Salud",
+        "columns": {
+          "user": "Usuario",
+          "email": "Email",
+          "role": "Rol",
+          "status": "Estado",
+          "invitedAt": "Fecha de Invitación",
+          "acceptedAt": "Fecha de Aceptación",
+          "actions": "Acciones"
+        },
+        "statuses": {
+          "PENDING": "Pendiente",
+          "ACCEPTED": "Aceptada",
+          "REJECTED": "Rechazada",
+          "EXPIRED": "Expirada"
+        },
+        "cancelConfirm": {
+          "title": "¿Cancelar Invitación?",
+          "description": "¿Estás seguro de que deseas cancelar la invitación para {name}? Esta acción no se puede deshacer.",
+          "cancel": "No, mantener",
+          "confirm": "Sí, cancelar"
+        }
+      }
     },
     "areas": {
       "title": "Gestión de Áreas",

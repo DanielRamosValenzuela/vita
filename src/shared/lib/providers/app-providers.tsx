@@ -2,6 +2,9 @@
 
 import { SessionProvider } from 'next-auth/react'
 import { ThemeProvider as NextThemesProvider } from 'next-themes'
+import { Toaster } from 'sonner'
+
+import { NavigationProgress } from '@/src/shared/ui/atoms'
 
 import { CustomThemeProvider } from './custom-theme-provider'
 
@@ -15,10 +18,14 @@ export function AppProviders({ children }: AppProvidersProps) {
       attribute="class"
       defaultTheme="system"
       enableSystem
-      disableTransitionOnChange
+      disableTransitionOnChange={false}
     >
       <CustomThemeProvider>
-        <SessionProvider>{children}</SessionProvider>
+        <SessionProvider>
+          <NavigationProgress />
+          <Toaster position="top-right" richColors closeButton />
+          {children}
+        </SessionProvider>
       </CustomThemeProvider>
     </NextThemesProvider>
   )

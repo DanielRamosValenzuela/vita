@@ -1,6 +1,7 @@
 'use server'
 
-import { Country, DocType } from '@prisma/client'
+import { Country, DocType, Prisma } from '@prisma/client'
+import { getTranslations } from 'next-intl/server'
 
 import { formatZodErrors } from '@/src/shared/lib/utils'
 
@@ -15,9 +16,11 @@ import { getLoginSchema, getRegisterSchema } from '../lib/schemas'
 import type { ActionResult, RegisterData } from '../lib/types'
 
 export async function registerAction(formData: FormData): Promise<ActionResult<RegisterData>> {
+  const locale = (formData.get('locale') as string) || 'es'
+
   try {
-    const locale = (formData.get('locale') as string) || 'es'
     const registerSchema = await getRegisterSchema(locale)
+    const t = await getTranslations({ locale, namespace: 'auth' })
 
     const rawData = {
       name: formData.get('name') as string,
@@ -34,7 +37,7 @@ export async function registerAction(formData: FormData): Promise<ActionResult<R
     if (!validationResult.success) {
       return {
         success: false,
-        error: 'Error de validación',
+        error: t('validationError'),
         fieldErrors: formatZodErrors(validationResult.error),
       }
     }
@@ -44,9 +47,9 @@ export async function registerAction(formData: FormData): Promise<ActionResult<R
     if (await checkEmailExists(data.email)) {
       return {
         success: false,
-        error: 'Este email ya está registrado',
+        error: t('emailExists'),
         fieldErrors: {
-          email: ['Este email ya está registrado'],
+          email: [t('emailExists')],
         },
       }
     }
@@ -55,9 +58,9 @@ export async function registerAction(formData: FormData): Promise<ActionResult<R
     if (await checkDocExists(data.country, data.docType, cleanDocNumber)) {
       return {
         success: false,
-        error: 'Este documento ya está registrado',
+        error: t('documentExists'),
         fieldErrors: {
-          docNumber: ['Este documento ya está registrado'],
+          docNumber: [t('documentExists')],
         },
       }
     }
@@ -70,9 +73,38 @@ export async function registerAction(formData: FormData): Promise<ActionResult<R
     }
   } catch (error) {
     console.error('Error en registerAction:', error)
+
+    const t = await getTranslations({ locale, namespace: 'auth' })
+
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === 'P2002') {
+        const target = error.meta?.target as string[] | undefined
+
+        if (target?.includes('email')) {
+          return {
+            success: false,
+            error: t('emailExists'),
+            fieldErrors: {
+              email: [t('emailExists')],
+            },
+          }
+        }
+
+        if (target?.includes('docNumber') || target?.includes('country')) {
+          return {
+            success: false,
+            error: t('documentExists'),
+            fieldErrors: {
+              docNumber: [t('documentExists')],
+            },
+          }
+        }
+      }
+    }
+
     return {
       success: false,
-      error: 'Error al registrar usuario. Por favor, intenta nuevamente.',
+      error: t('unexpectedError'),
     }
   }
 }

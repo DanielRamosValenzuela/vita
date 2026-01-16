@@ -4,10 +4,11 @@ import { useLayoutEffect, useState } from 'react'
 import { useTheme } from 'next-themes'
 import { Moon, Sun } from 'lucide-react'
 
-import { Button } from '@/src/shared/ui/button'
+import { Switch } from '@/src/shared/ui/switch'
+import { cn } from '@/src/shared/lib/utils/cn'
 
 export function ThemeToggle() {
-  const { theme, setTheme, resolvedTheme } = useTheme()
+  const { setTheme, resolvedTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
 
   useLayoutEffect(() => {
@@ -16,33 +17,36 @@ export function ThemeToggle() {
 
   if (!mounted) {
     return (
-      <Button
-        variant="ghost"
-        size="icon"
-        className="h-9 w-9 cursor-pointer"
-        aria-label="Toggle theme"
-        suppressHydrationWarning
-      >
-        <span className="h-4 w-4" suppressHydrationWarning />
-        <span className="sr-only">Toggle theme</span>
-      </Button>
+      <div className="flex items-center gap-2" suppressHydrationWarning>
+        <Sun className="h-4 w-4 opacity-50" suppressHydrationWarning />
+        <Switch checked={false} disabled suppressHydrationWarning />
+        <Moon className="h-4 w-4 opacity-50" suppressHydrationWarning />
+      </div>
     )
   }
 
+  const isDark = resolvedTheme === 'dark'
+
   return (
-    <Button
-      variant="ghost"
-      size="icon"
-      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-      className="h-9 w-9 cursor-pointer"
-      aria-label="Toggle theme"
-    >
-      {resolvedTheme === 'dark' ? (
-        <Sun className="h-4 w-4 transition-all" />
-      ) : (
-        <Moon className="h-4 w-4 transition-all" />
-      )}
-      <span className="sr-only">Toggle theme</span>
-    </Button>
+    <div className="flex items-center gap-2">
+      <Sun
+        className={cn(
+          'h-4 w-4 transition-all duration-300',
+          isDark ? 'opacity-40 scale-90' : 'opacity-100 scale-100 text-yellow-500'
+        )}
+      />
+      <Switch
+        checked={isDark}
+        onCheckedChange={(checked) => setTheme(checked ? 'dark' : 'light')}
+        aria-label="Toggle theme"
+        className="transition-all duration-300"
+      />
+      <Moon
+        className={cn(
+          'h-4 w-4 transition-all duration-300',
+          isDark ? 'opacity-100 scale-100 text-blue-400' : 'opacity-40 scale-90'
+        )}
+      />
+    </div>
   )
 }

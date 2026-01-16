@@ -2,7 +2,8 @@
 
 import { useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
-import type { Organization } from '@prisma/client'
+import { useRouter } from 'next/navigation'
+import type { Country, Role } from '@prisma/client'
 import { AlertCircle, CheckCircle2, Loader2, Mail, Search, User } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -13,13 +14,13 @@ import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
 import { Input } from '@/src/shared/ui/input'
 import { Label } from '@/src/shared/ui/label'
-
-import { inviteAdminHRAction, searchUserAction } from '../api/admin-hr-invitation-actions'
-
-interface InviteAdminHRFormProps {
-  organization: Organization
-  onSuccess?: () => void
-}
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/src/shared/ui/select'
 
 interface FoundUser {
   id: string
@@ -36,24 +37,47 @@ interface FoundUser {
   } | null
 }
 
+type ActionContext = 'admin-hr' | 'super-admin'
+
+interface InviteUserFormProps {
+  organizationId: string
+  organizationCountry: Country
+  translationNamespace: string
+  actionContext: ActionContext
+  allowedRoles?: Array<{ value: Role; label: string }>
+  defaultRole?: Role
+  onSuccess?: () => void
+}
+
 const validateEmail = (email: string): boolean => {
   if (!email.trim()) return false
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   return emailRegex.test(email.trim())
 }
 
-export function InviteAdminHRForm({ organization, onSuccess }: InviteAdminHRFormProps) {
-  const t = useTranslations('superAdmin.organizationDetails.adminHR.inviteForm')
+export function InviteUserForm({
+  organizationId,
+  organizationCountry,
+  translationNamespace,
+  actionContext,
+  allowedRoles,
+  defaultRole,
+  onSuccess,
+}: InviteUserFormProps) {
+  const t = useTranslations(translationNamespace)
+  const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [isSearching, setIsSearching] = useState(false)
+  const [selectedRole, setSelectedRole] = useState<Role | undefined>(defaultRole)
   const [emailValue, setEmailValue] = useState('')
   const [docValue, setDocValue] = useState('')
   const [foundUser, setFoundUser] = useState<FoundUser | null>(null)
   const [error, setError] = useState<string | null>(null)
 
-  const taxIdConfig = getTaxIdConfig(organization.country)
+
+  const taxIdConfig = getTaxIdConfig(organizationCountry)
   const isValidEmail = emailValue.trim() ? validateEmail(emailValue) : false
-  const isValidDoc = docValue.trim() ? validateTaxId(docValue, organization.country) : false
+  const isValidDoc = docValue.trim() ? validateTaxId(docValue, organizationCountry) : false
   const canSearch = isValidEmail || isValidDoc
 
   const handleEmailChange = (value: string) => {
@@ -64,7 +88,7 @@ export function InviteAdminHRForm({ organization, onSuccess }: InviteAdminHRForm
   }
 
   const handleDocChange = (value: string) => {
-    const formatted = formatTaxId(value, organization.country)
+    const formatted = formatTaxId(value, organizationCountry)
     setDocValue(formatted)
     setEmailValue('')
     setFoundUser(null)
@@ -84,7 +108,11 @@ export function InviteAdminHRForm({ organization, onSuccess }: InviteAdminHRForm
     setFoundUser(null)
 
     startTransition(async () => {
-      const result = await searchUserAction(searchTerm, organization.country)
+      const actions =
+        actionContext === 'admin-hr'
+          ? await import('@/src/features/admin-hr/api/invitation-actions')
+          : await import('@/src/features/super-admin/api/admin-hr-invitation-actions')
+      const result = await actions.searchUserAction(searchTerm, organizationCountry)
 
       setIsSearching(false)
 
@@ -99,9 +127,26 @@ export function InviteAdminHRForm({ organization, onSuccess }: InviteAdminHRForm
 
   const handleInvite = () => {
     if (!foundUser) return
+    if (allowedRoles && allowedRoles.length > 0 && !selectedRole) {
+      setError(t('roleRequired') || 'Debes seleccionar un rol')
+      return
+    }
 
     startTransition(async () => {
-      const result = await inviteAdminHRAction(organization.id, foundUser.id)
+      let result
+      if (actionContext === 'admin-hr') {
+        const actions = await import('@/src/features/admin-hr/api/invitation-actions')
+        if (selectedRole === 'CHIEF_AREA') {
+          result = await actions.inviteChiefAction(organizationId, foundUser.id)
+        } else if (selectedRole === 'STAFF_HEALTH') {
+          result = await actions.inviteStaffAction(organizationId, foundUser.id)
+        } else {
+          throw new Error('Rol no válido')
+        }
+      } else {
+        const actions = await import('@/src/features/super-admin/api/admin-hr-invitation-actions')
+        result = await actions.inviteAdminHRAction(organizationId, foundUser.id)
+      }
 
       if (result.success) {
         toast.success(t('inviteSuccess'))
@@ -109,6 +154,7 @@ export function InviteAdminHRForm({ organization, onSuccess }: InviteAdminHRForm
         setDocValue('')
         setFoundUser(null)
         setError(null)
+        router.refresh()
         if (onSuccess) {
           onSuccess()
         }
@@ -120,12 +166,39 @@ export function InviteAdminHRForm({ organization, onSuccess }: InviteAdminHRForm
   }
 
   const hasDocNumber = foundUser?.docNumber !== null && foundUser?.docNumber !== undefined
-  const isAlreadyAdminHR = foundUser?.role === 'ADMIN_HR'
-  const isInOtherOrg = foundUser?.organizationId && foundUser.organizationId !== organization.id
+  const isAlreadyInRole =
+    foundUser?.role === selectedRole && foundUser?.organizationId === organizationId
+  const isInOtherOrg = foundUser?.organizationId && foundUser.organizationId !== organizationId
 
   return (
     <div className="space-y-4">
       <div className="space-y-4">
+        {allowedRoles && allowedRoles.length > 0 && (
+          <div className="space-y-2">
+            <Label htmlFor="role">{t('roleLabel')}</Label>
+            <Select
+              value={selectedRole}
+              onValueChange={(value) => {
+                setSelectedRole(value as Role)
+                setFoundUser(null)
+                setError(null)
+              }}
+              disabled={isPending || isSearching}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {allowedRoles.map((role) => (
+                  <SelectItem key={role.value} value={role.value}>
+                    {role.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+
         <div className="space-y-2">
           <Label htmlFor="email">{t('emailLabel')}</Label>
           <div className="relative">
@@ -272,7 +345,7 @@ export function InviteAdminHRForm({ organization, onSuccess }: InviteAdminHRForm
               >
                 {t('cancel')}
               </Button>
-              <Button onClick={handleInvite} disabled={isPending || isAlreadyAdminHR}>
+              <Button onClick={handleInvite} disabled={isPending || isAlreadyInRole}>
                 {isPending ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />

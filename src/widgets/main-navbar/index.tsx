@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { Menu, User } from 'lucide-react'
+import { Menu } from 'lucide-react'
 
 import { LanguageSelector, Logo, ThemeSelector, ThemeToggle } from '@/src/shared/ui/atoms'
 import { Button } from '@/src/shared/ui/button'
@@ -74,8 +74,8 @@ export function MainNavbar() {
                       />
                     </div>
                   ) : (
-                    <div className="bg-primary/10 ring-primary/20 flex h-9 w-9 items-center justify-center rounded-full ring-2">
-                      <User className="text-primary h-5 w-5" />
+                    <div className="bg-primary text-primary-foreground flex h-9 w-9 items-center justify-center rounded-full">
+                      {session.user?.name?.charAt(0).toUpperCase() || 'U'}
                     </div>
                   )}
                 </Button>

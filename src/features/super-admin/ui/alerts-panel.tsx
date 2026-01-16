@@ -22,22 +22,22 @@ export function AlertsPanel({ data }: AlertsPanelProps) {
   const alerts = [
     {
       icon: Clock,
-      color: 'text-orange-600 dark:text-orange-400',
-      bg: 'bg-orange-100 dark:bg-orange-900/20',
+      color: 'text-muted-foreground',
+      bg: 'bg-muted',
       text: data.upcomingPaymentsText,
       show: data.showUpcoming,
     },
     {
       icon: AlertTriangle,
-      color: 'text-red-600 dark:text-red-400',
-      bg: 'bg-red-100 dark:bg-red-900/20',
+      color: 'text-destructive',
+      bg: 'bg-destructive/10',
       text: data.suspendedText,
       show: data.showSuspended,
     },
     {
       icon: CheckCircle,
-      color: 'text-green-600 dark:text-green-400',
-      bg: 'bg-green-100 dark:bg-green-900/20',
+      color: 'text-primary',
+      bg: 'bg-primary/10',
       text: data.paymentsTodayText,
       show: data.showToday,
     },

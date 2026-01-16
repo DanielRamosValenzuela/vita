@@ -8,7 +8,11 @@
     "loading": "Loading...",
     "error": "Error",
     "success": "Success",
-    "logout": "Sign Out"
+    "logout": "Sign Out",
+    "languages": {
+      "es": "Spanish",
+      "en": "English"
+    }
   },
   "nav": {
     "login": "Sign In",
@@ -96,6 +100,8 @@
     "passwordLowercase": "At least 1 lowercase letter",
     "passwordNumber": "At least 1 number",
     "taxIdInvalid": "The {label} entered is not valid",
+    "emailExists": "This email is already registered",
+    "documentExists": "This document is already registered",
     "unknownError": "Unknown error",
     "unexpectedError": "Unexpected error",
     "signInError": "Error signing in",
@@ -143,6 +149,8 @@
   },
   "dashboard": {
     "dashboard": "Dashboard",
+    "organization": "My Organization",
+    "invitations": "Invitations",
     "calendar": "Calendar",
     "organizations": "Organizations",
     "payments": "Payments",
@@ -599,14 +607,24 @@
           "email": "Email",
           "status": "Status",
           "invitedAt": "Invited At",
-          "acceptedAt": "Accepted At"
+          "acceptedAt": "Accepted At",
+          "actions": "Actions"
         },
         "statuses": {
           "PENDING": "Pending",
           "ACCEPTED": "Accepted",
           "REJECTED": "Rejected",
           "EXPIRED": "Expired"
-        }
+        },
+        "cancel": "Cancel",
+        "cancelConfirm": {
+          "title": "Cancel Invitation",
+          "description": "Are you sure you want to cancel the invitation for {name}? This action cannot be undone.",
+          "confirm": "Yes, cancel",
+          "cancel": "No, keep it"
+        },
+        "cancelSuccess": "Invitation cancelled successfully",
+        "cancelError": "Error cancelling invitation"
       }
     },
     "deleteOrganization": {
@@ -715,6 +733,134 @@
     "dashboard": {
       "title": "Control Panel",
       "description": "Welcome to the human resources administration panel"
+    },
+    "organization": {
+      "title": "My Organization",
+      "description": "Information and statistics of your organization",
+      "noOrganization": "You don't have an organization assigned",
+      "organizationNotFound": "Organization not found",
+      "organizationInfo": "Organization information",
+      "pending": "pending",
+      "statuses": {
+        "ACTIVE": "Active",
+        "SUSPENDED": "Suspended",
+        "PENDING_PAYMENT": "Payment Pending",
+        "INACTIVE": "Inactive"
+      },
+      "stats": {
+        "adminHR": {
+          "title": "HR Administrators",
+          "description": "Active administrators in the organization"
+        },
+        "chiefs": {
+          "title": "Area Chiefs",
+          "description": "Active area chiefs"
+        },
+        "staff": {
+          "title": "Health Staff",
+          "description": "Active health staff"
+        }
+      },
+      "chiefs": {
+        "title": "Area Chiefs",
+        "description": "Manage the area chiefs of your organization ({current} / {max})",
+        "invite": "Invite Chief",
+        "limitReached": "You have reached the limit of allowed area chiefs",
+        "empty": "No area chiefs registered",
+        "inviteFirst": "Invite first chief",
+        "inviteForm": {
+          "title": "Invite Area Chief",
+          "description": "Search for a user by email or document to invite them as an area chief"
+        },
+        "table": {
+          "name": "Name",
+          "email": "Email",
+          "createdAt": "Registration Date"
+        }
+      },
+      "staff": {
+        "title": "Health Staff",
+        "description": "Manage the health staff of your organization ({current} / {max})",
+        "invite": "Invite Staff",
+        "limitReached": "You have reached the limit of allowed health staff",
+        "empty": "No health staff registered",
+        "inviteFirst": "Invite first staff",
+        "inviteForm": {
+          "title": "Invite Health Staff",
+          "description": "Search for a user by email or document to invite them as health staff"
+        },
+        "table": {
+          "name": "Name",
+          "email": "Email",
+          "createdAt": "Registration Date"
+        }
+      }
+    },
+    "invitations": {
+      "title": "Invitations",
+      "description": "Manage invitations for chiefs and staff",
+      "noOrganization": "You don't have an organization assigned",
+      "empty": "No invitations",
+      "inviteForm": {
+        "title": "Invite User",
+        "roleLabel": "Role to Invite",
+        "roleChief": "Area Chief",
+        "roleStaff": "Health Staff",
+        "emailLabel": "Email",
+        "emailPlaceholder": "example@email.com",
+        "emailInvalid": "Invalid email",
+        "or": "Or",
+        "searchRequired": "You must enter an email or document",
+        "searchError": "Error searching for user",
+        "searching": "Searching...",
+        "searchButton": "Search User",
+        "userFound": "User Found",
+        "userFoundDescription": "Review the user information before sending the invitation",
+        "name": "Name",
+        "email": "Email",
+        "currentRole": "Current Role",
+        "docNumber": "Document Number",
+        "noDocNumberWarning": "This user does not have a registered document number",
+        "inOtherOrg": "This user belongs to another organization: {orgName}",
+        "inviteWithoutDoc": "You can invite the user even without a document. They will need to complete it before accepting the invitation.",
+        "cancel": "Cancel",
+        "inviting": "Sending...",
+        "sendInvitation": "Send Invitation",
+        "inviteSuccess": "Invitation sent successfully",
+        "inviteError": "Error sending invitation",
+        "docInvalid": "Invalid document"
+      },
+      "table": {
+        "title": "Invitation History",
+        "description": "List of all sent invitations",
+        "empty": "No invitations registered",
+        "cancel": "Cancel",
+        "cancelSuccess": "Invitation cancelled successfully",
+        "cancelError": "Error cancelling invitation",
+        "roleChief": "Area Chief",
+        "roleStaff": "Health Staff",
+        "columns": {
+          "user": "User",
+          "email": "Email",
+          "role": "Role",
+          "status": "Status",
+          "invitedAt": "Invitation Date",
+          "acceptedAt": "Acceptance Date",
+          "actions": "Actions"
+        },
+        "statuses": {
+          "PENDING": "Pending",
+          "ACCEPTED": "Accepted",
+          "REJECTED": "Rejected",
+          "EXPIRED": "Expired"
+        },
+        "cancelConfirm": {
+          "title": "Cancel Invitation?",
+          "description": "Are you sure you want to cancel the invitation for {name}? This action cannot be undone.",
+          "cancel": "No, keep",
+          "confirm": "Yes, cancel"
+        }
+      }
     },
     "areas": {
       "title": "Area Management",

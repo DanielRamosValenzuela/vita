@@ -19,7 +19,7 @@ import {
   TableRow,
 } from '@/src/shared/ui/table'
 import { getOrganizationById } from '@/src/features/super-admin/data/organization-repository'
-import { InvitationsTable } from '@/src/features/super-admin/ui/invitations-table'
+import { InvitationsTable } from '@/src/widgets/invitations'
 import { OrganizationAdminHRSection } from '@/src/features/super-admin/ui/organization-admin-hr-section'
 
 import { Link } from '@/i18n/navigation'
@@ -213,7 +213,12 @@ const OrganizationDetailsPage = async ({ params }: PageProps) => {
         maxLimit={organization.maxAdminHR}
       />
 
-      <InvitationsTable invitations={organization.invitations || []} />
+      <InvitationsTable
+        invitations={organization.invitations || []}
+        translationNamespace="superAdmin.organizationDetails.invitations"
+        actionContext="super-admin"
+        showRoleColumn={false}
+      />
 
       <Card>
         <CardHeader>

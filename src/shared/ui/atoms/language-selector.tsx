@@ -1,6 +1,7 @@
 'use client'
 
 import { useParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { Globe } from 'lucide-react'
 
 import { Button } from '@/src/shared/ui/button'
@@ -17,15 +18,11 @@ import { routing } from '@/i18n/routing'
 const locales = routing.locales
 type Locale = (typeof locales)[number]
 
-const localeNames: Record<Locale, string> = {
-  es: 'Español',
-  en: 'English',
-}
-
 export function LanguageSelector() {
   const params = useParams()
   const pathname = usePathname()
   const router = useRouter()
+  const t = useTranslations('common.languages')
   const currentLocale = (params?.locale as Locale) || routing.defaultLocale
 
   const handleLocaleChange = (newLocale: Locale) => {
@@ -53,7 +50,7 @@ export function LanguageSelector() {
             onClick={() => handleLocaleChange(locale)}
             className={currentLocale === locale ? 'bg-accent' : ''}
           >
-            {localeNames[locale]}
+            {t(locale)}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

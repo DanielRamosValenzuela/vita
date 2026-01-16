@@ -365,11 +365,11 @@ export function OrganizationsTableClient({
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="h-8 w-8 p-0 hover:bg-orange-50 hover:text-orange-600 dark:hover:bg-orange-950 dark:hover:text-orange-400"
+                                className="h-8 w-8 p-0 hover:bg-muted hover:text-muted-foreground"
                                 onClick={() => handleSuspend(org.id, org.name)}
                               >
                                 <span className="sr-only">{t('actions.suspend')}</span>
-                                <Ban className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+                                <Ban className="h-4 w-4 text-muted-foreground" />
                               </Button>
                             </TooltipTrigger>
                             <TooltipContent>
@@ -385,11 +385,11 @@ export function OrganizationsTableClient({
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="h-8 w-8 p-0 hover:bg-green-50 hover:text-green-600 dark:hover:bg-green-950 dark:hover:text-green-400"
+                                className="h-8 w-8 p-0 hover:bg-primary/10 hover:text-primary"
                                 onClick={() => handleReactivate(org.id, org.name)}
                               >
                                 <span className="sr-only">{t('actions.reactivate')}</span>
-                                <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+                                <CheckCircle className="h-4 w-4 text-primary" />
                               </Button>
                             </TooltipTrigger>
                             <TooltipContent>
@@ -446,7 +446,7 @@ export function OrganizationsTableClient({
                             <DropdownMenuSeparator />
                             {org.status === 'ACTIVE' && (
                               <DropdownMenuItem
-                                className="cursor-pointer text-orange-600"
+                                className="cursor-pointer text-muted-foreground"
                                 onClick={() => handleSuspend(org.id, org.name)}
                               >
                                 <Ban className="mr-2 h-4 w-4" />
@@ -457,7 +457,7 @@ export function OrganizationsTableClient({
                               org.status === 'PENDING_PAYMENT' ||
                               org.status === 'INACTIVE') && (
                               <DropdownMenuItem
-                                className="cursor-pointer text-green-600"
+                                className="cursor-pointer text-primary"
                                 onClick={() => handleReactivate(org.id, org.name)}
                               >
                                 <CheckCircle className="mr-2 h-4 w-4" />
@@ -548,7 +548,7 @@ export function OrganizationsTableClient({
             <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmSuspend}
-              className="bg-orange-600 hover:bg-orange-700"
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {t('actions.suspend')}
             </AlertDialogAction>
@@ -571,7 +571,7 @@ export function OrganizationsTableClient({
             <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmReactivate}
-              className="bg-green-600 hover:bg-green-700"
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
             >
               {t('actions.reactivate')}
             </AlertDialogAction>

@@ -25,7 +25,7 @@ export default function GlobalError({
   }, [error])
 
   return (
-    <html>
+    <html lang="en">
       <body>
         <div className="bg-background flex min-h-screen items-center justify-center p-4">
           <Card className="w-full max-w-md">
@@ -33,9 +33,9 @@ export default function GlobalError({
               <div className="bg-destructive/10 flex h-12 w-12 items-center justify-center rounded-full">
                 <AlertCircle className="text-destructive h-6 w-6" />
               </div>
-              <CardTitle className="mt-4">Algo salió mal</CardTitle>
+              <CardTitle className="mt-4">Something went wrong</CardTitle>
               <CardDescription>
-                Ha ocurrido un error inesperado. Por favor, intenta nuevamente o regresa al inicio.
+                An unexpected error has occurred. Please try again or return to the home page.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -45,11 +45,11 @@ export default function GlobalError({
             </CardContent>
             <CardFooter className="flex gap-2">
               <Button onClick={reset} variant="default">
-                Intentar de nuevo
+                Try again
               </Button>
               <Button onClick={() => (window.location.href = '/')} variant="outline">
                 <Home className="mr-2 h-4 w-4" />
-                Ir al inicio
+                Go home
               </Button>
             </CardFooter>
           </Card>

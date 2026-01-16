@@ -10,8 +10,9 @@ import type { ActionResult } from '@/src/shared/lib/types'
 import {
   checkOrganizationAdminHRLimit,
   createAdminHRInvitation,
-  searchUserByRUTOrEmail,
+  deleteInvitation,
 } from '../data/admin-hr-invitation-repository'
+import { searchUserByDocumentOrEmail } from '@/src/entities/user'
 
 export const searchUserAction = async (
   search: string,
@@ -27,7 +28,7 @@ export const searchUserAction = async (
       }
     }
 
-    const user = await searchUserByRUTOrEmail({ search: search.trim(), country })
+    const user = await searchUserByDocumentOrEmail({ search: search.trim(), country })
 
     if (!user) {
       return {
@@ -108,6 +109,38 @@ export const inviteAdminHRAction = async (
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Error al enviar invitación',
+    }
+  }
+}
+
+export const cancelInvitationAction = async (
+  invitationId: string
+): Promise<ActionResult<unknown>> => {
+  try {
+    await requireSuperAdmin()
+
+    const result = await deleteInvitation(invitationId)
+
+    if (!result.success) {
+      return {
+        success: false,
+        error: result.error,
+      }
+    }
+
+    if (result.data?.organizationId) {
+      revalidatePath(`/dashboard/organizations/${result.data.organizationId}`)
+    }
+    revalidatePath('/dashboard/organizations')
+
+    return {
+      success: true,
+    }
+  } catch (error) {
+    console.error('[cancelInvitationAction] Error:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Error al cancelar invitación',
     }
   }
 }
