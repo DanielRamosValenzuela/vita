@@ -474,6 +474,8 @@
         "totalUsers": "Total Usuarios",
         "totalAreas": "Total Áreas",
         "totalShifts": "Total Turnos",
+        "limits": "Límites de Cuentas",
+        "limitsDescription": "Visualiza el uso actual de cuentas por rol y los límites disponibles",
         "createdAt": "Fecha de Creación",
         "updatedAt": "Última Actualización"
       },
@@ -716,6 +718,8 @@
       "noOrganization": "No tienes una organización asignada",
       "organizationNotFound": "Organización no encontrada",
       "organizationInfo": "Información de la organización",
+      "limits": "Límites de Cuentas",
+      "limitsDescription": "Visualiza el uso actual de cuentas por rol y los límites disponibles",
       "pending": "pendientes",
       "statuses": {
         "ACTIVE": "Activa",

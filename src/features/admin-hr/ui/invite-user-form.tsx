@@ -6,17 +6,10 @@ import { useRouter } from 'next/navigation'
 import type { Role } from '@prisma/client'
 import { toast } from 'sonner'
 
-import {
-  InviteUserFormBase,
-  type FoundUser,
-} from '@/src/shared/ui/molecules'
 import { ROLES } from '@/src/shared/lib/constants'
+import { InviteUserFormBase, type FoundUser } from '@/src/shared/ui/molecules'
 
-import {
-  inviteChiefAction,
-  inviteStaffAction,
-  searchUserAction,
-} from '../api/invitation-actions'
+import { inviteChiefAction, inviteStaffAction, searchUserAction } from '../api/invitation-actions'
 
 export interface InviteUserFormProps {
   organizationId: string
@@ -75,16 +68,15 @@ export function InviteUserForm({
 
       setIsSearching(false)
 
-      if (result.success && result.data) 
-        setFoundUser(result.data as FoundUser)
-       else {
+      if (result.success && result.data) setFoundUser(result.data as FoundUser)
+      else {
         setError(result.error || t('searchError'))
         setFoundUser(null)
       }
     })
   }
 
-  const handleInvite = (selectedRole?: Role) => {
+  const handleInvite = async (selectedRole?: Role) => {
     if (!foundUser) return
     const role = selectedRole || defaultRole
     if (!role) {
@@ -94,11 +86,10 @@ export function InviteUserForm({
 
     startTransition(async () => {
       let result
-      if (role === ROLES.CHIEF_AREA) 
-        result = await inviteChiefAction(organizationId, foundUser.id)
-       else if (role === ROLES.STAFF_HEALTH) 
+      if (role === ROLES.CHIEF_AREA) result = await inviteChiefAction(organizationId, foundUser.id)
+      else if (role === ROLES.STAFF_HEALTH)
         result = await inviteStaffAction(organizationId, foundUser.id)
-       else {
+      else {
         setError('Rol no válido')
         return
       }
@@ -110,9 +101,7 @@ export function InviteUserForm({
         setFoundUser(null)
         setError(null)
         router.refresh()
-        if (onSuccess) 
-          onSuccess()
-        
+        if (onSuccess) onSuccess()
       } else {
         const errorMessage = result.error || t('inviteError')
         toast.error(errorMessage)

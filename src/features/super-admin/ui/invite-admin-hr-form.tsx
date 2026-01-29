@@ -5,15 +5,10 @@ import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
-import {
-  InviteUserFormBase,
-  type FoundUser,
-} from '@/src/shared/ui/molecules'
+import { ROLES } from '@/src/shared/lib/constants'
+import { InviteUserFormBase, type FoundUser } from '@/src/shared/ui/molecules'
 
-import {
-  inviteAdminHRAction,
-  searchUserAction,
-} from '../api/admin-hr-invitation-actions'
+import { inviteAdminHRAction, searchUserAction } from '../api/admin-hr-invitation-actions'
 
 export interface InviteAdminHRFormProps {
   organizationId: string
@@ -68,9 +63,8 @@ export function InviteAdminHRForm({
 
       setIsSearching(false)
 
-      if (result.success && result.data) 
-        setFoundUser(result.data as FoundUser)
-       else {
+      if (result.success && result.data) setFoundUser(result.data as FoundUser)
+      else {
         setError(result.error || t('searchError'))
         setFoundUser(null)
       }
@@ -90,9 +84,7 @@ export function InviteAdminHRForm({
         setFoundUser(null)
         setError(null)
         router.refresh()
-        if (onSuccess) 
-          onSuccess()
-        
+        if (onSuccess) onSuccess()
       } else {
         const errorMessage = result.error || t('inviteError')
         toast.error(errorMessage)

@@ -28,6 +28,8 @@ model Organization {
   users        User[]
   areas        Area[]
   invitations  OrganizationInvitation[]
+  shiftTypes   ShiftType[]
+  shifts       Shift[]
 
   @@index([taxId])
   @@index([country])
@@ -53,6 +55,7 @@ model User {
   sessions       Session[]
   organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   invitations    OrganizationInvitation[]
+  shifts         Shift[]
 
   @@unique([country, docType, docNumber])
   @@index([email])
@@ -149,6 +152,7 @@ model Area {
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  shifts         Shift[]
 
   @@index([organizationId])
   @@index([isActive])
@@ -178,4 +182,55 @@ enum InvitationStatus {
   ACCEPTED
   REJECTED
   EXPIRED
+}
+
+model ShiftType {
+  id             String       @id @default(cuid())
+  name           String
+  description    String?
+  color          String       @default("#3b82f6")
+  isActive       Boolean      @default(true)
+  organizationId String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  shifts         Shift[]
+
+  @@index([organizationId])
+  @@index([isActive])
+}
+
+model Shift {
+  id            String     @id @default(cuid())
+  title         String?
+  startTime     DateTime
+  endTime       DateTime
+  status        ShiftStatus @default(SCHEDULED)
+  notes         String?
+  userId        String
+  areaId        String
+  shiftTypeId   String
+  organizationId String
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  area          Area       @relation(fields: [areaId], references: [id], onDelete: Cascade)
+  shiftType     ShiftType  @relation(fields: [shiftTypeId], references: [id], onDelete: Cascade)
+  organization  Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([userId])
+  @@index([areaId])
+  @@index([shiftTypeId])
+  @@index([status])
+  @@index([startTime])
+  @@index([endTime])
+}
+
+enum ShiftStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  NO_SHOW
 }

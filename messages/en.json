@@ -519,6 +519,8 @@
         "totalUsers": "Total Users",
         "totalAreas": "Total Areas",
         "totalShifts": "Total Shifts",
+        "limits": "Account Limits",
+        "limitsDescription": "View current account usage by role and available limits",
         "createdAt": "Created At"
       },
       "adminHR": {
@@ -740,6 +742,8 @@
       "noOrganization": "You don't have an organization assigned",
       "organizationNotFound": "Organization not found",
       "organizationInfo": "Organization information",
+      "limits": "Account Limits",
+      "limitsDescription": "View current account usage by role and available limits",
       "pending": "pending",
       "statuses": {
         "ACTIVE": "Active",

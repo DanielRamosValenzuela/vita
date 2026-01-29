@@ -3,9 +3,10 @@ import { getTranslations } from 'next-intl/server'
 import { requireAdminHR } from '@/src/shared/lib/auth'
 import { ROLES } from '@/src/shared/lib/constants'
 import { getAdminHROrganization } from '@/src/features/admin-hr/data'
-import { OrganizationView } from '@/src/features/admin-hr/ui/organization-view'
-import { OrganizationTeamSection } from '@/src/features/admin-hr/ui/organization-team-section'
 import { InvitationsTable } from '@/src/features/admin-hr/ui/invitations-table'
+import { OrganizationLimitsCard } from '@/src/features/admin-hr/ui/organization-limits-card'
+import { OrganizationTeamSection } from '@/src/features/admin-hr/ui/organization-team-section'
+import { OrganizationView } from '@/src/features/admin-hr/ui/organization-view'
 
 interface AdminHROrganizationPageProps {
   params: Promise<{ locale: string }>
@@ -27,7 +28,7 @@ export default async function AdminHROrganizationPage({ params }: AdminHROrganiz
   const t = await getTranslations('adminHR.organization')
   const tInvitations = await getTranslations('adminHR.invitations')
 
-  if (!user.organizationId) 
+  if (!user.organizationId)
     return (
       <div className="space-y-8">
         <div>
@@ -36,11 +37,10 @@ export default async function AdminHROrganizationPage({ params }: AdminHROrganiz
         </div>
       </div>
     )
-  
 
   const organization = await getAdminHROrganization(user.organizationId)
 
-  if (!organization) 
+  if (!organization)
     return (
       <div className="space-y-8">
         <div>
@@ -49,7 +49,6 @@ export default async function AdminHROrganizationPage({ params }: AdminHROrganiz
         </div>
       </div>
     )
-  
 
   return (
     <div className="space-y-8">
@@ -60,6 +59,13 @@ export default async function AdminHROrganizationPage({ params }: AdminHROrganiz
 
       <OrganizationView organization={organization} />
 
+      <OrganizationLimitsCard
+        organizationId={organization.id}
+        maxAdminHR={organization.maxAdminHR}
+        maxChiefs={organization.maxChiefs}
+        maxStaff={organization.maxStaff}
+      />
+
       <OrganizationTeamSection
         organizationId={organization.id}
         organizationCountry={organization.country}
@@ -67,9 +73,7 @@ export default async function AdminHROrganizationPage({ params }: AdminHROrganiz
         currentCount={organization.currentChiefs}
         maxLimit={organization.maxChiefs}
         translationNamespace="adminHR.organization.chiefs"
-        allowedRoles={[
-          { value: ROLES.CHIEF_AREA, label: tInvitations('inviteForm.roleChief') },
-        ]}
+        allowedRoles={[{ value: ROLES.CHIEF_AREA, label: tInvitations('inviteForm.roleChief') }]}
         defaultRole={ROLES.CHIEF_AREA}
       />
 
@@ -80,9 +84,7 @@ export default async function AdminHROrganizationPage({ params }: AdminHROrganiz
         currentCount={organization.currentStaff}
         maxLimit={organization.maxStaff}
         translationNamespace="adminHR.organization.staff"
-        allowedRoles={[
-          { value: ROLES.STAFF_HEALTH, label: tInvitations('inviteForm.roleStaff') },
-        ]}
+        allowedRoles={[{ value: ROLES.STAFF_HEALTH, label: tInvitations('inviteForm.roleStaff') }]}
         defaultRole={ROLES.STAFF_HEALTH}
       />
 

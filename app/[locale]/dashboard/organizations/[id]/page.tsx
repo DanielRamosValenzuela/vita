@@ -6,8 +6,8 @@ import { es } from 'date-fns/locale'
 import { ArrowLeft, Calendar, DollarSign, Edit, Users } from 'lucide-react'
 
 import { requireSuperAdmin } from '@/src/shared/lib/auth/session'
-import { formatCurrency } from '@/src/shared/lib/utils/format'
 import { ROLES } from '@/src/shared/lib/constants'
+import { formatCurrency } from '@/src/shared/lib/utils/format'
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
@@ -22,6 +22,7 @@ import {
 import { getOrganizationById } from '@/src/features/super-admin/data/organization-repository'
 import { InvitationsTable } from '@/src/features/super-admin/ui/invitations-table'
 import { OrganizationAdminHRSection } from '@/src/features/super-admin/ui/organization-admin-hr-section'
+import { OrganizationLimitsCard } from '@/src/features/super-admin/ui/organization-limits-card'
 
 import { Link } from '@/i18n/navigation'
 
@@ -45,9 +46,7 @@ const OrganizationDetailsPage = async ({ params }: PageProps) => {
   const { id } = await params
   const organization = await getOrganizationById(id)
 
-  if (!organization) 
-    notFound()
-  
+  if (!organization) notFound()
 
   const t = await getTranslations('superAdmin.organizationDetails')
   const tOrg = await getTranslations('superAdmin.organizations')
@@ -161,19 +160,20 @@ const OrganizationDetailsPage = async ({ params }: PageProps) => {
         </Card>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-1">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('overview.totalUsers')}</CardTitle>
-            <Users className="text-muted-foreground h-4 w-4" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {(organization as OrganizationWithCount)._count.users}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>{t('overview.limits')}</CardTitle>
+          <CardDescription>{t('overview.limitsDescription')}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <OrganizationLimitsCard
+            organizationId={organization.id}
+            maxAdminHR={organization.maxAdminHR}
+            maxChiefs={organization.maxChiefs}
+            maxStaff={organization.maxStaff}
+          />
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
