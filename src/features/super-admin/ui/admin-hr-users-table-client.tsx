@@ -1,10 +1,12 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import type { Organization, User } from '@prisma/client'
 import { Edit, Plus, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
+
+import { formatDate } from '@/src/shared/lib/utils/format'
 
 import {
   AlertDialog,
@@ -41,6 +43,7 @@ interface AdminHRUsersTableClientProps {
 
 export function AdminHRUsersTableClient({ users }: AdminHRUsersTableClientProps) {
   const t = useTranslations('superAdmin.adminHRUsers')
+  const locale = useLocale() as 'es' | 'en'
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
 
@@ -69,26 +72,25 @@ export function AdminHRUsersTableClient({ users }: AdminHRUsersTableClientProps)
   }
 
   return (
-    <>
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-bold tracking-tight">{t('title')}</h2>
-            <p className="text-muted-foreground mt-1">{t('description')}</p>
-          </div>
-          <Button onClick={() => router.push('/dashboard/admin-hr-users/new')}>
-            <Plus className="mr-2 h-4 w-4" />
-            {t('new')}
-          </Button>
+    <section className="space-y-4" aria-labelledby="admin-hr-users-heading">
+      <header className="flex items-center justify-between">
+        <div>
+          <h2 id="admin-hr-users-heading" className="text-2xl font-bold tracking-tight">{t('title')}</h2>
+          <p className="text-muted-foreground mt-1">{t('description')}</p>
         </div>
+        <Button onClick={() => router.push('/dashboard/admin-hr-users/new')}>
+          <Plus className="mr-2 h-4 w-4" />
+          {t('new')}
+        </Button>
+      </header>
 
-        {users.length === 0 ? (
-          <div className="text-muted-foreground rounded-lg border p-8 text-center">
+      {users.length === 0 ? (
+        <section className="text-muted-foreground rounded-lg border p-8 text-center" aria-label={t('empty')}>
             <p className="mb-4">{t('empty')}</p>
             <Button variant="outline" onClick={() => router.push('/dashboard/admin-hr-users/new')}>
               {t('createFirst')}
             </Button>
-          </div>
+          </section>
         ) : (
           <div className="rounded-md border">
             <Table>
@@ -114,11 +116,7 @@ export function AdminHRUsersTableClient({ users }: AdminHRUsersTableClientProps)
                       )}
                     </TableCell>
                     <TableCell>
-                      {new Date(user.createdAt).toLocaleDateString('es-ES', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric',
-                      })}
+                      {formatDate(new Date(user.createdAt), locale)}
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
@@ -144,7 +142,6 @@ export function AdminHRUsersTableClient({ users }: AdminHRUsersTableClientProps)
             </Table>
           </div>
         )}
-      </div>
 
       <AlertDialog
         open={deleteDialog.open}
@@ -169,6 +166,6 @@ export function AdminHRUsersTableClient({ users }: AdminHRUsersTableClientProps)
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </>
+    </section>
   )
 }

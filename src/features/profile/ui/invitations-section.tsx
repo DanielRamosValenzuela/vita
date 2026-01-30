@@ -1,10 +1,11 @@
 'use client'
 
 import { useEffect, useState, useTransition } from 'react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { CheckCircle2, Loader2, XCircle } from 'lucide-react'
 import { toast } from 'sonner'
 
+import { formatDate } from '@/src/shared/lib/utils/format'
 import { Alert, AlertDescription } from '@/src/shared/ui/alert'
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
@@ -28,6 +29,7 @@ interface Invitation {
 
 export function InvitationsSection() {
   const t = useTranslations('profile.invitations')
+  const locale = useLocale() as 'es' | 'en'
   const [isPending, startTransition] = useTransition()
   const [invitations, setInvitations] = useState<Invitation[]>([])
   const [loading, setLoading] = useState(true)
@@ -79,9 +81,9 @@ export function InvitationsSection() {
           <CardTitle>{t('title')}</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-center py-8">
-            <Loader2 className="text-muted-foreground h-6 w-6 animate-spin" />
-          </div>
+          <p className="flex items-center justify-center py-8" role="status" aria-live="polite">
+            <Loader2 className="text-muted-foreground h-6 w-6 animate-spin" aria-hidden />
+          </p>
         </CardContent>
       </Card>
     )
@@ -106,44 +108,48 @@ export function InvitationsSection() {
         <CardTitle>{t('title')}</CardTitle>
         <CardDescription>{t('description')}</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        {invitations.map((invitation) => (
-          <Alert key={invitation.id}>
-            <AlertDescription className="flex items-center justify-between">
-              <div className="flex-1">
-                <p className="font-medium">
-                  {t('invitationFrom')} {invitation.organization.name}
-                </p>
-                <p className="text-muted-foreground text-sm">
-                  {t('role')}: <Badge variant="secondary">{invitation.role}</Badge>
-                </p>
-                <p className="text-muted-foreground text-xs">
-                  {new Date(invitation.createdAt).toLocaleDateString()}
-                </p>
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  variant="default"
-                  onClick={() => handleAccept(invitation.id)}
-                  disabled={isPending}
-                >
-                  <CheckCircle2 className="mr-2 h-4 w-4" />
-                  {t('accept')}
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => handleReject(invitation.id)}
-                  disabled={isPending}
-                >
-                  <XCircle className="mr-2 h-4 w-4" />
-                  {t('reject')}
-                </Button>
-              </div>
-            </AlertDescription>
-          </Alert>
-        ))}
+      <CardContent>
+        <ul className="space-y-4 list-none p-0 m-0">
+          {invitations.map((invitation) => (
+            <li key={invitation.id}>
+              <Alert>
+                <AlertDescription className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <p className="font-medium">
+                      {t('invitationFrom')} {invitation.organization.name}
+                    </p>
+                    <p className="text-muted-foreground text-sm">
+                      {t('role')}: <Badge variant="secondary">{invitation.role}</Badge>
+                    </p>
+                    <p className="text-muted-foreground text-xs">
+                      {formatDate(new Date(invitation.createdAt), locale)}
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="default"
+                      onClick={() => handleAccept(invitation.id)}
+                      disabled={isPending}
+                    >
+                      <CheckCircle2 className="mr-2 h-4 w-4" />
+                      {t('accept')}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleReject(invitation.id)}
+                      disabled={isPending}
+                    >
+                      <XCircle className="mr-2 h-4 w-4" />
+                      {t('reject')}
+                    </Button>
+                  </div>
+                </AlertDescription>
+              </Alert>
+            </li>
+          ))}
+        </ul>
       </CardContent>
     </Card>
   )

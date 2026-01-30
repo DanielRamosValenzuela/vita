@@ -55,78 +55,78 @@ export function OrganizationAlerts({ organizationId, alerts }: OrganizationAlert
       </CardHeader>
       <CardContent className="space-y-4">
         {!organizationId && (
-          <div className="grid gap-4 md:grid-cols-3">
-            <div className="text-center p-4 bg-muted/50 rounded-lg">
-              <div className="text-2xl font-bold text-muted-foreground">
+          <ul className="grid gap-4 md:grid-cols-3 list-none p-0 m-0" aria-label={t('title')}>
+            <li className="text-center p-4 bg-muted/50 rounded-lg">
+              <p className="text-2xl font-bold text-muted-foreground">
                 {alerts.organizationsWithWarnings}
-              </div>
-              <div className="text-sm text-muted-foreground">{t('withWarnings')}</div>
-            </div>
-            <div className="text-center p-4 bg-destructive/10 rounded-lg">
-              <div className="text-2xl font-bold text-destructive">
+              </p>
+              <p className="text-sm text-muted-foreground">{t('withWarnings')}</p>
+            </li>
+            <li className="text-center p-4 bg-destructive/10 rounded-lg">
+              <p className="text-2xl font-bold text-destructive">
                 {alerts.organizationsWithCriticals}
-              </div>
-              <div className="text-sm text-muted-foreground">{t('withCriticals')}</div>
-            </div>
-            <div className="text-center p-4 bg-muted/50 rounded-lg">
-              <div className="text-2xl font-bold">{filteredAlerts.length}</div>
-              <div className="text-sm text-muted-foreground">{t('totalAlerts')}</div>
-            </div>
-          </div>
+              </p>
+              <p className="text-sm text-muted-foreground">{t('withCriticals')}</p>
+            </li>
+            <li className="text-center p-4 bg-muted/50 rounded-lg">
+              <p className="text-2xl font-bold">{filteredAlerts.length}</p>
+              <p className="text-sm text-muted-foreground">{t('totalAlerts')}</p>
+            </li>
+          </ul>
         )}
 
         {criticalAlerts.length > 0 && (
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm font-medium text-destructive">
-              <AlertCircle className="h-4 w-4" />
+          <section className="space-y-2" aria-labelledby="alerts-critical-heading" role="alert">
+            <h3 id="alerts-critical-heading" className="flex items-center gap-2 text-sm font-medium text-destructive">
+              <AlertCircle className="h-4 w-4" aria-hidden />
               {t('limitsReached', { count: criticalAlerts.length })}
-            </div>
-            <div className="space-y-2">
+            </h3>
+            <ul className="space-y-2 list-none p-0 m-0">
               {criticalAlerts.map((alert) => (
-                <div
+                <li
                   key={`${alert.organizationId}-${alert.role}`}
                   className="flex items-center justify-between p-3 rounded-lg border border-destructive/20 bg-destructive/5"
                 >
                   <div className="flex-1">
-                    <div className="font-medium text-sm">{alert.message}</div>
-                    <div className="text-xs text-muted-foreground mt-1">
+                    <p className="font-medium text-sm">{alert.message}</p>
+                    <p className="text-xs text-muted-foreground mt-1">
                       {alert.usagePercentage.toFixed(1)} {t('percentUsed')}
-                    </div>
+                    </p>
                   </div>
                   <Badge variant="destructive">
                     {alert.currentCount}/{alert.maxLimit}
                   </Badge>
-                </div>
+                </li>
               ))}
-            </div>
-          </div>
+            </ul>
+          </section>
         )}
 
         {warningAlerts.length > 0 && (
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-              <AlertTriangle className="h-4 w-4" />
+          <section className="space-y-2" aria-labelledby="alerts-warning-heading">
+            <h3 id="alerts-warning-heading" className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+              <AlertTriangle className="h-4 w-4" aria-hidden />
               {t('nearLimit', { count: warningAlerts.length })}
-            </div>
-            <div className="space-y-2">
+            </h3>
+            <ul className="space-y-2 list-none p-0 m-0">
               {warningAlerts.map((alert) => (
-                <div
+                <li
                   key={`${alert.organizationId}-${alert.role}`}
                   className="flex items-center justify-between p-3 rounded-lg border border-muted bg-muted/50"
                 >
                   <div className="flex-1">
-                    <div className="font-medium text-sm">{alert.message}</div>
-                    <div className="text-xs text-muted-foreground mt-1">
+                    <p className="font-medium text-sm">{alert.message}</p>
+                    <p className="text-xs text-muted-foreground mt-1">
                       {alert.usagePercentage.toFixed(1)} {t('percentUsed')}
-                    </div>
+                    </p>
                   </div>
                   <Badge variant="secondary">
                     {alert.currentCount}/{alert.maxLimit}
                   </Badge>
-                </div>
+                </li>
               ))}
-            </div>
-          </div>
+            </ul>
+          </section>
         )}
       </CardContent>
     </Card>

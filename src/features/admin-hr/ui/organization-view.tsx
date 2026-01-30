@@ -3,6 +3,7 @@
 import { Building2, Users, UserCheck, UserX } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
+import { ORGANIZATION_STATUS_BADGE_VARIANTS } from '@/src/shared/lib/constants'
 import { Badge } from '@/src/shared/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
 
@@ -14,38 +15,28 @@ interface OrganizationViewProps {
 
 export function OrganizationView({ organization }: OrganizationViewProps) {
   const t = useTranslations('adminHR.organization')
-
-  const getStatusVariant = (status: string): 'default' | 'secondary' | 'destructive' => {
-    switch (status) {
-      case 'ACTIVE':
-        return 'default'
-      case 'SUSPENDED':
-        return 'destructive'
-      default:
-        return 'secondary'
-    }
-  }
+  const statusVariant = ORGANIZATION_STATUS_BADGE_VARIANTS[organization.status as keyof typeof ORGANIZATION_STATUS_BADGE_VARIANTS] ?? 'secondary'
 
   return (
-    <div className="space-y-6">
+    <section className="space-y-6" aria-labelledby="org-overview-heading">
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Building2 className="h-6 w-6 text-primary" />
+              <Building2 className="h-6 w-6 text-primary" aria-hidden />
               <div>
-                <CardTitle className="text-2xl">{organization.name}</CardTitle>
+                <CardTitle id="org-overview-heading" className="text-2xl">{organization.name}</CardTitle>
                 <CardDescription className="mt-1">{t('organizationInfo')}</CardDescription>
               </div>
             </div>
-            <Badge variant={getStatusVariant(organization.status)}>
+            <Badge variant={statusVariant}>
               {t(`statuses.${organization.status}` as 'statuses.ACTIVE')}
             </Badge>
           </div>
         </CardHeader>
       </Card>
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <section className="grid gap-4 md:grid-cols-3" aria-label={t('organizationInfo')}>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">{t('stats.adminHR.title')}</CardTitle>
@@ -100,7 +91,7 @@ export function OrganizationView({ organization }: OrganizationViewProps) {
             </p>
           </CardContent>
         </Card>
-      </div>
-    </div>
+      </section>
+    </section>
   )
 }

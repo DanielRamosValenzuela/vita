@@ -1,15 +1,17 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import type { Country, OrganizationPlan, OrganizationStatus } from '@prisma/client'
-import { format } from 'date-fns'
-import { es } from 'date-fns/locale'
 import { Ban, CheckCircle, Edit, Eye, MoreHorizontal, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 
-import { formatCurrency } from '@/src/shared/lib/utils/format'
-import { ROLES } from '@/src/shared/lib/constants'
+import {
+  ORGANIZATION_PLAN_BADGE_VARIANTS,
+  ORGANIZATION_STATUS_BADGE_VARIANTS,
+} from '@/src/shared/lib/constants'
+import { countUsersByRole } from '@/src/shared/lib/utils/count-users-by-role'
+import { formatCurrency, formatDate } from '@/src/shared/lib/utils/format'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -61,6 +63,7 @@ export function OrganizationsTableClient({
   initialFilters,
 }: OrganizationsTableClientProps) {
   const t = useTranslations('superAdmin.organizations')
+  const locale = useLocale() as 'es' | 'en'
   const router = useRouter()
   const pathname = usePathname()
   const [isPending, startTransition] = useTransition()
@@ -193,45 +196,20 @@ export function OrganizationsTableClient({
     })
   }
 
-  const getStatusBadge = (status: OrganizationStatus) => {
-    const variants = {
-      ACTIVE: 'default',
-      PENDING_PAYMENT: 'secondary',
-      SUSPENDED: 'destructive',
-      INACTIVE: 'outline',
-    } as const
+  const getStatusBadge = (status: OrganizationStatus) => (
+    <Badge variant={ORGANIZATION_STATUS_BADGE_VARIANTS[status] ?? 'outline'}>
+      {t(`statuses.${status}`)}
+    </Badge>
+  )
 
-    return <Badge variant={variants[status]}>{t(`statuses.${status}`)}</Badge>
-  }
-
-  const getPlanBadge = (plan: OrganizationPlan) => {
-    const variants = {
-      BASIC: 'outline',
-      PRO: 'secondary',
-      ENTERPRISE: 'default',
-    } as const
-
-    return <Badge variant={variants[plan]}>{t(`plans.${plan}`)}</Badge>
-  }
-
-  const getUserCounts = (users: Array<{ role: string }>) => {
-    const counts = {
-      ADMIN_HR: 0,
-      CHIEF: 0,
-      STAFF: 0,
-    }
-
-    users.forEach((user) => {
-      if (user.role === ROLES.ADMIN_HR) counts.ADMIN_HR++
-      else if (user.role === ROLES.CHIEF_AREA) counts.CHIEF++
-      else if (user.role === ROLES.STAFF_HEALTH) counts.STAFF++
-    })
-
-    return counts
-  }
+  const getPlanBadge = (plan: OrganizationPlan) => (
+    <Badge variant={ORGANIZATION_PLAN_BADGE_VARIANTS[plan] ?? 'outline'}>
+      {t(`plans.${plan}`)}
+    </Badge>
+  )
 
   return (
-    <div className="space-y-4">
+    <section className="space-y-4" aria-label={t('table.name')}>
       <OrganizationsFilters
         search={search}
         status={status}
@@ -285,7 +263,7 @@ export function OrganizationsTableClient({
               </TableRow>
             ) : (
               initialOrganizations.map((org) => {
-                const userCounts = getUserCounts(org.users)
+                const userCounts = countUsersByRole(org.users)
                 return (
                   <TableRow key={org.id} className="hover:bg-muted/50 cursor-pointer">
                     <TableCell className="font-medium">
@@ -308,13 +286,13 @@ export function OrganizationsTableClient({
                         <div className="flex items-center justify-between gap-2">
                           <span className="text-muted-foreground">{t('accountsChiefs')}</span>
                           <span className="font-medium">
-                            {userCounts.CHIEF}/{org.maxChiefs}
+                            {userCounts.CHIEF_AREA}/{org.maxChiefs}
                           </span>
                         </div>
                         <div className="flex items-center justify-between gap-2">
                           <span className="text-muted-foreground">{t('accountsStaff')}</span>
                           <span className="font-medium">
-                            {userCounts.STAFF}/{org.maxStaff}
+                            {userCounts.STAFF_HEALTH}/{org.maxStaff}
                           </span>
                         </div>
                       </div>
@@ -322,7 +300,7 @@ export function OrganizationsTableClient({
                     <TableCell className="text-right">{formatCurrency(org.monthlyFee)}</TableCell>
                     <TableCell>
                       {org.nextPayment
-                        ? format(new Date(org.nextPayment), 'dd MMM yyyy', { locale: es })
+                        ? formatDate(new Date(org.nextPayment), locale)
                         : '-'}
                     </TableCell>
                     <TableCell className="text-right">
@@ -620,6 +598,6 @@ export function OrganizationsTableClient({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+    </section>
   )
 }

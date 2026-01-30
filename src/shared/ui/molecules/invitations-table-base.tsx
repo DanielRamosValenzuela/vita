@@ -2,11 +2,14 @@
 
 import { useLocale, useTranslations } from 'next-intl'
 import type { InvitationStatus, Role } from '@prisma/client'
-import { format } from 'date-fns'
-import { enUS, es } from 'date-fns/locale'
 import { Ban } from 'lucide-react'
 
-import { INVITATION_STATUS } from '@/src/shared/lib/constants'
+import { formatDate } from '@/src/shared/lib/utils/format'
+
+import {
+  INVITATION_STATUS,
+  INVITATION_STATUS_BADGE_VARIANTS,
+} from '@/src/shared/lib/constants'
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
@@ -55,30 +58,19 @@ export function InvitationsTableBase({
   isPending = false,
 }: InvitationsTableBaseProps) {
   const t = useTranslations(translationNamespace)
-  const locale = useLocale()
-  const dateLocale = locale === 'es' ? es : enUS
+  const locale = useLocale() as 'es' | 'en'
 
-  const getStatusBadge = (status: InvitationStatus) => {
-    const variants: Record<InvitationStatus, 'default' | 'secondary' | 'destructive' | 'outline'> =
-      {
-        PENDING: 'secondary',
-        ACCEPTED: 'default',
-        REJECTED: 'destructive',
-        EXPIRED: 'outline',
-      }
-
-    return (
-      <Badge variant={variants[status] || 'outline'}>
-        {t(
-          `statuses.${status}` as
-            | 'statuses.PENDING'
-            | 'statuses.ACCEPTED'
-            | 'statuses.REJECTED'
-            | 'statuses.EXPIRED'
-        )}
-      </Badge>
-    )
-  }
+  const getStatusBadge = (status: InvitationStatus) => (
+    <Badge variant={INVITATION_STATUS_BADGE_VARIANTS[status] ?? 'outline'}>
+      {t(
+        `statuses.${status}` as
+          | 'statuses.PENDING'
+          | 'statuses.ACCEPTED'
+          | 'statuses.REJECTED'
+          | 'statuses.EXPIRED'
+      )}
+    </Badge>
+  )
 
   if (invitations.length === 0) 
     return (
@@ -131,11 +123,11 @@ export function InvitationsTableBase({
                 )}
                 <TableCell>{getStatusBadge(invitation.status)}</TableCell>
                 <TableCell>
-                  {format(new Date(invitation.createdAt), 'dd MMM yyyy', { locale: dateLocale })}
+                  {formatDate(new Date(invitation.createdAt), locale)}
                 </TableCell>
                 <TableCell>
                   {invitation.acceptedAt
-                    ? format(new Date(invitation.acceptedAt), 'dd MMM yyyy', { locale: dateLocale })
+                    ? formatDate(new Date(invitation.acceptedAt), locale)
                     : '-'}
                 </TableCell>
                 <TableCell className="text-right">

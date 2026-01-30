@@ -44,7 +44,7 @@ export function OrganizationsFilters({
   const hasActiveFilters = status !== 'ALL' || plan !== 'ALL' || country !== 'ALL' || search
 
   return (
-    <div className="space-y-4">
+    <section className="space-y-4" aria-label={t('search')}>
       <div className="relative">
         <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
         <Input
@@ -171,6 +171,6 @@ export function OrganizationsFilters({
           </div>
         </div>
       </div>
-    </div>
+    </section>
   )
 }

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Building2, Loader2 } from 'lucide-react'
 
+import { ORGANIZATION_STATUS_BADGE_VARIANTS } from '@/src/shared/lib/constants'
 import type { ActionResult } from '@/src/shared/lib/types'
 import { Badge } from '@/src/shared/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
@@ -63,9 +64,9 @@ export function OrganizationsSection() {
           <CardTitle>{t('title')}</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-center py-8">
-            <Loader2 className="text-muted-foreground h-6 w-6 animate-spin" />
-          </div>
+          <p className="flex items-center justify-center py-8" role="status" aria-live="polite">
+            <Loader2 className="text-muted-foreground h-6 w-6 animate-spin" aria-hidden />
+          </p>
         </CardContent>
       </Card>
     )
@@ -85,26 +86,17 @@ export function OrganizationsSection() {
     )
   
 
-  const getStatusBadge = (status: string) => {
-    const variants: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
-      ACTIVE: 'default',
-      PENDING_PAYMENT: 'secondary',
-      SUSPENDED: 'destructive',
-      INACTIVE: 'outline',
-    }
-
-    return (
-      <Badge variant={variants[status] || 'outline'}>
-        {t(
-          `statuses.${status}` as
-            | 'statuses.ACTIVE'
-            | 'statuses.PENDING_PAYMENT'
-            | 'statuses.SUSPENDED'
-            | 'statuses.INACTIVE'
-        )}
-      </Badge>
-    )
-  }
+  const getStatusBadge = (status: string) => (
+    <Badge variant={ORGANIZATION_STATUS_BADGE_VARIANTS[status as keyof typeof ORGANIZATION_STATUS_BADGE_VARIANTS] ?? 'outline'}>
+      {t(
+        `statuses.${status}` as
+          | 'statuses.ACTIVE'
+          | 'statuses.PENDING_PAYMENT'
+          | 'statuses.SUSPENDED'
+          | 'statuses.INACTIVE'
+      )}
+    </Badge>
+  )
 
   return (
     <Card>
@@ -112,21 +104,26 @@ export function OrganizationsSection() {
         <CardTitle>{t('title')}</CardTitle>
         <CardDescription>{t('description')}</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        {organizations.map((org) => (
-          <div key={org.id} className="flex items-center justify-between rounded-lg border p-4">
-            <div className="flex items-center gap-3">
-              <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-lg">
-                <Building2 className="text-primary h-5 w-5" />
+      <CardContent>
+        <ul className="space-y-4 list-none p-0 m-0">
+          {organizations.map((org) => (
+            <li
+              key={org.id}
+              className="flex items-center justify-between rounded-lg border p-4"
+            >
+              <div className="flex items-center gap-3">
+                <span className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-lg" aria-hidden>
+                  <Building2 className="text-primary h-5 w-5" />
+                </span>
+                <div>
+                  <p className="font-medium">{org.name}</p>
+                  <p className="text-muted-foreground text-sm">{org.taxId}</p>
+                </div>
               </div>
-              <div>
-                <p className="font-medium">{org.name}</p>
-                <p className="text-muted-foreground text-sm">{org.taxId}</p>
-              </div>
-            </div>
-            <div>{getStatusBadge(org.status)}</div>
-          </div>
-        ))}
+              <div>{getStatusBadge(org.status)}</div>
+            </li>
+          ))}
+        </ul>
       </CardContent>
     </Card>
   )

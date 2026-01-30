@@ -137,9 +137,12 @@
 **Adecuación al plan:**
   - FSD respetado en shifts y organización. Constantes en `shared`, TypeScript strict, estructura `lib/` por dominio y server/client.
 
+**DRY – reutilización adicional aplicada:**
+  - **`countUsersByRole`** en `shared/lib/utils/count-users-by-role.ts`: cuenta usuarios por rol (ADMIN_HR, CHIEF_AREA, STAFF_HEALTH). Usado en `organizations-table-client`; sustituye `getUserCounts` local.
+  - **Constantes de variantes para badges** en `shared/lib/constants/badge-variants.ts`: `ORGANIZATION_STATUS_BADGE_VARIANTS`, `ORGANIZATION_PLAN_BADGE_VARIANTS`, `INVITATION_STATUS_BADGE_VARIANTS`. Usadas en `organizations-table-client`, `organization-view`, `profile` `organizations-section`, `invitations-table-base` (sustituyen maps locales).
+  - **`formatDate`** en `shared/lib/utils/format.ts`: formatea fechas con locale (`es`/`en`) vía date-fns. Sustituye `toLocaleDateString` y `format(..., { locale })` en `organizations-table-client`, `admin-hr-users-table-client`, `invitations-table-base`, `invitations-section`.
+
 **DRY – pendiente / sugerido:**
-  - `getPlanBadge` / `getStatusBadge` en varias tablas (organizations, shift-types, invitations, profile): valorar util genérico en `shared` o extraer maps de variantes.
-  - `getUserCounts` por rol: lógica similar en `organizations-table-client` y `organization-usage`; candidato a `entities/organization` o `shared`.
   - Mensajes de `organization-alerts`: hoy se construyen en español en la entity; ideal que la UI monte el mensaje vía i18n (refactor mayor).
 
 **i18n – pendiente:**

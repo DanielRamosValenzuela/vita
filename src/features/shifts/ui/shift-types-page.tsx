@@ -148,17 +148,17 @@ export function ShiftTypesPage({ shiftTypes }: ShiftTypesPageProps) {
   ]
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <section className="space-y-6" aria-labelledby="shift-types-heading">
+      <header className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold">{t('title')}</h2>
+          <h2 id="shift-types-heading" className="text-2xl font-bold">{t('title')}</h2>
           <p className="text-muted-foreground mt-1">{t('description')}</p>
         </div>
         <Button onClick={handleCreate}>
           <Plus className="mr-2 h-4 w-4" />
           {t('create')}
         </Button>
-      </div>
+      </header>
 
       <Card>
         <CardHeader>
@@ -166,15 +166,15 @@ export function ShiftTypesPage({ shiftTypes }: ShiftTypesPageProps) {
         </CardHeader>
         <CardContent>
           {shiftTypes.length === 0 ? (
-            <div className="text-center py-8">
-              <Palette className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-medium">{t('empty.title')}</h3>
+            <section className="text-center py-8" aria-labelledby="shift-types-empty-heading">
+              <Palette className="mx-auto h-12 w-12 text-muted-foreground mb-4" aria-hidden />
+              <h3 id="shift-types-empty-heading" className="text-lg font-medium">{t('empty.title')}</h3>
               <p className="text-muted-foreground mt-2">{t('empty.description')}</p>
               <Button onClick={handleCreate} className="mt-4">
                 <Plus className="mr-2 h-4 w-4" />
                 {t('create')}
               </Button>
-            </div>
+            </section>
           ) : (
             <Table>
               <TableHeader>
@@ -192,13 +192,14 @@ export function ShiftTypesPage({ shiftTypes }: ShiftTypesPageProps) {
                   <TableRow key={shiftType.id}>
                     <TableCell className="font-medium">{shiftType.name}</TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-2">
-                        <div
-                          className="w-4 h-4 rounded-full border"
+                      <span className="flex items-center gap-2">
+                        <span
+                          className="w-4 h-4 rounded-full border shrink-0"
                           style={{ backgroundColor: shiftType.color }}
+                          aria-hidden
                         />
                         <span className="text-xs text-muted-foreground">{shiftType.color}</span>
-                      </div>
+                      </span>
                     </TableCell>
                     <TableCell>{shiftType.description || '-'}</TableCell>
                     <TableCell>{getStatusBadge(shiftType.isActive)}</TableCell>
@@ -206,7 +207,7 @@ export function ShiftTypesPage({ shiftTypes }: ShiftTypesPageProps) {
                       <span className="text-sm">{shiftType._count?.shifts || 0}</span>
                     </TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-2">
+                      <span className="flex items-center gap-2">
                         <Button variant="outline" size="sm" onClick={() => handleEdit(shiftType)}>
                           <Edit className="h-4 w-4" />
                         </Button>
@@ -218,7 +219,7 @@ export function ShiftTypesPage({ shiftTypes }: ShiftTypesPageProps) {
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
-                      </div>
+                      </span>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -386,6 +387,6 @@ export function ShiftTypesPage({ shiftTypes }: ShiftTypesPageProps) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </section>
   )
 }
