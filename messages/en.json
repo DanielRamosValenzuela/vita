@@ -1136,9 +1136,85 @@
       "comingSoon": "Coming soon: Complete CRUD for shift types"
     },
     "rates": {
-      "title": "Rates",
-      "description": "Configure shift rates",
-      "comingSoon": "Coming soon: Complete CRUD for rates"
+      "title": "Rates & Contracts",
+      "description": "Assign rates to staff as negotiated. Create global types or customize per person.",
+      "noOrganization": "You don't have an organization assigned",
+      "loadError": "Error loading",
+      "staffTable": {
+        "title": "Staff and rates",
+        "person": "Person",
+        "area": "Area",
+        "rateSource": "Source",
+        "effectiveRate": "Effective rate",
+        "baseSalary": "Base salary",
+        "actions": "Actions",
+        "noContract": "No contract",
+        "source": {
+          "template": "Type: {name}",
+          "template_adjusted": "Type: {name} + {adjustment}",
+          "custom": "Custom"
+        }
+      },
+      "rateTemplates": {
+        "title": "Rate types",
+        "description": "Reusable templates (e.g. Night guard, Day nurse)",
+        "create": "New type",
+        "empty": "No types yet. Create one to assign to staff."
+      },
+      "contract": {
+        "create": "Assign rate",
+        "edit": "Edit contract",
+        "createTitle": "Assign rate to {name}",
+        "editTitle": "Edit {name}'s contract",
+        "rateType": "Rate type",
+        "rateTypePlaceholder": "Select type (optional)",
+        "customRate": "Custom rate ($/min)",
+        "adjustment": "Additional adjustment ($/min)",
+        "adjustmentHelp": "Adds to base type if applicable",
+        "area": "Primary area",
+        "areaPlaceholder": "Select area",
+        "baseSalary": "Base salary (optional)",
+        "baseSalaryUnit": "Unit",
+        "baseSalaryUnits": {
+          "MONTHLY": "Monthly",
+          "DAILY": "Daily",
+          "HOURLY": "Hourly"
+        },
+        "useCustom": "Use custom rate",
+        "useTemplate": "Use rate type"
+      },
+      "rateTemplateForm": {
+        "createTitle": "New rate type",
+        "editTitle": "Edit rate type",
+        "name": "Name",
+        "namePlaceholder": "e.g. Night guard",
+        "ratePerMinute": "Rate per minute",
+        "baseSalary": "Base salary (optional)",
+        "contractsCount": "{count} contract(s)"
+      },
+      "delete": {
+        "contractTitle": "End contract",
+        "contractDescription": "End this contract? It will remain in history.",
+        "templateTitle": "Delete rate type",
+        "templateDescription": "Delete this type? It cannot have associated contracts.",
+        "confirm": "Confirm",
+        "endContract": "End",
+        "deleting": "Processing..."
+      },
+      "toast": {
+        "contractCreated": "Contract created",
+        "contractUpdated": "Contract updated",
+        "contractEnded": "Contract ended",
+        "templateCreated": "Type created",
+        "templateUpdated": "Type updated",
+        "templateDeleted": "Type deleted",
+        "error": "Error"
+      },
+      "empty": {
+        "noStaff": "No staff. Invite staff or chiefs first.",
+        "noContract": "Not assigned"
+      },
+      "perMinute": "/min"
     }
   },
   "errors": {

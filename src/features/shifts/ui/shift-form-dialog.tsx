@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
+
+import { useRouter } from '@/i18n/navigation'
 import { CalendarDays } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -33,6 +35,7 @@ export function ShiftFormDialog({
 }: ShiftFormDialogProps) {
   const t = useTranslations('shifts')
   const tToast = useTranslations()
+  const router = useRouter()
   const [open, setOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -44,8 +47,7 @@ export function ShiftFormDialog({
       if (result.success) {
         toast.success(tToast('toast.shifts.created'))
         setOpen(false)
-
-        window.location.reload()
+        router.refresh()
       } else toast.error(result.error || tToast('toast.shifts.errorCreating'))
     } catch (error) {
       toast.error(tToast('toast.shifts.errorCreating'))

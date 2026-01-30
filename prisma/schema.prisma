@@ -1,6 +1,7 @@
 generator client {
-  provider = "prisma-client-js"
-  engineType = "library"
+  provider        = "prisma-client-js"
+  engineType      = "library"
+  compilerBuild   = "small"
 }
 
 datasource db {
@@ -28,9 +29,10 @@ model Organization {
   users        User[]
   areas        Area[]
   invitations  OrganizationInvitation[]
-  shiftTypes   ShiftType[]
-  shifts       Shift[]
-  rates        Rate[]
+  shiftTypes    ShiftType[]
+  shifts        Shift[]
+  rateTemplates RateTemplate[]
+  contracts     Contract[]
 
   @@index([taxId])
   @@index([country])
@@ -57,6 +59,7 @@ model User {
   organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   invitations    OrganizationInvitation[]
   shifts         Shift[]
+  contracts      Contract[]
 
   @@unique([country, docType, docNumber])
   @@index([email])
@@ -144,47 +147,56 @@ enum OrganizationStatus {
   INACTIVE
 }
 
-enum RateType {
+enum BaseSalaryUnit {
+  MONTHLY
+  DAILY
   HOURLY
-  MINUTELY
 }
 
-enum RateUnit {
-  MINUTE
-  HOUR
-}
-
-model Rate {
-  id                String            @id @default(cuid())
-  name              String
-  description       String?
-  type              RateType        @default(MINUTELY)
-  unit              RateUnit        @default(MINUTE)
-  amount            Float
-  isActive          Boolean          @default(true)
-  organizationId    String
-  createdAt         DateTime          @default(now())
-  updatedAt         DateTime          @updatedAt
-  organization       Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  shiftRates        ShiftRate[]
+model RateTemplate {
+  id              String          @id @default(cuid())
+  name            String
+  description     String?
+  ratePerMinute   Float
+  ratePerHour     Float?
+  baseSalary      Float?
+  baseSalaryUnit  BaseSalaryUnit?
+  isActive        Boolean         @default(true)
+  organizationId  String
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  organization    Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  contracts       Contract[]
 
   @@index([organizationId])
-  @@index([type, unit])
+  @@index([isActive])
 }
 
-model ShiftRate {
-  id        String   @id @default(cuid())
-  rateId    String
-  shiftId   String
-  amount    Float    @default(0)
-  duration  Int      @default(0) // duration in the rate's unit (minutes or hours)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  rate      Rate     @relation(fields: [rateId], references: [id], onDelete: Cascade)
-  shift     Shift    @relation(fields: [shiftId], references: [id], onDelete: Cascade)
+model Contract {
+  id                 String          @id @default(cuid())
+  userId             String
+  organizationId     String
+  areaId             String?
+  rateTemplateId     String?
+  ratePerMinute      Float?
+  adjustmentPerMinute Float           @default(0)
+  baseSalary         Float?
+  baseSalaryUnit     BaseSalaryUnit?
+  startDate          DateTime        @default(now())
+  endDate            DateTime?
+  isActive           Boolean         @default(true)
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  user               User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization       Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  area               Area?           @relation(fields: [areaId], references: [id], onDelete: SetNull)
+  rateTemplate       RateTemplate?   @relation(fields: [rateTemplateId], references: [id], onDelete: SetNull)
+  shifts             Shift[]
 
-  @@unique([rateId, shiftId])
-  @@index([shiftId])
+  @@index([userId, organizationId])
+  @@index([organizationId])
+  @@index([userId])
+  @@index([areaId])
 }
 
 model Area {
@@ -197,6 +209,7 @@ model Area {
   updatedAt      DateTime     @updatedAt
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   shifts         Shift[]
+  contracts      Contract[]
 
   @@index([organizationId])
   @@index([isActive])
@@ -261,10 +274,13 @@ model Shift {
   area          Area       @relation(fields: [areaId], references: [id], onDelete: Cascade)
   shiftType     ShiftType  @relation(fields: [shiftTypeId], references: [id], onDelete: Cascade)
   organization  Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  shiftRates    ShiftRate[]
+  contractId    String?
+
+  contract      Contract?    @relation(fields: [contractId], references: [id], onDelete: SetNull)
 
   @@index([organizationId])
   @@index([userId])
+  @@index([contractId])
   @@index([areaId])
   @@index([shiftTypeId])
   @@index([status])

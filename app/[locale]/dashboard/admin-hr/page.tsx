@@ -27,7 +27,7 @@ export default async function AdminHRDashboardPage({ params }: AdminHRDashboardP
     totalAreas: 0,
     totalShiftTypes: 0,
     totalStaff: 0,
-    totalRates: 0,
+    totalContracts: 0,
     activeShifts: 0,
   }
 

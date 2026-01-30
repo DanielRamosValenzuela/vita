@@ -1112,9 +1112,85 @@
       "comingSoon": "Próximamente: CRUD completo de tipos de turno"
     },
     "rates": {
-      "title": "Tarifas",
-      "description": "Configura las tarifas de turnos",
-      "comingSoon": "Próximamente: CRUD completo de tarifas"
+      "title": "Tarifas y Contratos",
+      "description": "Asigna tarifas al personal según lo negociado. Crea tipos globales o personaliza por persona.",
+      "noOrganization": "No tienes una organización asignada",
+      "loadError": "Error al cargar",
+      "staffTable": {
+        "title": "Personal y tarifas",
+        "person": "Persona",
+        "area": "Área",
+        "rateSource": "Origen",
+        "effectiveRate": "Tarifa efectiva",
+        "baseSalary": "Sueldo base",
+        "actions": "Acciones",
+        "noContract": "Sin contrato",
+        "source": {
+          "template": "Tipo: {name}",
+          "template_adjusted": "Tipo: {name} + {adjustment}",
+          "custom": "Personalizada"
+        }
+      },
+      "rateTemplates": {
+        "title": "Tipos de tarifa",
+        "description": "Plantillas reutilizables (ej: Guardia nocturno, Enfermera día)",
+        "create": "Nuevo tipo",
+        "empty": "Sin tipos aún. Crea uno para asignar al personal."
+      },
+      "contract": {
+        "create": "Asignar tarifa",
+        "edit": "Editar contrato",
+        "createTitle": "Asignar tarifa a {name}",
+        "editTitle": "Editar contrato de {name}",
+        "rateType": "Tipo de tarifa",
+        "rateTypePlaceholder": "Seleccionar tipo (opcional)",
+        "customRate": "Tarifa personalizada ($/min)",
+        "adjustment": "Ajuste adicional ($/min)",
+        "adjustmentHelp": "Suma al tipo base si aplica",
+        "area": "Área principal",
+        "areaPlaceholder": "Seleccionar área",
+        "baseSalary": "Sueldo base (opcional)",
+        "baseSalaryUnit": "Unidad",
+        "baseSalaryUnits": {
+          "MONTHLY": "Mensual",
+          "DAILY": "Diario",
+          "HOURLY": "Por hora"
+        },
+        "useCustom": "Usar tarifa personalizada",
+        "useTemplate": "Usar tipo de tarifa"
+      },
+      "rateTemplateForm": {
+        "createTitle": "Nuevo tipo de tarifa",
+        "editTitle": "Editar tipo de tarifa",
+        "name": "Nombre",
+        "namePlaceholder": "ej: Guardia nocturno",
+        "ratePerMinute": "Tarifa por minuto",
+        "baseSalary": "Sueldo base (opcional)",
+        "contractsCount": "{count} contrato(s)"
+      },
+      "delete": {
+        "contractTitle": "Finalizar contrato",
+        "contractDescription": "¿Finalizar este contrato? Quedará en el historial.",
+        "templateTitle": "Eliminar tipo de tarifa",
+        "templateDescription": "¿Eliminar este tipo? No puede tener contratos asociados.",
+        "confirm": "Confirmar",
+        "endContract": "Finalizar",
+        "deleting": "Procesando..."
+      },
+      "toast": {
+        "contractCreated": "Contrato creado",
+        "contractUpdated": "Contrato actualizado",
+        "contractEnded": "Contrato finalizado",
+        "templateCreated": "Tipo creado",
+        "templateUpdated": "Tipo actualizado",
+        "templateDeleted": "Tipo eliminado",
+        "error": "Error"
+      },
+      "empty": {
+        "noStaff": "No hay personal. Invita a staff o chiefs primero.",
+        "noContract": "Sin asignar"
+      },
+      "perMinute": "/min"
     }
   },
   "errors": {

@@ -153,6 +153,125 @@
   2. Extraer lógica común de badges y "user counts por rol" a `shared` o `entities` según corresponda.
   3. Depurar front: `npm run dev`, login ADMIN_HR, revisar flujos de shifts, organizaciones y límites.
 
+### ✅ Sesión del 23 de Enero 2026 - CRUD Tarifas (Rates)
+
+**Contexto:** Admin HR gestiona tipos de tarifa (catálogo de precios por minuto/hora). Tarifas por área o persona se implementarán después.
+
+**Completado:**
+
+- ✅ **Server Actions** (`admin-hr/api/rate-actions.ts`):
+  - `getRatesAction()` – Lista tarifas de la organización con `_count.shiftRates`
+  - `createRateAction()` – Crear tarifa (name, description, type, unit, amount, isActive)
+  - `updateRateAction()` – Actualizar tarifa
+  - `deleteRateAction()` – Eliminar solo si no hay turnos asociados
+  - Validaciones: monto ≥ 0, nombres únicos, organización del usuario
+
+- ✅ **UI RatesPage** (`admin-hr/ui/rates-page.tsx`):
+  - Tabla: nombre, tipo (HOURLY/MINUTELY), unidad (MINUTE/HOUR), monto (formatCurrency), descripción, estado, turnos asociados, acciones
+  - Modal crear/editar: nombre, tipo, unidad, monto, descripción, activo
+  - Modal eliminar con advertencias si hay turnos asociados
+  - Estado vacío con CTA
+  - Semántica: section, header, listas
+
+- ✅ **i18n** (`adminHR.rates`): Claves ES/EN para título, descripción, tabla, formulario, modales, tipos, unidades, toasts.
+
+- ✅ **Rutas**:
+  - `/dashboard/rates` – Página principal (sidebar Admin HR)
+  - `/dashboard/admin-hr/rates` – Redirección a `/dashboard/rates`
+
+- ✅ **Reutilización (DRY):** `formatCurrency` de shared, patrón alineado con shift-types (modales, tabla, actions).
+
+- ✅ **Build:** `npm run lint` y `npm run build` pasan correctamente.
+
+### ✅ Sesión del 23 de Enero 2026 - Fixes Prisma, Auth, Login y Revisión DRY
+
+**Contexto:** Errores de login (MODULE_NOT_FOUND), db:generate fallando, migrate dev colgado. Revisión general de código y DRY.
+
+**Completado:**
+
+- ✅ **Prisma – fixes:**
+  - `compilerBuild = "small"` en schema: evita `query_compiler_fast_bg` y resuelve MODULE_NOT_FOUND.
+  - `@prisma/client` alineado a 7.3.0 (antes 7.1.0) para coincidir con CLI.
+  - Script `db:migrate` en package.json.
+  - `prisma generate` y `prisma db push` funcionando correctamente.
+
+- ✅ **Auth – manejo de errores:**
+  - `authorize` y callback `jwt` envueltos en try-catch para fallos de BD.
+  - Logs con `[NextAuth authorize]` y `[NextAuth jwt]` para depuración.
+
+- ✅ **UX – router.refresh en lugar de reload:**
+  - `rates-page`, `shift-types-page`, `shift-form-dialog`: reemplazo de `window.location.reload()` por `router.refresh()` tras create/update/delete para revalidar sin recarga completa.
+  - `invitations-section` mantiene reload tras aceptar (actualización de sesión/org).
+
+- ✅ **Revisión DRY:**
+  - InvitationsTableBase ya compartido; admin-hr y super-admin usan wrapper con actions propias.
+  - Patrones CRUD (ShiftTypes, Rates) consistentes; sin duplicación crítica.
+  - Uso correcto de shared utils: formatCurrency, formatDate, badge variants, role-display.
+
+- ✅ **Utilidad:** `npx kill-port 3000` para liberar puerto al reiniciar.
+
+### ✅ Sesión del 23 de Enero 2026 - DRY: InvitationsTable unificado + i18n shift-form
+
+**Completado:**
+
+- ✅ **InvitationsTable unificado (DRY):**
+  - Nuevo `InvitationsTableWithCancel` en `shared/ui/molecules`: recibe `onCancelInvitation(id)` como prop.
+  - admin-hr y super-admin `InvitationsTable` reducidos a wrappers que pasan su `cancelInvitationAction`.
+  - Eliminadas ~120 líneas duplicadas.
+
+- ✅ **i18n en shift-form:**
+  - Reemplazado hardcode `'Error al verificar conflictos de horario'` por `t('conflicts.error')` en `shift-form.tsx`.
+
+**DRY – sugerido (no aplicado):**
+  - Hook `useAsyncAction` para useTransition + toast: ganancia menor frente a la legibilidad actual.
+
+### ✅ Sesión del 23 de Enero 2026 - Limpieza de código muerto
+
+**Completado:**
+
+- ✅ **Código muerto eliminado:**
+  - `shift-form.tsx`: expresión vacía `{}` en el JSX.
+  - `shared/lib/constants/toast-messages.ts`: `TOAST_MESSAGES` nunca importado/usado.
+  - `shared/lib/utils/format.ts`: `formatRUT` y `formatNumber` nunca usados (se mantiene `formatPercentage`).
+  - `shared/lib/validation/document.ts`: `validateRUT` nunca usado (tax-id-config tiene su propia validación).
+  - `entities/shift/lib/shift-repository.ts`: repositorio completo sin referencias; `shift-actions` usa Prisma directamente.
+  - `features/admin-hr/api/shift-type-actions.ts`: stubs nunca usados; la implementación real está en `shifts/api/shift-type-actions.ts`.
+
+- ✅ **Actualización de índices:** `entities/shift`, `shared/lib/validation`, `shared/lib/constants`, `admin-hr/api`.
+
+- ✅ **Lint y build:** correctos tras la limpieza.
+
+### ✅ Sesión del 23 de Enero 2026 - Refactor Tarifas → Contratos y Tipos de Tarifa
+
+**Contexto:** Las tarifas pasan a ser por persona (negociadas), no por área. Staff puede tener múltiples contratos con distintas organizaciones. Sueldo base opcional por contrato. Historial de contratos (startDate/endDate).
+
+**Completado:**
+
+- ✅ **Schema Prisma:**
+  - Eliminados: `Rate`, `ShiftRate`, enums `RateType`, `RateUnit`.
+  - Nuevo: `RateTemplate` (tipos globales: nombre, ratePerMinute, baseSalary opcional, baseSalaryUnit).
+  - Nuevo: `Contract` (userId, organizationId, areaId?, rateTemplateId?, ratePerMinute?, adjustmentPerMinute, baseSalary?, baseSalaryUnit?, startDate, endDate, isActive).
+  - `Shift`: añadido `contractId` opcional.
+  - Enum `BaseSalaryUnit`: MONTHLY, DAILY, HOURLY.
+
+- ✅ **Lógica de tarifa efectiva:**
+  - Tipo base + ajuste: `RateTemplate.ratePerMinute + adjustmentPerMinute`.
+  - Personalizada: `Contract.ratePerMinute` (override o única).
+  - Origen visible en UI: template, template_adjusted, custom.
+
+- ✅ **API:** `rate-template-actions` (CRUD tipos), `contract-actions` (getContractsPageData, create, update, end, delete).
+
+- ✅ **UI:** `ContractsPage` con:
+  - Sección tipos de tarifa (badges, crear/editar/eliminar).
+  - Tabla staff (persona, área, origen tarifa, tarifa efectiva, sueldo base, acciones).
+  - Modales: crear/editar contrato (área, tipo o custom, ajuste, sueldo base), crear/editar tipo, finalizar contrato, eliminar tipo.
+
+- ✅ **i18n:** Claves ES/EN para `adminHR.rates` (staffTable, rateTemplates, contract, rateTemplateForm, delete, toast, empty).
+
+- ✅ **Dashboard:** `totalRates` → `totalContracts`; tarjeta "Contratos con tarifa".
+
+- ✅ **`db push`** y **`prisma generate`** ejecutados. **Lint y build:** correctos.
+
 ### ✅ Sesión del 11 de Enero 2026 - Integración de Invitaciones en Mi Organización
 
 **Completado:**

@@ -1,13 +1,14 @@
 import { getTranslations } from 'next-intl/server'
 
-import { requireAdminHR } from '@/src/shared/lib/auth'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
+import { getContractsPageDataAction } from '@/src/features/admin-hr/api/contract-actions'
+import { ContractsPage } from '@/src/features/admin-hr/ui'
+import { requireAdminHR } from '@/src/shared/lib/auth/session'
 
-interface RatesPageProps {
+interface RatesRouteProps {
   params: Promise<{ locale: string }>
 }
 
-export async function generateMetadata({ params }: RatesPageProps) {
+export async function generateMetadata({ params }: RatesRouteProps) {
   const { locale } = await params
   const t = await getTranslations({ locale, namespace: 'adminHR.rates' })
 
@@ -17,27 +18,41 @@ export async function generateMetadata({ params }: RatesPageProps) {
   }
 }
 
-export default async function RatesPage({ params }: RatesPageProps) {
+export default async function RatesRoute({ params }: RatesRouteProps) {
   const { locale } = await params
-  await requireAdminHR(locale)
+  const session = await requireAdminHR(locale)
   const t = await getTranslations('adminHR.rates')
 
+  if (!session.organizationId)
+    return (
+      <div className="space-y-8">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
+          <p className="text-muted-foreground mt-2">{t('noOrganization')}</p>
+        </div>
+      </div>
+    )
+
+  const result = await getContractsPageDataAction()
+
+  if (!result.success || !result.data)
+    return (
+      <div className="space-y-8">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
+          <p className="text-muted-foreground mt-2">{t('loadError')}</p>
+        </div>
+      </div>
+    )
+
   return (
-    <div className="container mx-auto py-8">
-      <div className="mb-8">
+    <div className="space-y-8">
+      <div>
         <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
         <p className="text-muted-foreground mt-2">{t('description')}</p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('title')}</CardTitle>
-          <CardDescription>{t('description')}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">{t('comingSoon')}</p>
-        </CardContent>
-      </Card>
+      <ContractsPage data={result.data} />
     </div>
   )
 }

@@ -31,10 +31,10 @@ export function DashboardStatsCards({ stats }: DashboardStatsCardsProps) {
       description: 'Personal activo',
     },
     {
-      title: 'Tarifas',
-      value: stats.totalRates,
+      title: 'Contratos',
+      value: stats.totalContracts,
       icon: DollarSign,
-      description: 'Tarifas configuradas',
+      description: 'Contratos con tarifa',
     },
     {
       title: 'Turnos Activos',

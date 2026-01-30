@@ -2,6 +2,8 @@
 
 import { useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
+
+import { useRouter } from '@/i18n/navigation'
 import { Check, Edit, Palette, Plus, Trash2, X } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -52,6 +54,7 @@ interface ShiftTypesPageProps {
 
 export function ShiftTypesPage({ shiftTypes }: ShiftTypesPageProps) {
   const t = useTranslations('shifts.shiftTypes')
+  const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [editingShiftType, setEditingShiftType] = useState<ShiftType | null>(null)
@@ -104,7 +107,7 @@ export function ShiftTypesPage({ shiftTypes }: ShiftTypesPageProps) {
         toast.success(editingShiftType ? t('toast.updated') : t('toast.created'))
         setIsCreateDialogOpen(false)
         resetForm()
-        window.location.reload()
+        router.refresh()
       } else toast.error(result.error || t('toast.error'))
     })
   }
@@ -124,7 +127,7 @@ export function ShiftTypesPage({ shiftTypes }: ShiftTypesPageProps) {
         toast.success(t('toast.deleted'))
         setDeleteDialogOpen(false)
         setDeleteTarget(null)
-        window.location.reload()
+        router.refresh()
       } else toast.error(result.error || t('toast.error'))
     })
   }

@@ -19,18 +19,6 @@ export interface ShiftType {
   updatedAt: Date
 }
 
-export interface Rate {
-  id: string
-  name: string
-  dayHourlyRate: number
-  nightHourlyRate: number
-  weekendMultiplier: number
-  holidayMultiplier: number
-  organizationId: string
-  createdAt: Date
-  updatedAt: Date
-}
-
 export interface ActionResult<T> {
   success: boolean
   data?: T

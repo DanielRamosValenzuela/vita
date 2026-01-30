@@ -1,0 +1,269 @@
+'use server'
+
+import { revalidatePath } from 'next/cache'
+
+import { prisma } from '@/src/shared/lib/auth/config'
+import { requireAdminHR } from '@/src/shared/lib/auth/session'
+import type { ActionResult } from '@/src/shared/lib/types'
+
+interface RateTemplate {
+  id: string
+  name: string
+  description: string | null
+  ratePerMinute: number
+  ratePerHour: number | null
+  baseSalary: number | null
+  baseSalaryUnit: string | null
+  isActive: boolean
+  organizationId: string
+  createdAt: Date
+  updatedAt: Date
+  _count?: { contracts: number }
+}
+
+export const getRateTemplatesAction = async (): Promise<
+  ActionResult<RateTemplate[]>
+> => {
+  try {
+    const session = await requireAdminHR()
+    if (!session.organizationId)
+      return {
+        success: false,
+        error: 'No tienes una organización asignada',
+      }
+
+    const templates = await prisma.rateTemplate.findMany({
+      where: { organizationId: session.organizationId },
+      orderBy: { createdAt: 'desc' },
+      include: {
+        _count: { select: { contracts: true } },
+      },
+    })
+
+    return {
+      success: true,
+      data: templates.map((r) => ({
+        ...r,
+        description: r.description ?? null,
+      })),
+    }
+  } catch (error) {
+    console.error('[getRateTemplatesAction] Error:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Error al obtener tipos de tarifa',
+    }
+  }
+}
+
+export const createRateTemplateAction = async (data: {
+  name: string
+  description?: string
+  ratePerMinute: number
+  ratePerHour?: number
+  baseSalary?: number
+  baseSalaryUnit?: 'MONTHLY' | 'DAILY' | 'HOURLY'
+  isActive?: boolean
+}): Promise<ActionResult<RateTemplate>> => {
+  try {
+    const session = await requireAdminHR()
+    if (!session.organizationId)
+      return {
+        success: false,
+        error: 'No tienes una organización asignada',
+      }
+
+    if (data.ratePerMinute < 0)
+      return {
+        success: false,
+        error: 'El monto no puede ser negativo',
+      }
+
+    const existing = await prisma.rateTemplate.findFirst({
+      where: {
+        name: data.name,
+        organizationId: session.organizationId,
+      },
+    })
+
+    if (existing)
+      return {
+        success: false,
+        error: 'Ya existe un tipo de tarifa con ese nombre en tu organización',
+      }
+
+    const ratePerHour = data.ratePerHour ?? data.ratePerMinute * 60
+
+    const template = await prisma.rateTemplate.create({
+      data: {
+        name: data.name,
+        description: data.description || null,
+        ratePerMinute: data.ratePerMinute,
+        ratePerHour,
+        baseSalary: data.baseSalary ?? null,
+        baseSalaryUnit: data.baseSalaryUnit ?? null,
+        isActive: data.isActive ?? true,
+        organizationId: session.organizationId,
+      },
+      include: {
+        _count: { select: { contracts: true } },
+      },
+    })
+
+    revalidatePath('/dashboard/rates')
+
+    return {
+      success: true,
+      data: template,
+      message: 'Tipo de tarifa creado exitosamente',
+    }
+  } catch (error) {
+    console.error('[createRateTemplateAction] Error:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Error al crear tipo de tarifa',
+    }
+  }
+}
+
+export const updateRateTemplateAction = async (
+  id: string,
+  data: {
+    name?: string
+    description?: string
+    ratePerMinute?: number
+    ratePerHour?: number
+    baseSalary?: number
+    baseSalaryUnit?: 'MONTHLY' | 'DAILY' | 'HOURLY'
+    isActive?: boolean
+  }
+): Promise<ActionResult<RateTemplate>> => {
+  try {
+    const session = await requireAdminHR()
+    if (!session.organizationId)
+      return {
+        success: false,
+        error: 'No tienes una organización asignada',
+      }
+
+    if (data.ratePerMinute !== undefined && data.ratePerMinute < 0)
+      return {
+        success: false,
+        error: 'El monto no puede ser negativo',
+      }
+
+    const existing = await prisma.rateTemplate.findUnique({
+      where: { id },
+    })
+
+    if (!existing)
+      return {
+        success: false,
+        error: 'Tipo de tarifa no encontrado',
+      }
+
+    if (existing.organizationId !== session.organizationId)
+      return {
+        success: false,
+        error: 'El tipo de tarifa no pertenece a tu organización',
+      }
+
+    if (data.name && data.name !== existing.name) {
+      const duplicate = await prisma.rateTemplate.findFirst({
+        where: {
+          name: data.name,
+          organizationId: session.organizationId,
+          id: { not: id },
+        },
+      })
+      if (duplicate)
+        return {
+          success: false,
+          error: 'Ya existe un tipo de tarifa con ese nombre en tu organización',
+        }
+    }
+
+    const updated = await prisma.rateTemplate.update({
+      where: { id },
+      data: {
+        ...data,
+        ratePerHour:
+          data.ratePerMinute !== undefined
+            ? data.ratePerMinute * 60
+            : data.ratePerHour,
+      },
+      include: {
+        _count: { select: { contracts: true } },
+      },
+    })
+
+    revalidatePath('/dashboard/rates')
+
+    return {
+      success: true,
+      data: updated,
+      message: 'Tipo de tarifa actualizado exitosamente',
+    }
+  } catch (error) {
+    console.error('[updateRateTemplateAction] Error:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Error al actualizar tipo de tarifa',
+    }
+  }
+}
+
+export const deleteRateTemplateAction = async (
+  id: string
+): Promise<ActionResult<null>> => {
+  try {
+    const session = await requireAdminHR()
+    if (!session.organizationId)
+      return {
+        success: false,
+        error: 'No tienes una organización asignada',
+      }
+
+    const existing = await prisma.rateTemplate.findUnique({
+      where: { id },
+      include: {
+        _count: { select: { contracts: true } },
+      },
+    })
+
+    if (!existing)
+      return {
+        success: false,
+        error: 'Tipo de tarifa no encontrado',
+      }
+
+    if (existing.organizationId !== session.organizationId)
+      return {
+        success: false,
+        error: 'El tipo de tarifa no pertenece a tu organización',
+      }
+
+    if (existing._count.contracts > 0)
+      return {
+        success: false,
+        error: 'No se puede eliminar: tiene contratos asociados',
+      }
+
+    await prisma.rateTemplate.delete({
+      where: { id },
+    })
+
+    revalidatePath('/dashboard/rates')
+
+    return {
+      success: true,
+      message: 'Tipo de tarifa eliminado exitosamente',
+    }
+  } catch (error) {
+    console.error('[deleteRateTemplateAction] Error:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Error al eliminar tipo de tarifa',
+    }
+  }
+}

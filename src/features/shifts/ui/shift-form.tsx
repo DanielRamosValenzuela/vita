@@ -116,7 +116,7 @@ export function ShiftForm({
       }
       await onSubmit(shiftData)
     } catch (_error) {
-      toast.error('Error al verificar conflictos de horario')
+      toast.error(t('conflicts.error'))
     } finally {
       setIsCheckingConflicts(false)
     }
@@ -129,7 +129,6 @@ export function ShiftForm({
       </CardHeader>
       <CardContent className="space-y-6">
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-          {}
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="title">{t('titleLabel')}</Label>
