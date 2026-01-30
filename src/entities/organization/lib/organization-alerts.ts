@@ -62,7 +62,7 @@ export async function getOrganizationsWithLimitAlerts(): Promise<UsageSummary> {
     for (const { role, maxLimit } of roles) {
       const currentCount = userCounts[role] || 0
 
-      if (maxLimit === 0) continue // Skip if limit is 0 (unlimited)
+      if (maxLimit === 0) continue
 
       const usagePercentage = (currentCount / maxLimit) * 100
 
@@ -160,7 +160,7 @@ export async function getOrganizationLimitAlerts(organizationId: string): Promis
 
     const usagePercentage = (currentCount / maxLimit) * 100
 
-    if (usagePercentage >= 80) {
+    if (usagePercentage >= 80) 
       alerts.push({
         organizationId: organization.id,
         organizationName: organization.name,
@@ -171,7 +171,7 @@ export async function getOrganizationLimitAlerts(organizationId: string): Promis
         alertType: usagePercentage >= 100 ? 'critical' : 'warning',
         message: `${usagePercentage >= 100 ? 'Límite alcanzado' : 'Cerca del límite'}: ${currentCount}/${maxLimit} para ${getRoleLabel(role)}`,
       })
-    }
+    
   }
 
   return alerts.sort((a, b) => b.usagePercentage - a.usagePercentage)

@@ -185,9 +185,9 @@ export function EditOrganizationForm({ organization }: EditOrganizationFormProps
                   <SelectValue placeholder={t('form.plan.placeholder')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="BASIC">Basic</SelectItem>
-                  <SelectItem value="PRO">Pro</SelectItem>
-                  <SelectItem value="ENTERPRISE">Enterprise</SelectItem>
+                  <SelectItem value="BASIC">{tOrgs('plans.BASIC')}</SelectItem>
+                  <SelectItem value="PRO">{tOrgs('plans.PRO')}</SelectItem>
+                  <SelectItem value="ENTERPRISE">{tOrgs('plans.ENTERPRISE')}</SelectItem>
                 </SelectContent>
               </Select>
               {errors.plan && <p className="text-destructive text-sm">{errors.plan.message}</p>}
@@ -224,7 +224,7 @@ export function EditOrganizationForm({ organization }: EditOrganizationFormProps
               <Label htmlFor="maxAdminHR">
                 {t('form.maxAdminHR.label')}
                 <Badge variant="secondary" className="ml-2">
-                  {currentAdminHR} actuales
+                  {t('form.currentCount', { count: currentAdminHR })}
                 </Badge>
               </Label>
               <Input
@@ -239,8 +239,7 @@ export function EditOrganizationForm({ organization }: EditOrganizationFormProps
                 aria-invalid={!!errors.maxAdminHR}
               />
               <p className="text-muted-foreground text-xs">
-                {t('form.maxAdminHR.description')} (Mín: {currentAdminHR}, Máx:{' '}
-                {planLimits.maxAdminHR})
+                {t('form.maxAdminHR.description')} {t('form.minMaxDescription', { min: currentAdminHR, max: planLimits.maxAdminHR })}
               </p>
               {errors.maxAdminHR && (
                 <p className="text-destructive text-sm">{errors.maxAdminHR.message}</p>
@@ -251,7 +250,7 @@ export function EditOrganizationForm({ organization }: EditOrganizationFormProps
               <Label htmlFor="maxChiefs">
                 {t('form.maxChiefs.label')}
                 <Badge variant="secondary" className="ml-2">
-                  {currentChiefs} actuales
+                  {t('form.currentCount', { count: currentChiefs })}
                 </Badge>
               </Label>
               <Input
@@ -266,8 +265,7 @@ export function EditOrganizationForm({ organization }: EditOrganizationFormProps
                 aria-invalid={!!errors.maxChiefs}
               />
               <p className="text-muted-foreground text-xs">
-                {t('form.maxChiefs.description')} (Mín: {currentChiefs}, Máx: {planLimits.maxChiefs}
-                )
+                {t('form.maxChiefs.description')} {t('form.minMaxDescription', { min: currentChiefs, max: planLimits.maxChiefs })}
               </p>
               {errors.maxChiefs && (
                 <p className="text-destructive text-sm">{errors.maxChiefs.message}</p>
@@ -278,7 +276,7 @@ export function EditOrganizationForm({ organization }: EditOrganizationFormProps
               <Label htmlFor="maxStaff">
                 {t('form.maxStaff.label')}
                 <Badge variant="secondary" className="ml-2">
-                  {currentStaff} actuales
+                  {t('form.currentCount', { count: currentStaff })}
                 </Badge>
               </Label>
               <Input
@@ -293,7 +291,7 @@ export function EditOrganizationForm({ organization }: EditOrganizationFormProps
                 aria-invalid={!!errors.maxStaff}
               />
               <p className="text-muted-foreground text-xs">
-                {t('form.maxStaff.description')} (Mín: {currentStaff}, Máx: {planLimits.maxStaff})
+                {t('form.maxStaff.description')} {t('form.minMaxDescription', { min: currentStaff, max: planLimits.maxStaff })}
               </p>
               {errors.maxStaff && (
                 <p className="text-destructive text-sm">{errors.maxStaff.message}</p>

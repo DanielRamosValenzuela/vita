@@ -33,9 +33,7 @@ export async function checkOrganizationRoleLimit(
     },
   })
 
-  if (!organization) 
-    return { success: false, error: 'Organización no encontrada' }
-  
+  if (!organization) return { success: false, error: 'Organization not found' }
 
   let maxLimit: number
   switch (role) {
@@ -49,7 +47,7 @@ export async function checkOrganizationRoleLimit(
       maxLimit = organization.maxStaff
       break
     default:
-      return { success: false, error: 'Rol no válido para verificar límites' }
+      return { success: false, error: 'Invalid role for limit check' }
   }
 
   const currentCount = organization._count.users

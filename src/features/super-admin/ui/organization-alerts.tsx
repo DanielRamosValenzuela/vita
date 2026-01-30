@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { AlertCircle, AlertTriangle } from 'lucide-react'
 
 import { Badge } from '@/src/shared/ui/badge'
@@ -29,17 +30,17 @@ interface OrganizationAlertsProps {
 }
 
 export function OrganizationAlerts({ organizationId, alerts }: OrganizationAlertsProps) {
-  if (!alerts || alerts.alerts.length === 0) {
-    return null
-  }
+  const t = useTranslations('organizationAlerts')
+
+  if (!alerts || alerts.alerts.length === 0) return null
 
   const filteredAlerts = organizationId
     ? alerts.alerts.filter((alert) => alert.organizationId === organizationId)
     : alerts.alerts
 
-  if (filteredAlerts.length === 0) {
+  if (filteredAlerts.length === 0) 
     return null
-  }
+  
 
   const criticalAlerts = filteredAlerts.filter((alert) => alert.alertType === 'critical')
   const warningAlerts = filteredAlerts.filter((alert) => alert.alertType === 'warning')
@@ -48,39 +49,37 @@ export function OrganizationAlerts({ organizationId, alerts }: OrganizationAlert
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <AlertTriangle className="h-5 w-5 text-orange-500" />
-          Alertas de Límites
+          <AlertTriangle className="h-5 w-5 text-muted-foreground" />
+          {t('title')}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Resumen general */}
         {!organizationId && (
           <div className="grid gap-4 md:grid-cols-3">
             <div className="text-center p-4 bg-muted/50 rounded-lg">
-              <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
+              <div className="text-2xl font-bold text-muted-foreground">
                 {alerts.organizationsWithWarnings}
               </div>
-              <div className="text-sm text-muted-foreground">Organizaciones con advertencias</div>
+              <div className="text-sm text-muted-foreground">{t('withWarnings')}</div>
             </div>
             <div className="text-center p-4 bg-destructive/10 rounded-lg">
               <div className="text-2xl font-bold text-destructive">
                 {alerts.organizationsWithCriticals}
               </div>
-              <div className="text-sm text-muted-foreground">Organizaciones críticas</div>
+              <div className="text-sm text-muted-foreground">{t('withCriticals')}</div>
             </div>
             <div className="text-center p-4 bg-muted/50 rounded-lg">
               <div className="text-2xl font-bold">{filteredAlerts.length}</div>
-              <div className="text-sm text-muted-foreground">Total de alertas</div>
+              <div className="text-sm text-muted-foreground">{t('totalAlerts')}</div>
             </div>
           </div>
         )}
 
-        {/* Alertas críticas */}
         {criticalAlerts.length > 0 && (
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-sm font-medium text-destructive">
               <AlertCircle className="h-4 w-4" />
-              Límites Alcanzados ({criticalAlerts.length})
+              {t('limitsReached', { count: criticalAlerts.length })}
             </div>
             <div className="space-y-2">
               {criticalAlerts.map((alert) => (
@@ -91,7 +90,7 @@ export function OrganizationAlerts({ organizationId, alerts }: OrganizationAlert
                   <div className="flex-1">
                     <div className="font-medium text-sm">{alert.message}</div>
                     <div className="text-xs text-muted-foreground mt-1">
-                      {alert.usagePercentage.toFixed(1)}% utilizado
+                      {alert.usagePercentage.toFixed(1)} {t('percentUsed')}
                     </div>
                   </div>
                   <Badge variant="destructive">
@@ -103,23 +102,22 @@ export function OrganizationAlerts({ organizationId, alerts }: OrganizationAlert
           </div>
         )}
 
-        {/* Alertas de advertencia */}
         {warningAlerts.length > 0 && (
           <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm font-medium text-orange-600 dark:text-orange-400">
+            <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
               <AlertTriangle className="h-4 w-4" />
-              Cerca del Límite ({warningAlerts.length})
+              {t('nearLimit', { count: warningAlerts.length })}
             </div>
             <div className="space-y-2">
               {warningAlerts.map((alert) => (
                 <div
                   key={`${alert.organizationId}-${alert.role}`}
-                  className="flex items-center justify-between p-3 rounded-lg border border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-950"
+                  className="flex items-center justify-between p-3 rounded-lg border border-muted bg-muted/50"
                 >
                   <div className="flex-1">
                     <div className="font-medium text-sm">{alert.message}</div>
                     <div className="text-xs text-muted-foreground mt-1">
-                      {alert.usagePercentage.toFixed(1)}% utilizado
+                      {alert.usagePercentage.toFixed(1)} {t('percentUsed')}
                     </div>
                   </div>
                   <Badge variant="secondary">

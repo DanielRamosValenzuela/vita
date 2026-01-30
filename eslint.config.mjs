@@ -2,6 +2,8 @@ import nextVitals from 'eslint-config-next/core-web-vitals'
 import nextTs from 'eslint-config-next/typescript'
 import prettier from 'eslint-config-prettier'
 import { defineConfig, globalIgnores } from 'eslint/config'
+import sanityI18n from '@sanity/eslint-plugin-i18n'
+import noComments from 'eslint-plugin-no-comments'
 
 const eslintConfig = defineConfig([
   ...nextVitals,
@@ -20,6 +22,7 @@ const eslintConfig = defineConfig([
   ]),
 
   {
+    plugins: { 'no-comments': noComments },
     rules: {
       '@typescript-eslint/no-unused-vars': [
         'error',
@@ -34,8 +37,68 @@ const eslintConfig = defineConfig([
       'react-hooks/exhaustive-deps': 'warn',
       'react-hooks/set-state-in-effect': 'off',
       'no-console': ['warn', { allow: ['warn', 'error'] }],
-      'spaced-comment': ['error', 'never', { block: { exceptions: ['*'], balanced: true } }],
       curly: ['error', 'multi'],
+      'no-comments/disallowComments': 'error',
+    },
+  },
+
+  {
+    files: ['app/**/*.{ts,tsx}', 'src/**/*.{ts,tsx}'],
+    plugins: { '@sanity/i18n': sanityI18n },
+    rules: {
+      'react/jsx-no-literals': [
+        'error',
+        {
+          noStrings: true,
+          ignoreProps: true,
+          allowedStrings: [
+            ':',
+            '/',
+            '(',
+            ')',
+            '-',
+            '•',
+            '©',
+            '+',
+            '%',
+            ' ',
+            '"',
+            '👔',
+            '🏥',
+            '⚕️',
+            '❓',
+            '⚠️',
+            '🟢',
+            '🟡',
+            '🔴',
+            '⚫',
+          ],
+        },
+      ],
+      '@sanity/i18n/no-attribute-string-literals': [
+        'error',
+        {
+          mode: 'extend',
+          ignores: {
+            or: [
+              {
+                attributes: [
+                  'size',
+                  'variant',
+                  'attribute',
+                  'defaultTheme',
+                  'position',
+                  'translationNamespace',
+                ],
+              },
+            ],
+          },
+        },
+      ],
+      '@sanity/i18n/no-attribute-template-literals': [
+        'error',
+        { mode: 'extend' },
+      ],
     },
   },
 ])

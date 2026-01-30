@@ -1,5 +1,7 @@
 'use client'
 
+/* eslint-disable react/jsx-no-literals -- Fallback when root layout crashes; i18n provider may be unavailable. */
+
 import { useEffect } from 'react'
 import { AlertCircle, Home } from 'lucide-react'
 

@@ -68,9 +68,7 @@ export function OrganizationsTable({ organizations }: OrganizationsTableProps) {
         <div className="flex items-center justify-between">
           <div>
             <CardTitle>{t('title')}</CardTitle>
-            <CardDescription className="mt-1">
-              Últimas organizaciones registradas o actualizadas
-            </CardDescription>
+            <CardDescription className="mt-1">{t('latestDescription')}</CardDescription>
           </div>
           <div className="flex gap-2">
             <Button asChild variant="outline">

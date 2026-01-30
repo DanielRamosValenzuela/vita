@@ -1,3 +1,5 @@
+/* eslint-disable react/jsx-no-literals -- Página en construcción (placeholder). */
+
 interface SupportPageProps {
   params: Promise<{ locale: string }>
 }

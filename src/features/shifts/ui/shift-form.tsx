@@ -25,7 +25,9 @@ import { Textarea } from '@/src/shared/ui/textarea'
 import { Calendar } from '@/shared/ui/calendar'
 import { Checkbox } from '@/shared/ui/checkbox'
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover'
-import { checkShiftConflicts } from '@/src/entities/shift'
+import { checkShiftConflictsClient } from '@/src/entities/shift/lib/shift-validation-client'
+
+import type { CreateShiftData, CreateShiftFormData } from '../types/shift-types'
 
 const shiftSchema = z.object({
   title: z.string().optional(),
@@ -44,18 +46,18 @@ const shiftSchema = z.object({
 type ShiftFormData = z.infer<typeof shiftSchema>
 
 interface ShiftFormProps {
-  organizationId: string
+  _organizationId: string
   users: Array<{ id: string; name: string; role: string }>
   areas: Array<{ id: string; name: string; description?: string }>
   shiftTypes: Array<{ id: string; name: string; color: string }>
   initialData?: Partial<ShiftFormData>
-  onSubmit: (data: any) => Promise<void>
+  onSubmit: (data: CreateShiftData) => Promise<void>
   onCancel: () => void
   isPending?: boolean
 }
 
 export function ShiftForm({
-  organizationId,
+  _organizationId,
   users,
   areas,
   shiftTypes,
@@ -86,8 +88,8 @@ export function ShiftForm({
   const selectedArea = areas.find((area) => area.id === form.watch('areaId'))
   const selectedShiftType = shiftTypes.find((type) => type.id === form.watch('shiftTypeId'))
 
-  const handleSubmit = async (data: any) => {
-    // Combinar fecha y hora para crear objetos Date completos
+  const handleSubmit = async (data: CreateShiftFormData) => {
+    
     const startDateTime = new Date(data.startDate)
     const [startHour, startMinute] = data.startTime.split(':')
     startDateTime.setHours(parseInt(startHour), parseInt(startMinute), 0, 0)
@@ -96,28 +98,24 @@ export function ShiftForm({
     const [endHour, endMinute] = data.endTime.split(':')
     endDateTime.setHours(parseInt(endHour), parseInt(endMinute), 0, 0)
 
-    // Verificar conflictos de horario
+    
     setIsCheckingConflicts(true)
     try {
-      const conflictResult = await checkShiftConflicts(
-        data.userId,
-        data.areaId,
-        startDateTime,
-        endDateTime
-      )
+      const conflictResult = checkShiftConflictsClient(startDateTime, endDateTime)
 
       if (conflictResult.hasConflict) {
         toast.error(conflictResult.message)
         return
       }
 
-      // Enviar datos con fechas combinadas
-      await onSubmit({
+      
+      const shiftData: CreateShiftData = {
         ...data,
         startTime: startDateTime,
         endTime: endDateTime,
-      })
-    } catch (error) {
+      }
+      await onSubmit(shiftData)
+    } catch (_error) {
       toast.error('Error al verificar conflictos de horario')
     } finally {
       setIsCheckingConflicts(false)
@@ -131,7 +129,7 @@ export function ShiftForm({
       </CardHeader>
       <CardContent className="space-y-6">
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-          {/* Información básica */}
+          {}
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="title">{t('titleLabel')}</Label>
@@ -163,7 +161,7 @@ export function ShiftForm({
             </div>
           </div>
 
-          {/* Área y tipo de turno */}
+          {}
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="areaId">{t('areaLabel')}</Label>
@@ -218,7 +216,7 @@ export function ShiftForm({
             </div>
           </div>
 
-          {/* Fechas y horas */}
+          {}
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="startDate">{t('startDateLabel')}</Label>
@@ -277,7 +275,7 @@ export function ShiftForm({
             </div>
           </div>
 
-          {/* Notas */}
+          {}
           <div className="space-y-2">
             <Label htmlFor="notes">{t('notesLabel')}</Label>
             <Textarea
@@ -288,7 +286,7 @@ export function ShiftForm({
             />
           </div>
 
-          {/* Botones de acción */}
+          {}
           <div className="flex justify-end gap-2 pt-4">
             <Button
               type="button"

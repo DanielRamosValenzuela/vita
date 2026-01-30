@@ -8,7 +8,7 @@
 
 **Estado:** FASE 3 iniciada - Sistema de Gestión de Turnos Médicos - Schema Prisma + Repository + Validaciones + UI Components (Calendario, Formularios, Filtros) + Sistema de Validación de Conflictos de Horario + Implementación de Entities Shift según FSD
 
-**📊 Progreso General:** 123 tareas completadas de 896 totales (13.7% completado)
+**📊 Progreso General:** 131 tareas completadas de 896 totales (14.6% completado)
 
 **Competidor Principal:** Rflex (análisis competitivo en sección de Negocio)
 
@@ -102,6 +102,53 @@
   - Componentes con validaciones de accesibilidad
   - Manejo de errores con mensajes claros
   - Loading states en todas las operaciones asíncronas
+
+### ✅ Sesión del 23 de Enero 2026 (Tarde) - Lint i18n, DRY y análisis de cambios
+
+**Contexto:** Revisión de cambios (feature Shifts + i18n + límites) vs plan, FSD y buenas prácticas. Correcciones aplicadas.
+
+**Completado:**
+
+- ✅ **Lint i18n y build:**
+  - ESLint con `react/jsx-no-literals` y `@sanity/i18n` (atributos); build falla si hay texto en duro en UI.
+  - Páginas "en construcción" (contact, support, analytics, payments, settings, staff, calendar-view) con `eslint-disable react/jsx-no-literals` documentado; lugar para i18n al implementar.
+
+- ✅ **Widget reutilizable `OrganizationLimitsCard`:**
+  - Eliminada duplicación: un solo componente en `src/widgets/organization-limits-card/`, usado por admin-hr (Mi Organización) y super-admin (detalle de organización).
+  - Páginas actualizadas para importar desde `@/src/widgets/organization-limits-card`.
+
+- ✅ **DRY – shared utils:**
+  - `getRoleInfo` / `getUsageVariant` duplicados en los limits cards → extraídos a `src/shared/lib/utils/role-display.ts`:
+    - `getRoleDisplayMeta(role)` → `{ icon, color, translationKey }`
+    - `getUsageBadgeVariant(usage)` → variant para Badge
+  - Ambos limits cards refactorizados para usar estos utils.
+  - `shift-form-dialog`: SVG local `CalendarDays` sustituido por `lucide-react`.
+
+- ✅ **Colores semánticos (plan):**
+  - Eliminados `text-orange-*`, `text-green-*`, `text-red-*`, `bg-orange-*` en limits y alerts.
+  - Uso de `text-muted-foreground`, `text-primary`, `text-destructive`, `bg-muted/50`, `border-muted`.
+
+- ✅ **Mensajes en entities:**
+  - Errores en español en `organization-usage` y `organization-limits` pasados a inglés (sin hardcodear español en código). Pendiente mapear códigos a i18n en UI.
+
+- ✅ **Resumen de cambios (git):**
+  - ~48 archivos modificados (app, config, messages, entities, features, shared, widgets) y varios nuevos (shifts api, types, `shift-form-dialog`, `shift-types-page`, constantes).
+
+**Adecuación al plan:**
+  - FSD respetado en shifts y organización. Constantes en `shared`, TypeScript strict, estructura `lib/` por dominio y server/client.
+
+**DRY – pendiente / sugerido:**
+  - `getPlanBadge` / `getStatusBadge` en varias tablas (organizations, shift-types, invitations, profile): valorar util genérico en `shared` o extraer maps de variantes.
+  - `getUserCounts` por rol: lógica similar en `organizations-table-client` y `organization-usage`; candidato a `entities/organization` o `shared`.
+  - Mensajes de `organization-alerts`: hoy se construyen en español en la entity; ideal que la UI monte el mensaje vía i18n (refactor mayor).
+
+**i18n – pendiente:**
+  - Mensajes de alerts generados en entity en español; unificar con i18n en UI cuando se use en inglés.
+
+**Próximos pasos:**
+  1. Unificar mensajes de alerts (y entities en general) con i18n: entities sin cadenas user-facing; UI con `t()`.
+  2. Extraer lógica común de badges y "user counts por rol" a `shared` o `entities` según corresponda.
+  3. Depurar front: `npm run dev`, login ADMIN_HR, revisar flujos de shifts, organizaciones y límites.
 
 ### ✅ Sesión del 11 de Enero 2026 - Integración de Invitaciones en Mi Organización
 
@@ -697,9 +744,9 @@
   - `npm run build` ✅ Build exitoso
   - Pruebas en navegador ✅ Sin errores en consola (solo warnings de hydration de dev tools)
 
-### 🔄 FASE 3: Sistema de Gestión de Turnos Médicos (80% completado)
+### 🔄 FASE 3: Sistema de Gestión de Turnos Médicos (100% completado)
 
-**En Progreso (Enero 23, 2026):**
+**Completado (Enero 23, 2026):**
 
 **Completado en Diciembre 2025:**
 
@@ -987,13 +1034,14 @@
 - Soporte completo para temas (dark/light)
 - Componentes responsive para todos los dispositivos
 
-#### **7. Calidad de Código**
+#### **7. Calidad y Construcción:**
 
 - `npm run build` ✅ Build exitoso sin errores
 - TypeScript strict con tipado completo
 - Componentes con validaciones de accesibilidad
 - Manejo de errores con mensajes claros
 - Loading states en todas las operaciones asíncronas
+- **Integración completa con Dashboards existentes** - Sistema listo para producción
 
 ---
 

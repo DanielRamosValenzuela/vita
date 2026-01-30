@@ -5,7 +5,6 @@ import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
-import { ROLES } from '@/src/shared/lib/constants'
 import { InviteUserFormBase, type FoundUser } from '@/src/shared/ui/molecules'
 
 import { inviteAdminHRAction, searchUserAction } from '../api/admin-hr-invitation-actions'

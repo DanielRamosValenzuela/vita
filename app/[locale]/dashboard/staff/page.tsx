@@ -1,3 +1,5 @@
+/* eslint-disable react/jsx-no-literals -- Página en construcción (Próximamente). */
+
 import { getTranslations } from 'next-intl/server'
 
 import { requireChiefArea } from '@/src/shared/lib/auth'

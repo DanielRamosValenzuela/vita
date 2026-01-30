@@ -30,8 +30,12 @@ import {
   type CreateOrganizationInput,
 } from '../lib/schemas'
 
+const COUNTRY_CODES = ['CL', 'AR', 'PE', 'CO', 'MX'] as const
+const PLAN_CODES = ['BASIC', 'PRO', 'ENTERPRISE'] as const
+
 export function CreateOrganizationForm() {
   const t = useTranslations('superAdmin.createOrganization')
+  const tOrgs = useTranslations('superAdmin.organizations')
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
@@ -128,11 +132,11 @@ export function CreateOrganizationForm() {
                 <SelectValue placeholder={t('form.country.placeholder')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="CL">Chile</SelectItem>
-                <SelectItem value="AR">Argentina</SelectItem>
-                <SelectItem value="PE">Perú</SelectItem>
-                <SelectItem value="CO">Colombia</SelectItem>
-                <SelectItem value="MX">México</SelectItem>
+                {COUNTRY_CODES.map((code) => (
+                  <SelectItem key={code} value={code}>
+                    {tOrgs(`countries.${code}`)}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             {errors.country && <p className="text-destructive text-sm">{errors.country.message}</p>}
@@ -155,9 +159,11 @@ export function CreateOrganizationForm() {
                 <SelectValue placeholder={t('form.plan.placeholder')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="BASIC">Básico</SelectItem>
-                <SelectItem value="PRO">Pro</SelectItem>
-                <SelectItem value="ENTERPRISE">Enterprise</SelectItem>
+                {PLAN_CODES.map((code) => (
+                  <SelectItem key={code} value={code}>
+                    {tOrgs(`plans.${code}`)}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             <p className="text-muted-foreground text-sm">{t('form.plan.description')}</p>
@@ -195,7 +201,7 @@ export function CreateOrganizationForm() {
                 aria-invalid={!!errors.maxAdminHR}
               />
               <p className="text-muted-foreground text-xs">
-                {t('form.maxAdminHR.description')} (Máx: {planLimits.maxAdminHR})
+                {t('form.maxAdminHR.description')} {t('form.maxSuffix', { max: planLimits.maxAdminHR })}
               </p>
               {errors.maxAdminHR && (
                 <p className="text-destructive text-sm">{errors.maxAdminHR.message}</p>
@@ -217,7 +223,7 @@ export function CreateOrganizationForm() {
                 aria-invalid={!!errors.maxChiefs}
               />
               <p className="text-muted-foreground text-xs">
-                {t('form.maxChiefs.description')} (Máx: {planLimits.maxChiefs})
+                {t('form.maxChiefs.description')} {t('form.maxSuffix', { max: planLimits.maxChiefs })}
               </p>
               {errors.maxChiefs && (
                 <p className="text-destructive text-sm">{errors.maxChiefs.message}</p>
@@ -239,7 +245,7 @@ export function CreateOrganizationForm() {
                 aria-invalid={!!errors.maxStaff}
               />
               <p className="text-muted-foreground text-xs">
-                {t('form.maxStaff.description')} (Máx: {planLimits.maxStaff})
+                {t('form.maxStaff.description')} {t('form.maxSuffix', { max: planLimits.maxStaff })}
               </p>
               {errors.maxStaff && (
                 <p className="text-destructive text-sm">{errors.maxStaff.message}</p>

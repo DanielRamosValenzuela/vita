@@ -3,9 +3,10 @@
 import { useMemo, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import type { ShiftStatus } from '@prisma/client'
-import { endOfDay, format, isWithinInterval, startOfDay } from 'date-fns'
+import { endOfDay, format, startOfDay } from 'date-fns'
 import { Calendar, Clock, Filter, Search, Users, X } from 'lucide-react'
 
+import { SHIFT_STATUS } from '@/src/shared/lib/constants'
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 import { Input } from '@/src/shared/ui/input'
@@ -18,8 +19,6 @@ import {
 } from '@/src/shared/ui/select'
 
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover'
-
-import { ShiftCalendar } from './shift-calendar'
 
 interface FilterState {
   search: string
@@ -61,7 +60,6 @@ export function ShiftFilters({
       filters.search ||
       filters.status ||
       filters.userId ||
-      filters.areaId ||
       filters.shiftTypeId ||
       filters.startDate ||
       filters.endDate
@@ -88,15 +86,15 @@ export function ShiftFilters({
 
   const getStatusColor = (status: ShiftStatus) => {
     switch (status) {
-      case 'SCHEDULED':
+      case SHIFT_STATUS.SCHEDULED:
         return 'bg-green-100 text-green-800 hover:bg-green-200'
-      case 'IN_PROGRESS':
+      case SHIFT_STATUS.IN_PROGRESS:
         return 'bg-blue-100 text-blue-800 hover:bg-blue-200'
-      case 'COMPLETED':
+      case SHIFT_STATUS.COMPLETED:
         return 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-      case 'CANCELLED':
+      case SHIFT_STATUS.CANCELLED:
         return 'bg-red-100 text-red-800 hover:bg-red-200'
-      case 'NO_SHOW':
+      case SHIFT_STATUS.NO_SHOW:
         return 'bg-orange-100 text-orange-800 hover:bg-orange-200'
       default:
         return 'bg-gray-100 text-gray-800 hover:bg-gray-200'
@@ -105,15 +103,15 @@ export function ShiftFilters({
 
   const getStatusLabel = (status: ShiftStatus) => {
     switch (status) {
-      case 'SCHEDULED':
+      case SHIFT_STATUS.SCHEDULED:
         return t('status.scheduled')
-      case 'IN_PROGRESS':
+      case SHIFT_STATUS.IN_PROGRESS:
         return t('status.inProgress')
-      case 'COMPLETED':
+      case SHIFT_STATUS.COMPLETED:
         return t('status.completed')
-      case 'CANCELLED':
+      case SHIFT_STATUS.CANCELLED:
         return t('status.cancelled')
-      case 'NO_SHOW':
+      case SHIFT_STATUS.NO_SHOW:
         return t('status.noShow')
       default:
         return status
@@ -133,7 +131,7 @@ export function ShiftFilters({
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {/* Búsqueda */}
+        {}
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
@@ -144,7 +142,7 @@ export function ShiftFilters({
           />
         </div>
 
-        {/* Filtro por estado */}
+        {}
         <Select
           value={filters.status}
           onValueChange={(value) => updateFilters({ status: value as ShiftStatus | '' })}
@@ -154,33 +152,35 @@ export function ShiftFilters({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="">{t('allStatuses')}</SelectItem>
-            <SelectItem value="SCHEDULED">
-              <Badge className={`mr-2 ${getStatusColor('SCHEDULED')}`}>
+            <SelectItem value={SHIFT_STATUS.SCHEDULED}>
+              <Badge className={`mr-2 ${getStatusColor(SHIFT_STATUS.SCHEDULED)}`}>
                 {t('status.scheduled')}
               </Badge>
             </SelectItem>
-            <SelectItem value="IN_PROGRESS">
-              <Badge className={`mr-2 ${getStatusColor('IN_PROGRESS')}`}>
+            <SelectItem value={SHIFT_STATUS.IN_PROGRESS}>
+              <Badge className={`mr-2 ${getStatusColor(SHIFT_STATUS.IN_PROGRESS)}`}>
                 {t('status.inProgress')}
               </Badge>
             </SelectItem>
-            <SelectItem value="COMPLETED">
-              <Badge className={`mr-2 ${getStatusColor('COMPLETED')}`}>
+            <SelectItem value={SHIFT_STATUS.COMPLETED}>
+              <Badge className={`mr-2 ${getStatusColor(SHIFT_STATUS.COMPLETED)}`}>
                 {t('status.completed')}
               </Badge>
             </SelectItem>
-            <SelectItem value="CANCELLED">
-              <Badge className={`mr-2 ${getStatusColor('CANCELLED')}`}>
+            <SelectItem value={SHIFT_STATUS.CANCELLED}>
+              <Badge className={`mr-2 ${getStatusColor(SHIFT_STATUS.CANCELLED)}`}>
                 {t('status.cancelled')}
               </Badge>
             </SelectItem>
-            <SelectItem value="NO_SHOW">
-              <Badge className={`mr-2 ${getStatusColor('NO_SHOW')}`}>{t('status.noShow')}</Badge>
+            <SelectItem value={SHIFT_STATUS.NO_SHOW}>
+              <Badge className={`mr-2 ${getStatusColor(SHIFT_STATUS.NO_SHOW)}`}>
+                {t('status.noShow')}
+              </Badge>
             </SelectItem>
           </SelectContent>
         </Select>
 
-        {/* Filtro por usuario */}
+        {}
         <Select value={filters.userId} onValueChange={(value) => updateFilters({ userId: value })}>
           <SelectTrigger>
             <SelectValue placeholder={t('userPlaceholder')} />
@@ -198,7 +198,7 @@ export function ShiftFilters({
           </SelectContent>
         </Select>
 
-        {/* Filtro por área */}
+        {}
         <Select value={filters.areaId} onValueChange={(value) => updateFilters({ areaId: value })}>
           <SelectTrigger>
             <SelectValue placeholder={t('areaPlaceholder')} />
@@ -215,7 +215,7 @@ export function ShiftFilters({
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {/* Filtro por tipo de turno */}
+        {}
         <Select
           value={filters.shiftTypeId}
           onValueChange={(value) => updateFilters({ shiftTypeId: value })}
@@ -236,7 +236,7 @@ export function ShiftFilters({
           </SelectContent>
         </Select>
 
-        {/* Filtro por fecha de inicio */}
+        {}
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" className="w-full justify-start text-left font-normal">
@@ -251,7 +251,7 @@ export function ShiftFilters({
           </PopoverContent>
         </Popover>
 
-        {/* Filtro por fecha de fin */}
+        {}
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" className="w-full justify-start text-left font-normal">
@@ -266,7 +266,7 @@ export function ShiftFilters({
           </PopoverContent>
         </Popover>
 
-        {/* Quick date filters */}
+        {}
         <Select
           onValueChange={(value) => {
             const now = new Date()
@@ -325,7 +325,7 @@ export function ShiftFilters({
         </Select>
       </div>
 
-      {/* Resumen de filtros activos */}
+      {}
       {hasActiveFilters && (
         <div className="flex flex-wrap gap-2 p-3 bg-muted/50 rounded-lg">
           <span className="text-sm text-muted-foreground">{t('activeFilters')}:</span>

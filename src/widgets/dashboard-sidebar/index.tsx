@@ -33,7 +33,7 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
   return (
     <div className="bg-card flex h-screen w-64 flex-col border-r">
       <Link href="/" className="border-b p-6 transition-opacity hover:opacity-80">
-        <h2 className="text-primary text-xl font-bold">VITA</h2>
+        <h2 className="text-primary text-xl font-bold">{tCommon('appName')}</h2>
         <p className="text-muted-foreground text-sm">{user.role.replace('_', ' ')}</p>
       </Link>
 

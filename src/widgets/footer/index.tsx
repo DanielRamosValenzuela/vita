@@ -10,6 +10,7 @@ export function Footer() {
   const params = useParams()
   const locale = (params?.locale as string) || 'es'
   const t = useTranslations('footer')
+  const tCommon = useTranslations('common')
 
   return (
     <footer className="bg-background border-t">
@@ -20,7 +21,7 @@ export function Footer() {
             <p className="text-muted-foreground text-sm">{t('description')}</p>
             <div className="pt-4">
               <p className="text-muted-foreground text-xs">
-                © {new Date().getFullYear()} <span className="text-primary font-medium">VITA</span>
+                © {new Date().getFullYear()} <span className="text-primary font-medium">{tCommon('appName')}</span>
               </p>
               <p className="text-muted-foreground mt-1 text-xs">{t('copyright')}</p>
             </div>

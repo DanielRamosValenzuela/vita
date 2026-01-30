@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import type { Role } from '@prisma/client'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
-import { ArrowLeft, Calendar, DollarSign, Edit, Users } from 'lucide-react'
+import { ArrowLeft, Calendar, DollarSign, Edit } from 'lucide-react'
 
 import { requireSuperAdmin } from '@/src/shared/lib/auth/session'
 import { ROLES } from '@/src/shared/lib/constants'
@@ -22,7 +22,7 @@ import {
 import { getOrganizationById } from '@/src/features/super-admin/data/organization-repository'
 import { InvitationsTable } from '@/src/features/super-admin/ui/invitations-table'
 import { OrganizationAdminHRSection } from '@/src/features/super-admin/ui/organization-admin-hr-section'
-import { OrganizationLimitsCard } from '@/src/features/super-admin/ui/organization-limits-card'
+import { OrganizationLimitsCard } from '@/src/widgets/organization-limits-card'
 
 import { Link } from '@/i18n/navigation'
 
@@ -50,12 +50,6 @@ const OrganizationDetailsPage = async ({ params }: PageProps) => {
 
   const t = await getTranslations('superAdmin.organizationDetails')
   const tOrg = await getTranslations('superAdmin.organizations')
-
-  type OrganizationWithCount = typeof organization & {
-    _count: {
-      users: number
-    }
-  }
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
@@ -166,12 +160,7 @@ const OrganizationDetailsPage = async ({ params }: PageProps) => {
           <CardDescription>{t('overview.limitsDescription')}</CardDescription>
         </CardHeader>
         <CardContent>
-          <OrganizationLimitsCard
-            organizationId={organization.id}
-            maxAdminHR={organization.maxAdminHR}
-            maxChiefs={organization.maxChiefs}
-            maxStaff={organization.maxStaff}
-          />
+          <OrganizationLimitsCard organizationId={organization.id} />
         </CardContent>
       </Card>
 

@@ -2,6 +2,7 @@
   "common": {
     "save": "Save",
     "cancel": "Cancel",
+    "close": "Close",
     "delete": "Delete",
     "edit": "Edit",
     "create": "Create",
@@ -9,6 +10,10 @@
     "error": "Error",
     "success": "Success",
     "logout": "Sign Out",
+    "appName": "VITA",
+    "selectLanguage": "Select language",
+    "theme": "Theme",
+    "logoLabel": "VITA - Home",
     "languages": {
       "es": "Spanish",
       "en": "English"
@@ -20,7 +25,8 @@
     "logout": "Sign Out",
     "profile": "My Profile",
     "support": "Support",
-    "contact": "Contact Us"
+    "contact": "Contact Us",
+    "toggleMenu": "Toggle menu"
   },
   "hero": {
     "title": {
@@ -119,6 +125,57 @@
     "title": "VITA - Medical Shift Management",
     "description": "Shift and attendance management system for healthcare institutions"
   },
+  "toast": {
+    "shifts": {
+      "created": "Shift created successfully",
+      "updated": "Shift updated successfully",
+      "deleted": "Shift deleted successfully",
+      "errorCreating": "Error creating shift",
+      "errorLoading": "Error loading shifts",
+      "successSaved": "Shift saved successfully",
+      "errorDeleting": "Error deleting shift"
+    }
+  },
+  "pages": {
+    "contact": {
+      "title": "Contact",
+      "localeLabel": "Locale"
+    },
+    "support": {
+      "title": "Support",
+      "localeLabel": "Locale"
+    }
+  },
+  "organizationAlerts": {
+    "title": "Limit Alerts",
+    "withWarnings": "Organizations with warnings",
+    "withCriticals": "Critical organizations",
+    "totalAlerts": "Total alerts",
+    "limitsReached": "Limits Reached ({count})",
+    "nearLimit": "Near Limit ({count})",
+    "percentUsed": "% used"
+  },
+  "organizationLimits": {
+    "loadError": "Could not load limits information",
+    "criticalsMessage": "Some roles have reached or exceeded their limits",
+    "warningsMessage": "Some roles are close to reaching their limits",
+    "roles": {
+      "ADMIN_HR": "Admin HR",
+      "CHIEF_AREA": "Area Chiefs",
+      "STAFF_HEALTH": "Health Staff",
+      "unknown": "Unknown"
+    },
+    "badgeExceeded": "Exceeded",
+    "badgeFull": "Full",
+    "badgeNear": "80%",
+    "limitLabel": "Limit",
+    "usage": "Usage",
+    "available": "Available",
+    "noSlots": "No slots available",
+    "totalUsage": "Total Organization Usage",
+    "accountsUsed": "{current} of {total} accounts used",
+    "availableCount": "available"
+  },
   "onboarding": {
     "title": "Welcome to VITA!",
     "subtitle": "To start using VITA, you need to be linked to an organization",
@@ -161,10 +218,174 @@
     "staff": "Staff",
     "shifts": "Shifts",
     "profile": "Profile",
+    "settings": "Settings",
     "calendarTitle": "Calendar",
     "calendarDescription": "View the shift calendar. Sign in to manage your shifts.",
     "calendarWelcome": "Welcome, {name}. Here you can view all your shifts.",
-    "calendarWelcomePlaceholder": "Welcome, {name}. Here you can view all your shifts."
+    "calendarWelcomePlaceholder": "Welcome, {name}. Here you can view all your shifts.",
+    "staffDescription": "Manage your area staff",
+    "staffCardDescription": "Staff management",
+    "staffComingSoon": "Coming soon: Full staff CRUD",
+    "analyticsDescription": "Global charts and reports (In development)",
+    "paymentsDescription": "Payment registration and management (In development)",
+    "settingsDescription": "System configuration (In development)",
+    "calendarViewTitle": "Shift Calendar",
+    "calendarViewAuthenticated": "You'll see all your assigned shifts here",
+    "calendarViewUnauthenticated": "Sign in to view and manage your shifts",
+    "calendarViewComingSoon": "Calendar in development",
+    "calendarViewComingSoonDescription": "The calendar component will be implemented soon"
+  },
+  "shifts": {
+    "title": "Shift Management",
+    "description": "Manage your staff shifts efficiently",
+    "newShift": "New Shift",
+    "noOrganization": "You don't have an assigned organization",
+    "loadError": "Error loading shifts",
+    "stats": {
+      "totalShifts": "Total Shifts",
+      "thisMonth": "This Month",
+      "inProgress": "In Progress",
+      "completed": "Completed"
+    },
+    "filters": {
+      "title": "Filters",
+      "search": "Search...",
+      "status": "Status",
+      "user": "User",
+      "area": "Area",
+      "shiftType": "Shift Type",
+      "dateRange": "Date Range",
+      "clear": "Clear Filters",
+      "apply": "Apply Filters"
+    },
+    "calendar": {
+      "title": "Shift Calendar"
+    },
+    "recent": {
+      "title": "Recent Shifts",
+      "noShifts": "No shifts scheduled",
+      "viewAll": "View All"
+    },
+    "table": {
+      "user": "User",
+      "title": "Title",
+      "role": "Role",
+      "time": "Schedule",
+      "status": "Status"
+    },
+    "more": "more",
+    "status": {
+      "scheduled": "Scheduled",
+      "inProgress": "In Progress",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "noShow": "No Show"
+    },
+    "form": {
+      "dialogTitle": "Create New Shift",
+      "title": "Create Shift",
+      "basicInfo": "Basic Information",
+      "title": {
+        "label": "Title",
+        "placeholder": "Shift title"
+      },
+      "user": {
+        "label": "User",
+        "placeholder": "Select user"
+      },
+      "area": {
+        "label": "Area",
+        "placeholder": "Select area"
+      },
+      "shiftType": {
+        "label": "Shift Type",
+        "placeholder": "Select type"
+      },
+      "date": {
+        "label": "Date",
+        "placeholder": "Select date"
+      },
+      "startTime": {
+        "label": "Start Time",
+        "placeholder": "Select time"
+      },
+      "endTime": {
+        "label": "End Time",
+        "placeholder": "Select time"
+      },
+      "notes": {
+        "label": "Notes",
+        "placeholder": "Additional notes"
+      },
+      "conflicts": {
+        "checking": "Checking conflicts...",
+        "error": "Error checking conflicts",
+        "none": "No conflicts"
+      },
+      "create": "Create Shift",
+      "creating": "Creating shift...",
+      "cancel": "Cancel"
+    },
+    "shiftTypes": {
+      "title": "Shift Types",
+      "description": "Manage shift types available in your organization",
+      "noOrganization": "You don't have an organization assigned",
+      "loadError": "Error loading shift types",
+      "noTypes": "No shift types configured",
+      "create": "New Type",
+      "list": "List",
+      "active": "Active",
+      "inactive": "Inactive",
+      "empty": {
+        "title": "No shift types yet",
+        "description": "Create your first shift type to organize shifts (e.g. Morning, Night, On-call)."
+      },
+      "table": {
+        "name": "Name",
+        "color": "Color",
+        "description": "Description",
+        "status": "Status",
+        "shiftsCount": "Shifts",
+        "actions": "Actions"
+      },
+      "createModal": {
+        "title": "New shift type",
+        "description": "Add a new type to classify shifts."
+      },
+      "edit": {
+        "title": "Edit shift type",
+        "description": "Update name, color or status."
+      },
+      "form": {
+        "name": "Name",
+        "namePlaceholder": "e.g. Morning, Night, On-call",
+        "nameRequired": "Name is required",
+        "color": "Color",
+        "description": "Description",
+        "descriptionPlaceholder": "Optional",
+        "active": "Active",
+        "cancel": "Cancel",
+        "save": "Save",
+        "saving": "Saving..."
+      },
+      "delete": {
+        "title": "Confirm deletion",
+        "description": "Are you sure you want to delete this shift type?",
+        "shiftsCount": "{count} shift(s) use this type.",
+        "noShiftsWarning": "No shifts use this type. Safe to delete.",
+        "hasShiftsWarning": "Some shifts use this type. Delete or reassign them first.",
+        "confirm": "Delete",
+        "cancel": "Cancel",
+        "deleting": "Deleting...",
+        "error": "Cannot delete because it has associated shifts"
+      },
+      "toast": {
+        "created": "Shift type created",
+        "updated": "Shift type updated",
+        "deleted": "Shift type deleted",
+        "error": "Error"
+      }
+    }
   },
   "profile": {
     "title": "Profile",
@@ -296,6 +517,7 @@
         "removePlan": "Remove plan filter",
         "removeCountry": "Remove country filter"
       },
+      "latestDescription": "Latest organizations registered or updated",
       "table": {
         "name": "Name",
         "taxId": "Tax ID",
@@ -366,6 +588,10 @@
       "viewAll": "View All",
       "new": "New Organization",
       "name": "Organization",
+      "openMenu": "Open menu",
+      "accountsAdminHR": "Admin HR:",
+      "accountsChiefs": "Chiefs:",
+      "accountsStaff": "Staff:",
       "status": "Status",
       "plan": "Plan",
       "accounts": "Accounts",
@@ -388,6 +614,7 @@
         "basicInfo": "Basic Information",
         "contactInfo": "Contact Information",
         "billingInfo": "Billing Information",
+        "maxSuffix": "(Max: {max})",
         "name": {
           "label": "Organization Name",
           "placeholder": "St. Joseph Hospital"
@@ -459,6 +686,8 @@
         "accountLimits": "Account Limits",
         "limitsWarning": "Limits cannot be lower than the current number of users in each role",
         "contact": "Contact Information",
+        "currentCount": "{count} current",
+        "minMaxDescription": "(Min: {min}, Max: {max})",
         "name": {
           "label": "Organization Name",
           "placeholder": "St. Joseph Hospital"
@@ -657,6 +886,7 @@
       "createFirst": "Create first user",
       "deleteSuccess": "User deleted successfully",
       "deleteError": "Error deleting user",
+      "noOrganization": "No organization",
       "table": {
         "name": "Name",
         "email": "Email",
@@ -1010,6 +1240,35 @@
     },
     "adminHRUser": {
       "emailInvalid": "Invalid email"
+    },
+    "common": {
+      "created": "Created successfully",
+      "updated": "Updated successfully",
+      "deleted": "Deleted successfully",
+      "errorCreating": "Error creating",
+      "errorLoading": "Error loading",
+      "successSaved": "Saved successfully",
+      "errorDeleting": "Error deleting",
+      "confirmDelete": "Confirm deletion",
+      "cancel": "Cancel",
+      "save": "Save",
+      "edit": "Edit",
+      "delete": "Delete",
+      "create": "Create",
+      "loading": "Loading...",
+      "error": "Error",
+      "success": "Success"
+    },
+    "toast": {
+      "shifts": {
+        "created": "Shift created successfully",
+        "updated": "Shift updated successfully",
+        "deleted": "Shift deleted successfully",
+        "errorCreating": "Error creating shift",
+        "errorLoading": "Error loading shifts",
+        "successSaved": "Shift saved successfully",
+        "errorDeleting": "Error deleting shift"
+      }
     }
   }
 }

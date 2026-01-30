@@ -110,7 +110,7 @@ export function AdminHRUsersTableClient({ users }: AdminHRUsersTableClientProps)
                       {user.organization ? (
                         <Badge variant="outline">{user.organization.name}</Badge>
                       ) : (
-                        <span className="text-muted-foreground text-sm">Sin organización</span>
+                        <span className="text-muted-foreground text-sm">{t('noOrganization')}</span>
                       )}
                     </TableCell>
                     <TableCell>

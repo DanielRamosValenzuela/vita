@@ -2,6 +2,7 @@
   "common": {
     "save": "Guardar",
     "cancel": "Cancelar",
+    "close": "Cerrar",
     "delete": "Eliminar",
     "edit": "Editar",
     "create": "Crear",
@@ -9,6 +10,10 @@
     "error": "Error",
     "success": "Éxito",
     "logout": "Cerrar Sesión",
+    "appName": "VITA",
+    "selectLanguage": "Seleccionar idioma",
+    "theme": "Tema",
+    "logoLabel": "VITA - Inicio",
     "languages": {
       "es": "Español",
       "en": "Inglés"
@@ -20,7 +25,8 @@
     "logout": "Cerrar Sesión",
     "profile": "Mi Perfil",
     "support": "Soporte",
-    "contact": "Contáctanos"
+    "contact": "Contáctanos",
+    "toggleMenu": "Abrir menú"
   },
   "hero": {
     "title": {
@@ -119,6 +125,57 @@
     "title": "VITA - Gestión de Turnos Médicos",
     "description": "Sistema de gestión de turnos y asistencia para instituciones de salud"
   },
+  "toast": {
+    "shifts": {
+      "created": "Turno creado exitosamente",
+      "updated": "Turno actualizado exitosamente",
+      "deleted": "Turno eliminado exitosamente",
+      "errorCreating": "Error al crear el turno",
+      "errorLoading": "Error al cargar los turnos",
+      "successSaved": "Turno guardado exitosamente",
+      "errorDeleting": "Error al eliminar el turno"
+    }
+  },
+  "pages": {
+    "contact": {
+      "title": "Contacto",
+      "localeLabel": "Idioma"
+    },
+    "support": {
+      "title": "Soporte",
+      "localeLabel": "Idioma"
+    }
+  },
+  "organizationAlerts": {
+    "title": "Alertas de Límites",
+    "withWarnings": "Organizaciones con advertencias",
+    "withCriticals": "Organizaciones críticas",
+    "totalAlerts": "Total de alertas",
+    "limitsReached": "Límites Alcanzados ({count})",
+    "nearLimit": "Cerca del Límite ({count})",
+    "percentUsed": "% utilizado"
+  },
+  "organizationLimits": {
+    "loadError": "No se pudo cargar la información de límites",
+    "criticalsMessage": "Algunos roles han alcanzado o superado sus límites",
+    "warningsMessage": "Algunos roles están cerca de alcanzar sus límites",
+    "roles": {
+      "ADMIN_HR": "Administradores RRHH",
+      "CHIEF_AREA": "Jefes de Área",
+      "STAFF_HEALTH": "Personal de Salud",
+      "unknown": "Desconocido"
+    },
+    "badgeExceeded": "Excedido",
+    "badgeFull": "Lleno",
+    "badgeNear": "80%",
+    "limitLabel": "Límite",
+    "usage": "Uso",
+    "available": "Disponible",
+    "noSlots": "Sin cupos disponibles",
+    "totalUsage": "Uso Total de la Organización",
+    "accountsUsed": "{current} de {total} cuentas utilizadas",
+    "availableCount": "disponibles"
+  },
   "onboarding": {
     "title": "¡Bienvenido a VITA!",
     "subtitle": "Para comenzar a usar VITA, necesitas estar vinculado a una organización",
@@ -161,10 +218,174 @@
     "staff": "Personal",
     "shifts": "Turnos",
     "profile": "Perfil",
+    "settings": "Configuración",
     "calendarTitle": "Calendario",
     "calendarDescription": "Visualiza el calendario de turnos. Inicia sesión para gestionar tus turnos.",
     "calendarWelcome": "Bienvenido, {name}. Aquí puedes ver todos tus turnos.",
-    "calendarWelcomePlaceholder": "Bienvenido, {name}. Aquí puedes ver todos tus turnos."
+    "calendarWelcomePlaceholder": "Bienvenido, {name}. Aquí puedes ver todos tus turnos.",
+    "staffDescription": "Gestiona el personal de tu área",
+    "staffCardDescription": "Gestión de personal",
+    "staffComingSoon": "Próximamente: CRUD completo de personal",
+    "analyticsDescription": "Gráficos y reportes globales (En desarrollo)",
+    "paymentsDescription": "Registro y gestión de pagos (En desarrollo)",
+    "settingsDescription": "Configuración del sistema (En desarrollo)",
+    "calendarViewTitle": "Calendario de Turnos",
+    "calendarViewAuthenticated": "Aquí verás todos tus turnos asignados",
+    "calendarViewUnauthenticated": "Inicia sesión para ver y gestionar tus turnos",
+    "calendarViewComingSoon": "Calendario en desarrollo",
+    "calendarViewComingSoonDescription": "El componente de calendario se implementará próximamente"
+  },
+  "shifts": {
+    "title": "Gestión de Turnos",
+    "description": "Administra los turnos de tu personal de forma eficiente",
+    "newShift": "Nuevo Turno",
+    "noOrganization": "No tienes una organización asignada",
+    "loadError": "Error al cargar los turnos",
+    "stats": {
+      "totalShifts": "Total de Turnos",
+      "thisMonth": "Este Mes",
+      "inProgress": "En Progreso",
+      "completed": "Completados"
+    },
+    "filters": {
+      "title": "Filtros",
+      "search": "Buscar...",
+      "status": "Estado",
+      "user": "Usuario",
+      "area": "Área",
+      "shiftType": "Tipo de Turno",
+      "dateRange": "Rango de Fechas",
+      "clear": "Limpiar Filtros",
+      "apply": "Aplicar Filtros"
+    },
+    "calendar": {
+      "title": "Calendario de Turnos"
+    },
+    "recent": {
+      "title": "Turnos Recientes",
+      "noShifts": "No hay turnos programados",
+      "viewAll": "Ver Todos"
+    },
+    "table": {
+      "user": "Usuario",
+      "title": "Título",
+      "role": "Rol",
+      "time": "Horario",
+      "status": "Estado"
+    },
+    "more": "más",
+    "status": {
+      "scheduled": "Programado",
+      "inProgress": "En Progreso",
+      "completed": "Completado",
+      "cancelled": "Cancelado",
+      "noShow": "No Asistió"
+    },
+    "form": {
+      "dialogTitle": "Crear Nuevo Turno",
+      "title": "Crear Turno",
+      "basicInfo": "Información Básica",
+      "title": {
+        "label": "Título",
+        "placeholder": "Título del turno"
+      },
+      "user": {
+        "label": "Usuario",
+        "placeholder": "Seleccionar usuario"
+      },
+      "area": {
+        "label": "Área",
+        "placeholder": "Seleccionar área"
+      },
+      "shiftType": {
+        "label": "Tipo de Turno",
+        "placeholder": "Seleccionar tipo"
+      },
+      "date": {
+        "label": "Fecha",
+        "placeholder": "Seleccionar fecha"
+      },
+      "startTime": {
+        "label": "Hora Inicio",
+        "placeholder": "Seleccionar hora"
+      },
+      "endTime": {
+        "label": "Hora Fin",
+        "placeholder": "Seleccionar hora"
+      },
+      "notes": {
+        "label": "Notas",
+        "placeholder": "Notas adicionales"
+      },
+      "conflicts": {
+        "checking": "Verificando conflictos...",
+        "error": "Error al verificar conflictos",
+        "none": "No hay conflictos"
+      },
+      "create": "Crear Turno",
+      "creating": "Creando turno...",
+      "cancel": "Cancelar"
+    },
+    "shiftTypes": {
+      "title": "Tipos de Turno",
+      "description": "Gestiona los tipos de turnos disponibles en tu organización",
+      "noOrganization": "No tienes una organización asignada",
+      "loadError": "Error al cargar tipos de turno",
+      "noTypes": "No hay tipos de turno configurados",
+      "create": "Nuevo Tipo",
+      "list": "Listado",
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "empty": {
+        "title": "Sin tipos de turno",
+        "description": "Crea tu primer tipo para organizar turnos (ej. Mañana, Noche, Guardia)."
+      },
+      "table": {
+        "name": "Nombre",
+        "color": "Color",
+        "description": "Descripción",
+        "status": "Estado",
+        "shiftsCount": "Turnos",
+        "actions": "Acciones"
+      },
+      "createModal": {
+        "title": "Nuevo tipo de turno",
+        "description": "Añade un tipo para clasificar turnos."
+      },
+      "edit": {
+        "title": "Editar tipo de turno",
+        "description": "Actualiza nombre, color o estado."
+      },
+      "form": {
+        "name": "Nombre",
+        "namePlaceholder": "ej. Mañana, Noche, Guardia",
+        "nameRequired": "El nombre es requerido",
+        "color": "Color",
+        "description": "Descripción",
+        "descriptionPlaceholder": "Opcional",
+        "active": "Activo",
+        "cancel": "Cancelar",
+        "save": "Guardar",
+        "saving": "Guardando..."
+      },
+      "delete": {
+        "title": "Confirmar eliminación",
+        "description": "¿Estás seguro de que deseas eliminar este tipo de turno?",
+        "shiftsCount": "{count} turno(s) usan este tipo.",
+        "noShiftsWarning": "Ningún turno usa este tipo. Se puede eliminar.",
+        "hasShiftsWarning": "Hay turnos que usan este tipo. Elimínalos o reasígnalos antes.",
+        "confirm": "Eliminar",
+        "cancel": "Cancelar",
+        "deleting": "Eliminando...",
+        "error": "No se puede eliminar porque tiene turnos asociados"
+      },
+      "toast": {
+        "created": "Tipo de turno creado",
+        "updated": "Tipo de turno actualizado",
+        "deleted": "Tipo de turno eliminado",
+        "error": "Error"
+      }
+    }
   },
   "profile": {
     "title": "Perfil",
@@ -276,6 +497,7 @@
         "removePlan": "Eliminar filtro de plan",
         "removeCountry": "Eliminar filtro de país"
       },
+      "latestDescription": "Últimas organizaciones registradas o actualizadas",
       "table": {
         "name": "Nombre",
         "taxId": "RUT/ID Fiscal",
@@ -331,6 +553,10 @@
       "deleteSuccess": "Organización eliminada exitosamente",
       "deleteError": "Error al eliminar la organización",
       "cancel": "Cancelar",
+      "openMenu": "Abrir menú",
+      "accountsAdminHR": "Admin HR:",
+      "accountsChiefs": "Jefes:",
+      "accountsStaff": "Staff:",
       "pagination": {
         "showing": "Mostrando {from} a {to} de {total} organizaciones",
         "page": "Página {current} de {total}",
@@ -345,6 +571,7 @@
         "basicInfo": "Información Básica",
         "contactInfo": "Información de Contacto",
         "billingInfo": "Información de Facturación",
+        "maxSuffix": "(Máx: {max})",
         "name": {
           "label": "Nombre de la Organización",
           "placeholder": "Hospital San José"
@@ -414,6 +641,8 @@
         "accountLimits": "Límites de Cuentas",
         "limitsWarning": "Los límites no pueden ser menores al número actual de usuarios en cada rol",
         "contact": "Información de Contacto",
+        "currentCount": "{count} actuales",
+        "minMaxDescription": "(Mín: {min}, Máx: {max})",
         "name": {
           "label": "Nombre de la Organización",
           "placeholder": "Hospital San José"
@@ -613,6 +842,7 @@
       "createFirst": "Crear primer usuario",
       "deleteSuccess": "Usuario eliminado exitosamente",
       "deleteError": "Error al eliminar el usuario",
+      "noOrganization": "Sin organización",
       "table": {
         "name": "Nombre",
         "email": "Email",
@@ -986,6 +1216,35 @@
     },
     "adminHRUser": {
       "emailInvalid": "Email inválido"
+    },
+    "common": {
+      "created": "Creado exitosamente",
+      "updated": "Actualizado exitosamente",
+      "deleted": "Eliminado exitosamente",
+      "errorCreating": "Error al crear",
+      "errorLoading": "Error al cargar",
+      "successSaved": "Guardado exitosamente",
+      "errorDeleting": "Error al eliminar",
+      "confirmDelete": "Confirmar eliminación",
+      "cancel": "Cancelar",
+      "save": "Guardar",
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "create": "Crear",
+      "loading": "Cargando...",
+      "error": "Error",
+      "success": "Éxito"
+    },
+    "toast": {
+      "shifts": {
+        "created": "Turno creado exitosamente",
+        "updated": "Turno actualizado exitosamente",
+        "deleted": "Turno eliminado exitosamente",
+        "errorCreating": "Error al crear turno",
+        "errorLoading": "Error al cargar turnos",
+        "successSaved": "Turno guardado exitosamente",
+        "errorDeleting": "Error al eliminar turno"
+      }
     }
   }
 }

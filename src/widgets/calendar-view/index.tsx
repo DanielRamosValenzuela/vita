@@ -1,5 +1,7 @@
 'use client'
 
+/* eslint-disable react/jsx-no-literals -- Widget en construcción (Calendario en desarrollo). */
+
 import { Calendar } from 'lucide-react'
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'

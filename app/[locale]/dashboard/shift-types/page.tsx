@@ -1,15 +1,17 @@
 import { getTranslations } from 'next-intl/server'
 
-import { requireAdminHR } from '@/src/shared/lib/auth'
+import { requireAdminHR } from '@/src/shared/lib/auth/session'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
+import { getShiftTypesAction } from '@/src/features/shifts/api/shift-type-actions'
+import { ShiftTypesPage } from '@/src/features/shifts/ui/shift-types-page'
 
-interface ShiftTypesPageProps {
+interface ShiftTypesProps {
   params: Promise<{ locale: string }>
 }
 
-export async function generateMetadata({ params }: ShiftTypesPageProps) {
+export async function generateMetadata({ params }: ShiftTypesProps) {
   const { locale } = await params
-  const t = await getTranslations({ locale, namespace: 'adminHR.shiftTypes' })
+  const t = await getTranslations({ locale, namespace: 'shifts.shiftTypes' })
 
   return {
     title: `${t('title')} | VITA`,
@@ -17,14 +19,41 @@ export async function generateMetadata({ params }: ShiftTypesPageProps) {
   }
 }
 
-export default async function ShiftTypesPage({ params }: ShiftTypesPageProps) {
+export default async function ShiftTypes({ params }: ShiftTypesProps) {
   const { locale } = await params
-  await requireAdminHR(locale)
-  const t = await getTranslations('adminHR.shiftTypes')
+  const session = await requireAdminHR(locale)
+  const t = await getTranslations('shifts.shiftTypes')
+
+  if (!session.organizationId) 
+    return (
+      <div className="space-y-8">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
+          <p className="text-muted-foreground mt-2">{t('noOrganization')}</p>
+        </div>
+      </div>
+    )
+  
+
+  
+  const shiftTypesResult = await getShiftTypesAction()
+
+  if (!shiftTypesResult.success || !shiftTypesResult.data) 
+    return (
+      <div className="space-y-8">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
+          <p className="text-muted-foreground mt-2">{t('loadError')}</p>
+        </div>
+      </div>
+    )
+  
+
+  const shiftTypes = shiftTypesResult.data
 
   return (
-    <div className="container mx-auto py-8">
-      <div className="mb-8">
+    <div className="space-y-8">
+      <div>
         <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
         <p className="text-muted-foreground mt-2">{t('description')}</p>
       </div>
@@ -35,7 +64,7 @@ export default async function ShiftTypesPage({ params }: ShiftTypesPageProps) {
           <CardDescription>{t('description')}</CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground">{t('comingSoon')}</p>
+          <ShiftTypesPage shiftTypes={shiftTypes || []} />
         </CardContent>
       </Card>
     </div>

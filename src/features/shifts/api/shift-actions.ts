@@ -1,0 +1,401 @@
+'use server'
+
+import { revalidatePath } from 'next/cache'
+import type { Prisma } from '@prisma/client'
+import { z } from 'zod'
+
+import { prisma } from '@/src/shared/lib/auth/config'
+import { requireAdminHR } from '@/src/shared/lib/auth/session'
+import type { ActionResult } from '@/src/shared/lib/types'
+
+import { checkShiftConflicts } from '@/src/entities/shift'
+
+import type { GetShiftsParams, GetShiftsResult, ShiftWithRelations } from '../types/shift-types'
+
+const createShiftSchema = z.object({
+  title: z.string().optional(),
+  userId: z.string().min(1, 'ID de usuario requerido'),
+  areaId: z.string().min(1, 'ID de área requerido'),
+  shiftTypeId: z.string().min(1, 'ID de tipo de turno requerido'),
+  startTime: z.date(),
+  endTime: z.date(),
+  notes: z.string().optional(),
+})
+
+const updateShiftSchema = z.object({
+  title: z.string().optional(),
+  status: z.enum(['SCHEDULED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED', 'NO_SHOW']).optional(),
+  userId: z.string().optional(),
+  areaId: z.string().optional(),
+  shiftTypeId: z.string().optional(),
+  startTime: z.date().optional(),
+  endTime: z.date().optional(),
+  notes: z.string().optional(),
+})
+
+export const createShiftAction = async (
+  data: z.infer<typeof createShiftSchema>
+): Promise<ActionResult<ShiftWithRelations>> => {
+  try {
+    const session = await requireAdminHR()
+    if (!session.organizationId)
+      return {
+        success: false,
+        error: 'No tienes una organización asignada',
+      }
+
+    const validatedData = createShiftSchema.parse(data)
+
+    
+    const user = await prisma.user.findUnique({
+      where: { id: validatedData.userId },
+      select: { organizationId: true },
+    })
+
+    if (!user || user.organizationId !== session.organizationId)
+      return {
+        success: false,
+        error: 'El usuario no pertenece a tu organización',
+      }
+
+    
+    const conflictCheck = await checkShiftConflicts(
+      validatedData.userId,
+      validatedData.areaId,
+      validatedData.startTime,
+      validatedData.endTime
+    )
+
+    if (conflictCheck.hasConflict)
+      return {
+        success: false,
+        error: conflictCheck.message,
+      }
+
+    
+    const area = await prisma.area.findUnique({
+      where: {
+        id: validatedData.areaId,
+        organizationId: session.organizationId,
+      },
+    })
+
+    if (!area)
+      return {
+        success: false,
+        error: 'El área no pertenece a tu organización',
+      }
+
+    
+    const shiftType = await prisma.shiftType.findUnique({
+      where: {
+        id: validatedData.shiftTypeId,
+        organizationId: session.organizationId,
+      },
+    })
+
+    if (!shiftType)
+      return {
+        success: false,
+        error: 'El tipo de turno no pertenece a tu organización',
+      }
+
+    const shift = await prisma.shift.create({
+      data: {
+        ...validatedData,
+        organizationId: session.organizationId,
+        status: 'SCHEDULED',
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+          },
+        },
+        area: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+          },
+        },
+        shiftType: {
+          select: {
+            id: true,
+            name: true,
+            color: true,
+          },
+        },
+      },
+    })
+
+    revalidatePath('/dashboard/shifts')
+    revalidatePath('/dashboard/shifts/calendar')
+
+    return {
+      success: true,
+      data: shift,
+      message: 'Turno creado exitosamente',
+    }
+  } catch (error) {
+    console.error('[createShiftAction] Error:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Error al crear turno',
+    }
+  }
+}
+
+export const updateShiftAction = async (
+  id: string,
+  data: z.infer<typeof updateShiftSchema>
+): Promise<ActionResult<ShiftWithRelations>> => {
+  try {
+    const session = await requireAdminHR()
+
+    const validatedData = updateShiftSchema.parse(data)
+
+    
+    const existingShift = await prisma.shift.findUnique({
+      where: { id },
+      include: {
+        user: {
+          select: { organizationId: true },
+        },
+      },
+    })
+
+    if (!existingShift)
+      return {
+        success: false,
+        error: 'Turno no encontrado',
+      }
+
+    if (existingShift.user.organizationId !== session.organizationId)
+      return {
+        success: false,
+        error: 'El turno no pertenece a tu organización',
+      }
+
+    
+    if (validatedData.startTime || validatedData.endTime) {
+      const startTime = validatedData.startTime || existingShift.startTime
+      const endTime = validatedData.endTime || existingShift.endTime
+      const userId = validatedData.userId || existingShift.userId
+      const areaId = validatedData.areaId || existingShift.areaId
+
+      const conflictCheck = await checkShiftConflicts(
+        userId,
+        areaId,
+        startTime,
+        endTime,
+        id 
+      )
+
+      if (conflictCheck.hasConflict)
+        return {
+          success: false,
+          error: conflictCheck.message,
+        }
+    }
+
+    const updatedShift = await prisma.shift.update({
+      where: { id },
+      data: validatedData,
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+          },
+        },
+        area: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+          },
+        },
+        shiftType: {
+          select: {
+            id: true,
+            name: true,
+            color: true,
+          },
+        },
+      },
+    })
+
+    revalidatePath('/dashboard/shifts')
+    revalidatePath('/dashboard/shifts/calendar')
+    revalidatePath(`/dashboard/shifts/${id}`)
+
+    return {
+      success: true,
+      data: updatedShift,
+      message: 'Turno actualizado exitosamente',
+    }
+  } catch (error) {
+    console.error('[updateShiftAction] Error:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Error al actualizar turno',
+    }
+  }
+}
+
+export const deleteShiftAction = async (id: string): Promise<ActionResult<null>> => {
+  try {
+    const session = await requireAdminHR()
+
+    
+    const shift = await prisma.shift.findUnique({
+      where: { id },
+      include: {
+        user: {
+          select: { organizationId: true },
+        },
+      },
+    })
+
+    if (!shift)
+      return {
+        success: false,
+        error: 'Turno no encontrado',
+      }
+
+    if (shift.user.organizationId !== session.organizationId)
+      return {
+        success: false,
+        error: 'El turno no pertenece a tu organización',
+      }
+
+    
+    await prisma.shift.update({
+      where: { id },
+      data: { status: 'CANCELLED' },
+    })
+
+    revalidatePath('/dashboard/shifts')
+    revalidatePath('/dashboard/shifts/calendar')
+    revalidatePath(`/dashboard/shifts/${id}`)
+
+    return {
+      success: true,
+      message: 'Turno cancelado exitosamente',
+    }
+  } catch (error) {
+    console.error('[deleteShiftAction] Error:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Error al cancelar turno',
+    }
+  }
+}
+
+export const getShiftsAction = async (
+  params: GetShiftsParams
+): Promise<ActionResult<GetShiftsResult>> => {
+  try {
+    const session = await requireAdminHR()
+    if (!session.organizationId)
+      return {
+        success: false,
+        error: 'No tienes una organización asignada',
+      }
+
+    const {
+      page = 1,
+      pageSize = 20,
+      status,
+      userId,
+      areaId,
+      shiftTypeId,
+      search,
+      startDate,
+      endDate,
+    } = params
+
+    const where: Prisma.ShiftWhereInput = {
+      organizationId: session.organizationId,
+    }
+
+    if (status) where.status = status
+    if (userId) where.userId = userId
+    if (areaId) where.areaId = areaId
+    if (shiftTypeId) where.shiftTypeId = shiftTypeId
+
+    if (search)
+      where.OR = [
+        { title: { contains: search, mode: 'insensitive' } },
+        { notes: { contains: search, mode: 'insensitive' } },
+        { user: { name: { contains: search, mode: 'insensitive' } } },
+        { user: { email: { contains: search, mode: 'insensitive' } } },
+        { area: { name: { contains: search, mode: 'insensitive' } } },
+      ]
+
+    if (startDate || endDate) {
+      where.startTime = {}
+      if (startDate) where.startTime.gte = startDate
+      if (endDate) where.startTime.lte = endDate
+    }
+
+    const skip = (page - 1) * pageSize
+
+    const [shifts, total] = await Promise.all([
+      prisma.shift.findMany({
+        where,
+        skip,
+        take: pageSize,
+        orderBy: { startTime: 'asc' },
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              role: true,
+            },
+          },
+          area: {
+            select: {
+              id: true,
+              name: true,
+              description: true,
+            },
+          },
+          shiftType: {
+            select: {
+              id: true,
+              name: true,
+              color: true,
+            },
+          },
+        },
+      }),
+      prisma.shift.count({ where }),
+    ])
+
+    return {
+      success: true,
+      data: {
+        shifts,
+        total,
+        page,
+        pageSize,
+        totalPages: Math.ceil(total / pageSize),
+      },
+    }
+  } catch (error) {
+    console.error('[getShiftsAction] Error:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Error al obtener turnos',
+    }
+  }
+}

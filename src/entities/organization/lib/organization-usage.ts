@@ -40,9 +40,8 @@ export async function getOrganizationUsageSummary(
     },
   })
 
-  if (!organization) {
-    throw new Error('Organización no encontrada')
-  }
+  if (!organization) throw new Error('Organization not found')
+  
 
   const userCounts = organization.users.reduce(
     (acc, user) => {
@@ -115,9 +114,8 @@ export async function getRoleUsageForOrganization(
   const summary = await getOrganizationUsageSummary(organizationId)
   const roleUsage = summary.roleUsage.find((usage) => usage.role === role)
 
-  if (!roleUsage) {
-    throw new Error(`Rol ${role} no encontrado en la organización`)
-  }
+  if (!roleUsage) throw new Error(`Role ${role} not found in organization`)
+  
 
   return roleUsage
 }

@@ -4,7 +4,7 @@ import { requireAdminHR } from '@/src/shared/lib/auth'
 import { ROLES } from '@/src/shared/lib/constants'
 import { getAdminHROrganization } from '@/src/features/admin-hr/data'
 import { InvitationsTable } from '@/src/features/admin-hr/ui/invitations-table'
-import { OrganizationLimitsCard } from '@/src/features/admin-hr/ui/organization-limits-card'
+import { OrganizationLimitsCard } from '@/src/widgets/organization-limits-card'
 import { OrganizationTeamSection } from '@/src/features/admin-hr/ui/organization-team-section'
 import { OrganizationView } from '@/src/features/admin-hr/ui/organization-view'
 
@@ -59,12 +59,7 @@ export default async function AdminHROrganizationPage({ params }: AdminHROrganiz
 
       <OrganizationView organization={organization} />
 
-      <OrganizationLimitsCard
-        organizationId={organization.id}
-        maxAdminHR={organization.maxAdminHR}
-        maxChiefs={organization.maxChiefs}
-        maxStaff={organization.maxStaff}
-      />
+      <OrganizationLimitsCard organizationId={organization.id} />
 
       <OrganizationTeamSection
         organizationId={organization.id}

@@ -1,4 +1,4 @@
-import type { Prisma, Shift, ShiftStatus } from '@prisma/client'
+import type { Prisma, ShiftStatus } from '@prisma/client'
 
 import { prisma } from '@/src/shared/lib/auth/config'
 

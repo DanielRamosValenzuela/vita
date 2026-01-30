@@ -1,20 +1,11 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import {
-  addMonths,
-  eachDayOfInterval,
-  endOfMonth,
-  format,
-  isSameMonth,
-  isToday,
-  startOfMonth,
-  subMonths,
-} from 'date-fns'
+import { useTranslations } from 'next-intl'
+import { addMonths, format, isSameMonth, isToday, subMonths } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
-import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/src/shared/ui/card'
 
@@ -44,16 +35,16 @@ export function ShiftCalendar({
   onShiftClick,
   selectedDate,
 }: ShiftCalendarProps) {
+  const t = useTranslations('shifts')
   const [currentMonth, setCurrentMonth] = useState(new Date())
 
-  // Agrupar turnos por día
+  
   const shiftsByDay = useMemo(() => {
     return shifts.reduce(
       (acc, shift) => {
         const dateKey = format(shift.startTime, 'yyyy-MM-dd')
-        if (!acc[dateKey]) {
-          acc[dateKey] = []
-        }
+        if (!acc[dateKey]) acc[dateKey] = []
+
         acc[dateKey].push(shift)
         return acc
       },
@@ -61,17 +52,17 @@ export function ShiftCalendar({
     )
   }, [shifts])
 
-  // Obtener eventos para un día específico
+  
   const getEventsForDay = (date: Date) => {
     const dateKey = format(date, 'yyyy-MM-dd')
     return shiftsByDay[dateKey] || []
   }
 
-  // Navegación de mes
+  
   const handlePreviousMonth = () => setCurrentMonth(subMonths(currentMonth, 1))
   const handleNextMonth = () => setCurrentMonth(addMonths(currentMonth, 1))
 
-  // Función para renderizar el contenido del día
+  
   const renderDay = (day: Date) => {
     const dayShifts = getEventsForDay(day)
     const isSelected = selectedDate && isSameMonth(day, selectedDate) && isToday(day)
@@ -83,10 +74,9 @@ export function ShiftCalendar({
         >
           <div className="font-medium">{format(day, 'd')}</div>
 
-          {/* Mostrar indicadores de turnos */}
           {dayShifts.length > 0 && (
             <div className="space-y-1 mt-1">
-              {dayShifts.slice(0, 3).map((shift, index) => (
+              {dayShifts.slice(0, 3).map((shift) => (
                 <div
                   key={shift.id}
                   className="text-xs p-1 rounded cursor-pointer hover:opacity-80 truncate"
@@ -98,14 +88,13 @@ export function ShiftCalendar({
                   onClick={() => onShiftClick?.(shift)}
                   title={`${shift.title} - ${shift.userName}`}
                 >
-                  {shift.userName.split(' ')[0]} {/* Solo el nombre */}
+                  {shift.userName.split(' ')[0]}
                 </div>
               ))}
 
-              {/* Indicador de más turnos */}
               {dayShifts.length > 3 && (
                 <div className="text-xs text-muted-foreground text-center">
-                  +{dayShifts.length - 3} más
+                  +{dayShifts.length - 3} {t('more')}
                 </div>
               )}
             </div>
@@ -176,23 +165,22 @@ export function ShiftCalendar({
           }}
         />
 
-        {/* Leyenda de estados */}
         <div className="mt-4 flex flex-wrap gap-2">
           <div className="flex items-center gap-2 text-sm">
-            <div className="w-3 h-3 rounded-full bg-green-500"></div>
-            <span>Programado</span>
+            <div className="w-3 h-3 rounded-full bg-green-500" />
+            <span>{t('status.scheduled')}</span>
           </div>
           <div className="flex items-center gap-2 text-sm">
-            <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-            <span>En progreso</span>
+            <div className="w-3 h-3 rounded-full bg-blue-500" />
+            <span>{t('status.inProgress')}</span>
           </div>
           <div className="flex items-center gap-2 text-sm">
-            <div className="w-3 h-3 rounded-full bg-gray-500"></div>
-            <span>Completado</span>
+            <div className="w-3 h-3 rounded-full bg-gray-500" />
+            <span>{t('status.completed')}</span>
           </div>
           <div className="flex items-center gap-2 text-sm">
-            <div className="w-3 h-3 rounded-full bg-red-500"></div>
-            <span>Cancelado</span>
+            <div className="w-3 h-3 rounded-full bg-red-500" />
+            <span>{t('status.cancelled')}</span>
           </div>
         </div>
       </CardContent>

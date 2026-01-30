@@ -30,6 +30,7 @@ model Organization {
   invitations  OrganizationInvitation[]
   shiftTypes   ShiftType[]
   shifts       Shift[]
+  rates        Rate[]
 
   @@index([taxId])
   @@index([country])
@@ -143,6 +144,49 @@ enum OrganizationStatus {
   INACTIVE
 }
 
+enum RateType {
+  HOURLY
+  MINUTELY
+}
+
+enum RateUnit {
+  MINUTE
+  HOUR
+}
+
+model Rate {
+  id                String            @id @default(cuid())
+  name              String
+  description       String?
+  type              RateType        @default(MINUTELY)
+  unit              RateUnit        @default(MINUTE)
+  amount            Float
+  isActive          Boolean          @default(true)
+  organizationId    String
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  organization       Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  shiftRates        ShiftRate[]
+
+  @@index([organizationId])
+  @@index([type, unit])
+}
+
+model ShiftRate {
+  id        String   @id @default(cuid())
+  rateId    String
+  shiftId   String
+  amount    Float    @default(0)
+  duration  Int      @default(0) // duration in the rate's unit (minutes or hours)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  rate      Rate     @relation(fields: [rateId], references: [id], onDelete: Cascade)
+  shift     Shift    @relation(fields: [shiftId], references: [id], onDelete: Cascade)
+
+  @@unique([rateId, shiftId])
+  @@index([shiftId])
+}
+
 model Area {
   id             String       @id @default(cuid())
   name           String
@@ -217,6 +261,7 @@ model Shift {
   area          Area       @relation(fields: [areaId], references: [id], onDelete: Cascade)
   shiftType     ShiftType  @relation(fields: [shiftTypeId], references: [id], onDelete: Cascade)
   organization  Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  shiftRates    ShiftRate[]
 
   @@index([organizationId])
   @@index([userId])

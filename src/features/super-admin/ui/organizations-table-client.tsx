@@ -300,19 +300,19 @@ export function OrganizationsTableClient({
                     <TableCell className="text-center">
                       <div className="space-y-1 text-xs">
                         <div className="flex items-center justify-between gap-2">
-                          <span className="text-muted-foreground">Admin HR:</span>
+                          <span className="text-muted-foreground">{t('accountsAdminHR')}</span>
                           <span className="font-medium">
                             {userCounts.ADMIN_HR}/{org.maxAdminHR}
                           </span>
                         </div>
                         <div className="flex items-center justify-between gap-2">
-                          <span className="text-muted-foreground">Jefes:</span>
+                          <span className="text-muted-foreground">{t('accountsChiefs')}</span>
                           <span className="font-medium">
                             {userCounts.CHIEF}/{org.maxChiefs}
                           </span>
                         </div>
                         <div className="flex items-center justify-between gap-2">
-                          <span className="text-muted-foreground">Staff:</span>
+                          <span className="text-muted-foreground">{t('accountsStaff')}</span>
                           <span className="font-medium">
                             {userCounts.STAFF}/{org.maxStaff}
                           </span>
@@ -326,7 +326,6 @@ export function OrganizationsTableClient({
                         : '-'}
                     </TableCell>
                     <TableCell className="text-right">
-                      {/*Desktop: Iconos individuales con tooltips*/}
                       <div className="hidden md:flex items-center justify-end gap-2">
                         <Tooltip>
                           <TooltipTrigger asChild>
@@ -418,12 +417,11 @@ export function OrganizationsTableClient({
                         )}
                       </div>
 
-                      {/*Mobile: Dropdown menu*/}
                       <div className="flex md:hidden items-center justify-end">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" className="h-8 w-8 p-0">
-                              <span className="sr-only">Abrir menú</span>
+                              <span className="sr-only">{t('openMenu')}</span>
                               <MoreHorizontal className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>

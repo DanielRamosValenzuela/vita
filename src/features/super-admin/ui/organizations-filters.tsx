@@ -65,7 +65,7 @@ export function OrganizationsFilters({
             <div className="flex flex-wrap gap-2">
               {search && (
                 <Badge variant="secondary" className="gap-1">
-                  {t('filters.search')}: "{search}"
+                  {t('filters.search')}: {search}
                   <button
                     onClick={() => onSearchChange('')}
                     className="hover:bg-muted-foreground/20 rounded-full p-0.5 transition-colors"

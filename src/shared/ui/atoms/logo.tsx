@@ -1,3 +1,6 @@
+'use client'
+
+import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 
 import { cn } from '@/src/shared/lib/utils'
@@ -10,6 +13,7 @@ interface LogoProps {
 }
 
 export function Logo({ className, showText = true, size = 'md', locale = 'es' }: LogoProps) {
+  const t = useTranslations('common')
   const sizeClasses = {
     sm: 'h-6 w-6 text-lg',
     md: 'h-8 w-8 text-xl',
@@ -23,7 +27,7 @@ export function Logo({ className, showText = true, size = 'md', locale = 'es' }:
         'flex items-center gap-2 font-bold transition-opacity hover:opacity-80',
         className
       )}
-      aria-label="VITA - Inicio"
+      aria-label={t('logoLabel')}
     >
       <span
         className={cn(
@@ -40,7 +44,7 @@ export function Logo({ className, showText = true, size = 'md', locale = 'es' }:
             size === 'lg' ? 'text-2xl' : size === 'sm' ? 'text-base' : 'text-xl'
           )}
         >
-          VITA
+          {t('appName')}
         </span>
       )}
     </Link>

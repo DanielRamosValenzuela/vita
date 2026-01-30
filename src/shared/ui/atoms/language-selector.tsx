@@ -22,7 +22,7 @@ export function LanguageSelector() {
   const params = useParams()
   const pathname = usePathname()
   const router = useRouter()
-  const t = useTranslations('common.languages')
+  const t = useTranslations('common')
   const currentLocale = (params?.locale as Locale) || routing.defaultLocale
 
   const handleLocaleChange = (newLocale: Locale) => {
@@ -37,7 +37,7 @@ export function LanguageSelector() {
           variant="ghost"
           size="icon"
           className="h-9 w-9 cursor-pointer"
-          aria-label="Select language"
+          aria-label={t('selectLanguage')}
           suppressHydrationWarning
         >
           <Globe className="h-4 w-4" />
@@ -50,7 +50,7 @@ export function LanguageSelector() {
             onClick={() => handleLocaleChange(locale)}
             className={currentLocale === locale ? 'bg-accent' : ''}
           >
-            {t(locale)}
+            {t(`languages.${locale}`)}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>
