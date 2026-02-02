@@ -133,7 +133,7 @@ export async function getAreasAction() {
               shiftType: { select: { id: true, name: true, durationMinutes: true } },
             },
           },
-          _count: { select: { shiftTypes: true } },
+          _count: { select: { shiftTypes: true, userAreas: true, contracts: true } },
         },
       })
       return { success: true, data: areas }

@@ -30,7 +30,7 @@ export async function getAreas(organizationId: string) {
           shiftType: { select: { id: true, name: true, durationMinutes: true } },
         },
       },
-      _count: { select: { shiftTypes: true } },
+      _count: { select: { shiftTypes: true, userAreas: true, contracts: true } },
     },
   })
 }

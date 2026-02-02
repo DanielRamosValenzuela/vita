@@ -32,7 +32,7 @@ interface AreasTableProps {
     icon: string | null
     color: string
     isActive: boolean
-    _count?: { shiftTypes: number }
+    _count?: { shiftTypes: number; userAreas?: number; contracts?: number }
   }>
   canCreate?: boolean
   canDelete?: boolean
@@ -101,6 +101,12 @@ export function AreasTable({ areas, canCreate = true, canDelete = true }: AreasT
                     {t('table.shiftTypes')}
                   </th>
                   <th className="text-muted-foreground pb-3 text-left text-sm font-medium">
+                    {t('table.chiefs')}
+                  </th>
+                  <th className="text-muted-foreground pb-3 text-left text-sm font-medium">
+                    {t('table.staff')}
+                  </th>
+                  <th className="text-muted-foreground pb-3 text-left text-sm font-medium">
                     {t('table.status')}
                   </th>
                   <th className="text-muted-foreground pb-3 text-right text-sm font-medium">
@@ -124,6 +130,12 @@ export function AreasTable({ areas, canCreate = true, canDelete = true }: AreasT
                     </td>
                     <td className="py-4 text-sm">
                       {area._count?.shiftTypes ?? 0}
+                    </td>
+                    <td className="py-4 text-sm">
+                      {area._count?.userAreas ?? 0}
+                    </td>
+                    <td className="py-4 text-sm">
+                      {area._count?.contracts ?? 0}
                     </td>
                     <td className="py-4">
                       <Badge variant={area.isActive ? 'default' : 'secondary'}>

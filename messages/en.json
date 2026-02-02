@@ -1204,6 +1204,8 @@
         "name": "Name",
         "description": "Description",
         "shiftTypes": "Types",
+        "chiefs": "Chiefs",
+        "staff": "Staff",
         "status": "Status",
         "actions": "Actions",
         "view": "View / Edit"

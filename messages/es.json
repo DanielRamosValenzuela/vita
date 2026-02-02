@@ -1183,6 +1183,8 @@
         "name": "Nombre",
         "description": "Descripción",
         "shiftTypes": "Tipos",
+        "chiefs": "Jefes",
+        "staff": "Personal",
         "status": "Estado",
         "actions": "Acciones",
         "view": "Ver / Editar"

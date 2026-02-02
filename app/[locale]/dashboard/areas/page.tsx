@@ -45,7 +45,7 @@ export default async function AreasPage({ params }: AreasPageProps) {
     icon: string | null
     color: string
     isActive: boolean
-    _count?: { shiftTypes: number }
+    _count?: { shiftTypes: number; userAreas?: number; contracts?: number }
   }>
 
   return (
