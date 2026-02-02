@@ -1,6 +1,7 @@
 import { getTranslations } from 'next-intl/server'
 
 import { requireAdminHR } from '@/src/shared/lib/auth/session'
+import { getAreas } from '@/src/entities/area'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
 import { getShiftTypesAction } from '@/src/features/shifts/api'
 import { ShiftTypesPage } from '@/src/features/shifts/ui'
@@ -36,9 +37,12 @@ export default async function ShiftTypes({ params }: ShiftTypesProps) {
   
 
   
-  const shiftTypesResult = await getShiftTypesAction()
+  const [shiftTypesResult, areas] = await Promise.all([
+    getShiftTypesAction(),
+    session.organizationId ? getAreas(session.organizationId) : [],
+  ])
 
-  if (!shiftTypesResult.success || !shiftTypesResult.data) 
+  if (!shiftTypesResult.success || !shiftTypesResult.data)
     return (
       <div className="space-y-8">
         <div>
@@ -47,7 +51,6 @@ export default async function ShiftTypes({ params }: ShiftTypesProps) {
         </div>
       </div>
     )
-  
 
   const shiftTypes = shiftTypesResult.data
 
@@ -64,7 +67,7 @@ export default async function ShiftTypes({ params }: ShiftTypesProps) {
           <CardDescription>{t('description')}</CardDescription>
         </CardHeader>
         <CardContent>
-          <ShiftTypesPage shiftTypes={shiftTypes || []} />
+          <ShiftTypesPage shiftTypes={shiftTypes || []} areas={areas} />
         </CardContent>
       </Card>
     </div>

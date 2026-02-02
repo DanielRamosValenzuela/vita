@@ -36,16 +36,30 @@ export const assignShiftTypesToAreaAction = async (
 
     const validIds = validShiftTypes.map((st) => st.id)
 
-    await prisma.areaShiftType.deleteMany({
-      where: { areaId },
+    await Promise.all(
+      validIds.map((shiftTypeId) =>
+        prisma.areaShiftType.upsert({
+          where: {
+            areaId_shiftTypeId: { areaId, shiftTypeId },
+          },
+          create: { areaId, shiftTypeId, isActive: true },
+          update: { isActive: true },
+        })
+      )
+    )
+
+    await prisma.areaShiftType.updateMany({
+      where: {
+        areaId,
+        shiftTypeId: { notIn: validIds },
+      },
+      data: { isActive: false },
     })
 
-    if (validIds.length > 0)
-      await prisma.areaShiftType.createMany({
-        data: validIds.map((shiftTypeId) => ({ areaId, shiftTypeId })),
-      })
-
-    const canActivate = validIds.length > 0
+    const assignedCount = await prisma.areaShiftType.count({
+      where: { areaId, isActive: true },
+    })
+    const canActivate = assignedCount > 0
     await prisma.area.update({
       where: { id: areaId },
       data: {
@@ -77,9 +91,6 @@ export const setAreaActiveAction = async (
 
     const area = await prisma.area.findFirst({
       where: { id: areaId, organizationId: session.organizationId },
-      include: {
-        _count: { select: { shiftTypes: true } },
-      },
     })
 
     if (!area)
@@ -88,11 +99,16 @@ export const setAreaActiveAction = async (
         error: 'Área no encontrada',
       }
 
-    if (isActive && area._count.shiftTypes === 0)
-      return {
-        success: false,
-        error: 'Asigna al menos un tipo de turno para activar el área',
-      }
+    if (isActive) {
+      const assignedCount = await prisma.areaShiftType.count({
+        where: { areaId, isActive: true },
+      })
+      if (assignedCount === 0)
+        return {
+          success: false,
+          error: 'Asigna al menos un tipo de turno para activar el área',
+        }
+    }
 
     await prisma.area.update({
       where: { id: areaId },

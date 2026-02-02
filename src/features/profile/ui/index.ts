@@ -1,5 +1,6 @@
 export { ProfileForm } from './profile-form'
 export { ChangePasswordForm } from './change-password-form'
 export { DocumentForm } from './document-form'
+export { DocumentSection } from './document-section'
 export { InvitationsSection } from './invitations-section'
 export { OrganizationsSection } from './organizations-section'

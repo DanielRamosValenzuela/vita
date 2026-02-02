@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useMemo } from 'react'
 import { useTranslations } from 'next-intl'
 import { useRouter } from '@/i18n/navigation'
 import Link from 'next/link'
@@ -8,6 +8,16 @@ import { ArrowLeft, Info, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { AREA_ICONS } from '@/src/shared/lib/constants'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/src/shared/ui/alert-dialog'
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
@@ -46,6 +56,7 @@ interface AreaEditFormProps {
     maxConsecutiveHours?: number | null
     minRestHours?: number | null
     shiftTypes: Array<{
+      isActive: boolean
       shiftType: {
         id: string
         name: string
@@ -81,23 +92,64 @@ export function AreaEditForm({ area, shiftTypes }: AreaEditFormProps) {
     area.minRestHours != null ? String(area.minRestHours) : ''
   )
   const [selectedShiftTypeIds, setSelectedShiftTypeIds] = useState<Set<string>>(
-    new Set(area.shiftTypes.map((ast) => ast.shiftType.id))
+    () => new Set(area.shiftTypes.filter((ast) => ast.isActive).map((ast) => ast.shiftType.id))
+  )
+  const [showSaveConfirm, setShowSaveConfirm] = useState(false)
+
+  const initialSelectedIds = useMemo(
+    () => new Set(area.shiftTypes.filter((ast) => ast.isActive).map((ast) => ast.shiftType.id)),
+    [area.shiftTypes]
   )
 
   const assignedCount = selectedShiftTypeIds.size
   const canActivate = assignedCount > 0
 
+  const hasChanges = useMemo(() => {
+    if (name.trim() !== area.name) return true
+    if ((description || '') !== (area.description || '')) return true
+    if ((icon ?? 'Building2') !== (area.icon ?? 'Building2')) return true
+    if ((color ?? '#3b82f6') !== (area.color ?? '#3b82f6')) return true
+    if (isActive !== area.isActive) return true
+    const maxStr = area.maxConsecutiveHours != null ? String(area.maxConsecutiveHours) : ''
+    if (maxConsecutiveHours !== maxStr) return true
+    const minStr = area.minRestHours != null ? String(area.minRestHours) : ''
+    if (minRestHours !== minStr) return true
+    if (selectedShiftTypeIds.size !== initialSelectedIds.size) return true
+    if ([...selectedShiftTypeIds].some((id) => !initialSelectedIds.has(id))) return true
+    if ([...initialSelectedIds].some((id) => !selectedShiftTypeIds.has(id))) return true
+    return false
+  }, [
+    name,
+    description,
+    icon,
+    color,
+    isActive,
+    maxConsecutiveHours,
+    minRestHours,
+    selectedShiftTypeIds,
+    initialSelectedIds,
+    area.name,
+    area.description,
+    area.icon,
+    area.color,
+    area.isActive,
+    area.maxConsecutiveHours,
+    area.minRestHours,
+  ])
+
   const handleSelectionChange = (ids: Set<string>) => {
     setSelectedShiftTypeIds(ids)
   }
 
-  const handleSave = () => {
+  const performSave = () => {
     if (!name.trim()) {
       toast.error(t('form.nameRequired'))
       return
     }
 
     startTransition(async () => {
+      setShowSaveConfirm(false)
+
       const assignResult = await assignShiftTypesToAreaAction(
         area.id,
         Array.from(selectedShiftTypeIds)
@@ -128,20 +180,18 @@ export function AreaEditForm({ area, shiftTypes }: AreaEditFormProps) {
       }
 
       toast.success(t('editSuccess'))
-      router.refresh()
+      router.push('/dashboard/areas')
     })
+  }
+
+  const handleSave = () => {
+    if (!hasChanges) return
+    setShowSaveConfirm(true)
   }
 
   const handleToggleActive = (checked: boolean) => {
     if (checked && !canActivate) return
     setIsActive(checked)
-    startTransition(async () => {
-      const result = await setAreaActiveAction(area.id, checked)
-      if (result.success) {
-        toast.success(result.message)
-        router.refresh()
-      } else toast.error(result.error)
-    })
   }
 
   return (
@@ -340,7 +390,7 @@ export function AreaEditForm({ area, shiftTypes }: AreaEditFormProps) {
       </Card>
 
       <div className="flex gap-4">
-        <Button onClick={handleSave} disabled={isPending}>
+        <Button onClick={handleSave} disabled={!hasChanges || isPending}>
           {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           {t('save')}
         </Button>
@@ -348,6 +398,22 @@ export function AreaEditForm({ area, shiftTypes }: AreaEditFormProps) {
           <Link href="/dashboard/areas">{t('cancel')}</Link>
         </Button>
       </div>
+
+      <AlertDialog open={showSaveConfirm} onOpenChange={setShowSaveConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('saveConfirm.title')}</AlertDialogTitle>
+            <AlertDialogDescription>{t('saveConfirm.description')}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isPending}>{t('saveConfirm.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={performSave} disabled={isPending}>
+              {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {t('saveConfirm.confirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

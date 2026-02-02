@@ -34,6 +34,7 @@ declare module 'next-auth/jwt' {
     role: Role
     organizationId?: string
     country?: Country
+    docType?: DocType
     docNumber?: string
   }
 }

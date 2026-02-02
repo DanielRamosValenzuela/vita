@@ -5,7 +5,7 @@ import type { Country } from '@prisma/client'
 import { getCurrentUser } from '@/src/shared/lib/auth/session'
 import {
   ChangePasswordForm,
-  DocumentForm,
+  DocumentSection,
   InvitationsSection,
   OrganizationsSection,
   ProfileForm,
@@ -20,9 +20,8 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   const user = await getCurrentUser()
   const t = await getTranslations('profile')
 
-  if (!user) 
+  if (!user)
     redirect(`/${locale}/login`)
-  
 
   return (
     <div className="space-y-6 pb-6">
@@ -44,14 +43,13 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
 
       <OrganizationsSection />
 
-      {(!user.docNumber || !user.country) && (
-        <DocumentForm
-          initialData={{
-            country: (user.country as Country) || null,
-            docNumber: user.docNumber || null,
-          }}
-        />
-      )}
+      <DocumentSection
+        user={
+          user.country && user.docNumber
+            ? { country: user.country as Country, docNumber: user.docNumber }
+            : null
+        }
+      />
     </div>
   )
 }

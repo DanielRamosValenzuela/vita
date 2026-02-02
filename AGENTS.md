@@ -26,10 +26,12 @@ src/
 
 ## Convenciones Clave
 
-- **i18n:** Todo texto visible debe usar `useTranslations` o `getTranslations`. Keys en `messages/es.json` y `messages/en.json`. Build falla si hay literales en JSX.
+- **i18n:** Todo texto visible debe usar `useTranslations` o `getTranslations`. Keys en `messages/es.json` y `messages/en.json`. Build falla si hay literales en JSX. Diálogos (Radix) deben tener `Description` o `aria-describedby` para accesibilidad.
+- **Config:** Variables de entorno se leen y validan una sola vez en `src/shared/lib/config/env.server.ts`; auth y proxy usan ese objeto.
 - **Tipos:** Usar Prisma para modelos. `ActionResult<T>` en shared/lib/types para respuestas de actions.
 - **Utilities:** `handleActionError`, `toastActionResult`, `revalidatePaths`, `requireAdminHRWithOrg` en shared/lib/utils.
 - **Hooks:** `useFormAction` para formularios que llaman server actions.
+- **Formularios modales (edición):** Patrón recomendado: `hasChanges`, botón Guardar deshabilitado si no hay cambios o `isPending`, AlertDialog de confirmación al guardar, redirección al listado tras éxito (ej. tipos de turno, área, tarifas/contratos).
 - **Indentación:** 2 espacios. Standard.js para estilo.
 
 ## Estructura de Datos Principal

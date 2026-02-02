@@ -18,13 +18,13 @@ import {
 
 import { createShiftAction } from '../api/shift-actions'
 import type { CreateShiftData } from '../types/shift-types'
-import { ShiftForm } from './shift-form'
+import { ShiftForm, type ShiftTypeOption } from './shift-form'
 
 interface ShiftFormDialogProps {
   organizationId: string
   users: Array<{ id: string; name: string; role: string }>
   areas: Array<{ id: string; name: string; description?: string }>
-  shiftTypes: Array<{ id: string; name: string; color: string }>
+  shiftTypes: ShiftTypeOption[]
 }
 
 export function ShiftFormDialog({

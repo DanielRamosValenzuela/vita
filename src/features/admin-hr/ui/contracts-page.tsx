@@ -1,11 +1,21 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useMemo } from 'react'
 import { useTranslations } from 'next-intl'
 import { useRouter } from '@/i18n/navigation'
-import { Edit, FileText, Plus, Trash2 } from 'lucide-react'
+import { Edit, FileText, Loader2, Plus, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/src/shared/ui/alert-dialog'
 import { formatCurrency } from '@/src/shared/lib/utils/format'
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
@@ -69,6 +79,13 @@ export function ContractsPage({ data }: ContractsPageProps) {
     name: string
     contractsCount: number
   } | null>(null)
+  const [showSaveContractConfirm, setShowSaveContractConfirm] = useState(false)
+  const [showSaveTemplateConfirm, setShowSaveTemplateConfirm] = useState(false)
+  const [initialTemplateForm, setInitialTemplateForm] = useState<{
+    name: string
+    ratePerMinute: string
+    baseSalary: string
+  } | null>(null)
   const [templateForm, setTemplateForm] = useState<{
     id: string | null
     name: string
@@ -125,21 +142,55 @@ export function ContractsPage({ data }: ContractsPageProps) {
   }
 
   const openTemplateCreate = () => {
+    setInitialTemplateForm(null)
     setTemplateForm({ id: null, name: '', ratePerMinute: '', baseSalary: '' })
     setTemplateDialogOpen(true)
   }
 
   const openTemplateEdit = (id: string, name: string, ratePerMinute: number, baseSalary: number | null) => {
-    setTemplateForm({
-      id,
-      name,
-      ratePerMinute: String(ratePerMinute),
-      baseSalary: baseSalary != null ? String(baseSalary) : '',
-    })
+    const rateStr = String(ratePerMinute)
+    const baseStr = baseSalary != null ? String(baseSalary) : ''
+    setInitialTemplateForm({ name, ratePerMinute: rateStr, baseSalary: baseStr })
+    setTemplateForm({ id, name, ratePerMinute: rateStr, baseSalary: baseStr })
     setTemplateDialogOpen(true)
   }
 
-  const handleSaveContract = () => {
+  const hasContractChanges = useMemo(() => {
+    if (!selectedContract) {
+      return (
+        contractForm.rateTemplateId !== '' ||
+        (contractForm.useCustomRate && contractForm.ratePerMinute !== '') ||
+        contractForm.areaId !== '' ||
+        contractForm.adjustmentPerMinute !== '0' ||
+        contractForm.baseSalary !== ''
+      )
+    }
+    return (
+      (contractForm.areaId || '') !== (selectedContract.areaId || '') ||
+      (contractForm.rateTemplateId || '') !== (selectedContract.rateTemplateId || '') ||
+      contractForm.useCustomRate !== (selectedContract.source === 'custom') ||
+      contractForm.ratePerMinute !==
+        (selectedContract.ratePerMinute != null ? String(selectedContract.ratePerMinute) : '') ||
+      contractForm.adjustmentPerMinute !== String(selectedContract.adjustmentPerMinute ?? 0) ||
+      contractForm.baseSalary !==
+        (selectedContract.baseSalary != null ? String(selectedContract.baseSalary) : '') ||
+      (contractForm.baseSalaryUnit || 'MONTHLY') !== (selectedContract.baseSalaryUnit || 'MONTHLY')
+    )
+  }, [contractForm, selectedContract])
+
+  const hasTemplateChanges = useMemo(() => {
+    if (!templateForm.id) {
+      return templateForm.name.trim() !== '' || templateForm.ratePerMinute !== '' || templateForm.baseSalary !== ''
+    }
+    if (!initialTemplateForm) return false
+    return (
+      templateForm.name.trim() !== initialTemplateForm.name ||
+      templateForm.ratePerMinute !== initialTemplateForm.ratePerMinute ||
+      templateForm.baseSalary !== initialTemplateForm.baseSalary
+    )
+  }, [templateForm, initialTemplateForm])
+
+  const performSaveContract = () => {
     if (!selectedStaff) return
     const isEdit = !!selectedContract
 
@@ -169,6 +220,7 @@ export function ContractsPage({ data }: ContractsPageProps) {
     }
 
     startTransition(async () => {
+      setShowSaveContractConfirm(false)
       const result = isEdit
         ? await updateContractAction(selectedContract!.id, {
             areaId: payload.areaId || null,
@@ -184,12 +236,18 @@ export function ContractsPage({ data }: ContractsPageProps) {
         toast.success(isEdit ? t('toast.contractUpdated') : t('toast.contractCreated'))
         setContractDialogOpen(false)
         setSelectedStaff(null)
-        router.refresh()
+        setSelectedContract(null)
+        router.push('/dashboard/rates')
       } else toast.error(result.error || t('toast.error'))
     })
   }
 
-  const handleSaveTemplate = () => {
+  const handleSaveContract = () => {
+    if (!hasContractChanges) return
+    setShowSaveContractConfirm(true)
+  }
+
+  const performSaveTemplate = () => {
     if (!templateForm.name.trim()) {
       toast.error(t('toast.error'))
       return
@@ -201,6 +259,7 @@ export function ContractsPage({ data }: ContractsPageProps) {
     }
 
     startTransition(async () => {
+      setShowSaveTemplateConfirm(false)
       const payload = {
         name: templateForm.name.trim(),
         ratePerMinute,
@@ -216,9 +275,14 @@ export function ContractsPage({ data }: ContractsPageProps) {
       if (result.success) {
         toast.success(templateForm.id ? t('toast.templateUpdated') : t('toast.templateCreated'))
         setTemplateDialogOpen(false)
-        router.refresh()
+        router.push('/dashboard/rates')
       } else toast.error(result.error || t('toast.error'))
     })
+  }
+
+  const handleSaveTemplate = () => {
+    if (!hasTemplateChanges) return
+    setShowSaveTemplateConfirm(true)
   }
 
   const handleEndContract = () => {
@@ -518,12 +582,28 @@ export function ContractsPage({ data }: ContractsPageProps) {
             <Button variant="outline" onClick={() => setContractDialogOpen(false)}>
               {tCommon('cancel')}
             </Button>
-            <Button onClick={handleSaveContract} disabled={isPending}>
+            <Button onClick={handleSaveContract} disabled={!hasContractChanges || isPending}>
               {isPending ? tCommon('loading') : tCommon('save')}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={showSaveContractConfirm} onOpenChange={setShowSaveContractConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('saveConfirm.title')}</AlertDialogTitle>
+            <AlertDialogDescription>{t('saveConfirm.description')}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isPending}>{t('saveConfirm.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={performSaveContract} disabled={isPending}>
+              {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {t('saveConfirm.confirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <Dialog open={templateDialogOpen} onOpenChange={setTemplateDialogOpen}>
         <DialogContent className="sm:max-w-xl">
@@ -570,12 +650,28 @@ export function ContractsPage({ data }: ContractsPageProps) {
             <Button variant="outline" onClick={() => setTemplateDialogOpen(false)}>
               {tCommon('cancel')}
             </Button>
-            <Button onClick={handleSaveTemplate} disabled={isPending}>
+            <Button onClick={handleSaveTemplate} disabled={!hasTemplateChanges || isPending}>
               {isPending ? tCommon('loading') : tCommon('save')}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={showSaveTemplateConfirm} onOpenChange={setShowSaveTemplateConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('saveConfirm.title')}</AlertDialogTitle>
+            <AlertDialogDescription>{t('saveConfirm.description')}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isPending}>{t('saveConfirm.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={performSaveTemplate} disabled={isPending}>
+              {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {t('saveConfirm.confirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <Dialog open={endContractDialogOpen} onOpenChange={setEndContractDialogOpen}>
         <DialogContent>

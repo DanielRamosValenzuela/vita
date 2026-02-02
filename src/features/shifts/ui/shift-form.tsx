@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { format } from 'date-fns'
@@ -45,11 +45,19 @@ const shiftSchema = z.object({
 
 type ShiftFormData = z.infer<typeof shiftSchema>
 
+export type ShiftTypeOption = {
+  id: string
+  name: string
+  color: string
+  isGlobal?: boolean
+  areaShiftTypes?: Array<{ areaId: string; isActive: boolean }>
+}
+
 interface ShiftFormProps {
   _organizationId: string
   users: Array<{ id: string; name: string; role: string }>
   areas: Array<{ id: string; name: string; description?: string }>
-  shiftTypes: Array<{ id: string; name: string; color: string }>
+  shiftTypes: ShiftTypeOption[]
   initialData?: Partial<ShiftFormData>
   onSubmit: (data: CreateShiftData) => Promise<void>
   onCancel: () => void
@@ -84,9 +92,25 @@ export function ShiftForm({
     },
   })
 
+  const areaId = form.watch('areaId')
+  const availableShiftTypes = useMemo(() => {
+    if (!areaId) return shiftTypes
+    return shiftTypes.filter(
+      (st) =>
+        st.isGlobal === true ||
+        (st.areaShiftTypes?.some((ast) => ast.areaId === areaId && ast.isActive) ?? false)
+    )
+  }, [shiftTypes, areaId])
+
+  useEffect(() => {
+    const currentId = form.getValues('shiftTypeId')
+    if (currentId && !availableShiftTypes.some((st) => st.id === currentId))
+      form.setValue('shiftTypeId', '')
+  }, [availableShiftTypes, form])
+
   const selectedUser = users.find((user) => user.id === form.watch('userId'))
-  const selectedArea = areas.find((area) => area.id === form.watch('areaId'))
-  const selectedShiftType = shiftTypes.find((type) => type.id === form.watch('shiftTypeId'))
+  const selectedArea = areas.find((area) => area.id === areaId)
+  const selectedShiftType = availableShiftTypes.find((type) => type.id === form.watch('shiftTypeId'))
 
   const handleSubmit = async (data: CreateShiftFormData) => {
     
@@ -194,7 +218,7 @@ export function ShiftForm({
                   <SelectValue placeholder={t('shiftTypePlaceholder')} />
                 </SelectTrigger>
                 <SelectContent>
-                  {shiftTypes.map((type) => (
+                  {availableShiftTypes.map((type) => (
                     <SelectItem key={type.id} value={type.id}>
                       <div className="flex items-center gap-2">
                         <div

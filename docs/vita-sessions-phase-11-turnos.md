@@ -64,3 +64,10 @@ Sesiones relacionadas con el sistema de gestión de turnos, tipos de turno, áre
 - Tooltips en minStaffRequired, idealStaffCount, maxStaffAllowed, isGlobal
 - Botón eliminar área funcional, colores en iconos Ver/Eliminar
 - Definido: Gestión de Personal (/dashboard/staff), UserArea en schema
+
+## Sesión Feb 2026 - Tipos de turno por área, config env, UX formularios
+
+- **Tipos de turno ↔ áreas:** Al crear/editar tipo de turno, la relación AreaShiftType se crea con `isActive: false`; se activa desde la edición del área. Formulario de turnos filtra tipos por área: solo globales o con relación activa. Tabla tipos: columna "Global" (Sí/No), "Áreas" (cantidad o "-"), "Asignado" (antes "Turnos"). `assignShiftTypesToAreaAction` usa upsert (isActive true/false), no borra relaciones.
+- **Config centralizada:** `src/shared/lib/config/env.server.ts` lee y valida `process.env` una vez; auth/config y proxy consumen ese objeto.
+- **UX formularios modales:** Tipos de turno, edición de área, tarifas y contratos: estado `hasChanges`, botón Guardar deshabilitado si no hay cambios o está en curso, AlertDialog "¿Guardar cambios?" al guardar, redirección al listado tras éxito.
+- **i18n y accesibilidad:** Claves faltantes añadidas en messages (es/en). Descripciones para DialogContent (Description/aria-describedby) para eliminar warnings de Radix.

@@ -40,7 +40,8 @@ export async function getAreaById(id: string, organizationId: string) {
     where: { id, organizationId },
     include: {
       shiftTypes: {
-        include: {
+        select: {
+          isActive: true,
           shiftType: {
             select: {
               id: true,
@@ -92,8 +93,10 @@ export async function updateArea(
 
   if (data.isActive !== undefined) {
     if (data.isActive) {
-      const count = await prisma.areaShiftType.count({ where: { areaId: id } })
-      if (count === 0)
+      const assignedCount = await prisma.areaShiftType.count({
+        where: { areaId: id, isActive: true },
+      })
+      if (assignedCount === 0)
         throw new Error('Asigna al menos un tipo de turno para activar el área')
     }
     updateData.isActive = data.isActive

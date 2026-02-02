@@ -30,6 +30,11 @@ interface ShiftType {
     shifts: number
     areaShiftTypes: number
   }
+  areaShiftTypes?: Array<{
+    areaId: string
+    isActive: boolean
+    area: { id: string; name: string }
+  }>
 }
 
 export const getShiftTypesAction = async (): Promise<ActionResult<ShiftType[]>> => {
@@ -41,6 +46,9 @@ export const getShiftTypesAction = async (): Promise<ActionResult<ShiftType[]>> 
       orderBy: { createdAt: 'desc' },
       include: {
         _count: { select: { shifts: true, areaShiftTypes: true } },
+        areaShiftTypes: {
+          select: { areaId: true, isActive: true, area: { select: { id: true, name: true } } },
+        },
       },
     })
 
@@ -75,6 +83,7 @@ export const createShiftTypeAction = async (data: {
   suggestedRestDays?: number
   isGlobal?: boolean
   isActive?: boolean
+  areaConfigs?: Array<{ areaId: string; isActive: boolean }>
 }): Promise<ActionResult<ShiftType>> => {
   try {
     const session = await requireAdminHRWithOrg()
@@ -92,6 +101,29 @@ export const createShiftTypeAction = async (data: {
         success: false,
         error: 'La duración debe estar entre 30 minutos y 24 horas (1440 min)',
       }
+
+    const isGlobal = data.isGlobal ?? true
+    const areaConfigs = data.areaConfigs ?? []
+    if (!isGlobal && areaConfigs.length === 0)
+      return {
+        success: false,
+        error: 'Si el tipo no es global, debes seleccionar al menos un área',
+      }
+
+    if (!isGlobal && areaConfigs.length > 0) {
+      const areaIds = areaConfigs.map((c) => c.areaId)
+      const areasInOrg = await prisma.area.count({
+        where: {
+          id: { in: areaIds },
+          organizationId: session.organizationId,
+        },
+      })
+      if (areasInOrg !== areaIds.length)
+        return {
+          success: false,
+          error: 'Una o más áreas no pertenecen a tu organización',
+        }
+    }
 
     const existingType = await prisma.shiftType.findFirst({
       where: {
@@ -118,22 +150,44 @@ export const createShiftTypeAction = async (data: {
         idealStaffCount: data.idealStaffCount ?? 1,
         maxStaffAllowed: data.maxStaffAllowed ?? 10,
         suggestedRestDays: data.suggestedRestDays ?? 1,
-        isGlobal: data.isGlobal ?? true,
+        isGlobal,
         isActive: data.isActive ?? true,
         organizationId: session.organizationId,
       },
       include: {
         _count: { select: { shifts: true, areaShiftTypes: true } },
+        areaShiftTypes: {
+          select: { areaId: true, isActive: true, area: { select: { id: true, name: true } } },
+        },
       },
     })
 
+    if (!isGlobal && areaConfigs.length > 0)
+      await prisma.areaShiftType.createMany({
+        data: areaConfigs.map((c) => ({
+          areaId: c.areaId,
+          shiftTypeId: shiftType.id,
+          isActive: false,
+        })),
+      })
+
     revalidatePaths(...SHIFT_TYPES_PATHS)
+
+    const withAreas = await prisma.shiftType.findUnique({
+      where: { id: shiftType.id },
+      include: {
+        _count: { select: { shifts: true, areaShiftTypes: true } },
+        areaShiftTypes: {
+          select: { areaId: true, isActive: true, area: { select: { id: true, name: true } } },
+        },
+      },
+    })
 
     return {
       success: true,
       data: {
-        ...shiftType,
-        description: shiftType.description ?? undefined,
+        ...withAreas!,
+        description: withAreas!.description ?? undefined,
       },
       message: 'Tipo de turno creado exitosamente',
     }
@@ -161,6 +215,7 @@ export const updateShiftTypeAction = async (
     suggestedRestDays?: number
     isGlobal?: boolean
     isActive?: boolean
+    areaConfigs?: Array<{ areaId: string; isActive: boolean }>
   }
 ): Promise<ActionResult<ShiftType>> => {
   try {
@@ -197,7 +252,29 @@ export const updateShiftTypeAction = async (
         error: 'El tipo de turno no pertenece a tu organización',
       }
 
-    
+    const isGlobal = data.isGlobal ?? existingType.isGlobal
+    const areaConfigs = data.areaConfigs ?? []
+    if (!isGlobal && areaConfigs.length === 0)
+      return {
+        success: false,
+        error: 'Si el tipo no es global, debes seleccionar al menos un área',
+      }
+
+    if (!isGlobal && areaConfigs.length > 0) {
+      const areaIds = areaConfigs.map((c) => c.areaId)
+      const areasInOrg = await prisma.area.count({
+        where: {
+          id: { in: areaIds },
+          organizationId: session.organizationId,
+        },
+      })
+      if (areasInOrg !== areaIds.length)
+        return {
+          success: false,
+          error: 'Una o más áreas no pertenecen a tu organización',
+        }
+    }
+
     if (data.name && data.name !== existingType.name) {
       const duplicateType = await prisma.shiftType.findFirst({
         where: {
@@ -214,21 +291,39 @@ export const updateShiftTypeAction = async (
         }
     }
 
-    const updatedShiftType = await prisma.shiftType.update({
+    const { areaConfigs: _areaConfigs, ...updateData } = data
+    await prisma.shiftType.update({
       where: { id },
-      data,
-      include: {
-        _count: { select: { shifts: true, areaShiftTypes: true } },
-      },
+      data: updateData,
     })
 
+    await prisma.areaShiftType.deleteMany({ where: { shiftTypeId: id } })
+    if (!isGlobal && areaConfigs.length > 0)
+      await prisma.areaShiftType.createMany({
+        data: areaConfigs.map((c) => ({
+          areaId: c.areaId,
+          shiftTypeId: id,
+          isActive: false,
+        })),
+      })
+
     revalidatePaths(...SHIFT_TYPES_PATHS)
+
+    const withAreas = await prisma.shiftType.findUnique({
+      where: { id },
+      include: {
+        _count: { select: { shifts: true, areaShiftTypes: true } },
+        areaShiftTypes: {
+          select: { areaId: true, isActive: true, area: { select: { id: true, name: true } } },
+        },
+      },
+    })
 
     return {
       success: true,
       data: {
-        ...updatedShiftType,
-        description: updatedShiftType.description ?? undefined,
+        ...withAreas!,
+        description: withAreas!.description ?? undefined,
       },
       message: 'Tipo de turno actualizado exitosamente',
     }

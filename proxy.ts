@@ -2,6 +2,7 @@ import { getToken } from 'next-auth/jwt'
 import createMiddleware from 'next-intl/middleware'
 import { NextResponse, type NextRequest } from 'next/server'
 
+import { env } from '@/src/shared/lib/config'
 import { routing } from './i18n/routing'
 
 const { defaultLocale } = routing
@@ -41,7 +42,7 @@ export async function proxy(request: NextRequest) {
   if (!isPublicRoute && !isPublicCalendar) {
     const token = await getToken({
       req: request,
-      secret: process.env.NEXTAUTH_SECRET,
+      secret: env.NEXTAUTH_SECRET,
     })
 
     if (!token) {
@@ -68,7 +69,7 @@ export async function proxy(request: NextRequest) {
   if (isAuthRoute) {
     const token = await getToken({
       req: request,
-      secret: process.env.NEXTAUTH_SECRET,
+      secret: env.NEXTAUTH_SECRET,
     })
 
     if (token) {

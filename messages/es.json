@@ -349,7 +349,10 @@
         "color": "Color",
         "description": "Descripción",
         "status": "Estado",
-        "shiftsCount": "Turnos",
+        "global": "Global",
+        "globalYes": "Sí",
+        "globalNo": "No",
+        "shiftsCount": "Asignado",
         "areasCount": "Áreas",
         "actions": "Acciones"
       },
@@ -387,10 +390,28 @@
         "maxStaffAllowedTooltip": "Límite máximo de personas que pueden estar asignadas a un turno de este tipo. Evita sobrecargar el turno.",
         "isGlobal": "Tipo global",
         "isGlobalTooltip": "Si está activo, el tipo estará disponible para asignarse a cualquier área de la organización. Si está inactivo, solo se asignará a las áreas que elijas al crearlo.",
+        "areasLabel": "Áreas que pueden usar este tipo",
+        "areasPlaceholder": "Buscar áreas...",
+        "areasSearchLabel": "Buscar y agregar áreas",
+        "areasEmpty": "No hay áreas en la organización",
+        "areasNoResults": "Ningún área coincide con la búsqueda",
+        "areasSelected": "Áreas seleccionadas",
+        "areasRequired": "Selecciona al menos un área cuando el tipo no es global",
+        "areasRemoveArea": "Quitar área {name}",
+        "areasActivePerArea": "Activar o desactivar por área",
+        "areaActive": "Activo",
+        "areaInactive": "Inactivo",
+        "areaToggleActive": "Activar o desactivar tipo de turno para {name}",
         "active": "Activo",
         "cancel": "Cancelar",
         "save": "Guardar",
-        "saving": "Guardando..."
+        "saving": "Guardando...",
+        "saveConfirm": {
+          "title": "¿Guardar cambios?",
+          "description": "¿Está seguro de que desea guardar los cambios en este tipo de turno?",
+          "confirm": "Guardar",
+          "cancel": "Cancelar"
+        }
       },
       "classification": {
         "DAY": "Día",
@@ -454,7 +475,11 @@
     "document": {
       "title": "Número de Identificación",
       "description": "Completa tu número de documento para poder aceptar invitaciones",
-      "warning": "⚠️ Debes completar este campo para poder aceptar invitaciones. Sin tu número de identificación, no podrás unirte a organizaciones.",
+      "warning": "Debes completar este campo para poder aceptar invitaciones. Sin tu número de identificación, no podrás unirte a organizaciones.",
+      "registeredTitle": "Documento registrado",
+      "registeredDescription": "Tu número de documento ya está completo. Puedes aceptar invitaciones a organizaciones.",
+      "changeButton": "Cambiar documento",
+      "cancel": "Cancelar",
       "country": {
         "label": "País",
         "placeholder": "Selecciona tu país"
@@ -1042,6 +1067,7 @@
       "empty": "No hay invitaciones",
       "inviteForm": {
         "title": "Invitar Usuario",
+        "description": "Busca un usuario por email o documento para invitarlo a tu equipo.",
         "roleLabel": "Rol a Invitar",
         "roleChief": "Jefe de Área",
         "roleStaff": "Personal de Salud",
@@ -1062,6 +1088,7 @@
         "noDocNumberWarning": "Este usuario no tiene número de documento registrado",
         "inOtherOrg": "Este usuario pertenece a otra organización: {orgName}",
         "inviteWithoutDoc": "Puedes invitar al usuario aunque no tenga documento. Deberá completarlo antes de aceptar la invitación.",
+        "actions": "Acciones",
         "cancel": "Cancelar",
         "inviting": "Enviando...",
         "sendInvitation": "Enviar Invitación",
@@ -1176,6 +1203,12 @@
       },
       "back": "Volver",
       "save": "Guardar",
+      "saveConfirm": {
+        "title": "¿Guardar cambios?",
+        "description": "¿Está seguro de que desea guardar los cambios en esta área?",
+        "confirm": "Guardar",
+        "cancel": "Cancelar"
+      },
       "status": {
         "active": "Activa",
         "inactive": "Inactiva"
@@ -1243,6 +1276,12 @@
         "ratePerMinute": "Tarifa por minuto",
         "baseSalary": "Sueldo base (opcional)",
         "contractsCount": "{count} contrato(s)"
+      },
+      "saveConfirm": {
+        "title": "¿Guardar cambios?",
+        "description": "¿Está seguro de que desea guardar los cambios?",
+        "confirm": "Guardar",
+        "cancel": "Cancelar"
       },
       "delete": {
         "contractTitle": "Finalizar contrato",

@@ -57,6 +57,11 @@ src/
 - Keys en `messages/es.json` y `messages/en.json`
 - Build falla si hay literales en JSX (`react/jsx-no-literals`)
 
+## Configuración y variables de entorno
+
+- Variables de entorno se leen y validan **una sola vez** en `src/shared/lib/config/env.server.ts`.
+- Auth (`shared/lib/auth/config.ts`) y proxy consumen el objeto `env` exportado; no se usa `process.env` directamente en esos módulos.
+
 ## Multi-Tenancy
 
 - BD compartida con `organizationId` en cada entidad

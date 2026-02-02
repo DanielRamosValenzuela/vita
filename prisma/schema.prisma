@@ -280,6 +280,7 @@ model ShiftType {
 model AreaShiftType {
   areaId      String
   shiftTypeId String
+  isActive    Boolean   @default(true)
   area        Area      @relation(fields: [areaId], references: [id], onDelete: Cascade)
   shiftType   ShiftType @relation(fields: [shiftTypeId], references: [id], onDelete: Cascade)
 

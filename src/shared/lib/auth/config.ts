@@ -7,28 +7,26 @@ import { PrismaClient, Role } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 import { Pool } from 'pg'
 
+import { env, isDev } from '@/src/shared/lib/config'
+
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
 }
-
-if (!process.env.DATABASE_URL) 
-  throw new Error('DATABASE_URL is not set in environment variables')
-
 
 let prisma: PrismaClient
 
 try {
   const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
+    connectionString: env.DATABASE_URL,
   })
   const adapter = new PrismaPg(pool)
   prisma =
     globalForPrisma.prisma ??
     new PrismaClient({
       adapter,
-      log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
+      log: isDev ? ['error', 'warn'] : ['error'],
     })
-  if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+  if (env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
 } catch (error) {
   throw error
 }
@@ -40,8 +38,8 @@ export const authOptions: NextAuthOptions = {
 
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      clientId: env.GOOGLE_CLIENT_ID,
+      clientSecret: env.GOOGLE_CLIENT_SECRET,
     }),
     CredentialsProvider({
       name: 'Credentials',
@@ -107,8 +105,9 @@ export const authOptions: NextAuthOptions = {
         token.role = user.role
         token.organizationId = user.organizationId
         token.country = user.country
+        token.docType = user.docType
         token.docNumber = user.docNumber
-      } else if (token.id) 
+      } else if (token.id)
         try {
           const currentUser = await prisma.user.findUnique({
             where: { id: token.id as string },
@@ -116,6 +115,7 @@ export const authOptions: NextAuthOptions = {
               role: true,
               organizationId: true,
               country: true,
+              docType: true,
               docNumber: true,
             },
           })
@@ -124,6 +124,7 @@ export const authOptions: NextAuthOptions = {
             token.role = currentUser.role
             token.organizationId = currentUser.organizationId || undefined
             token.country = currentUser.country || undefined
+            token.docType = currentUser.docType || undefined
             token.docNumber = currentUser.docNumber || undefined
           }
         } catch (error) {
@@ -137,6 +138,9 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.id as string
         session.user.role = token.role as Role
         session.user.organizationId = token.organizationId as string | undefined
+        session.user.country = token.country
+        session.user.docType = token.docType
+        session.user.docNumber = token.docNumber
       }
       return session
     },
@@ -147,5 +151,5 @@ export const authOptions: NextAuthOptions = {
     maxAge: 30 * 24 * 60 * 60,
   },
 
-  debug: process.env.NODE_ENV === 'development',
+  debug: isDev,
 }

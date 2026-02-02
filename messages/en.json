@@ -349,7 +349,10 @@
         "color": "Color",
         "description": "Description",
         "status": "Status",
-        "shiftsCount": "Shifts",
+        "global": "Global",
+        "globalYes": "Yes",
+        "globalNo": "No",
+        "shiftsCount": "Assigned",
         "areasCount": "Areas",
         "actions": "Actions"
       },
@@ -387,10 +390,28 @@
         "maxStaffAllowedTooltip": "Maximum number of people that can be assigned to a shift of this type. Prevents overstaffing.",
         "isGlobal": "Global type",
         "isGlobalTooltip": "When enabled, this type can be assigned to any area in the organization. When disabled, it will only be assigned to the areas you select when creating it.",
+        "areasLabel": "Areas that can use this type",
+        "areasPlaceholder": "Search areas...",
+        "areasSearchLabel": "Search and add areas",
+        "areasEmpty": "No areas in the organization",
+        "areasNoResults": "No areas match your search",
+        "areasSelected": "Selected areas",
+        "areasRequired": "Select at least one area when the type is not global",
+        "areasRemoveArea": "Remove area {name}",
+        "areasActivePerArea": "Enable or disable per area",
+        "areaActive": "Active",
+        "areaInactive": "Inactive",
+        "areaToggleActive": "Enable or disable shift type for {name}",
         "active": "Active",
         "cancel": "Cancel",
         "save": "Save",
-        "saving": "Saving..."
+        "saving": "Saving...",
+        "saveConfirm": {
+          "title": "Save changes?",
+          "description": "Are you sure you want to save the changes to this shift type?",
+          "confirm": "Save",
+          "cancel": "Cancel"
+        }
       },
       "classification": {
         "DAY": "Day",
@@ -454,7 +475,11 @@
     "document": {
       "title": "Identification Number",
       "description": "Complete your document number to be able to accept invitations",
-      "warning": "⚠️ You must complete this field to accept invitations. Without your identification number, you will not be able to join organizations.",
+      "warning": "You must complete this field to accept invitations. Without your identification number, you will not be able to join organizations.",
+      "registeredTitle": "Document registered",
+      "registeredDescription": "Your document number is already complete. You can accept invitations to organizations.",
+      "changeButton": "Change document",
+      "cancel": "Cancel",
       "country": {
         "label": "Country",
         "placeholder": "Select your country"
@@ -1066,6 +1091,7 @@
       "empty": "No invitations",
       "inviteForm": {
         "title": "Invite User",
+        "description": "Search for a user by email or document to invite them to your team.",
         "roleLabel": "Role to Invite",
         "roleChief": "Area Chief",
         "roleStaff": "Health Staff",
@@ -1086,6 +1112,7 @@
         "noDocNumberWarning": "This user does not have a registered document number",
         "inOtherOrg": "This user belongs to another organization: {orgName}",
         "inviteWithoutDoc": "You can invite the user even without a document. They will need to complete it before accepting the invitation.",
+        "actions": "Actions",
         "cancel": "Cancel",
         "inviting": "Sending...",
         "sendInvitation": "Send Invitation",
@@ -1197,6 +1224,12 @@
       },
       "back": "Back",
       "save": "Save",
+      "saveConfirm": {
+        "title": "Save changes?",
+        "description": "Are you sure you want to save the changes to this area?",
+        "confirm": "Save",
+        "cancel": "Cancel"
+      },
       "status": {
         "active": "Active",
         "inactive": "Inactive"
@@ -1264,6 +1297,12 @@
         "ratePerMinute": "Rate per minute",
         "baseSalary": "Base salary (optional)",
         "contractsCount": "{count} contract(s)"
+      },
+      "saveConfirm": {
+        "title": "Save changes?",
+        "description": "Are you sure you want to save the changes?",
+        "confirm": "Save",
+        "cancel": "Cancel"
       },
       "delete": {
         "contractTitle": "End contract",

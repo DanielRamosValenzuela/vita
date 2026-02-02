@@ -44,7 +44,18 @@ export default async function AreaEditPage({ params }: AreaEditPageProps) {
   if (!area)
     notFound()
 
-  const shiftTypes = shiftTypesResult.success && shiftTypesResult.data ? shiftTypesResult.data : []
+  const allShiftTypes = shiftTypesResult.success && shiftTypesResult.data ? shiftTypesResult.data : []
+  const areaShiftTypeIds = new Set(area.shiftTypes.map((ast) => ast.shiftType.id))
+  const shiftTypes = allShiftTypes.filter(
+    (st) => st.isGlobal || areaShiftTypeIds.has(st.id)
+  ).map((st) => ({
+    id: st.id,
+    name: st.name,
+    durationMinutes: st.durationMinutes,
+    classification: st.classification,
+    color: st.color,
+    icon: st.icon ?? undefined,
+  }))
 
   return (
     <div className="space-y-6">

@@ -1,12 +1,22 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useMemo } from 'react'
 import { useTranslations } from 'next-intl'
 
 import { useRouter } from '@/i18n/navigation'
-import { Check, Edit, Info, Palette, Plus, Trash2, X } from 'lucide-react'
+import { Check, Edit, Info, Loader2, Palette, Plus, Trash2, X } from 'lucide-react'
 import { toast } from 'sonner'
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/src/shared/ui/alert-dialog'
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/src/shared/ui/card'
@@ -20,6 +30,13 @@ import {
 } from '@/src/shared/ui/dialog'
 import { Input } from '@/src/shared/ui/input'
 import { Label } from '@/src/shared/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/src/shared/ui/select'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/src/shared/ui/tooltip'
 import {
   Table,
@@ -32,6 +49,7 @@ import {
 
 import { SHIFT_TYPE_ICONS } from '@/src/shared/lib/constants'
 import { IconPicker, renderIcon } from '@/src/shared/ui/icon-picker'
+import { SearchableAddableList } from '@/src/shared/ui/molecules'
 import {
   createShiftTypeAction,
   deleteShiftTypeAction,
@@ -59,13 +77,24 @@ interface ShiftType {
     shifts: number
     areaShiftTypes?: number
   }
+  areaShiftTypes?: Array<{
+    areaId: string
+    isActive: boolean
+    area: { id: string; name: string }
+  }>
+}
+
+interface AreaOption {
+  id: string
+  name: string
 }
 
 interface ShiftTypesPageProps {
   shiftTypes: ShiftType[]
+  areas: AreaOption[]
 }
 
-export function ShiftTypesPage({ shiftTypes }: ShiftTypesPageProps) {
+export function ShiftTypesPage({ shiftTypes, areas }: ShiftTypesPageProps) {
   const t = useTranslations('shifts.shiftTypes')
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
@@ -73,19 +102,35 @@ export function ShiftTypesPage({ shiftTypes }: ShiftTypesPageProps) {
   const [editingShiftType, setEditingShiftType] = useState<ShiftType | null>(null)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<ShiftType | null>(null)
-  const [formData, setFormData] = useState({
+  const [showSaveConfirm, setShowSaveConfirm] = useState(false)
+  const [formData, setFormData] = useState<{
+    name: string
+    description: string
+    icon: string
+    durationHours: string
+    durationMinutes: string
+    classification: ShiftClassification
+    color: string
+    minStaffRequired: string
+    idealStaffCount: string
+    maxStaffAllowed: string
+    isGlobal: boolean
+    isActive: boolean
+    areaConfigs: Array<{ areaId: string; isActive: boolean }>
+  }>({
     name: '',
     description: '',
-    icon: 'Clock' as string,
+    icon: 'Clock',
     durationHours: '8',
     durationMinutes: '0',
-    classification: 'DAY' as ShiftClassification,
+    classification: 'DAY',
     color: '#3b82f6',
     minStaffRequired: '1',
     idealStaffCount: '1',
     maxStaffAllowed: '10',
     isGlobal: true,
     isActive: true,
+    areaConfigs: [],
   })
 
   const resetForm = () => {
@@ -102,6 +147,7 @@ export function ShiftTypesPage({ shiftTypes }: ShiftTypesPageProps) {
       maxStaffAllowed: '10',
       isGlobal: true,
       isActive: true,
+      areaConfigs: [],
     })
     setEditingShiftType(null)
   }
@@ -120,6 +166,11 @@ export function ShiftTypesPage({ shiftTypes }: ShiftTypesPageProps) {
   const handleEdit = (shiftType: ShiftType) => {
     const h = Math.floor(shiftType.durationMinutes / 60)
     const m = shiftType.durationMinutes % 60
+    const areaConfigs =
+      shiftType.areaShiftTypes?.map((a) => ({
+        areaId: a.areaId ?? a.area?.id ?? '',
+        isActive: a.isActive ?? true,
+      })) ?? []
     setFormData({
       name: shiftType.name,
       description: shiftType.description || '',
@@ -133,11 +184,60 @@ export function ShiftTypesPage({ shiftTypes }: ShiftTypesPageProps) {
       maxStaffAllowed: String(shiftType.maxStaffAllowed),
       isGlobal: shiftType.isGlobal,
       isActive: shiftType.isActive,
+      areaConfigs,
     })
     setEditingShiftType(shiftType)
   }
 
-  const handleSave = () => {
+  const hasChanges = useMemo(() => {
+    if (editingShiftType) {
+      const h = Math.floor(editingShiftType.durationMinutes / 60)
+      const m = editingShiftType.durationMinutes % 60
+      const initialAreaConfigs =
+        editingShiftType.areaShiftTypes?.map((a) => ({
+          areaId: a.areaId ?? a.area?.id ?? '',
+          isActive: a.isActive ?? true,
+        })) ?? []
+      if (formData.name.trim() !== editingShiftType.name) return true
+      if ((formData.description || '') !== (editingShiftType.description || '')) return true
+      if ((formData.icon ?? 'Clock') !== (editingShiftType.icon ?? 'Clock')) return true
+      if (formData.durationHours !== String(h) || formData.durationMinutes !== String(m))
+        return true
+      if (formData.classification !== editingShiftType.classification) return true
+      if ((formData.color ?? '#3b82f6') !== editingShiftType.color) return true
+      if (formData.minStaffRequired !== String(editingShiftType.minStaffRequired)) return true
+      if (formData.idealStaffCount !== String(editingShiftType.idealStaffCount)) return true
+      if (formData.maxStaffAllowed !== String(editingShiftType.maxStaffAllowed)) return true
+      if (formData.isGlobal !== editingShiftType.isGlobal) return true
+      if (formData.isActive !== editingShiftType.isActive) return true
+      if (formData.areaConfigs.length !== initialAreaConfigs.length) return true
+      const sameAreaConfigs =
+        formData.areaConfigs.length === initialAreaConfigs.length &&
+        formData.areaConfigs.every(
+          (c, i) =>
+            initialAreaConfigs[i]?.areaId === c.areaId &&
+            initialAreaConfigs[i]?.isActive === c.isActive
+        )
+      if (!sameAreaConfigs) return true
+      return false
+    }
+    return (
+      formData.name.trim() !== '' ||
+      (formData.description || '') !== '' ||
+      formData.durationHours !== '8' ||
+      formData.durationMinutes !== '0' ||
+      formData.classification !== 'DAY' ||
+      formData.color !== '#3b82f6' ||
+      formData.minStaffRequired !== '1' ||
+      formData.idealStaffCount !== '1' ||
+      formData.maxStaffAllowed !== '10' ||
+      formData.isGlobal !== true ||
+      formData.isActive !== true ||
+      formData.areaConfigs.length > 0
+    )
+  }, [formData, editingShiftType])
+
+  const performSave = () => {
     if (!formData.name.trim()) {
       toast.error(t('form.nameRequired'))
       return
@@ -150,6 +250,13 @@ export function ShiftTypesPage({ shiftTypes }: ShiftTypesPageProps) {
       toast.error(t('form.durationInvalid'))
       return
     }
+
+    if (!formData.isGlobal && formData.areaConfigs.length === 0) {
+      toast.error(t('form.areasRequired'))
+      return
+    }
+
+    const areaConfigs = formData.isGlobal ? undefined : formData.areaConfigs
 
     const payload = {
       name: formData.name.trim(),
@@ -164,9 +271,11 @@ export function ShiftTypesPage({ shiftTypes }: ShiftTypesPageProps) {
       suggestedRestDays: 1,
       isGlobal: formData.isGlobal,
       isActive: formData.isActive,
+      areaConfigs,
     }
 
     startTransition(async () => {
+      setShowSaveConfirm(false)
       let result
       if (editingShiftType) result = await updateShiftTypeAction(editingShiftType.id, payload)
       else result = await createShiftTypeAction(payload)
@@ -175,9 +284,14 @@ export function ShiftTypesPage({ shiftTypes }: ShiftTypesPageProps) {
         toast.success(editingShiftType ? t('toast.updated') : t('toast.created'))
         setIsCreateDialogOpen(false)
         resetForm()
-        router.refresh()
+        router.push('/dashboard/shift-types')
       } else toast.error(result.error || t('toast.error'))
     })
+  }
+
+  const handleSave = () => {
+    if (!hasChanges) return
+    setShowSaveConfirm(true)
   }
 
   const handleDelete = (shiftType: ShiftType) => {
@@ -257,6 +371,7 @@ export function ShiftTypesPage({ shiftTypes }: ShiftTypesPageProps) {
                   <TableHead>{t('table.color')}</TableHead>
                   <TableHead>{t('table.description')}</TableHead>
                   <TableHead>{t('table.status')}</TableHead>
+                  <TableHead>{t('table.global')}</TableHead>
                   <TableHead>{t('table.shiftsCount')}</TableHead>
                   <TableHead>{t('table.areasCount')}</TableHead>
                   <TableHead>{t('table.actions')}</TableHead>
@@ -286,10 +401,19 @@ export function ShiftTypesPage({ shiftTypes }: ShiftTypesPageProps) {
                     <TableCell>{shiftType.description || '-'}</TableCell>
                     <TableCell>{getStatusBadge(shiftType.isActive)}</TableCell>
                     <TableCell>
+                      <span className="text-muted-foreground text-sm">
+                        {shiftType.isGlobal ? t('table.globalYes') : t('table.globalNo')}
+                      </span>
+                    </TableCell>
+                    <TableCell>
                       <span className="text-sm">{shiftType._count?.shifts || 0}</span>
                     </TableCell>
                     <TableCell>
-                      <span className="text-sm">{shiftType._count?.areaShiftTypes || 0}</span>
+                      <span className="text-sm">
+                        {shiftType.isGlobal
+                          ? '-'
+                          : (shiftType._count?.areaShiftTypes ?? shiftType.areaShiftTypes?.length ?? 0)}
+                      </span>
                     </TableCell>
                     <TableCell>
                       <span className="flex items-center gap-2">
@@ -332,8 +456,8 @@ export function ShiftTypesPage({ shiftTypes }: ShiftTypesPageProps) {
               {editingShiftType ? t('edit.description') : t('createModal.description')}
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-5 py-5 max-h-[70vh] overflow-y-auto">
-            <div className="grid gap-2">
+          <div className="grid gap-5 py-5 max-h-[70vh] overflow-y-auto overflow-x-hidden overscroll-contain pt-px">
+            <div className="grid gap-2 scroll-mt-4">
               <Label htmlFor="name">{t('form.name')}</Label>
               <Input
                 id="name"
@@ -368,23 +492,26 @@ export function ShiftTypesPage({ shiftTypes }: ShiftTypesPageProps) {
                 />
               </div>
             </div>
-            <div className="grid gap-2">
+            <div className="grid gap-2 scroll-mt-4">
               <Label htmlFor="classification">{t('form.classification')}</Label>
-              <select
-                id="classification"
+              <Select
                 value={formData.classification}
-                onChange={(e) =>
+                onValueChange={(value) =>
                   setFormData({
                     ...formData,
-                    classification: e.target.value as ShiftClassification,
+                    classification: value as ShiftClassification,
                   })
                 }
-                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
               >
-                <option value="DAY">{t('classification.DAY')}</option>
-                <option value="NIGHT">{t('classification.NIGHT')}</option>
-                <option value="MIXED">{t('classification.MIXED')}</option>
-              </select>
+                <SelectTrigger id="classification" className="w-full">
+                  <SelectValue placeholder={t('form.classification')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="DAY">{t('classification.DAY')}</SelectItem>
+                  <SelectItem value="NIGHT">{t('classification.NIGHT')}</SelectItem>
+                  <SelectItem value="MIXED">{t('classification.MIXED')}</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div className="grid gap-2">
               <Label>{t('form.icon')}</Label>
@@ -524,6 +651,35 @@ export function ShiftTypesPage({ shiftTypes }: ShiftTypesPageProps) {
                 </Tooltip>
               </div>
             </div>
+            {!formData.isGlobal && (
+              <div className="grid gap-2">
+                <Label id="areas-label">{t('form.areasLabel')}</Label>
+                <SearchableAddableList<AreaOption>
+                  items={areas}
+                  selectedIds={new Set(formData.areaConfigs.map((c) => c.areaId))}
+                  onSelectionChange={(ids) => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      areaConfigs: [
+                        ...prev.areaConfigs.filter((c) => ids.has(c.areaId)),
+                        ...Array.from(ids)
+                          .filter((id) => !prev.areaConfigs.some((c) => c.areaId === id))
+                          .map((areaId) => ({ areaId, isActive: true })),
+                      ],
+                    }))
+                  }}
+                  getItemId={(a) => a.id}
+                  getSearchableText={(a) => a.name}
+                  renderItem={(a) => <span className="text-sm font-medium">{a.name}</span>}
+                  searchPlaceholder={t('form.areasPlaceholder')}
+                  searchLabel={t('form.areasSearchLabel')}
+                  emptyMessage={t('form.areasEmpty')}
+                  noResultsMessage={t('form.areasNoResults')}
+                  selectedLabel={t('form.areasSelected')}
+                  removeItemAriaLabel={(a) => t('form.areasRemoveArea', { name: a.name })}
+                />
+              </div>
+            )}
             <div className="flex items-center space-x-2">
               <input
                 type="checkbox"
@@ -545,12 +701,28 @@ export function ShiftTypesPage({ shiftTypes }: ShiftTypesPageProps) {
             >
               {t('form.cancel')}
             </Button>
-            <Button onClick={handleSave} disabled={isPending}>
+            <Button onClick={handleSave} disabled={!hasChanges || isPending}>
               {isPending ? t('form.saving') : t('form.save')}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={showSaveConfirm} onOpenChange={setShowSaveConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('form.saveConfirm.title')}</AlertDialogTitle>
+            <AlertDialogDescription>{t('form.saveConfirm.description')}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isPending}>{t('form.saveConfirm.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={performSave} disabled={isPending}>
+              {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {t('form.saveConfirm.confirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <Dialog
         open={deleteDialogOpen}

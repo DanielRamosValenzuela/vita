@@ -100,20 +100,21 @@ export const createShiftAction = async (
         error: 'El tipo de turno no pertenece a tu organización',
       }
 
-    const areaShiftType = await prisma.areaShiftType.findUnique({
-      where: {
-        areaId_shiftTypeId: {
-          areaId: validatedData.areaId,
-          shiftTypeId: validatedData.shiftTypeId,
+    if (!shiftType.isGlobal) {
+      const areaShiftType = await prisma.areaShiftType.findUnique({
+        where: {
+          areaId_shiftTypeId: {
+            areaId: validatedData.areaId,
+            shiftTypeId: validatedData.shiftTypeId,
+          },
         },
-      },
-    })
-
-    if (!areaShiftType)
-      return {
-        success: false,
-        error: 'El tipo de turno no está asignado a esta área',
-      }
+      })
+      if (!areaShiftType)
+        return {
+          success: false,
+          error: 'El tipo de turno no está asignado a esta área',
+        }
+    }
 
     const shift = await prisma.shift.create({
       data: {
@@ -222,16 +223,21 @@ export const updateShiftAction = async (
     const shiftTypeId = validatedData.shiftTypeId ?? existingShift.shiftTypeId
 
     if (areaId && shiftTypeId) {
-      const areaShiftType = await prisma.areaShiftType.findUnique({
-        where: {
-          areaId_shiftTypeId: { areaId, shiftTypeId },
-        },
+      const shiftType = await prisma.shiftType.findFirst({
+        where: { id: shiftTypeId, organizationId: session.organizationId },
       })
-      if (!areaShiftType)
-        return {
-          success: false,
-          error: 'El tipo de turno no está asignado a esta área',
-        }
+      if (shiftType && !shiftType.isGlobal) {
+        const areaShiftType = await prisma.areaShiftType.findUnique({
+          where: {
+            areaId_shiftTypeId: { areaId, shiftTypeId },
+          },
+        })
+        if (!areaShiftType)
+          return {
+            success: false,
+            error: 'El tipo de turno no está asignado a esta área',
+          }
+      }
     }
 
     const updatedShift = await prisma.shift.update({

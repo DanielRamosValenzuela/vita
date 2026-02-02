@@ -30,9 +30,11 @@ interface DocumentFormProps {
     country: Country | null
     docNumber: string | null
   }
+  onCancel?: () => void
+  onSuccess?: () => void
 }
 
-export function DocumentForm({ initialData }: DocumentFormProps) {
+export function DocumentForm({ initialData, onCancel, onSuccess }: DocumentFormProps) {
   const t = useTranslations('profile.document')
   const tOrgs = useTranslations('superAdmin.organizations')
   const [isPending, startTransition] = useTransition()
@@ -91,6 +93,7 @@ export function DocumentForm({ initialData }: DocumentFormProps) {
       if (result.success) {
         toast.success(t('success'))
         form.reset(data)
+        onSuccess?.()
       } else {
         setError(result.error || t('error'))
         toast.error(result.error || t('error'))
@@ -105,9 +108,11 @@ export function DocumentForm({ initialData }: DocumentFormProps) {
         <CardDescription>{t('description')}</CardDescription>
       </CardHeader>
       <CardContent>
-        <Alert variant="warning" className="mb-4">
-          <AlertDescription>{t('warning')}</AlertDescription>
-        </Alert>
+        {!onCancel && (
+          <Alert variant="warning" className="mb-4">
+            <AlertDescription>{t('warning')}</AlertDescription>
+          </Alert>
+        )}
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
@@ -153,10 +158,17 @@ export function DocumentForm({ initialData }: DocumentFormProps) {
             </div>
           )}
 
-          <Button type="submit" disabled={isPending || !selectedCountry}>
-            {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {t('save')}
-          </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            {onCancel && (
+              <Button type="button" variant="outline" onClick={onCancel} disabled={isPending}>
+                {t('cancel')}
+              </Button>
+            )}
+            <Button type="submit" disabled={isPending || !selectedCountry}>
+              {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {t('save')}
+            </Button>
+          </div>
         </form>
       </CardContent>
     </Card>
