@@ -1,7 +1,8 @@
 'use server'
 
-import { prisma } from '@/src/shared/lib/auth/config'
-import { requireAdminHRWithOrg } from '@/src/shared/lib/auth'
+import { prisma } from '@/src/shared/lib/db'
+import { requireAdminHRWithOrg, requireAdminHROrChiefArea } from '@/src/shared/lib/auth'
+import { ROLES } from '@/src/shared/lib/constants'
 import type { ActionResult } from '@/src/shared/lib/types'
 import { handleActionError } from '@/src/shared/lib/utils'
 import { revalidatePaths } from '@/src/shared/lib/utils/revalidate-paths'
@@ -39,10 +40,41 @@ interface ShiftType {
 
 export const getShiftTypesAction = async (): Promise<ActionResult<ShiftType[]>> => {
   try {
-    const session = await requireAdminHRWithOrg()
+    const session = await requireAdminHROrChiefArea()
+    const orgId = session.organizationId
+    if (!orgId)
+      return {
+        success: false,
+        error: 'No tienes una organización asignada',
+      }
+
+    const where: { organizationId: string; OR?: Array<{ isGlobal: boolean } | { areaShiftTypes: { some: { areaId: { in: string[] }; isActive: boolean } } }> } = {
+      organizationId: orgId,
+    }
+
+    if (session.role === ROLES.CHIEF_AREA) {
+      const chiefAreas = await prisma.userArea.findMany({
+        where: { userId: session.id },
+        select: { areaId: true },
+      })
+      const chiefAreaIds = chiefAreas.map((a) => a.areaId)
+      if (chiefAreaIds.length === 0)
+        return { success: true, data: [] }
+      where.OR = [
+        { isGlobal: true },
+        {
+          areaShiftTypes: {
+            some: {
+              areaId: { in: chiefAreaIds },
+              isActive: true,
+            },
+          },
+        },
+      ]
+    }
 
     const shiftTypes = await prisma.shiftType.findMany({
-      where: { organizationId: session.organizationId },
+      where,
       orderBy: { createdAt: 'desc' },
       include: {
         _count: { select: { shifts: true, areaShiftTypes: true } },

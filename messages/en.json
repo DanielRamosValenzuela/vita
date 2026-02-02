@@ -227,6 +227,7 @@
     "staffDescription": "Manage your area staff",
     "staffCardDescription": "Staff management",
     "staffComingSoon": "Coming soon: Full staff CRUD",
+    "staffNoAreasAssigned": "You have no areas assigned. Contact HR to be linked to one or more areas.",
     "analyticsDescription": "Global charts and reports (In development)",
     "paymentsDescription": "Payment registration and management (In development)",
     "settingsDescription": "System configuration (In development)",
@@ -1063,7 +1064,18 @@
         "table": {
           "name": "Name",
           "email": "Email",
-          "createdAt": "Registration Date"
+          "areaAssigned": "Assigned Area",
+          "noAreaAssigned": "No area assigned",
+          "createdAt": "Registration Date",
+          "actions": "Actions",
+          "unlink": "Unlink"
+        },
+        "unlinkConfirm": {
+          "title": "Unlink area chief",
+          "description": "Are you sure you want to unlink {name} from the organization? They will no longer have access to areas and shifts.",
+          "cancel": "Cancel",
+          "confirm": "Unlink",
+          "unlinking": "Unlinking..."
         }
       },
       "staff": {
@@ -1080,7 +1092,16 @@
         "table": {
           "name": "Name",
           "email": "Email",
-          "createdAt": "Registration Date"
+          "createdAt": "Registration Date",
+          "actions": "Actions",
+          "unlink": "Unlink"
+        },
+        "unlinkConfirm": {
+          "title": "Unlink staff member",
+          "description": "Are you sure you want to unlink {name} from the organization? They will no longer have access.",
+          "cancel": "Cancel",
+          "confirm": "Unlink",
+          "unlinking": "Unlinking..."
         }
       }
     },
@@ -1220,7 +1241,15 @@
         "separator": "-",
         "status": "Status",
         "statusDescription": "Activate the area to assign shifts",
-        "statusDescriptionInactive": "Assign at least one shift type to activate"
+        "statusDescriptionInactive": "Assign at least one shift type to activate",
+        "chiefs": "Area chiefs",
+        "chiefsDescription": "Assign the chiefs who manage this area. Only they will see this area in their menu and can create shifts in it.",
+        "chiefsSearch": "Search by name or document...",
+        "chiefDocNumber": "Document",
+        "assignedChiefsLabel": "Chiefs assigned to this area",
+        "noChiefs": "No area chiefs in the organization. Invite a chief from My Organization.",
+        "removeChief": "Remove {name}",
+        "chiefsAssignedCount": "{count} chief(s) assigned"
       },
       "back": "Back",
       "save": "Save",

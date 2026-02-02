@@ -1,6 +1,6 @@
 import type { Country, Prisma } from '@prisma/client'
 
-import { prisma } from '@/src/shared/lib/auth/config'
+import { prisma } from '@/src/shared/lib/db'
 
 interface SearchUserByDocumentOrEmailParams {
   search: string

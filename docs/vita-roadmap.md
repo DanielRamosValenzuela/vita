@@ -19,19 +19,20 @@
 | 12 | Sistema de Notificaciones | Pendiente |
 | 13 | Testing y Pulido | Pendiente |
 
-## Próximos Pasos Inmediatos (Enero 2026)
+## Próximos Pasos Inmediatos (Feb 2026)
 
-1. **Gestión de Personal** (`/dashboard/staff`) - ADMIN_HR y CHIEF
-2. **UserArea en schema** - Chief ↔ Área
-3. **Completar vistas de detalle** de organización
-4. **Testing manual** de flujos CRUD
+1. ~~**UserArea en schema**~~ ✅ Chief ↔ Área (modelo UserArea, migración aplicada)
+2. ~~**Gestión de Personal** (`/dashboard/staff`)~~ ✅ ADMIN_HR y CHIEF ven la página; ADMIN_HR todo el personal, CHIEF solo personal de sus áreas (según UserArea)
+3. **Asignar jefes a áreas** desde UI (crear/editar UserArea cuando ADMIN_HR asigna un jefe a un área)
+4. **Completar vistas de detalle** de organización
+5. **Testing manual** de flujos CRUD
 
 ## Prioridad 1: Completar Dashboard ADMIN_HR
 
 - Gestión de Áreas ✅
 - Gestión de Tipos de Turno ✅
 - Gestión de Tarifas/Contratos ✅
-- Gestión de Personal (pendiente)
+- Gestión de Personal (staff page activa; falta UI para asignar jefes a áreas)
 - Dashboard con métricas reales
 
 ## Prioridad 2: SUPER_ADMIN

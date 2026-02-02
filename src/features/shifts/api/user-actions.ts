@@ -1,7 +1,7 @@
 'use server'
 
-import { prisma } from '@/src/shared/lib/auth/config'
-import { requireAdminHR } from '@/src/shared/lib/auth/session'
+import { prisma } from '@/src/shared/lib/db'
+import { requireAdminHROrChiefArea } from '@/src/shared/lib/auth/session'
 import type { ActionResult } from '@/src/shared/lib/types'
 
 interface ShiftUser {
@@ -13,7 +13,7 @@ interface ShiftUser {
 
 export const getUsersForShiftsAction = async (): Promise<ActionResult<ShiftUser[]>> => {
   try {
-    const session = await requireAdminHR()
+    const session = await requireAdminHROrChiefArea()
     if (!session.organizationId)
       return {
         success: false,

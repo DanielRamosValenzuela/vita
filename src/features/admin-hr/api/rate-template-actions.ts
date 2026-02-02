@@ -1,6 +1,6 @@
 'use server'
 
-import { prisma } from '@/src/shared/lib/auth/config'
+import { prisma } from '@/src/shared/lib/db'
 import { requireAdminHRWithOrg } from '@/src/shared/lib/auth'
 import type { ActionResult } from '@/src/shared/lib/types'
 import { handleActionError } from '@/src/shared/lib/utils'

@@ -1,6 +1,6 @@
 import type { Role } from '@prisma/client'
 
-import { prisma } from '@/src/shared/lib/auth/config'
+import { prisma } from '@/src/shared/lib/db'
 import { ROLES } from '@/src/shared/lib/constants'
 
 interface LimitAlert {

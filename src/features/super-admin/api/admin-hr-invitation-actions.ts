@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import type { Country } from '@prisma/client'
 
-import { prisma } from '@/src/shared/lib/auth/config'
+import { prisma } from '@/src/shared/lib/db'
 import { requireSuperAdmin } from '@/src/shared/lib/auth/session'
 import type { ActionResult } from '@/src/shared/lib/types'
 import { ROLES } from '@/src/shared/lib/constants'

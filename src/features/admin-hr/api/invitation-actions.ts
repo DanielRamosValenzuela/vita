@@ -2,7 +2,7 @@
 
 import type { Country } from '@prisma/client'
 
-import { prisma } from '@/src/shared/lib/auth/config'
+import { prisma } from '@/src/shared/lib/db'
 import { requireAdminHR, requireAdminHRWithOrg } from '@/src/shared/lib/auth'
 import type { ActionResult } from '@/src/shared/lib/types'
 import { ROLES } from '@/src/shared/lib/constants'
@@ -215,5 +215,47 @@ export const cancelInvitationAction = async (
     }
   } catch (error) {
     return handleActionError(error, 'cancelInvitationAction', 'Error al cancelar invitación')
+  }
+}
+
+export const removeUserFromOrganizationAction = async (
+  userId: string
+): Promise<ActionResult<unknown>> => {
+  try {
+    const session = await requireAdminHRWithOrg()
+    const orgId = session.organizationId
+    if (!orgId)
+      return { success: false, error: 'No tienes una organización asignada' }
+
+    const target = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { organizationId: true, role: true, name: true },
+    })
+
+    if (!target)
+      return { success: false, error: 'Usuario no encontrado' }
+
+    if (target.organizationId !== orgId)
+      return { success: false, error: 'El usuario no pertenece a tu organización' }
+
+    if (target.role === ROLES.ADMIN_HR)
+      return { success: false, error: 'No puedes desvincular a un administrador RRHH desde aquí' }
+
+    await prisma.$transaction([
+      prisma.userArea.deleteMany({ where: { userId } }),
+      prisma.user.update({
+        where: { id: userId },
+        data: { organizationId: null },
+      }),
+    ])
+
+    revalidatePaths(...INVITATION_PATHS)
+
+    return {
+      success: true,
+      message: `${target.name} ha sido desvinculado de la organización`,
+    }
+  } catch (error) {
+    return handleActionError(error, 'removeUserFromOrganizationAction', 'Error al desvincular usuario')
   }
 }

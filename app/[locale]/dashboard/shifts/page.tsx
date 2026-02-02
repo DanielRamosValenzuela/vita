@@ -2,7 +2,7 @@ import { getTranslations } from 'next-intl/server'
 import { ShiftStatus } from '@prisma/client'
 import { endOfMonth, format, startOfMonth } from 'date-fns'
 
-import { requireAdminHR } from '@/src/shared/lib/auth/session'
+import { requireAdminHROrChiefArea } from '@/src/shared/lib/auth/session'
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/src/shared/ui/card'
@@ -39,7 +39,7 @@ export async function generateMetadata({ params }: ShiftsPageProps) {
 
 export default async function ShiftsPage({ params }: ShiftsPageProps) {
   const { locale } = await params
-  const session = await requireAdminHR(locale)
+  const session = await requireAdminHROrChiefArea(locale)
   const t = await getTranslations('shifts')
 
   if (!session.organizationId)

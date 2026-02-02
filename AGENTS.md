@@ -27,7 +27,7 @@ src/
 ## Convenciones Clave
 
 - **i18n:** Todo texto visible debe usar `useTranslations` o `getTranslations`. Keys en `messages/es.json` y `messages/en.json`. Build falla si hay literales en JSX. Diálogos (Radix) deben tener `Description` o `aria-describedby` para accesibilidad.
-- **Config:** Variables de entorno se leen y validan una sola vez en `src/shared/lib/config/env.server.ts`; auth y proxy usan ese objeto.
+- **Config:** Variables de entorno se leen y validan una sola vez en `src/shared/config/env.server.ts`; auth y proxy usan ese objeto.
 - **Tipos:** Usar Prisma para modelos. `ActionResult<T>` en shared/lib/types para respuestas de actions.
 - **Utilities:** `handleActionError`, `toastActionResult`, `revalidatePaths`, `requireAdminHRWithOrg` en shared/lib/utils.
 - **Hooks:** `useFormAction` para formularios que llaman server actions.
@@ -38,6 +38,7 @@ src/
 
 - **Organization** → Areas, Users, Invitations, ShiftTypes, Contracts
 - **Area** ↔ **ShiftType** (many-to-many vía AreaShiftType)
+- **UserArea** (userId, areaId): vincula usuario a área (jefe de área ↔ áreas que gestiona; futuro: staff ↔ áreas asignadas)
 - **Shift** → User, Area, ShiftType
 - **Contract** → User, Area, RateTemplate (tarifa por persona)
 - **Roles:** SUPER_ADMIN, ADMIN_HR, CHIEF_AREA, STAFF_HEALTH
@@ -83,8 +84,8 @@ La documentación está en **docs/** dividida por tema (vita-overview.md, vita-b
 
 ## Próximos Pasos (resumen)
 
-1. Gestión de Personal (`/dashboard/staff`) - ADMIN_HR y CHIEF
-2. Modelo UserArea (Jefe ↔ Área) en schema
+1. ~~Modelo UserArea (Jefe ↔ Área)~~ ✅ En schema. Asignar jefes a áreas desde UI (ADMIN_HR).
+2. ~~Gestión de Personal (`/dashboard/staff`) - ADMIN_HR y CHIEF~~ ✅ Página activa: ADMIN_HR ve todo el personal; CHIEF ve solo personal de sus áreas (según UserArea). Sin áreas asignadas: mensaje "Contacta a RRHH".
 3. Completar vistas de detalle de organización
 4. Testing manual de flujos CRUD
 

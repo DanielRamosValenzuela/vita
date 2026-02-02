@@ -1,7 +1,7 @@
 'use server'
 
-import { prisma } from '@/src/shared/lib/auth/config'
-import { requireAdminHRWithOrg } from '@/src/shared/lib/auth'
+import { prisma } from '@/src/shared/lib/db'
+import { requireAdminHRWithOrg, requireAdminHROrChiefArea } from '@/src/shared/lib/auth'
 import { ROLES } from '@/src/shared/lib/constants'
 import type { ActionResult } from '@/src/shared/lib/types'
 import { handleActionError } from '@/src/shared/lib/utils'
@@ -169,6 +169,114 @@ export const getContractsPageDataAction = async (): Promise<
     }
   } catch (error) {
     return handleActionError(error, 'getContractsPageDataAction', 'Error al cargar contratos')
+  }
+}
+
+export const getStaffPageDataAction = async (): Promise<
+  ActionResult<ContractsPageData & { isChiefWithNoAreas?: boolean }>
+> => {
+  try {
+    const session = await requireAdminHROrChiefArea()
+    const orgId = session.organizationId!
+
+    if (session.role === ROLES.ADMIN_HR) {
+      const result = await getContractsPageDataAction()
+      return result
+    }
+
+    const chiefAreas = await prisma.userArea.findMany({
+      where: { userId: session.id },
+      select: { areaId: true },
+    })
+    const areaIds = chiefAreas.map((a) => a.areaId)
+
+    if (areaIds.length === 0)
+      return {
+        success: true,
+        data: {
+          staff: [],
+          rateTemplates: [],
+          areas: [],
+          isChiefWithNoAreas: true,
+        },
+      }
+
+    const [contractsInAreas, rateTemplates, areas] = await Promise.all([
+      prisma.contract.findMany({
+        where: {
+          organizationId: orgId,
+          areaId: { in: areaIds },
+          isActive: true,
+          endDate: null,
+        },
+        include: {
+          user: { select: { id: true, name: true, email: true, role: true } },
+          area: { select: { id: true, name: true } },
+          rateTemplate: { select: { id: true, name: true, ratePerMinute: true } },
+        },
+      }),
+      prisma.rateTemplate.findMany({
+        where: { organizationId: orgId, isActive: true },
+        select: {
+          id: true,
+          name: true,
+          ratePerMinute: true,
+          baseSalary: true,
+          _count: { select: { contracts: true } },
+        },
+        orderBy: { name: 'asc' },
+      }),
+      prisma.area.findMany({
+        where: { id: { in: areaIds }, isActive: true },
+        select: { id: true, name: true },
+        orderBy: { name: 'asc' },
+      }),
+    ])
+
+    const byUser = new Map<string, (typeof contractsInAreas)[0]>()
+    for (const c of contractsInAreas)
+      if (!byUser.has(c.userId)) byUser.set(c.userId, c)
+
+    const staff: StaffWithContract[] = Array.from(byUser.values()).map((contract) => {
+      const { effective, source } = getEffectiveRate(
+        contract.rateTemplate,
+        contract.ratePerMinute,
+        contract.adjustmentPerMinute
+      )
+      return {
+        id: contract.user.id,
+        name: contract.user.name,
+        email: contract.user.email,
+        role: contract.user.role,
+        contract: {
+          id: contract.id,
+          areaId: contract.areaId,
+          areaName: contract.area?.name ?? null,
+          rateTemplateId: contract.rateTemplateId,
+          rateTemplateName: contract.rateTemplate?.name ?? null,
+          ratePerMinute: contract.ratePerMinute,
+          adjustmentPerMinute: contract.adjustmentPerMinute,
+          effectiveRatePerMinute: effective,
+          baseSalary: contract.baseSalary,
+          baseSalaryUnit: contract.baseSalaryUnit,
+          startDate: contract.startDate,
+          endDate: contract.endDate,
+          isActive: contract.isActive,
+          source,
+        },
+      }
+    })
+
+    return {
+      success: true,
+      data: {
+        staff: staff.sort((a, b) => a.name.localeCompare(b.name)),
+        rateTemplates,
+        areas,
+      },
+    }
+  } catch (error) {
+    return handleActionError(error, 'getStaffPageDataAction', 'Error al cargar personal')
   }
 }
 

@@ -31,10 +31,12 @@ import { IconPicker } from '@/src/shared/ui/icon-picker'
 import { SearchableAddableList } from '@/src/shared/ui/molecules'
 import { renderIcon } from '@/src/shared/ui/icon-picker'
 import {
+  assignChiefsToAreaAction,
   assignShiftTypesToAreaAction,
   setAreaActiveAction,
   updateAreaAction,
 } from '../api'
+import type { ChiefOption } from '../api/area-actions'
 
 interface ShiftTypeOption {
   id: string
@@ -67,6 +69,9 @@ interface AreaEditFormProps {
     }>
   }
   shiftTypes: ShiftTypeOption[]
+  canAssignChiefs?: boolean
+  chiefs?: ChiefOption[]
+  initialAssignedChiefIds?: Set<string>
 }
 
 function formatDuration(mins: number) {
@@ -75,7 +80,13 @@ function formatDuration(mins: number) {
   return m > 0 ? `${h}h ${m}min` : `${h}h`
 }
 
-export function AreaEditForm({ area, shiftTypes }: AreaEditFormProps) {
+export function AreaEditForm({
+  area,
+  shiftTypes,
+  canAssignChiefs = false,
+  chiefs = [],
+  initialAssignedChiefIds = new Set(),
+}: AreaEditFormProps) {
   const t = useTranslations('adminHR.areas')
   const tShifts = useTranslations('shifts.shiftTypes')
   const router = useRouter()
@@ -94,6 +105,7 @@ export function AreaEditForm({ area, shiftTypes }: AreaEditFormProps) {
   const [selectedShiftTypeIds, setSelectedShiftTypeIds] = useState<Set<string>>(
     () => new Set(area.shiftTypes.filter((ast) => ast.isActive).map((ast) => ast.shiftType.id))
   )
+  const [selectedChiefIds, setSelectedChiefIds] = useState<Set<string>>(() => new Set(initialAssignedChiefIds))
   const [showSaveConfirm, setShowSaveConfirm] = useState(false)
 
   const initialSelectedIds = useMemo(
@@ -117,6 +129,11 @@ export function AreaEditForm({ area, shiftTypes }: AreaEditFormProps) {
     if (selectedShiftTypeIds.size !== initialSelectedIds.size) return true
     if ([...selectedShiftTypeIds].some((id) => !initialSelectedIds.has(id))) return true
     if ([...initialSelectedIds].some((id) => !selectedShiftTypeIds.has(id))) return true
+    if (canAssignChiefs) {
+      if (selectedChiefIds.size !== initialAssignedChiefIds.size) return true
+      if ([...selectedChiefIds].some((id) => !initialAssignedChiefIds.has(id))) return true
+      if ([...initialAssignedChiefIds].some((id) => !selectedChiefIds.has(id))) return true
+    }
     return false
   }, [
     name,
@@ -135,6 +152,9 @@ export function AreaEditForm({ area, shiftTypes }: AreaEditFormProps) {
     area.isActive,
     area.maxConsecutiveHours,
     area.minRestHours,
+    canAssignChiefs,
+    selectedChiefIds,
+    initialAssignedChiefIds,
   ])
 
   const handleSelectionChange = (ids: Set<string>) => {
@@ -157,6 +177,14 @@ export function AreaEditForm({ area, shiftTypes }: AreaEditFormProps) {
       if (!assignResult.success) {
         toast.error(assignResult.error)
         return
+      }
+
+      if (canAssignChiefs) {
+        const chiefsResult = await assignChiefsToAreaAction(area.id, Array.from(selectedChiefIds))
+        if (!chiefsResult.success) {
+          toast.error(chiefsResult.error)
+          return
+        }
       }
 
       const updateResult = await updateAreaAction(area.id, {
@@ -310,6 +338,47 @@ export function AreaEditForm({ area, shiftTypes }: AreaEditFormProps) {
           </p>
         </CardContent>
       </Card>
+
+      {canAssignChiefs && (
+        <Card>
+          <CardHeader>
+            <CardTitle>{t('editForm.chiefs')}</CardTitle>
+            <CardDescription>{t('editForm.chiefsDescription')}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {chiefs.length === 0 ? (
+              <p className="text-muted-foreground text-sm">{t('editForm.noChiefs')}</p>
+            ) : (
+              <SearchableAddableList<ChiefOption>
+                items={chiefs}
+                selectedIds={selectedChiefIds}
+                onSelectionChange={setSelectedChiefIds}
+                getItemId={(c) => c.id}
+                getSearchableText={(c) => `${c.name} ${c.email} ${c.docNumber ?? ''}`.trim()}
+                renderItem={(c) => (
+                  <span className="flex flex-col gap-0.5">
+                    <span className="font-medium">{c.name}</span>
+                    <span className="text-muted-foreground text-sm">{c.email}</span>
+                    {c.docNumber && (
+                      <span className="text-muted-foreground text-xs">
+                        {t('editForm.chiefDocNumber')}: {c.docNumber}
+                      </span>
+                    )}
+                  </span>
+                )}
+                searchPlaceholder={t('editForm.chiefsSearch')}
+                emptyMessage={t('editForm.noChiefs')}
+                noResultsMessage={t('editForm.noMatch')}
+                selectedLabel={t('editForm.assignedChiefsLabel')}
+                removeItemAriaLabel={(c) => t('editForm.removeChief', { name: c.name })}
+              />
+            )}
+            <p className="text-muted-foreground mt-4 text-sm">
+              {t('editForm.chiefsAssignedCount', { count: selectedChiefIds.size })}
+            </p>
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardHeader>

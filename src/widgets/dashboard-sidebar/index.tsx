@@ -16,7 +16,7 @@ import { Link, usePathname } from '@/i18n/navigation'
 import { getNavItems } from './constants'
 import type { DashboardSidebarProps } from './types'
 
-export function DashboardSidebar({ user }: DashboardSidebarProps) {
+export function DashboardSidebar({ user, className }: DashboardSidebarProps) {
   const t = useTranslations('dashboard')
   const tCommon = useTranslations('common')
   const pathname = usePathname()
@@ -31,7 +31,10 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
   const filteredNavItems = navItems.filter((item) => item.roles.includes(user.role))
 
   return (
-    <aside className="bg-card flex h-screen w-64 flex-col border-r" aria-label={t('sidebarLabel')}>
+    <aside
+      className={cn('bg-card flex h-screen w-64 flex-col border-r', className)}
+      aria-label={t('sidebarLabel')}
+    >
       <Link href="/" className="border-b p-6 transition-opacity hover:opacity-80">
         <h2 className="text-primary text-xl font-bold">{tCommon('appName')}</h2>
         <p className="text-muted-foreground text-sm">{user.role.replace('_', ' ')}</p>

@@ -34,9 +34,11 @@ interface AreasTableProps {
     isActive: boolean
     _count?: { shiftTypes: number }
   }>
+  canCreate?: boolean
+  canDelete?: boolean
 }
 
-export function AreasTable({ areas }: AreasTableProps) {
+export function AreasTable({ areas, canCreate = true, canDelete = true }: AreasTableProps) {
   const t = useTranslations('adminHR.areas')
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
@@ -64,21 +66,25 @@ export function AreasTable({ areas }: AreasTableProps) {
             <CardTitle>{t('title')}</CardTitle>
             <CardDescription className="mt-1">{t('description')}</CardDescription>
           </div>
-          <Button asChild>
-            <Link href="/dashboard/areas/new">
-              <Plus className="mr-2 h-4 w-4" />
-              {t('new')}
-            </Link>
-          </Button>
+          {canCreate && (
+            <Button asChild>
+              <Link href="/dashboard/areas/new">
+                <Plus className="mr-2 h-4 w-4" />
+                {t('new')}
+              </Link>
+            </Button>
+          )}
         </div>
       </CardHeader>
       <CardContent>
         {areas.length === 0 ? (
           <div className="text-muted-foreground py-8 text-center">
             <p className="mb-4">{t('empty')}</p>
-            <Button asChild variant="outline">
-              <Link href="/dashboard/areas/new">{t('createFirst')}</Link>
-            </Button>
+            {canCreate && (
+              <Button asChild variant="outline">
+                <Link href="/dashboard/areas/new">{t('createFirst')}</Link>
+              </Button>
+            )}
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -136,20 +142,22 @@ export function AreasTable({ areas }: AreasTableProps) {
                           </TooltipTrigger>
                           <TooltipContent side="top">{t('table.view')}</TooltipContent>
                         </Tooltip>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setDeleteTarget({ id: area.id, name: area.name })}
-                              className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                              aria-label={t('delete')}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent side="top">{t('delete')}</TooltipContent>
-                        </Tooltip>
+                        {canDelete && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setDeleteTarget({ id: area.id, name: area.name })}
+                                className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                                aria-label={t('delete')}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="top">{t('delete')}</TooltipContent>
+                          </Tooltip>
+                        )}
                       </div>
                     </td>
                   </tr>

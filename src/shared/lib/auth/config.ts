@@ -2,36 +2,11 @@ import { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import GoogleProvider from 'next-auth/providers/google'
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
-import { PrismaPg } from '@prisma/adapter-pg'
-import { PrismaClient, Role } from '@prisma/client'
+import { Role } from '@prisma/client'
 import bcrypt from 'bcryptjs'
-import { Pool } from 'pg'
 
-import { env, isDev } from '@/src/shared/lib/config'
-
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined
-}
-
-let prisma: PrismaClient
-
-try {
-  const pool = new Pool({
-    connectionString: env.DATABASE_URL,
-  })
-  const adapter = new PrismaPg(pool)
-  prisma =
-    globalForPrisma.prisma ??
-    new PrismaClient({
-      adapter,
-      log: isDev ? ['error', 'warn'] : ['error'],
-    })
-  if (env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
-} catch (error) {
-  throw error
-}
-
-export { prisma }
+import { prisma } from '@/src/shared/lib/db'
+import { env, isDev } from '@/src/shared/config'
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),

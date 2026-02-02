@@ -1,4 +1,4 @@
-export { authOptions, prisma } from './config'
+export { authOptions } from './config'
 export {
   getCurrentUser,
   requireAuth,
@@ -6,6 +6,7 @@ export {
   requireAdminHR,
   requireAdminHRWithOrg,
   requireChiefArea,
+  requireAdminHROrChiefArea,
   requireStaffHealth,
   getUserWithOrganization,
 } from './session'

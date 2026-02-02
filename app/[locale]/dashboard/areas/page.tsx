@@ -1,8 +1,9 @@
 import { getTranslations } from 'next-intl/server'
+import { Role } from '@prisma/client'
 
-import { requireAdminHR } from '@/src/shared/lib/auth'
-import { getAreas } from '@/src/entities/area'
+import { getAreasAction } from '@/src/features/admin-hr/api'
 import { AreasTable } from '@/src/features/admin-hr/ui'
+import { requireAdminHROrChiefArea } from '@/src/shared/lib/auth'
 
 interface AreasPageProps {
   params: Promise<{ locale: string }>
@@ -20,10 +21,10 @@ export async function generateMetadata({ params }: AreasPageProps) {
 
 export default async function AreasPage({ params }: AreasPageProps) {
   const { locale } = await params
-  const user = await requireAdminHR(locale)
+  const user = await requireAdminHROrChiefArea(locale)
   const t = await getTranslations('adminHR.areas')
 
-  if (!user.organizationId) 
+  if (!user.organizationId)
     return (
       <div className="space-y-6">
         <div>
@@ -35,9 +36,17 @@ export default async function AreasPage({ params }: AreasPageProps) {
         </div>
       </div>
     )
-  
 
-  const areas = await getAreas(user.organizationId)
+  const result = await getAreasAction()
+  const areas = (result.success && result.data ? result.data : []) as Array<{
+    id: string
+    name: string
+    description: string | null
+    icon: string | null
+    color: string
+    isActive: boolean
+    _count?: { shiftTypes: number }
+  }>
 
   return (
     <div className="space-y-6">
@@ -46,7 +55,11 @@ export default async function AreasPage({ params }: AreasPageProps) {
         <p className="text-muted-foreground mt-2">{t('description')}</p>
       </div>
 
-      <AreasTable areas={areas} />
+      <AreasTable
+        areas={areas}
+        canCreate={user.role === Role.ADMIN_HR}
+        canDelete={user.role === Role.ADMIN_HR}
+      />
     </div>
   )
 }

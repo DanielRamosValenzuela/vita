@@ -156,7 +156,7 @@ export function ContractsPage({ data }: ContractsPageProps) {
   }
 
   const hasContractChanges = useMemo(() => {
-    if (!selectedContract) {
+    if (!selectedContract)
       return (
         contractForm.rateTemplateId !== '' ||
         (contractForm.useCustomRate && contractForm.ratePerMinute !== '') ||
@@ -164,7 +164,6 @@ export function ContractsPage({ data }: ContractsPageProps) {
         contractForm.adjustmentPerMinute !== '0' ||
         contractForm.baseSalary !== ''
       )
-    }
     return (
       (contractForm.areaId || '') !== (selectedContract.areaId || '') ||
       (contractForm.rateTemplateId || '') !== (selectedContract.rateTemplateId || '') ||
@@ -179,9 +178,8 @@ export function ContractsPage({ data }: ContractsPageProps) {
   }, [contractForm, selectedContract])
 
   const hasTemplateChanges = useMemo(() => {
-    if (!templateForm.id) {
+    if (!templateForm.id)
       return templateForm.name.trim() !== '' || templateForm.ratePerMinute !== '' || templateForm.baseSalary !== ''
-    }
     if (!initialTemplateForm) return false
     return (
       templateForm.name.trim() !== initialTemplateForm.name ||

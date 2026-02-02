@@ -1,7 +1,7 @@
 import { Country } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
-import { prisma } from '@/src/shared/lib/auth/config'
+import { prisma } from '@/src/shared/lib/db'
 import { INVITATION_STATUS } from '@/src/shared/lib/constants'
 import type { ActionResult } from '@/src/shared/lib/types'
 import {

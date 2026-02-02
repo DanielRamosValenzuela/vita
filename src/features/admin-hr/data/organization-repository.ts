@@ -1,6 +1,6 @@
 import type { Country } from '@prisma/client'
 
-import { prisma } from '@/src/shared/lib/auth/config'
+import { prisma } from '@/src/shared/lib/db'
 import { ROLES, INVITATION_STATUS } from '@/src/shared/lib/constants'
 import type { InvitationWithUser } from '@/src/shared/ui/molecules'
 
@@ -27,6 +27,7 @@ export interface OrganizationStats {
     name: string
     email: string
     createdAt: Date
+    areas: Array<{ id: string; name: string }>
   }>
   staff: Array<{
     id: string
@@ -126,6 +127,11 @@ export async function getAdminHROrganization(organizationId: string): Promise<Or
         name: true,
         email: true,
         createdAt: true,
+        userAreas: {
+          select: {
+            area: { select: { id: true, name: true } },
+          },
+        },
       },
       orderBy: { createdAt: 'desc' },
     }),
@@ -160,7 +166,13 @@ export async function getAdminHROrganization(organizationId: string): Promise<Or
       staff: pendingStaffInvitations,
     },
     invitations: invitations as InvitationWithUser[],
-    chiefs,
+    chiefs: chiefs.map((c) => ({
+      id: c.id,
+      name: c.name,
+      email: c.email,
+      createdAt: c.createdAt,
+      areas: c.userAreas.map((ua) => ({ id: ua.area.id, name: ua.area.name })),
+    })),
     staff,
   }
 }

@@ -1,7 +1,7 @@
 import { getTranslations } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 
-import { prisma } from '@/src/shared/lib/auth/config'
+import { prisma } from '@/src/shared/lib/db'
 import { requireSuperAdmin } from '@/src/shared/lib/auth/session'
 import { getAdminHRUserById } from '@/src/features/super-admin/data'
 import { EditAdminHRUserForm } from '@/src/features/super-admin/ui'

@@ -5,9 +5,20 @@ import { useTranslations } from 'next-intl'
 import type { Country, Role } from '@prisma/client'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
-import { UserPlus } from 'lucide-react'
+import { UserMinus, UserPlus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/src/shared/ui/alert-dialog'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
 import {
@@ -27,6 +38,7 @@ import {
   TableRow,
 } from '@/src/shared/ui/table'
 
+import { removeUserFromOrganizationAction } from '../api/invitation-actions'
 import { InviteUserForm } from './invite-user-form'
 
 interface OrganizationTeamSectionProps {
@@ -37,12 +49,15 @@ interface OrganizationTeamSectionProps {
     name: string
     email: string
     createdAt: Date
+    areas?: Array<{ id: string; name: string }>
   }>
   currentCount: number
   maxLimit: number
   translationNamespace: string
   allowedRoles: Array<{ value: Role; label: string }>
   defaultRole: Role
+  showAreaColumn?: boolean
+  showUnlinkButton?: boolean
 }
 
 export function OrganizationTeamSection({
@@ -54,12 +69,32 @@ export function OrganizationTeamSection({
   translationNamespace,
   allowedRoles,
   defaultRole,
+  showAreaColumn = false,
+  showUnlinkButton = false,
 }: OrganizationTeamSectionProps) {
   const t = useTranslations(translationNamespace)
   const router = useRouter()
   const [createDialogOpen, setCreateDialogOpen] = useState(false)
+  const [unlinkTarget, setUnlinkTarget] = useState<{ id: string; name: string } | null>(null)
+  const [isUnlinking, setIsUnlinking] = useState(false)
 
   const canCreateMore = currentCount < maxLimit
+
+  async function handleUnlink() {
+    if (!unlinkTarget) return
+    setIsUnlinking(true)
+    try {
+      const result = await removeUserFromOrganizationAction(unlinkTarget.id)
+      if (result.success) {
+        toast.success(result.message)
+        setUnlinkTarget(null)
+        router.refresh()
+      } else
+        toast.error(result.error)
+    } finally {
+      setIsUnlinking(false)
+    }
+  }
 
   return (
     <Card>
@@ -116,28 +151,78 @@ export function OrganizationTeamSection({
             )}
           </div>
         ) : (
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{t('table.name')}</TableHead>
-                  <TableHead>{t('table.email')}</TableHead>
-                  <TableHead>{t('table.createdAt')}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {users.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell className="font-medium">{user.name}</TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>
-                      {format(new Date(user.createdAt), 'dd MMM yyyy', { locale: es })}
-                    </TableCell>
+          <>
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>{t('table.name')}</TableHead>
+                    <TableHead>{t('table.email')}</TableHead>
+                    {showAreaColumn && (
+                      <TableHead>{t('table.areaAssigned')}</TableHead>
+                    )}
+                    <TableHead>{t('table.createdAt')}</TableHead>
+                    {showUnlinkButton && <TableHead className="w-[100px]">{t('table.actions')}</TableHead>}
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+                </TableHeader>
+                <TableBody>
+                  {users.map((user) => (
+                    <TableRow key={user.id}>
+                      <TableCell className="font-medium">{user.name}</TableCell>
+                      <TableCell>{user.email}</TableCell>
+                      {showAreaColumn && (
+                        <TableCell className="text-muted-foreground">
+                          {user.areas && user.areas.length > 0
+                            ? user.areas.map((a) => a.name).join(', ')
+                            : t('table.noAreaAssigned')}
+                        </TableCell>
+                      )}
+                      <TableCell>
+                        {format(new Date(user.createdAt), 'dd MMM yyyy', { locale: es })}
+                      </TableCell>
+                      {showUnlinkButton && (
+                        <TableCell>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                            onClick={() => setUnlinkTarget({ id: user.id, name: user.name })}
+                          >
+                            <UserMinus className="mr-1 h-4 w-4" />
+                            {t('table.unlink')}
+                          </Button>
+                        </TableCell>
+                      )}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+
+            <AlertDialog open={!!unlinkTarget} onOpenChange={(open) => !open && setUnlinkTarget(null)}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>{t('unlinkConfirm.title')}</AlertDialogTitle>
+                <AlertDialogDescription>
+                  {unlinkTarget ? t('unlinkConfirm.description', { name: unlinkTarget.name }) : ''}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel disabled={isUnlinking}>{t('unlinkConfirm.cancel')}</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={(e) => {
+                    e.preventDefault()
+                    handleUnlink()
+                  }}
+                  disabled={isUnlinking}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  {isUnlinking ? t('unlinkConfirm.unlinking') : t('unlinkConfirm.confirm')}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+          </>
         )}
       </CardContent>
     </Card>

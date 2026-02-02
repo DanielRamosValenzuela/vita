@@ -60,6 +60,7 @@ model User {
   invitations    OrganizationInvitation[]
   shifts         Shift[]
   contracts      Contract[]
+  userAreas      UserArea[]
 
   @@unique([country, docType, docNumber])
   @@index([email])
@@ -215,9 +216,21 @@ model Area {
   shifts         Shift[]
   contracts      Contract[]
   shiftTypes     AreaShiftType[]
+  userAreas      UserArea[]
 
   @@index([organizationId])
   @@index([isActive])
+}
+
+model UserArea {
+  userId   String
+  areaId   String
+  user     User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  area     Area @relation(fields: [areaId], references: [id], onDelete: Cascade)
+
+  @@id([userId, areaId])
+  @@index([userId])
+  @@index([areaId])
 }
 
 model OrganizationInvitation {

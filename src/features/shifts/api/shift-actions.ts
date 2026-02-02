@@ -4,8 +4,9 @@ import { revalidatePath } from 'next/cache'
 import type { Prisma } from '@prisma/client'
 import { z } from 'zod'
 
-import { prisma } from '@/src/shared/lib/auth/config'
-import { requireAdminHR } from '@/src/shared/lib/auth/session'
+import { prisma } from '@/src/shared/lib/db'
+import { requireAdminHROrChiefArea } from '@/src/shared/lib/auth/session'
+import { ROLES } from '@/src/shared/lib/constants'
 import type { ActionResult } from '@/src/shared/lib/types'
 
 import { checkShiftConflicts } from '@/src/entities/shift'
@@ -37,7 +38,7 @@ export const createShiftAction = async (
   data: z.infer<typeof createShiftSchema>
 ): Promise<ActionResult<ShiftWithRelations>> => {
   try {
-    const session = await requireAdminHR()
+    const session = await requireAdminHROrChiefArea()
     if (!session.organizationId)
       return {
         success: false,
@@ -46,13 +47,23 @@ export const createShiftAction = async (
 
     const validatedData = createShiftSchema.parse(data)
 
-    
+    if (session.role === ROLES.CHIEF_AREA) {
+      const chiefArea = await prisma.userArea.findFirst({
+        where: { userId: session.id, areaId: validatedData.areaId },
+      })
+      if (!chiefArea)
+        return {
+          success: false,
+          error: 'Solo puedes crear turnos en las áreas que tienes asignadas',
+        }
+    }
+
     const user = await prisma.user.findUnique({
       where: { id: validatedData.userId },
       select: { organizationId: true },
     })
 
-    if (!user || user.organizationId !== session.organizationId)
+    if (!user || user.organizationId !== session.organizationId!)
       return {
         success: false,
         error: 'El usuario no pertenece a tu organización',
@@ -76,7 +87,7 @@ export const createShiftAction = async (
     const area = await prisma.area.findUnique({
       where: {
         id: validatedData.areaId,
-        organizationId: session.organizationId,
+        organizationId: session.organizationId!,
       },
     })
 
@@ -90,7 +101,7 @@ export const createShiftAction = async (
     const shiftType = await prisma.shiftType.findUnique({
       where: {
         id: validatedData.shiftTypeId,
-        organizationId: session.organizationId,
+        organizationId: session.organizationId!,
       },
     })
 
@@ -119,7 +130,7 @@ export const createShiftAction = async (
     const shift = await prisma.shift.create({
       data: {
         ...validatedData,
-        organizationId: session.organizationId,
+        organizationId: session.organizationId!,
         status: 'SCHEDULED',
       },
       include: {
@@ -171,17 +182,25 @@ export const updateShiftAction = async (
   data: z.infer<typeof updateShiftSchema>
 ): Promise<ActionResult<ShiftWithRelations>> => {
   try {
-    const session = await requireAdminHR()
+    const session = await requireAdminHROrChiefArea()
+    if (!session.organizationId)
+      return {
+        success: false,
+        error: 'No tienes una organización asignada',
+      }
 
     const validatedData = updateShiftSchema.parse(data)
 
-    
     const existingShift = await prisma.shift.findUnique({
       where: { id },
-      include: {
-        user: {
-          select: { organizationId: true },
-        },
+      select: {
+        id: true,
+        organizationId: true,
+        areaId: true,
+        userId: true,
+        startTime: true,
+        endTime: true,
+        shiftTypeId: true,
       },
     })
 
@@ -191,11 +210,22 @@ export const updateShiftAction = async (
         error: 'Turno no encontrado',
       }
 
-    if (existingShift.user.organizationId !== session.organizationId)
+    if (existingShift.organizationId !== session.organizationId)
       return {
         success: false,
         error: 'El turno no pertenece a tu organización',
       }
+
+    if (session.role === ROLES.CHIEF_AREA) {
+      const chiefArea = await prisma.userArea.findFirst({
+        where: { userId: session.id, areaId: existingShift.areaId },
+      })
+      if (!chiefArea)
+        return {
+          success: false,
+          error: 'Solo puedes editar turnos de tus áreas',
+        }
+    }
 
     
     if (validatedData.startTime || validatedData.endTime) {
@@ -224,7 +254,7 @@ export const updateShiftAction = async (
 
     if (areaId && shiftTypeId) {
       const shiftType = await prisma.shiftType.findFirst({
-        where: { id: shiftTypeId, organizationId: session.organizationId },
+        where: { id: shiftTypeId, organizationId: session.organizationId! },
       })
       if (shiftType && !shiftType.isGlobal) {
         const areaShiftType = await prisma.areaShiftType.findUnique({
@@ -290,16 +320,16 @@ export const updateShiftAction = async (
 
 export const deleteShiftAction = async (id: string): Promise<ActionResult<null>> => {
   try {
-    const session = await requireAdminHR()
+    const session = await requireAdminHROrChiefArea()
+    if (!session.organizationId)
+      return {
+        success: false,
+        error: 'No tienes una organización asignada',
+      }
 
-    
     const shift = await prisma.shift.findUnique({
       where: { id },
-      include: {
-        user: {
-          select: { organizationId: true },
-        },
-      },
+      select: { id: true, organizationId: true, areaId: true },
     })
 
     if (!shift)
@@ -308,11 +338,22 @@ export const deleteShiftAction = async (id: string): Promise<ActionResult<null>>
         error: 'Turno no encontrado',
       }
 
-    if (shift.user.organizationId !== session.organizationId)
+    if (shift.organizationId !== session.organizationId)
       return {
         success: false,
         error: 'El turno no pertenece a tu organización',
       }
+
+    if (session.role === ROLES.CHIEF_AREA) {
+      const chiefArea = await prisma.userArea.findFirst({
+        where: { userId: session.id, areaId: shift.areaId },
+      })
+      if (!chiefArea)
+        return {
+          success: false,
+          error: 'Solo puedes cancelar turnos de tus áreas',
+        }
+    }
 
     
     await prisma.shift.update({
@@ -341,7 +382,7 @@ export const getShiftsAction = async (
   params: GetShiftsParams
 ): Promise<ActionResult<GetShiftsResult>> => {
   try {
-    const session = await requireAdminHR()
+    const session = await requireAdminHROrChiefArea()
     if (!session.organizationId)
       return {
         success: false,
@@ -364,9 +405,31 @@ export const getShiftsAction = async (
       organizationId: session.organizationId,
     }
 
+    let chiefAreaIds: string[] = []
+    if (session.role === ROLES.CHIEF_AREA) {
+      const chiefAreas = await prisma.userArea.findMany({
+        where: { userId: session.id },
+        select: { areaId: true },
+      })
+      chiefAreaIds = chiefAreas.map((a) => a.areaId)
+      if (chiefAreaIds.length === 0)
+        return {
+          success: true,
+          data: {
+            shifts: [],
+            total: 0,
+            page: 1,
+            pageSize: pageSize ?? 20,
+            totalPages: 0,
+          },
+        }
+      where.areaId = { in: chiefAreaIds }
+    }
+
     if (status) where.status = status
     if (userId) where.userId = userId
-    if (areaId) where.areaId = areaId
+    if (areaId && (chiefAreaIds.length === 0 || chiefAreaIds.includes(areaId)))
+      where.areaId = areaId
     if (shiftTypeId) where.shiftTypeId = shiftTypeId
 
     if (search)

@@ -1,7 +1,7 @@
 import { Country, DocType, type Prisma } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
-import { prisma } from '@/src/shared/lib/auth/config'
+import { prisma } from '@/src/shared/lib/db'
 import { ROLES } from '@/src/shared/lib/constants'
 
 import type { CreateAdminHRUserInput, UpdateAdminHRUserInput } from '../lib/schemas'

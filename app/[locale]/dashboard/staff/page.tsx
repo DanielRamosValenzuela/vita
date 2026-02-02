@@ -1,9 +1,9 @@
-/* eslint-disable react/jsx-no-literals -- Página en construcción (Próximamente). */
-
 import { getTranslations } from 'next-intl/server'
 
-import { requireChiefArea } from '@/src/shared/lib/auth'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
+import { getStaffPageDataAction } from '@/src/features/admin-hr/api'
+import { ContractsPage } from '@/src/features/admin-hr/ui'
+import { requireAdminHROrChiefArea } from '@/src/shared/lib/auth'
+import { Alert, AlertDescription, AlertTitle } from '@/src/shared/ui/alert'
 
 interface StaffPageProps {
   params: Promise<{ locale: string }>
@@ -15,31 +15,45 @@ export async function generateMetadata({ params }: StaffPageProps) {
 
   return {
     title: `${t('staff')} | VITA`,
-    description: 'Gestión de personal',
+    description: t('staffCardDescription'),
   }
 }
 
 export default async function StaffPage({ params }: StaffPageProps) {
   const { locale } = await params
-  await requireChiefArea(locale)
+  await requireAdminHROrChiefArea(locale)
   const t = await getTranslations('dashboard')
 
+  const result = await getStaffPageDataAction()
+
+  if (!result.success || !result.data)
+    return (
+      <div className="container mx-auto py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold tracking-tight">{t('staff')}</h1>
+          <p className="text-muted-foreground mt-2">{t('staffDescription')}</p>
+        </div>
+        <p className="text-muted-foreground">{t('staffComingSoon')}</p>
+      </div>
+    )
+
+  const { staff, rateTemplates, areas, isChiefWithNoAreas } = result.data
+
   return (
-    <div className="container mx-auto py-8">
-      <div className="mb-8">
+    <div className="container mx-auto py-8 space-y-8">
+      <div>
         <h1 className="text-3xl font-bold tracking-tight">{t('staff')}</h1>
-        <p className="text-muted-foreground mt-2">Gestiona el personal de tu área</p>
+        <p className="text-muted-foreground mt-2">{t('staffDescription')}</p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('staff')}</CardTitle>
-          <CardDescription>Gestión de personal</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">Próximamente: CRUD completo de personal</p>
-        </CardContent>
-      </Card>
+      {isChiefWithNoAreas ? (
+        <Alert variant="default">
+          <AlertTitle>{t('staff')}</AlertTitle>
+          <AlertDescription>{t('staffNoAreasAssigned')}</AlertDescription>
+        </Alert>
+      ) : (
+        <ContractsPage data={{ staff, rateTemplates, areas }} />
+      )}
     </div>
   )
 }

@@ -68,6 +68,12 @@ Sesiones relacionadas con el sistema de gestión de turnos, tipos de turno, áre
 ## Sesión Feb 2026 - Tipos de turno por área, config env, UX formularios
 
 - **Tipos de turno ↔ áreas:** Al crear/editar tipo de turno, la relación AreaShiftType se crea con `isActive: false`; se activa desde la edición del área. Formulario de turnos filtra tipos por área: solo globales o con relación activa. Tabla tipos: columna "Global" (Sí/No), "Áreas" (cantidad o "-"), "Asignado" (antes "Turnos"). `assignShiftTypesToAreaAction` usa upsert (isActive true/false), no borra relaciones.
-- **Config centralizada:** `src/shared/lib/config/env.server.ts` lee y valida `process.env` una vez; auth/config y proxy consumen ese objeto.
+- **Config centralizada:** `src/shared/config/env.server.ts` lee y valida `process.env` una vez; auth/config y proxy consumen ese objeto.
 - **UX formularios modales:** Tipos de turno, edición de área, tarifas y contratos: estado `hasChanges`, botón Guardar deshabilitado si no hay cambios o está en curso, AlertDialog "¿Guardar cambios?" al guardar, redirección al listado tras éxito.
 - **i18n y accesibilidad:** Claves faltantes añadidas en messages (es/en). Descripciones para DialogContent (Description/aria-describedby) para eliminar warnings de Radix.
+
+## Sesión Feb 2026 - UserArea y Gestión de Personal
+
+- **UserArea en schema:** Modelo `UserArea` (userId, areaId) para vincular jefes a áreas. Migración `20260202120000_add_user_area`. Relaciones en User y Area.
+- **Staff page para ADMIN_HR y CHIEF:** Sidebar muestra "Personal" a ambos roles. `requireAdminHROrChiefArea` en auth/session. ADMIN_HR ve todo el personal (misma data que Tarifas); CHIEF ve solo personal con contrato en sus áreas (UserArea). Si CHIEF sin áreas: mensaje "No tienes áreas asignadas. Contacta a RRHH." (`staffNoAreasAssigned` i18n).
+- **getStaffPageDataAction:** En contract-actions; usa requireAdminHROrChiefArea; para ADMIN_HR delega en getContractsPageDataAction; para CHIEF filtra por UserArea del usuario y contratos en esas áreas. Página staff usa ContractsPage con esa data.

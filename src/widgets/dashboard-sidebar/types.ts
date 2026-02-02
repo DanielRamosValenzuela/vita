@@ -5,6 +5,7 @@ import type { CurrentUser } from '@/types'
 
 export interface DashboardSidebarProps {
   user: CurrentUser
+  className?: string
 }
 
 export interface NavItem {

@@ -59,8 +59,22 @@ src/
 
 ## Configuración y variables de entorno
 
-- Variables de entorno se leen y validan **una sola vez** en `src/shared/lib/config/env.server.ts`.
+- Variables de entorno se leen y validan **una sola vez** en `src/shared/config/env.server.ts`.
 - Auth (`shared/lib/auth/config.ts`) y proxy consumen el objeto `env` exportado; no se usa `process.env` directamente en esos módulos.
+
+## Dashboard responsive
+
+- **Desktop (lg+):** Sidebar fija a la izquierda.
+- **Móvil/tablet (&lt; lg):** Sidebar oculta; barra superior con botón hamburguesa que abre un Sheet (drawer) con la misma navegación. Al cambiar de ruta el Sheet se cierra automáticamente.
+- Implementación: `DashboardShell` en `src/widgets/dashboard-sidebar/dashboard-shell.tsx` envuelve sidebar + contenido y gestiona el estado del menú móvil.
+
+## Capacitor (app móvil nativa)
+
+- El proyecto **no tiene Capacitor instalado aún**. Para convertirlo en app iOS/Android con Capacitor:
+  1. **Opción recomendada:** Next.js con servidor (SSR). Capacitor apunta la WebView a la URL de tu backend (ej. `https://tu-dominio.com`). No hace falta `output: 'export'`; la app es un cliente que consume la misma app desplegada.
+  2. **Opción estática:** Si quieres la app totalmente offline, habría que usar `output: 'export'` en `next.config` y limitar funcionalidad a lo que no requiera SSR (auth y datos vía API externa). No es el caso actual (Server Actions, sesión en servidor).
+- **Preparación actual:** La UI es responsive (sidebar hamburguesa en móvil), los componentes son estándar web y funcionan en WebView. Cuando añadas Capacitor: `npm i @capacitor/core @capacitor/cli`, `npx cap init`, configurar `capacitor.config.ts` con la URL de la app (o el build estático si migras). Añadir plataformas `ios` y `android` con `npx cap add ios` / `npx cap add android`.
+- Documentación oficial: [Capacitor + Next.js](https://capacitorjs.com/docs/getting-started/with-ionic).
 
 ## Multi-Tenancy
 

@@ -227,6 +227,7 @@
     "staffDescription": "Gestiona el personal de tu área",
     "staffCardDescription": "Gestión de personal",
     "staffComingSoon": "Próximamente: CRUD completo de personal",
+    "staffNoAreasAssigned": "No tienes áreas asignadas. Contacta a RRHH para que te vinculen a una o más áreas.",
     "analyticsDescription": "Gráficos y reportes globales (En desarrollo)",
     "paymentsDescription": "Registro y gestión de pagos (En desarrollo)",
     "settingsDescription": "Configuración del sistema (En desarrollo)",
@@ -1039,7 +1040,18 @@
         "table": {
           "name": "Nombre",
           "email": "Email",
-          "createdAt": "Fecha de Registro"
+          "areaAssigned": "Área asignada",
+          "noAreaAssigned": "Sin área asignada",
+          "createdAt": "Fecha de Registro",
+          "actions": "Acciones",
+          "unlink": "Desvincular"
+        },
+        "unlinkConfirm": {
+          "title": "Desvincular jefe de área",
+          "description": "¿Estás seguro de que deseas desvincular a {name} de la organización? Dejará de tener acceso a las áreas y turnos.",
+          "cancel": "Cancelar",
+          "confirm": "Desvincular",
+          "unlinking": "Desvinculando..."
         }
       },
       "staff": {
@@ -1056,7 +1068,16 @@
         "table": {
           "name": "Nombre",
           "email": "Email",
-          "createdAt": "Fecha de Registro"
+          "createdAt": "Fecha de Registro",
+          "actions": "Acciones",
+          "unlink": "Desvincular"
+        },
+        "unlinkConfirm": {
+          "title": "Desvincular personal",
+          "description": "¿Estás seguro de que deseas desvincular a {name} de la organización? Dejará de tener acceso.",
+          "cancel": "Cancelar",
+          "confirm": "Desvincular",
+          "unlinking": "Desvinculando..."
         }
       }
     },
@@ -1199,7 +1220,15 @@
         "separator": "-",
         "status": "Estado",
         "statusDescription": "Activa el área para asignar turnos",
-        "statusDescriptionInactive": "Asigna al menos un tipo de turno para activar"
+        "statusDescriptionInactive": "Asigna al menos un tipo de turno para activar",
+        "chiefs": "Jefes de área",
+        "chiefsDescription": "Asigna los jefes que gestionan esta área. Solo ellos verán esta área en su menú y podrán crear turnos en ella.",
+        "chiefsSearch": "Buscar por nombre o documento...",
+        "chiefDocNumber": "Documento",
+        "assignedChiefsLabel": "Jefes asignados a esta área",
+        "noChiefs": "No hay jefes de área en la organización. Invita a un jefe desde Mi Organización.",
+        "removeChief": "Quitar {name}",
+        "chiefsAssignedCount": "{count} jefe(s) asignado(s)"
       },
       "back": "Volver",
       "save": "Guardar",

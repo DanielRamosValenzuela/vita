@@ -72,6 +72,8 @@ export default async function AdminHROrganizationPage({ params }: AdminHROrganiz
         translationNamespace="adminHR.organization.chiefs"
         allowedRoles={[{ value: ROLES.CHIEF_AREA, label: tInvitations('inviteForm.roleChief') }]}
         defaultRole={ROLES.CHIEF_AREA}
+        showAreaColumn
+        showUnlinkButton
       />
 
       <OrganizationTeamSection
@@ -83,6 +85,7 @@ export default async function AdminHROrganizationPage({ params }: AdminHROrganiz
         translationNamespace="adminHR.organization.staff"
         allowedRoles={[{ value: ROLES.STAFF_HEALTH, label: tInvitations('inviteForm.roleStaff') }]}
         defaultRole={ROLES.STAFF_HEALTH}
+        showUnlinkButton
       />
 
       <InvitationsTable
