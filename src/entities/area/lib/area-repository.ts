@@ -1,22 +1,24 @@
+import type { Area, Prisma } from '@prisma/client'
+
 import { prisma } from '@/src/shared/lib/auth/config'
-import type { Area } from '@/src/shared/lib/types'
 
-export interface CreateAreaInput {
-  name: string
-  description?: string
-  icon?: string
-  color?: string
-}
+export type CreateAreaInput = Pick<
+  Prisma.AreaUncheckedCreateInput,
+  'name' | 'description' | 'icon' | 'color'
+>
 
-export interface UpdateAreaInput {
-  name?: string
-  description?: string
-  icon?: string
-  color?: string
-  isActive?: boolean
-  maxConsecutiveHours?: number | null
-  minRestHours?: number | null
-}
+export type UpdateAreaInput = Partial<
+  Pick<
+    Prisma.AreaUncheckedUpdateInput,
+    | 'name'
+    | 'description'
+    | 'icon'
+    | 'color'
+    | 'isActive'
+    | 'maxConsecutiveHours'
+    | 'minRestHours'
+  >
+>
 
 export async function getAreas(organizationId: string) {
   return await prisma.area.findMany({
@@ -77,15 +79,7 @@ export async function updateArea(
   data: UpdateAreaInput,
   organizationId: string
 ): Promise<Area> {
-  const updateData: {
-    name?: string
-    description?: string | null
-    icon?: string
-    color?: string
-    isActive?: boolean
-    maxConsecutiveHours?: number | null
-    minRestHours?: number | null
-  } = {}
+  const updateData: Prisma.AreaUncheckedUpdateInput = {}
 
   if (data.name !== undefined) updateData.name = data.name
   if (data.description !== undefined)

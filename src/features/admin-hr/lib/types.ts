@@ -1,5 +1,3 @@
-import type { Area, ShiftType } from '@/src/shared/lib/types'
-
 export interface AdminHRDashboardStats {
   totalAreas: number
   totalShiftTypes: number
@@ -7,8 +5,6 @@ export interface AdminHRDashboardStats {
   totalContracts: number
   activeShifts: number
 }
-
-export type { Area, ShiftType }
 
 export type CreateAreaInput = {
   name: string

@@ -12,8 +12,10 @@ import {
   findUserWithCredentials,
   verifyPassword,
 } from '../data/user-repository'
+import type { ActionResult } from '@/src/shared/lib/types'
+
 import { getLoginSchema, getRegisterSchema } from '../lib/schemas'
-import type { ActionResult, RegisterData } from '../lib/types'
+import type { RegisterData } from '../lib/types'
 
 export async function registerAction(formData: FormData): Promise<ActionResult<RegisterData>> {
   const locale = (formData.get('locale') as string) || 'es'

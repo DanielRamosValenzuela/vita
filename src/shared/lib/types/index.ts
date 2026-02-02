@@ -1,27 +1,7 @@
-export interface Area {
-  id: string
-  name: string
-  description: string | null
-  isActive: boolean
-  organizationId: string
-  createdAt: Date
-  updatedAt: Date
-}
-
-export interface ShiftType {
-  id: string
-  name: string
-  duration: number
-  classification: 'DAY' | 'NIGHT' | 'MIXED'
-  color: string
-  organizationId: string
-  createdAt: Date
-  updatedAt: Date
-}
-
-export interface ActionResult<T> {
+export interface ActionResult<T = unknown> {
   success: boolean
   data?: T
   error?: string
   message?: string
+  fieldErrors?: Record<string, string[]>
 }
