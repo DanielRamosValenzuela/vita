@@ -4,8 +4,8 @@ import { getTranslations } from 'next-intl/server'
 
 import { requireAdminHR } from '@/src/shared/lib/auth'
 import { getAreaById } from '@/src/entities/area'
-import { getShiftTypesAction } from '@/src/features/shifts/api/shift-type-actions'
-import { AreaEditForm } from '@/src/features/admin-hr/ui/area-edit-form'
+import { getShiftTypesAction } from '@/src/features/shifts/api'
+import { AreaEditForm } from '@/src/features/admin-hr/ui'
 
 interface AreaEditPageProps {
   params: Promise<{ locale: string; id: string }>

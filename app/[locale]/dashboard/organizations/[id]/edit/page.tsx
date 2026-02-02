@@ -2,8 +2,8 @@ import { getTranslations } from 'next-intl/server'
 import { notFound, redirect } from 'next/navigation'
 
 import { requireSuperAdmin } from '@/src/shared/lib/auth/session'
-import { getOrganizationById } from '@/src/features/super-admin/data/organization-repository'
-import { EditOrganizationForm } from '@/src/features/super-admin/ui/edit-organization-form'
+import { getOrganizationById } from '@/src/features/super-admin/data'
+import { EditOrganizationForm } from '@/src/features/super-admin/ui'
 
 interface EditOrganizationPageProps {
   params: Promise<{

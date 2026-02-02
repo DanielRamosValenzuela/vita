@@ -3,10 +3,12 @@ import { getTranslations } from 'next-intl/server'
 import { requireAdminHR } from '@/src/shared/lib/auth'
 import { ROLES } from '@/src/shared/lib/constants'
 import { getAdminHROrganization } from '@/src/features/admin-hr/data'
-import { InvitationsTable } from '@/src/features/admin-hr/ui/invitations-table'
+import {
+  InvitationsTable,
+  OrganizationTeamSection,
+  OrganizationView,
+} from '@/src/features/admin-hr/ui'
 import { OrganizationLimitsCard } from '@/src/widgets/organization-limits-card'
-import { OrganizationTeamSection } from '@/src/features/admin-hr/ui/organization-team-section'
-import { OrganizationView } from '@/src/features/admin-hr/ui/organization-view'
 
 interface AdminHROrganizationPageProps {
   params: Promise<{ locale: string }>

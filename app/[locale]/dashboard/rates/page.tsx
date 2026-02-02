@@ -1,6 +1,6 @@
 import { getTranslations } from 'next-intl/server'
 
-import { getContractsPageDataAction } from '@/src/features/admin-hr/api/contract-actions'
+import { getContractsPageDataAction } from '@/src/features/admin-hr/api'
 import { ContractsPage } from '@/src/features/admin-hr/ui'
 import { requireAdminHR } from '@/src/shared/lib/auth/session'
 

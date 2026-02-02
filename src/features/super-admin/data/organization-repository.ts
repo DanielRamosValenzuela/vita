@@ -3,6 +3,16 @@ import type { Country, OrganizationPlan, OrganizationStatus, Prisma } from '@pri
 import { prisma } from '@/src/shared/lib/auth/config'
 import { ROLES } from '@/src/shared/lib/constants'
 
+export type OrganizationWithDetails = Prisma.OrganizationGetPayload<{
+  include: {
+    users: { select: { id: true; name: true; email: true; role: true; createdAt: true } }
+    invitations: {
+      include: { user: { select: { id: true; name: true; email: true } } }
+    }
+    _count: { select: { users: true } }
+  }
+}>
+
 interface GetOrganizationsParams {
   search?: string
   status?: OrganizationStatus
@@ -70,7 +80,9 @@ export const getOrganizations = async (params: GetOrganizationsParams = {}) => {
   }
 }
 
-export const getOrganizationById = async (id: string) => {
+export const getOrganizationById = async (
+  id: string
+): Promise<OrganizationWithDetails | null> => {
   const organization = await prisma.organization.findUnique({
     where: { id },
     include: {

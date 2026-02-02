@@ -2,8 +2,8 @@ import { getTranslations } from 'next-intl/server'
 
 import { requireAdminHR } from '@/src/shared/lib/auth/session'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
-import { getShiftTypesAction } from '@/src/features/shifts/api/shift-type-actions'
-import { ShiftTypesPage } from '@/src/features/shifts/ui/shift-types-page'
+import { getShiftTypesAction } from '@/src/features/shifts/api'
+import { ShiftTypesPage } from '@/src/features/shifts/ui'
 
 interface ShiftTypesProps {
   params: Promise<{ locale: string }>

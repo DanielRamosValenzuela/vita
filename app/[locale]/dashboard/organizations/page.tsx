@@ -5,8 +5,8 @@ import { Plus } from 'lucide-react'
 
 import { requireSuperAdmin } from '@/src/shared/lib/auth/session'
 import { Button } from '@/src/shared/ui/button'
-import { getOrganizations } from '@/src/features/super-admin/data/organization-repository'
-import { OrganizationsTableClient } from '@/src/features/super-admin/ui/organizations-table-client'
+import { getOrganizations } from '@/src/features/super-admin/data'
+import { OrganizationsTableClient } from '@/src/features/super-admin/ui'
 
 import { Link } from '@/i18n/navigation'
 

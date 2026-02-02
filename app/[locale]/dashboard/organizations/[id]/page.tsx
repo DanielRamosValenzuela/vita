@@ -1,6 +1,5 @@
 import { getTranslations } from 'next-intl/server'
 import { notFound } from 'next/navigation'
-import type { Role } from '@prisma/client'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { ArrowLeft, Calendar, DollarSign, Edit } from 'lucide-react'
@@ -19,9 +18,11 @@ import {
   TableHeader,
   TableRow,
 } from '@/src/shared/ui/table'
-import { getOrganizationById } from '@/src/features/super-admin/data/organization-repository'
-import { InvitationsTable } from '@/src/features/super-admin/ui/invitations-table'
-import { OrganizationAdminHRSection } from '@/src/features/super-admin/ui/organization-admin-hr-section'
+import { getOrganizationById } from '@/src/features/super-admin/data'
+import {
+  InvitationsTable,
+  OrganizationAdminHRSection,
+} from '@/src/features/super-admin/ui'
 import { OrganizationLimitsCard } from '@/src/widgets/organization-limits-card'
 
 import { Link } from '@/i18n/navigation'
@@ -30,14 +31,6 @@ interface PageProps {
   params: Promise<{
     id: string
   }>
-}
-
-interface OrganizationUser {
-  id: string
-  name: string
-  email: string
-  role: Role
-  createdAt: Date
 }
 
 const OrganizationDetailsPage = async ({ params }: PageProps) => {
@@ -229,7 +222,7 @@ const OrganizationDetailsPage = async ({ params }: PageProps) => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {organization.users.map((user: OrganizationUser) => (
+                {organization.users.map((user) => (
                   <TableRow key={user.id}>
                     <TableCell className="font-medium">{user.name}</TableCell>
                     <TableCell>{user.email}</TableCell>

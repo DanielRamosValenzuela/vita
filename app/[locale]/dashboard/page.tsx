@@ -10,9 +10,11 @@ import {
   formatStatsData,
   getDashboardData,
 } from '@/src/features/super-admin/lib/helpers/server/dashboard-helpers'
-import { AlertsPanel } from '@/src/features/super-admin/ui/alerts-panel'
-import { OrganizationsTable } from '@/src/features/super-admin/ui/organizations-table'
-import { StatsCards } from '@/src/features/super-admin/ui/stats-cards'
+import {
+  AlertsPanel,
+  OrganizationsTable,
+  StatsCards,
+} from '@/src/features/super-admin/ui'
 
 interface DashboardPageProps {
   params: Promise<{ locale: string }>

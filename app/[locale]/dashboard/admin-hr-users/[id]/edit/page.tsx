@@ -3,8 +3,8 @@ import { notFound } from 'next/navigation'
 
 import { prisma } from '@/src/shared/lib/auth/config'
 import { requireSuperAdmin } from '@/src/shared/lib/auth/session'
-import { getAdminHRUserById } from '@/src/features/super-admin/data/admin-hr-user-repository'
-import { EditAdminHRUserForm } from '@/src/features/super-admin/ui/edit-admin-hr-user-form'
+import { getAdminHRUserById } from '@/src/features/super-admin/data'
+import { EditAdminHRUserForm } from '@/src/features/super-admin/ui'
 
 interface EditAdminHRUserPageProps {
   params: Promise<{ id: string }>

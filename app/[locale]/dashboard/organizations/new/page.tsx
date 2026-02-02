@@ -3,7 +3,7 @@ import { ArrowLeft } from 'lucide-react'
 
 import { requireSuperAdmin } from '@/src/shared/lib/auth/session'
 import { Button } from '@/src/shared/ui/button'
-import { CreateOrganizationForm } from '@/src/features/super-admin/ui/create-organization-form'
+import { CreateOrganizationForm } from '@/src/features/super-admin/ui'
 
 import { Link } from '@/i18n/navigation'
 

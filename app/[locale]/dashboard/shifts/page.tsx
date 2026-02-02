@@ -14,38 +14,14 @@ import {
   TableHeader,
   TableRow,
 } from '@/src/shared/ui/table'
-import { getAreasAction } from '@/src/features/admin-hr/api/area-actions'
-import { getShiftsAction } from '@/src/features/shifts/api/shift-actions'
-import { getShiftTypesAction } from '@/src/features/shifts/api/shift-type-actions'
-import { getUsersForShiftsAction } from '@/src/features/shifts/api/user-actions'
-import { ShiftCalendar } from '@/src/features/shifts/ui/shift-calendar'
-import { ShiftFilters } from '@/src/features/shifts/ui/shift-filters'
-import { ShiftFormDialog } from '@/src/features/shifts/ui/shift-form-dialog'
-
-interface Shift {
-  id: string
-  title: string | null
-  startTime: Date
-  endTime: Date
-  status: ShiftStatus
-  notes: string | null
-  user: {
-    id: string
-    name: string
-    email: string
-    role: string
-  }
-  area: {
-    id: string
-    name: string
-  }
-  shiftType: {
-    id: string
-    name: string
-    color: string
-    icon?: string | null
-  }
-}
+import { getAreasAction } from '@/src/features/admin-hr/api'
+import {
+  getShiftsAction,
+  getShiftTypesAction,
+  getUsersForShiftsAction,
+  type ShiftWithRelations,
+} from '@/src/features/shifts/api'
+import { ShiftCalendar, ShiftFilters, ShiftFormDialog } from '@/src/features/shifts/ui'
 
 interface ShiftsPageProps {
   params: Promise<{ locale: string }>
@@ -116,7 +92,7 @@ export default async function ShiftsPage({ params }: ShiftsPageProps) {
 
   const shifts = shiftsResult.data?.shifts || []
 
-  const calendarShifts = (shifts || []).map((shift: Shift) => ({
+  const calendarShifts = (shifts || []).map((shift: ShiftWithRelations) => ({
     id: shift.id,
     title: shift.title || 'Sin título',
     startTime: shift.startTime,
@@ -195,7 +171,7 @@ export default async function ShiftsPage({ params }: ShiftsPageProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {shifts.filter((s: Shift) => s.status === 'SCHEDULED').length}
+              {shifts.filter((s: ShiftWithRelations) => s.status === 'SCHEDULED').length}
             </div>
           </CardContent>
         </Card>
@@ -206,7 +182,7 @@ export default async function ShiftsPage({ params }: ShiftsPageProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {shifts.filter((s: Shift) => s.status === 'IN_PROGRESS').length}
+              {shifts.filter((s: ShiftWithRelations) => s.status === 'IN_PROGRESS').length}
             </div>
           </CardContent>
         </Card>
@@ -217,7 +193,7 @@ export default async function ShiftsPage({ params }: ShiftsPageProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {shifts.filter((s: Shift) => s.status === 'COMPLETED').length}
+              {shifts.filter((s: ShiftWithRelations) => s.status === 'COMPLETED').length}
             </div>
           </CardContent>
         </Card>
@@ -273,7 +249,7 @@ export default async function ShiftsPage({ params }: ShiftsPageProps) {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {(shifts || []).slice(0, 10).map((shift: Shift) => (
+                  {(shifts || []).slice(0, 10).map((shift: ShiftWithRelations) => (
                     <TableRow key={shift.id}>
                       <TableCell className="font-medium">{shift.user.name}</TableCell>
                       <TableCell>{shift.title || 'Sin título'}</TableCell>
