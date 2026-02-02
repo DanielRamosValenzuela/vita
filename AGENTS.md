@@ -1,6 +1,8 @@
-# VITA - Contexto para Agente IA
+# VITA — Context for AI Agent
 
-Sistema SaaS B2B multi-tenant para gestión de turnos médicos en hospitales y clínicas (Chile). Competidor principal: Rflex.
+This file is the **main context** for the agent: product, stack, architecture, conventions, and how to use Cursor skills and rules.
+
+**Product:** B2B multi-tenant SaaS for medical shift scheduling in hospitals and clinics (Chile). Main competitor: Rflex.
 
 ## Stack Tecnológico
 
@@ -48,6 +50,24 @@ src/
 - `/dashboard/staff` - Gestión de personal (pendiente)
 - `/dashboard/admin-hr/organization` - Mi organización
 - `/dashboard/organizations` - Organizaciones (SUPER_ADMIN)
+
+## Cursor: Skills and Rules
+
+**Skills** (`.cursor/skills/`) are applied automatically when the task or user message matches their "When to use" triggers:
+
+| Skill | Use when |
+|-------|----------|
+| **create-skill** | Creating or templating a new Cursor skill |
+| **fsd-react-nextjs** | Structuring code, placing modules, FSD layers, or user mentions FSD |
+| **typescript-react-nextjs-best-practices** | Writing/reviewing TS, React, Next.js (types, server/client, actions) |
+| **ui-ux-frontend-design** | Designing UI, styling, semantics, accessibility, or user mentions UI/UX |
+
+**Rules** (`.cursor/rules/`) are applied when referenced with `@` or by glob/description:
+
+- **@vita-plan-reference** — Plan, roadmap, phases, docs in `docs/`. Use when asking about next steps, architecture, or business decisions.
+- Other rules: Accessibility, Best-Practices, Code-Style-Structure, Error-Handling-Validation, Forms-Validation, Naming-Conventions, TypeScript-Configuration, etc.
+
+**Recommendation:** For plan/roadmap questions, mention `@vita-plan-reference` or "plan" so the agent includes the rule.
 
 ## Plan de Desarrollo
 
