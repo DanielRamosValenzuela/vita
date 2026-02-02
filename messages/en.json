@@ -205,6 +205,7 @@
     }
   },
   "dashboard": {
+    "sidebarLabel": "Main navigation",
     "dashboard": "Dashboard",
     "organization": "My Organization",
     "invitations": "Invitations",

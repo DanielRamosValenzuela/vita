@@ -1,10 +1,12 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
-
 import { prisma } from '@/src/shared/lib/auth/config'
-import { requireAdminHR } from '@/src/shared/lib/auth/session'
+import { requireAdminHRWithOrg } from '@/src/shared/lib/auth'
 import type { ActionResult } from '@/src/shared/lib/types'
+import { handleActionError } from '@/src/shared/lib/utils'
+import { revalidatePaths } from '@/src/shared/lib/utils/revalidate-paths'
+
+const RATES_PATHS = ['/dashboard/rates'] as const
 
 interface RateTemplate {
   id: string
@@ -25,12 +27,7 @@ export const getRateTemplatesAction = async (): Promise<
   ActionResult<RateTemplate[]>
 > => {
   try {
-    const session = await requireAdminHR()
-    if (!session.organizationId)
-      return {
-        success: false,
-        error: 'No tienes una organización asignada',
-      }
+    const session = await requireAdminHRWithOrg()
 
     const templates = await prisma.rateTemplate.findMany({
       where: { organizationId: session.organizationId },
@@ -48,11 +45,11 @@ export const getRateTemplatesAction = async (): Promise<
       })),
     }
   } catch (error) {
-    console.error('[getRateTemplatesAction] Error:', error)
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Error al obtener tipos de tarifa',
-    }
+    return handleActionError(
+      error,
+      'getRateTemplatesAction',
+      'Error al obtener tipos de tarifa'
+    )
   }
 }
 
@@ -66,12 +63,7 @@ export const createRateTemplateAction = async (data: {
   isActive?: boolean
 }): Promise<ActionResult<RateTemplate>> => {
   try {
-    const session = await requireAdminHR()
-    if (!session.organizationId)
-      return {
-        success: false,
-        error: 'No tienes una organización asignada',
-      }
+    const session = await requireAdminHRWithOrg()
 
     if (data.ratePerMinute < 0)
       return {
@@ -110,7 +102,7 @@ export const createRateTemplateAction = async (data: {
       },
     })
 
-    revalidatePath('/dashboard/rates')
+    revalidatePaths(...RATES_PATHS)
 
     return {
       success: true,
@@ -118,11 +110,11 @@ export const createRateTemplateAction = async (data: {
       message: 'Tipo de tarifa creado exitosamente',
     }
   } catch (error) {
-    console.error('[createRateTemplateAction] Error:', error)
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Error al crear tipo de tarifa',
-    }
+    return handleActionError(
+      error,
+      'createRateTemplateAction',
+      'Error al crear tipo de tarifa'
+    )
   }
 }
 
@@ -139,12 +131,7 @@ export const updateRateTemplateAction = async (
   }
 ): Promise<ActionResult<RateTemplate>> => {
   try {
-    const session = await requireAdminHR()
-    if (!session.organizationId)
-      return {
-        success: false,
-        error: 'No tienes una organización asignada',
-      }
+    const session = await requireAdminHRWithOrg()
 
     if (data.ratePerMinute !== undefined && data.ratePerMinute < 0)
       return {
@@ -197,7 +184,7 @@ export const updateRateTemplateAction = async (
       },
     })
 
-    revalidatePath('/dashboard/rates')
+    revalidatePaths(...RATES_PATHS)
 
     return {
       success: true,
@@ -205,11 +192,11 @@ export const updateRateTemplateAction = async (
       message: 'Tipo de tarifa actualizado exitosamente',
     }
   } catch (error) {
-    console.error('[updateRateTemplateAction] Error:', error)
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Error al actualizar tipo de tarifa',
-    }
+    return handleActionError(
+      error,
+      'updateRateTemplateAction',
+      'Error al actualizar tipo de tarifa'
+    )
   }
 }
 
@@ -217,12 +204,7 @@ export const deleteRateTemplateAction = async (
   id: string
 ): Promise<ActionResult<null>> => {
   try {
-    const session = await requireAdminHR()
-    if (!session.organizationId)
-      return {
-        success: false,
-        error: 'No tienes una organización asignada',
-      }
+    const session = await requireAdminHRWithOrg()
 
     const existing = await prisma.rateTemplate.findUnique({
       where: { id },
@@ -253,17 +235,17 @@ export const deleteRateTemplateAction = async (
       where: { id },
     })
 
-    revalidatePath('/dashboard/rates')
+    revalidatePaths(...RATES_PATHS)
 
     return {
       success: true,
       message: 'Tipo de tarifa eliminado exitosamente',
     }
   } catch (error) {
-    console.error('[deleteRateTemplateAction] Error:', error)
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Error al eliminar tipo de tarifa',
-    }
+    return handleActionError(
+      error,
+      'deleteRateTemplateAction',
+      'Error al eliminar tipo de tarifa'
+    )
   }
 }

@@ -5,3 +5,5 @@ export interface ActionResult<T = unknown> {
   message?: string
   fieldErrors?: Record<string, string[]>
 }
+
+export type { AuthValidationMessages } from './validation-messages'

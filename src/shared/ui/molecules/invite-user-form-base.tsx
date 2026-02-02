@@ -265,7 +265,7 @@ export function InviteUserFormBase({
               </Alert>
             )}
 
-            <nav className="flex justify-end gap-2" aria-label={t('actions')}>
+            <div className="flex justify-end gap-2" role="group" aria-label={t('actions')}>
               <Button variant="outline" onClick={onCancel} disabled={isPending}>
                 {t('cancel')}
               </Button>
@@ -279,7 +279,7 @@ export function InviteUserFormBase({
                   t('sendInvitation')
                 )}
               </Button>
-            </nav>
+            </div>
           </CardContent>
         </Card>
       )}

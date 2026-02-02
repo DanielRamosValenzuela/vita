@@ -4,6 +4,7 @@ export {
   requireAuth,
   requireSuperAdmin,
   requireAdminHR,
+  requireAdminHRWithOrg,
   requireChiefArea,
   requireStaffHealth,
   getUserWithOrganization,

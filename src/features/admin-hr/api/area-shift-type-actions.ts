@@ -1,22 +1,19 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
-
 import { prisma } from '@/src/shared/lib/auth/config'
-import { requireAdminHR } from '@/src/shared/lib/auth/session'
+import { requireAdminHRWithOrg } from '@/src/shared/lib/auth'
 import type { ActionResult } from '@/src/shared/lib/types'
+import { handleActionError } from '@/src/shared/lib/utils'
+import { revalidatePaths } from '@/src/shared/lib/utils/revalidate-paths'
+
+const AREA_PATHS = ['/dashboard/areas', '/dashboard/admin-hr'] as const
 
 export const assignShiftTypesToAreaAction = async (
   areaId: string,
   shiftTypeIds: string[]
 ): Promise<ActionResult<null>> => {
   try {
-    const session = await requireAdminHR()
-    if (!session.organizationId)
-      return {
-        success: false,
-        error: 'No tienes una organización asignada',
-      }
+    const session = await requireAdminHRWithOrg()
 
     const area = await prisma.area.findFirst({
       where: { id: areaId, organizationId: session.organizationId },
@@ -56,19 +53,18 @@ export const assignShiftTypesToAreaAction = async (
       },
     })
 
-    revalidatePath('/dashboard/areas')
-    revalidatePath('/dashboard/admin-hr')
+    revalidatePaths(...AREA_PATHS)
 
     return {
       success: true,
       message: 'Tipos de turno asignados correctamente',
     }
   } catch (error) {
-    console.error('[assignShiftTypesToAreaAction] Error:', error)
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Error al asignar tipos de turno',
-    }
+    return handleActionError(
+      error,
+      'assignShiftTypesToAreaAction',
+      'Error al asignar tipos de turno'
+    )
   }
 }
 
@@ -77,12 +73,7 @@ export const setAreaActiveAction = async (
   isActive: boolean
 ): Promise<ActionResult<null>> => {
   try {
-    const session = await requireAdminHR()
-    if (!session.organizationId)
-      return {
-        success: false,
-        error: 'No tienes una organización asignada',
-      }
+    const session = await requireAdminHRWithOrg()
 
     const area = await prisma.area.findFirst({
       where: { id: areaId, organizationId: session.organizationId },
@@ -108,18 +99,17 @@ export const setAreaActiveAction = async (
       data: { isActive },
     })
 
-    revalidatePath('/dashboard/areas')
-    revalidatePath('/dashboard/admin-hr')
+    revalidatePaths(...AREA_PATHS)
 
     return {
       success: true,
       message: isActive ? 'Área activada' : 'Área desactivada',
     }
   } catch (error) {
-    console.error('[setAreaActiveAction] Error:', error)
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Error al actualizar estado',
-    }
+    return handleActionError(
+      error,
+      'setAreaActiveAction',
+      'Error al actualizar estado'
+    )
   }
 }

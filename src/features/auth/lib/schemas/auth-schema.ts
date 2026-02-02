@@ -1,41 +1,11 @@
 import { Country, DocType } from '@prisma/client'
 import { z } from 'zod'
 
+import type { AuthValidationMessages } from '@/src/shared/lib/types'
 import { getDocTypeForCountry } from '@/src/shared/lib/utils/doc-type-mapper'
 import { getTaxIdConfig, validateTaxId } from '@/src/shared/lib/utils/tax-id-config'
 
-export interface ValidationMessages {
-  email: {
-    required: string
-    invalid: string
-  }
-  password: {
-    required: string
-    minLength: string
-    maxLength: string
-    uppercase: string
-    lowercase: string
-    number: string
-  }
-  name: {
-    required: string
-    minLength: string
-    maxLength: string
-  }
-  docNumber: {
-    required: string
-    minLength: (min: number) => string
-    maxLength: (max: number) => string
-    invalid: (label: string) => string
-  }
-  confirmPassword: {
-    required: string
-    mismatch: string
-  }
-  docType: {
-    mismatch: (expected: string, country: string) => string
-  }
-}
+export type ValidationMessages = AuthValidationMessages
 
 export function createEmailSchema(messages: ValidationMessages['email']) {
   return z.string().min(1, messages.required).email(messages.invalid).toLowerCase().trim()
@@ -106,7 +76,9 @@ export function createRegisterSchema(messages: ValidationMessages) {
     })
 }
 
-export function createLoginSchema(messages: Pick<ValidationMessages, 'email' | 'password'>) {
+export function createLoginSchema(
+  messages: Pick<AuthValidationMessages, 'email' | 'password'>
+) {
   return z.object({
     email: createEmailSchema(messages.email),
     password: z.string().min(1, messages.password.required),

@@ -107,11 +107,13 @@ export default async function ShiftsPage({ params }: ShiftsPageProps) {
 
   const shiftTypes = shiftTypesResult.data || []
   const users = usersResult.data || []
-  const areas = (areasResult.data || []).map((area) => ({
+  const areasRaw = Array.isArray(areasResult.data) ? areasResult.data : []
+  const areas = areasRaw.map((area: { id: string; name: string; description?: string | null }) => ({
     id: area.id,
     name: area.name,
     description: area.description || undefined,
   }))
+
   const shifts = shiftsResult.data?.shifts || []
 
   const calendarShifts = (shifts || []).map((shift: Shift) => ({

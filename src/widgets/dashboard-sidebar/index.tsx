@@ -31,7 +31,7 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
   const filteredNavItems = navItems.filter((item) => item.roles.includes(user.role))
 
   return (
-    <div className="bg-card flex h-screen w-64 flex-col border-r">
+    <aside className="bg-card flex h-screen w-64 flex-col border-r" aria-label={t('sidebarLabel')}>
       <Link href="/" className="border-b p-6 transition-opacity hover:opacity-80">
         <h2 className="text-primary text-xl font-bold">{tCommon('appName')}</h2>
         <p className="text-muted-foreground text-sm">{user.role.replace('_', ' ')}</p>
@@ -103,6 +103,6 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
           {tCommon('logout')}
         </Button>
       </div>
-    </div>
+    </aside>
   )
 }

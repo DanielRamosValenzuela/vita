@@ -1,10 +1,12 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
-
 import { prisma } from '@/src/shared/lib/auth/config'
-import { requireAdminHR } from '@/src/shared/lib/auth/session'
+import { requireAdminHRWithOrg } from '@/src/shared/lib/auth'
 import type { ActionResult } from '@/src/shared/lib/types'
+import { handleActionError } from '@/src/shared/lib/utils'
+import { revalidatePaths } from '@/src/shared/lib/utils/revalidate-paths'
+
+const SHIFT_TYPES_PATHS = ['/dashboard/shift-types'] as const
 
 type ShiftClassification = 'DAY' | 'NIGHT' | 'MIXED'
 
@@ -32,12 +34,7 @@ interface ShiftType {
 
 export const getShiftTypesAction = async (): Promise<ActionResult<ShiftType[]>> => {
   try {
-    const session = await requireAdminHR()
-    if (!session.organizationId)
-      return {
-        success: false,
-        error: 'No tienes una organización asignada',
-      }
+    const session = await requireAdminHRWithOrg()
 
     const shiftTypes = await prisma.shiftType.findMany({
       where: { organizationId: session.organizationId },
@@ -57,11 +54,11 @@ export const getShiftTypesAction = async (): Promise<ActionResult<ShiftType[]>> 
       data: formattedShiftTypes,
     }
   } catch (error) {
-    console.error('[getShiftTypesAction] Error:', error)
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Error al obtener tipos de turno',
-    }
+    return handleActionError(
+      error,
+      'getShiftTypesAction',
+      'Error al obtener tipos de turno'
+    )
   }
 }
 
@@ -80,12 +77,7 @@ export const createShiftTypeAction = async (data: {
   isActive?: boolean
 }): Promise<ActionResult<ShiftType>> => {
   try {
-    const session = await requireAdminHR()
-    if (!session.organizationId)
-      return {
-        success: false,
-        error: 'No tienes una organización asignada',
-      }
+    const session = await requireAdminHRWithOrg()
 
     const color = data.color ?? '#3b82f6'
     const colorRegex = /^#[0-9A-Fa-f]{6}$/
@@ -135,7 +127,7 @@ export const createShiftTypeAction = async (data: {
       },
     })
 
-    revalidatePath('/dashboard/shift-types')
+    revalidatePaths(...SHIFT_TYPES_PATHS)
 
     return {
       success: true,
@@ -146,11 +138,11 @@ export const createShiftTypeAction = async (data: {
       message: 'Tipo de turno creado exitosamente',
     }
   } catch (error) {
-    console.error('[createShiftTypeAction] Error:', error)
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Error al crear tipo de turno',
-    }
+    return handleActionError(
+      error,
+      'createShiftTypeAction',
+      'Error al crear tipo de turno'
+    )
   }
 }
 
@@ -172,12 +164,7 @@ export const updateShiftTypeAction = async (
   }
 ): Promise<ActionResult<ShiftType>> => {
   try {
-    const session = await requireAdminHR()
-    if (!session.organizationId)
-      return {
-        success: false,
-        error: 'No tienes una organización asignada',
-      }
+    const session = await requireAdminHRWithOrg()
 
     if (data.color) {
       const colorRegex = /^#[0-9A-Fa-f]{6}$/
@@ -235,7 +222,7 @@ export const updateShiftTypeAction = async (
       },
     })
 
-    revalidatePath('/dashboard/shift-types')
+    revalidatePaths(...SHIFT_TYPES_PATHS)
 
     return {
       success: true,
@@ -246,24 +233,18 @@ export const updateShiftTypeAction = async (
       message: 'Tipo de turno actualizado exitosamente',
     }
   } catch (error) {
-    console.error('[updateShiftTypeAction] Error:', error)
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Error al actualizar tipo de turno',
-    }
+    return handleActionError(
+      error,
+      'updateShiftTypeAction',
+      'Error al actualizar tipo de turno'
+    )
   }
 }
 
 export const deleteShiftTypeAction = async (id: string): Promise<ActionResult<null>> => {
   try {
-    const session = await requireAdminHR()
-    if (!session.organizationId)
-      return {
-        success: false,
-        error: 'No tienes una organización asignada',
-      }
+    const session = await requireAdminHRWithOrg()
 
-    
     const existingType = await prisma.shiftType.findUnique({
       where: { id },
       include: {
@@ -298,17 +279,17 @@ export const deleteShiftTypeAction = async (id: string): Promise<ActionResult<nu
       where: { id },
     })
 
-    revalidatePath('/dashboard/shift-types')
+    revalidatePaths(...SHIFT_TYPES_PATHS)
 
     return {
       success: true,
       message: 'Tipo de turno eliminado exitosamente',
     }
   } catch (error) {
-    console.error('[deleteShiftTypeAction] Error:', error)
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Error al eliminar tipo de turno',
-    }
+    return handleActionError(
+      error,
+      'deleteShiftTypeAction',
+      'Error al eliminar tipo de turno'
+    )
   }
 }

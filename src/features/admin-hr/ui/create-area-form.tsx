@@ -1,12 +1,14 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Loader2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
 
+import { useRouter } from '@/i18n/navigation'
+
+import { useFormAction } from '@/src/shared/hooks'
 import { AREA_ICONS } from '@/src/shared/lib/constants'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
@@ -15,17 +17,20 @@ import { Input } from '@/src/shared/ui/input'
 import { Label } from '@/src/shared/ui/label'
 import { Textarea } from '@/src/shared/ui/textarea'
 
-import { useRouter } from '@/i18n/navigation'
-
 import { createAreaAction } from '../api/area-actions'
 import { useCreateAreaSchema, type CreateAreaInput } from '../lib/schemas'
 
 export function CreateAreaForm() {
   const t = useTranslations('adminHR.areas')
   const router = useRouter()
-  const [isPending, startTransition] = useTransition()
-  const [error, setError] = useState<string | null>(null)
   const createAreaSchema = useCreateAreaSchema()
+
+  const { execute, isPending, error } = useFormAction({
+    action: createAreaAction,
+    successMessage: t('createSuccess'),
+    errorMessage: t('createError'),
+    redirectTo: '/dashboard/areas',
+  })
 
   const form = useForm<CreateAreaInput>({
     resolver: zodResolver(createAreaSchema),
@@ -58,21 +63,8 @@ export function CreateAreaForm() {
     setValue('color', v)
   }
 
-  const onSubmit = async (data: CreateAreaInput) => {
-    setError(null)
-    const payload = { ...data, icon, color }
-
-    startTransition(async () => {
-      const result = await createAreaAction(payload)
-
-      if (result.success) {
-        toast.success(t('createSuccess'))
-        router.push('/dashboard/areas')
-      } else {
-        setError(result.error || t('createError'))
-        toast.error(result.error || t('createError'))
-      }
-    })
+  const onSubmit = (data: CreateAreaInput) => {
+    execute({ ...data, icon, color })
   }
 
   return (

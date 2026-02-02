@@ -1,0 +1,36 @@
+---
+description: "Referencia al plan de desarrollo VITA. Incluir cuando el usuario pregunte por próximos pasos, roadmap, fases, tareas pendientes, modelo de negocio o decisiones de arquitectura."
+globs: []
+alwaysApply: false
+---
+
+# Referencia al Plan VITA
+
+La documentación está en **docs/** dividida por tema. Cada archivo tiene menos de 500 líneas.
+
+## Documentos principales
+
+| Archivo | Contenido |
+|---------|-----------|
+| docs/vita-overview.md | Qué es VITA, problema, solución |
+| docs/vita-business-model.md | Pricing, límites, pool de cuentas |
+| docs/vita-roles.md | Sistema de roles |
+| docs/vita-competitive.md | Análisis Rflex |
+| docs/vita-architecture.md | Stack, FSD |
+| docs/vita-roadmap.md | Fases, próximos pasos |
+| docs/vita-lessons.md | Lecciones aprendidas |
+
+## Historial de sesiones (por fase)
+
+| Archivo | Fase |
+|---------|------|
+| docs/vita-sessions-phase-4-super-admin.md | SUPER_ADMIN, Organizations |
+| docs/vita-sessions-phase-7-admin-hr.md | ADMIN_HR, invitaciones |
+| docs/vita-sessions-phase-11-turnos.md | Turnos, tarifas, contratos |
+
+## Cómo usar
+
+1. **docs/README.md** - Índice completo
+2. **docs/PLAN-INDEX.md** - Índice de búsqueda
+3. **Búsqueda semántica** en docs/ para términos específicos
+4. **AGENTS.md** - Contexto técnico conciso

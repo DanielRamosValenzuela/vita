@@ -1,12 +1,13 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
 import type { Country } from '@prisma/client'
 
 import { prisma } from '@/src/shared/lib/auth/config'
-import { requireAdminHR } from '@/src/shared/lib/auth/session'
+import { requireAdminHR, requireAdminHRWithOrg } from '@/src/shared/lib/auth'
 import type { ActionResult } from '@/src/shared/lib/types'
 import { ROLES } from '@/src/shared/lib/constants'
+import { handleActionError } from '@/src/shared/lib/utils'
+import { revalidatePaths } from '@/src/shared/lib/utils/revalidate-paths'
 
 import {
   checkOrganizationLimit,
@@ -43,13 +44,11 @@ export const searchUserAction = async (
       data: user,
     }
   } catch (error) {
-    console.error('[searchUserAction] Error:', error)
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Error al buscar usuario',
-    }
+    return handleActionError(error, 'searchUserAction', 'Error al buscar usuario')
   }
 }
+
+const INVITATION_PATHS = ['/dashboard/admin-hr/organization', '/dashboard/admin-hr/invitations'] as const
 
 export const inviteChiefAction = async (
   organizationId: string,
@@ -110,8 +109,7 @@ export const inviteChiefAction = async (
       return invitationResult
     
 
-    revalidatePath(`/dashboard/admin-hr/organization`)
-    revalidatePath('/dashboard/admin-hr/invitations')
+    revalidatePaths(...INVITATION_PATHS)
 
     return {
       success: true,
@@ -119,11 +117,7 @@ export const inviteChiefAction = async (
       message: 'Invitación enviada exitosamente',
     }
   } catch (error) {
-    console.error('[inviteChiefAction] Error:', error)
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Error al enviar invitación',
-    }
+    return handleActionError(error, 'inviteChiefAction', 'Error al enviar invitación')
   }
 }
 
@@ -132,7 +126,7 @@ export const inviteStaffAction = async (
   userId: string
 ): Promise<ActionResult<unknown>> => {
   try {
-    const session = await requireAdminHR()
+    const session = await requireAdminHRWithOrg()
 
     if (session.organizationId !== organizationId) 
       return {
@@ -186,8 +180,7 @@ export const inviteStaffAction = async (
       return invitationResult
     
 
-    revalidatePath(`/dashboard/admin-hr/organization`)
-    revalidatePath('/dashboard/admin-hr/invitations')
+    revalidatePaths(...INVITATION_PATHS)
 
     return {
       success: true,
@@ -195,11 +188,7 @@ export const inviteStaffAction = async (
       message: 'Invitación enviada exitosamente',
     }
   } catch (error) {
-    console.error('[inviteStaffAction] Error:', error)
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Error al enviar invitación',
-    }
+    return handleActionError(error, 'inviteStaffAction', 'Error al enviar invitación')
   }
 }
 
@@ -218,20 +207,13 @@ export const cancelInvitationAction = async (
       }
     
 
-    if (result.data?.organizationId) 
-      revalidatePath(`/dashboard/admin-hr/organization`)
-    
-    revalidatePath('/dashboard/admin-hr/invitations')
+    revalidatePaths(...INVITATION_PATHS)
 
     return {
       success: true,
       message: 'Invitación cancelada exitosamente',
     }
   } catch (error) {
-    console.error('[cancelInvitationAction] Error:', error)
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Error al cancelar invitación',
-    }
+    return handleActionError(error, 'cancelInvitationAction', 'Error al cancelar invitación')
   }
 }

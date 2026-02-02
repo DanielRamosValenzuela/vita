@@ -205,6 +205,7 @@
     }
   },
   "dashboard": {
+    "sidebarLabel": "Navegación principal",
     "dashboard": "Panel de Control",
     "organization": "Mi Organización",
     "invitations": "Invitaciones",

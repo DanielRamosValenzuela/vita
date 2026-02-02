@@ -1,3 +1,8 @@
+import {
+  MAX_SHIFT_DURATION_MS,
+  MIN_SHIFT_DURATION_MS,
+  ONE_HOUR_MS,
+} from '@/src/shared/lib/constants'
 
 interface ShiftConflict {
   hasConflict: boolean
@@ -15,7 +20,7 @@ export function checkShiftConflictsClient(startTime: Date, endTime: Date): Shift
   
 
   const now = new Date()
-  const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000)
+  const oneHourAgo = new Date(now.getTime() - ONE_HOUR_MS)
   if (startTime < oneHourAgo) 
     return {
       hasConflict: true,
@@ -25,7 +30,7 @@ export function checkShiftConflictsClient(startTime: Date, endTime: Date): Shift
   
 
   const shiftDuration = endTime.getTime() - startTime.getTime()
-  const maxDuration = 12 * 60 * 60 * 1000 
+  const maxDuration = MAX_SHIFT_DURATION_MS
   if (shiftDuration > maxDuration) 
     return {
       hasConflict: true,
@@ -35,7 +40,7 @@ export function checkShiftConflictsClient(startTime: Date, endTime: Date): Shift
   
 
   
-  const minDuration = 30 * 60 * 1000 
+  const minDuration = MIN_SHIFT_DURATION_MS
   if (shiftDuration < minDuration) 
     return {
       hasConflict: true,

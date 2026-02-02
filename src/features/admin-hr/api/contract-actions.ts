@@ -1,11 +1,13 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
-
 import { prisma } from '@/src/shared/lib/auth/config'
-import { requireAdminHR } from '@/src/shared/lib/auth/session'
+import { requireAdminHRWithOrg } from '@/src/shared/lib/auth'
 import { ROLES } from '@/src/shared/lib/constants'
 import type { ActionResult } from '@/src/shared/lib/types'
+import { handleActionError } from '@/src/shared/lib/utils'
+import { revalidatePaths } from '@/src/shared/lib/utils/revalidate-paths'
+
+const RATES_PATHS = ['/dashboard/rates'] as const
 
 export interface StaffWithContract {
   id: string
@@ -64,13 +66,7 @@ export const getContractsPageDataAction = async (): Promise<
   ActionResult<ContractsPageData>
 > => {
   try {
-    const session = await requireAdminHR()
-    if (!session.organizationId)
-      return {
-        success: false,
-        error: 'No tienes una organización asignada',
-      }
-
+    const session = await requireAdminHRWithOrg()
     const orgId = session.organizationId
 
     const [users, rateTemplates, areas] = await Promise.all([
@@ -172,11 +168,7 @@ export const getContractsPageDataAction = async (): Promise<
       },
     }
   } catch (error) {
-    console.error('[getContractsPageDataAction] Error:', error)
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Error al cargar contratos',
-    }
+    return handleActionError(error, 'getContractsPageDataAction', 'Error al cargar contratos')
   }
 }
 
@@ -190,13 +182,7 @@ export const createContractAction = async (data: {
   baseSalaryUnit?: 'MONTHLY' | 'DAILY' | 'HOURLY'
 }): Promise<ActionResult<{ id: string }>> => {
   try {
-    const session = await requireAdminHR()
-    if (!session.organizationId)
-      return {
-        success: false,
-        error: 'No tienes una organización asignada',
-      }
-
+    const session = await requireAdminHRWithOrg()
     const orgId = session.organizationId
 
     const hasRateTemplate = !!data.rateTemplateId
@@ -276,7 +262,7 @@ export const createContractAction = async (data: {
       select: { id: true },
     })
 
-    revalidatePath('/dashboard/rates')
+    revalidatePaths(...RATES_PATHS)
 
     return {
       success: true,
@@ -284,11 +270,7 @@ export const createContractAction = async (data: {
       message: 'Contrato creado exitosamente',
     }
   } catch (error) {
-    console.error('[createContractAction] Error:', error)
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Error al crear contrato',
-    }
+    return handleActionError(error, 'createContractAction', 'Error al crear contrato')
   }
 }
 
@@ -304,12 +286,7 @@ export const updateContractAction = async (
   }
 ): Promise<ActionResult<null>> => {
   try {
-    const session = await requireAdminHR()
-    if (!session.organizationId)
-      return {
-        success: false,
-        error: 'No tienes una organización asignada',
-      }
+    const session = await requireAdminHRWithOrg()
 
     const existing = await prisma.contract.findUnique({
       where: { id },
@@ -350,29 +327,20 @@ export const updateContractAction = async (
       },
     })
 
-    revalidatePath('/dashboard/rates')
+    revalidatePaths(...RATES_PATHS)
 
     return {
       success: true,
       message: 'Contrato actualizado exitosamente',
     }
   } catch (error) {
-    console.error('[updateContractAction] Error:', error)
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Error al actualizar contrato',
-    }
+    return handleActionError(error, 'updateContractAction', 'Error al actualizar contrato')
   }
 }
 
 export const endContractAction = async (id: string): Promise<ActionResult<null>> => {
   try {
-    const session = await requireAdminHR()
-    if (!session.organizationId)
-      return {
-        success: false,
-        error: 'No tienes una organización asignada',
-      }
+    const session = await requireAdminHRWithOrg()
 
     const existing = await prisma.contract.findUnique({
       where: { id },
@@ -398,29 +366,20 @@ export const endContractAction = async (id: string): Promise<ActionResult<null>>
       },
     })
 
-    revalidatePath('/dashboard/rates')
+    revalidatePaths(...RATES_PATHS)
 
     return {
       success: true,
       message: 'Contrato finalizado exitosamente',
     }
   } catch (error) {
-    console.error('[endContractAction] Error:', error)
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Error al finalizar contrato',
-    }
+    return handleActionError(error, 'endContractAction', 'Error al finalizar contrato')
   }
 }
 
 export const deleteContractAction = async (id: string): Promise<ActionResult<null>> => {
   try {
-    const session = await requireAdminHR()
-    if (!session.organizationId)
-      return {
-        success: false,
-        error: 'No tienes una organización asignada',
-      }
+    const session = await requireAdminHRWithOrg()
 
     const existing = await prisma.contract.findUnique({
       where: { id },
@@ -451,17 +410,13 @@ export const deleteContractAction = async (id: string): Promise<ActionResult<nul
       where: { id },
     })
 
-    revalidatePath('/dashboard/rates')
+    revalidatePaths(...RATES_PATHS)
 
     return {
       success: true,
       message: 'Contrato eliminado exitosamente',
     }
   } catch (error) {
-    console.error('[deleteContractAction] Error:', error)
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Error al eliminar contrato',
-    }
+    return handleActionError(error, 'deleteContractAction', 'Error al eliminar contrato')
   }
 }

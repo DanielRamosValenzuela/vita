@@ -1,8 +1,8 @@
 import { Country } from '@prisma/client'
 import { z } from 'zod'
 
+import type { AuthValidationMessages } from '@/src/shared/lib/types'
 import { validateTaxId } from '@/src/shared/lib/utils/tax-id-config'
-import type { ValidationMessages as AuthValidationMessages } from '@/src/features/auth/lib/schemas/auth-schema'
 
 export interface ProfileValidationMessages {
   name: AuthValidationMessages['name']

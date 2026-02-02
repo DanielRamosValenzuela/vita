@@ -44,11 +44,21 @@ export async function requireSuperAdmin(locale: string = 'es'): Promise<CurrentU
 export async function requireAdminHR(locale: string = 'es'): Promise<CurrentUser> {
   const user = await requireAuth(locale)
 
-  if (user.role !== Role.ADMIN_HR) 
+  if (user.role !== Role.ADMIN_HR)
     redirect(`/${locale}/dashboard`)
-  
 
   return user
+}
+
+export async function requireAdminHRWithOrg(
+  locale: string = 'es'
+): Promise<CurrentUser & { organizationId: string }> {
+  const user = await requireAdminHR(locale)
+
+  if (!user.organizationId)
+    throw new Error('No estás vinculado a una organización')
+
+  return user as CurrentUser & { organizationId: string }
 }
 
 export async function requireChiefArea(locale: string = 'es'): Promise<CurrentUser> {

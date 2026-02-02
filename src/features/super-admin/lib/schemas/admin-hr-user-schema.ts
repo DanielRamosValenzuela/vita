@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { CountryEnum } from '@/src/shared/lib/constants'
-import type { ValidationMessages as AuthValidationMessages } from '@/src/features/auth/lib/schemas/auth-schema'
+import type { AuthValidationMessages } from '@/src/shared/lib/types'
 
 export interface AdminHRUserValidationMessages {
   name: AuthValidationMessages['name']
