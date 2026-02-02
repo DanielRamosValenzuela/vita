@@ -1,7 +1,7 @@
 import { getTranslations } from 'next-intl/server'
 
 import { requireAdminHR } from '@/src/shared/lib/auth'
-import { getAreas } from '@/src/features/admin-hr/data/area-repository'
+import { getAreas } from '@/src/entities/area'
 import { AreasTable } from '@/src/features/admin-hr/ui'
 
 interface AreasPageProps {

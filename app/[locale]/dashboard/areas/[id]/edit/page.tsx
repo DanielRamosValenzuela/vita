@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
 
 import { requireAdminHR } from '@/src/shared/lib/auth'
-import { getAreaById } from '@/src/features/admin-hr/data/area-repository'
+import { getAreaById } from '@/src/entities/area'
 import { getShiftTypesAction } from '@/src/features/shifts/api/shift-type-actions'
 import { AreaEditForm } from '@/src/features/admin-hr/ui/area-edit-form'
 

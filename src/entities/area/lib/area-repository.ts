@@ -1,7 +1,22 @@
 import { prisma } from '@/src/shared/lib/auth/config'
 import type { Area } from '@/src/shared/lib/types'
 
-import type { CreateAreaInput, UpdateAreaInput } from '../lib/schemas'
+export interface CreateAreaInput {
+  name: string
+  description?: string
+  icon?: string
+  color?: string
+}
+
+export interface UpdateAreaInput {
+  name?: string
+  description?: string
+  icon?: string
+  color?: string
+  isActive?: boolean
+  maxConsecutiveHours?: number | null
+  minRestHours?: number | null
+}
 
 export async function getAreas(organizationId: string) {
   return await prisma.area.findMany({
@@ -39,7 +54,10 @@ export async function getAreaById(id: string, organizationId: string) {
   })
 }
 
-export async function createArea(data: CreateAreaInput, organizationId: string): Promise<Area> {
+export async function createArea(
+  data: CreateAreaInput,
+  organizationId: string
+): Promise<Area> {
   const area = await prisma.area.create({
     data: {
       name: data.name,
@@ -74,7 +92,8 @@ export async function updateArea(
     updateData.description = data.description === '' ? null : data.description
   if (data.icon !== undefined) updateData.icon = data.icon
   if (data.color !== undefined) updateData.color = data.color
-  if (data.maxConsecutiveHours !== undefined) updateData.maxConsecutiveHours = data.maxConsecutiveHours
+  if (data.maxConsecutiveHours !== undefined)
+    updateData.maxConsecutiveHours = data.maxConsecutiveHours
   if (data.minRestHours !== undefined) updateData.minRestHours = data.minRestHours
 
   if (data.isActive !== undefined) {
@@ -94,7 +113,10 @@ export async function updateArea(
   return area
 }
 
-export async function deleteArea(id: string, organizationId: string): Promise<void> {
+export async function deleteArea(
+  id: string,
+  organizationId: string
+): Promise<void> {
   await prisma.area.deleteMany({
     where: { id, organizationId },
   })

@@ -5,7 +5,12 @@ import { revalidatePath } from 'next/cache'
 import { requireAdminHR } from '@/src/shared/lib/auth'
 import { getLocaleFromHeaders } from '@/src/shared/lib/utils/get-locale'
 
-import { createArea, deleteArea, getAreas, updateArea } from '../data/area-repository'
+import {
+  createArea,
+  deleteArea,
+  getAreas,
+  updateArea,
+} from '@/src/entities/area'
 import {
   getCreateAreaSchema,
   getUpdateAreaSchema,
