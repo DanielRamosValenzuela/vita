@@ -22,9 +22,9 @@ import {
 } from '@/src/shared/ui/select'
 import { Textarea } from '@/src/shared/ui/textarea'
 
-import { Calendar } from '@/shared/ui/calendar'
-import { Checkbox } from '@/shared/ui/checkbox'
-import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover'
+import { Calendar } from '@/src/shared/ui/calendar'
+import { Checkbox } from '@/src/shared/ui/checkbox'
+import { Popover, PopoverContent, PopoverTrigger } from '@/src/shared/ui/popover'
 import { checkShiftConflictsClient } from '@/src/entities/shift/lib/shift-validation-client'
 
 import type { CreateShiftData, CreateShiftFormData } from '../types/shift-types'

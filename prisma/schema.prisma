@@ -200,16 +200,21 @@ model Contract {
 }
 
 model Area {
-  id             String       @id @default(cuid())
-  name           String
-  description    String?
-  isActive       Boolean      @default(true)
-  organizationId String
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  id                   String          @id @default(cuid())
+  name                 String
+  description          String?
+  icon                 String?         @default("Building2")
+  color                String          @default("#3b82f6")
+  isActive             Boolean         @default(false)
+  maxConsecutiveHours  Int?
+  minRestHours         Int?
+  organizationId       String
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   shifts         Shift[]
   contracts      Contract[]
+  shiftTypes     AreaShiftType[]
 
   @@index([organizationId])
   @@index([isActive])
@@ -241,20 +246,46 @@ enum InvitationStatus {
   EXPIRED
 }
 
+enum ShiftClassification {
+  DAY
+  NIGHT
+  MIXED
+}
+
 model ShiftType {
-  id             String       @id @default(cuid())
-  name           String
-  description    String?
-  color          String       @default("#3b82f6")
-  isActive       Boolean      @default(true)
-  organizationId String
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  shifts         Shift[]
+  id                String             @id @default(cuid())
+  name              String
+  description       String?
+  icon              String?            @default("Clock")
+  durationMinutes   Int                @default(480)
+  classification    ShiftClassification @default(DAY)
+  color             String             @default("#3b82f6")
+  minStaffRequired  Int                @default(1)
+  idealStaffCount   Int                @default(1)
+  maxStaffAllowed   Int                @default(10)
+  suggestedRestDays Int                @default(1)
+  isGlobal          Boolean            @default(true)
+  isActive          Boolean            @default(true)
+  organizationId    String
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  organization      Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  shifts            Shift[]
+  areaShiftTypes    AreaShiftType[]
 
   @@index([organizationId])
   @@index([isActive])
+}
+
+model AreaShiftType {
+  areaId      String
+  shiftTypeId String
+  area        Area      @relation(fields: [areaId], references: [id], onDelete: Cascade)
+  shiftType   ShiftType @relation(fields: [shiftTypeId], references: [id], onDelete: Cascade)
+
+  @@id([areaId, shiftTypeId])
+  @@index([areaId])
+  @@index([shiftTypeId])
 }
 
 model Shift {

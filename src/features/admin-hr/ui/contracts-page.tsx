@@ -398,7 +398,7 @@ export function ContractsPage({ data }: ContractsPageProps) {
       </Card>
 
       <Dialog open={contractDialogOpen} onOpenChange={setContractDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-xl">
           <DialogHeader>
             <DialogTitle>
               {selectedContract
@@ -407,7 +407,7 @@ export function ContractsPage({ data }: ContractsPageProps) {
             </DialogTitle>
             <DialogDescription />
           </DialogHeader>
-          <div className="grid gap-4 py-4">
+          <div className="grid gap-5 py-5">
             <div className="grid gap-2">
               <Label>{t('contract.area')}</Label>
               <Select
@@ -526,7 +526,7 @@ export function ContractsPage({ data }: ContractsPageProps) {
       </Dialog>
 
       <Dialog open={templateDialogOpen} onOpenChange={setTemplateDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-xl">
           <DialogHeader>
             <DialogTitle>
               {templateForm.id
@@ -534,7 +534,7 @@ export function ContractsPage({ data }: ContractsPageProps) {
                 : t('rateTemplateForm.createTitle')}
             </DialogTitle>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
+          <div className="grid gap-5 py-5">
             <div className="grid gap-2">
               <Label>{t('rateTemplateForm.name')}</Label>
               <Input

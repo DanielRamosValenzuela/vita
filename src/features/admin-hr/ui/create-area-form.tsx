@@ -4,14 +4,15 @@ import { useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Loader2 } from 'lucide-react'
-import { useForm, useWatch } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
+import { AREA_ICONS } from '@/src/shared/lib/constants'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
+import { IconPicker } from '@/src/shared/ui/icon-picker'
 import { Input } from '@/src/shared/ui/input'
 import { Label } from '@/src/shared/ui/label'
-import { Switch } from '@/src/shared/ui/switch'
 import { Textarea } from '@/src/shared/ui/textarea'
 
 import { useRouter } from '@/i18n/navigation'
@@ -31,25 +32,38 @@ export function CreateAreaForm() {
     defaultValues: {
       name: '',
       description: '',
-      isActive: true,
+      icon: 'Building2',
+      color: '#3b82f6',
+      isActive: false,
     },
   })
+
+  const [icon, setIcon] = useState('Building2')
+  const [color, setColor] = useState('#3b82f6')
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     setValue,
-    control,
   } = form
 
-  const isActive = useWatch({ control, name: 'isActive' })
+  const onIconChange = (v: string) => {
+    setIcon(v)
+    setValue('icon', v)
+  }
+
+  const onColorChange = (v: string) => {
+    setColor(v)
+    setValue('color', v)
+  }
 
   const onSubmit = async (data: CreateAreaInput) => {
     setError(null)
+    const payload = { ...data, icon, color }
 
     startTransition(async () => {
-      const result = await createAreaAction(data)
+      const result = await createAreaAction(payload)
 
       if (result.success) {
         toast.success(t('createSuccess'))
@@ -100,17 +114,42 @@ export function CreateAreaForm() {
             )}
           </div>
 
-          <div className="flex items-center justify-between rounded-lg border p-4">
-            <div className="space-y-0.5">
-              <Label htmlFor="isActive">{t('form.status')}</Label>
-              <p className="text-muted-foreground text-sm">{t('form.statusDescription')}</p>
-            </div>
-            <Switch
-              id="isActive"
-              checked={isActive}
-              onCheckedChange={(checked) => setValue('isActive', checked)}
+          <div className="space-y-2">
+            <Label>{t('form.icon')}</Label>
+            <IconPicker
+              value={icon}
+              onChange={onIconChange}
+              icons={AREA_ICONS}
+              ariaLabel={t('form.iconAria')}
+              searchPlaceholder={t('form.iconSearch')}
+              statusLabel={(showing, total, hasSearch) =>
+                hasSearch ? t('form.iconShowing', { showing, total }) : t('form.iconTotal', { total })
+              }
             />
           </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="color">{t('form.color')}</Label>
+            <div className="flex items-center gap-2">
+              <Input
+                id="color"
+                type="color"
+                value={color}
+                onChange={(e) => onColorChange(e.target.value)}
+                className="h-10 w-20"
+              />
+              <Input
+                type="text"
+                value={color}
+                onChange={(e) => onColorChange(e.target.value)}
+                className="font-mono text-sm"
+              />
+            </div>
+          </div>
+
+          <p className="text-muted-foreground text-sm">
+            {t('form.inactiveUntilShiftTypes')}
+          </p>
 
           <div className="flex gap-4">
             <Button type="submit" disabled={isPending} className="flex-1">

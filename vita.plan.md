@@ -272,6 +272,59 @@
 
 - ✅ **`db push`** y **`prisma generate`** ejecutados. **Lint y build:** correctos.
 
+### ✅ Sesión del 23 de Enero 2026 - ShiftType con duración + Area ↔ ShiftType
+
+**Contexto:** Tipos de turno con duración (horas/minutos), clasificación (DAY/NIGHT/MIXED), campos adicionales. Áreas con tipos de turno asignados. Área sin tipos permanece inactiva.
+
+**Completado:**
+
+- ✅ **Schema Prisma:**
+  - `ShiftType`: `durationMinutes`, `classification` (DAY|NIGHT|MIXED), `minStaffRequired`, `idealStaffCount`, `maxStaffAllowed`, `suggestedRestDays`, `isGlobal`.
+  - `AreaShiftType`: tabla many-to-many Area ↔ ShiftType.
+  - `Area`: `isActive` por defecto `false`; nueva relación `shiftTypes`.
+
+- ✅ **API:** `shift-type-actions` actualizados con nuevos campos; `area-shift-type-actions` (`assignShiftTypesToAreaAction`, `setAreaActiveAction`).
+
+- ✅ **UI Tipos de turno:** Formulario con duración (h+min), clasificación, min/ideal/max staff, días descanso, isGlobal. Tabla con columnas duración, clasificación, áreas.
+
+- ✅ **UI Áreas:** Crear área sin switch isActive (siempre inactiva). Página editar área (`/dashboard/areas/[id]/edit`) con asignación de tipos de turno y switch activar (solo si tiene tipos).
+
+- ✅ **Validaciones:** Área no se puede activar sin tipos asignados; `updateArea` y `setAreaActiveAction` lo validan.
+
+- ✅ **i18n:** Claves para shifts.shiftTypes (duration, classification, form extra) y adminHR.areas (editForm, shiftTypes en tabla).
+
+- ✅ **Lint y build:** correctos.
+
+### ✅ Sesión del 23 de Enero 2026 (Tarde) - UI/UX, Iconos, Áreas, Gestor de Personal
+
+**Contexto:** Mejoras UI (IconPicker con buscador, SearchableAddableList, diálogos anchos), tooltips en tipos de turno, correcciones en áreas, definición de Gestión de Personal.
+
+**Completado:**
+
+- ✅ **IconPicker mejorado:** Más iconos (~66), buscador (ES/EN con aliases), `IconPicker` en shared/ui.
+- ✅ **SearchableAddableList:** Componente reutilizable en shared/ui/molecules para asignar tipos de turno a áreas (buscar, seleccionar, agregar).
+- ✅ **Dialogs más anchos:** Base sm:max-w-2xl, formularios tipo turno 2xl.
+- ✅ **Input focus:** `ring-inset` para evitar clipping del borde en contenedores con overflow.
+- ✅ **Tooltips:** minStaffRequired, idealStaffCount, maxStaffAllowed, isGlobal en formulario tipos de turno.
+- ✅ **Áreas:** Eliminado suggestedRestDays de tipos de turno; añadidos maxConsecutiveHours y minRestHours a Area (configurable por jefe).
+- ✅ **Áreas delete:** Botón eliminar funcional con AlertDialog; colores y tooltips en iconos Ver/Eliminar.
+- ✅ **Cursor pointer:** Input type="color" y botones de color predefinidos.
+
+**Definido (pendiente implementar):**
+
+- **Gestión de Personal (`/dashboard/staff`):**
+  - **ADMIN_HR:** Acceso completo. Ve todo el personal (staff y jefes). Puede asignar/cambiar área a staff y a jefes. Solo ADMIN_HR cambia áreas de jefes.
+  - **CHIEF_AREA:** Acceso a personal de sus áreas. Ve solo staff de sus áreas. Solo puede cambiar área al staff (no a jefes).
+  - Sidebar: Añadir "Personal" para ADMIN_HR; CHIEF ya tiene el enlace (página actualmente placeholder).
+- **UserArea (schema):** Tabla Chief ↔ Área para saber qué áreas gestiona cada jefe. Requerida para filtrar staff y tipos de turno del CHIEF.
+- **Tipos de turno:** CHIEF podrá crear tipos (isGlobal=false) para una o varias de sus áreas; ADMIN_HR crea globales.
+
+**Modelo acordado:**
+
+- Invitaciones: solo ADMIN_HR.
+- Asignar área al staff: Jefe (via contratos) o ADMIN_HR.
+- Cambiar área de jefes: solo ADMIN_HR.
+
 ### ✅ Sesión del 11 de Enero 2026 - Integración de Invitaciones en Mi Organización
 
 **Completado:**
@@ -1277,6 +1330,24 @@ Organization {
 
 ---
 
+## 🔮 FUTURAS MEJORAS (Modelo de Negocio y Producto)
+
+**Nota:** FASE 0 (Investigación Rflex) permanece pendiente y se ejecutará cuando corresponda.
+
+### Aclaraciones de Modelo
+
+1. **Pool vs pago por activos:** Definir explícitamente si `maxStaff`/`maxChiefs` son techo de contratación (pool redistribuible) o límite hard por tipo. Documentar qué se factura mes a mes.
+2. **Staff multi-organización:** Definir flujo de cambio de organización activa en sesión y si se factura por organización o consolidado.
+3. **Tipos de turno:** ADMIN_HR crea tipos globales (isGlobal=true). CHIEF_AREA puede crear tipos para una o varias de sus áreas (isGlobal=false); al crearlos selecciona área(s) destino.
+4. **Gestión de Personal (`/dashboard/staff`):** Página compartida ADMIN_HR y CHIEF. ADMIN_HR ve todo (staff + jefes) y puede cambiar área a cualquiera. CHIEF solo ve staff de sus áreas y solo puede cambiar área al staff (no a jefes). Solo ADMIN_HR asigna/cambia áreas de jefes. Invitaciones: solo ADMIN_HR.
+
+### Producto y Métricas
+
+4. **Aha moment:** Definir un solo momento clave (ej: "veo mis turnos en un solo lugar", "liquidación automática", "intercambio sin llamar") para priorizar UX.
+5. **Métricas tempranas:** Definir 2-3 métricas (turnos/semana, intercambios aprobados/mes, tiempo ahorrado en tareo) para caso de estudio y ajuste de producto.
+
+---
+
 ## 🎯 PRÓXIMOS PASOS INMEDIATOS (Enero 8, 2026)
 
 ### 1. Completar CRUD de Organizaciones (Funcionalidad Restante) ⏳
@@ -2058,6 +2129,7 @@ Piloto gratis en 1 área, expandes cuando estés listo."
 
 - [ ] **Áreas:** Crear áreas (Enfermería UCI, Médicos Urgencia, etc.)
 - **Tipos de Turno:** Crear tipos globales disponibles para todos los jefes
+- [ ] **Gestión de Personal:** Página `/dashboard/staff` - Ver todo el personal (staff y jefes), asignar/cambiar área a staff y a jefes. Solo ADMIN_HR cambia áreas de jefes.
 - [ ] **Pool de Cuentas:** Asignar límites a cada `CHIEF_AREA` (ej: Jefe Enfermería puede vincular 20 personas)
 - **Tarifas:** Configurar tarifa por persona (día/noche, bonos, multiplicadores)
 - [ ] **Reportes:** Ver resumen de turnos y horas trabajadas (MVP2: liquidaciones PDF)
@@ -2098,25 +2170,29 @@ Piloto gratis en 1 área, expandes cuando estés listo."
 - [ ] Personal aprueba → Se agrega al equipo
 - Puede desvincular fácilmente
 
-**2. Tipos de Turno:**
+**2. Gestión de Personal:**
+
+- [ ] Página `/dashboard/staff` - Ve solo staff de sus áreas (vía UserArea). Puede asignar/cambiar área al staff. No puede cambiar áreas de jefes (solo ADMIN_HR).
+
+**3. Tipos de Turno:**
 
 - [ ] Usa tipos globales (creados por HR)
-- Crea tipos específicos para su área
+- [ ] Crea tipos específicos para una o varias de sus áreas (isGlobal=false)
 - [ ] Configura: nombre, duración, clasificación (día/noche), color, mín/máx personal
 
-**3. Asignación de Turnos:**
+**4. Asignación de Turnos:**
 
 - [ ] **Manual:** Arrastra y asigna a persona específica
 - **Abierto:** Crea turno sin asignar, personal postula, jefe elige
 - [ ] Calendario mensual/semanal de su equipo
 
-**4. Aprobaciones:**
+**5. Aprobaciones:**
 
 - [ ] Intercambios entre personal
 - Postulaciones a turnos abiertos
 - [ ] Override de validaciones legales (con justificación)
 
-**5. Asistencia (MVP1):**
+**6. Asistencia (MVP1):**
 
 - [ ] Acreditar manualmente que personal llegó
 - Sistema alerta si no hay check-in 30 min después
@@ -2865,6 +2941,16 @@ Los usuarios pueden autenticarse con:
 - [ ] `user`: Usuario global
 - `organization`: Hospital
 - [ ] `areas`: Áreas donde trabaja (si es STAFF o CHIEF)
+
+---
+
+#### 3b. UserArea (Jefe ↔ Área) - PENDIENTE SCHEMA
+
+**Propósito:** Define qué áreas gestiona cada CHIEF_AREA. Requerido para filtrar staff y tipos de turno del jefe.
+
+**Campos:** `userId`, `areaId`. Tabla many-to-many User (CHIEF) ↔ Area.
+
+**Uso:** ADMIN_HR asigna jefes a áreas; CHIEF solo ve/gestiona staff y tipos de turno de sus áreas.
 
 ---
 

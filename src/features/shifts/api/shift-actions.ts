@@ -100,6 +100,21 @@ export const createShiftAction = async (
         error: 'El tipo de turno no pertenece a tu organización',
       }
 
+    const areaShiftType = await prisma.areaShiftType.findUnique({
+      where: {
+        areaId_shiftTypeId: {
+          areaId: validatedData.areaId,
+          shiftTypeId: validatedData.shiftTypeId,
+        },
+      },
+    })
+
+    if (!areaShiftType)
+      return {
+        success: false,
+        error: 'El tipo de turno no está asignado a esta área',
+      }
+
     const shift = await prisma.shift.create({
       data: {
         ...validatedData,
@@ -127,6 +142,7 @@ export const createShiftAction = async (
             id: true,
             name: true,
             color: true,
+            icon: true,
           },
         },
       },
@@ -202,6 +218,22 @@ export const updateShiftAction = async (
         }
     }
 
+    const areaId = validatedData.areaId ?? existingShift.areaId
+    const shiftTypeId = validatedData.shiftTypeId ?? existingShift.shiftTypeId
+
+    if (areaId && shiftTypeId) {
+      const areaShiftType = await prisma.areaShiftType.findUnique({
+        where: {
+          areaId_shiftTypeId: { areaId, shiftTypeId },
+        },
+      })
+      if (!areaShiftType)
+        return {
+          success: false,
+          error: 'El tipo de turno no está asignado a esta área',
+        }
+    }
+
     const updatedShift = await prisma.shift.update({
       where: { id },
       data: validatedData,
@@ -226,6 +258,7 @@ export const updateShiftAction = async (
             id: true,
             name: true,
             color: true,
+            icon: true,
           },
         },
       },

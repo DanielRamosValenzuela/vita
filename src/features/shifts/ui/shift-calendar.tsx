@@ -6,10 +6,11 @@ import { addMonths, format, isSameMonth, isToday, subMonths } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
+import { renderIcon } from '@/src/shared/ui/icon-picker'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/src/shared/ui/card'
 
-import { Calendar } from '@/shared/ui/calendar'
+import { Calendar } from '@/src/shared/ui/calendar'
 
 interface CalendarEvent {
   id: string
@@ -20,6 +21,7 @@ interface CalendarEvent {
   userName: string
   areaName: string
   color: string
+  icon?: string
 }
 
 interface ShiftCalendarProps {
@@ -76,21 +78,28 @@ export function ShiftCalendar({
 
           {dayShifts.length > 0 && (
             <div className="space-y-1 mt-1">
-              {dayShifts.slice(0, 3).map((shift) => (
-                <div
-                  key={shift.id}
-                  className="text-xs p-1 rounded cursor-pointer hover:opacity-80 truncate"
-                  style={{
-                    backgroundColor: shift.color + '20',
-                    borderLeft: `3px solid ${shift.color}`,
-                    color: shift.color,
-                  }}
-                  onClick={() => onShiftClick?.(shift)}
-                  title={`${shift.title} - ${shift.userName}`}
-                >
-                  {shift.userName.split(' ')[0]}
-                </div>
-              ))}
+              {dayShifts.slice(0, 3).map((shift) => {
+                const now = new Date()
+                const isPast = new Date(shift.endTime) < now
+                const opacity = isPast ? 0.45 : 1
+                return (
+                  <div
+                    key={shift.id}
+                    className="text-xs p-1 rounded cursor-pointer hover:opacity-80 truncate flex items-center gap-1"
+                    style={{
+                      backgroundColor: shift.color + (isPast ? '30' : '20'),
+                      borderLeft: `3px solid ${shift.color}`,
+                      color: shift.color,
+                      opacity,
+                    }}
+                    onClick={() => onShiftClick?.(shift)}
+                    title={`${shift.title} - ${shift.userName}`}
+                  >
+                    {renderIcon(shift.icon ?? 'Clock', 'shrink-0', 12)}
+                    <span className="truncate">{shift.userName.split(' ')[0]}</span>
+                  </div>
+                )
+              })}
 
               {dayShifts.length > 3 && (
                 <div className="text-xs text-muted-foreground text-center">

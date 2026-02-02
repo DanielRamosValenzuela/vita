@@ -4,7 +4,7 @@ import { AlertCircle, AlertTriangle, Users } from 'lucide-react'
 import { Badge } from '@/src/shared/ui/badge'
 import { getRoleDisplayMeta, getUsageBadgeVariant } from '@/src/shared/lib/utils/role-display'
 
-import { Progress } from '@/shared/ui/progress'
+import { Progress } from '@/src/shared/ui/progress'
 import { getOrganizationUsageSummary } from '@/src/entities/organization/lib/organization-usage'
 
 interface OrganizationLimitsCardProps {

@@ -43,6 +43,7 @@ interface Shift {
     id: string
     name: string
     color: string
+    icon?: string | null
   }
 }
 
@@ -122,6 +123,7 @@ export default async function ShiftsPage({ params }: ShiftsPageProps) {
     userName: shift.user.name,
     areaName: shift.area.name,
     color: shift.shiftType.color,
+    icon: shift.shiftType.icon ?? 'Clock',
   }))
 
   const getStatusColor = (status: ShiftStatus) => {

@@ -6,16 +6,27 @@ import { prisma } from '@/src/shared/lib/auth/config'
 import { requireAdminHR } from '@/src/shared/lib/auth/session'
 import type { ActionResult } from '@/src/shared/lib/types'
 
+type ShiftClassification = 'DAY' | 'NIGHT' | 'MIXED'
+
 interface ShiftType {
   id: string
   name: string
   description?: string | undefined
+  icon?: string | null
+  durationMinutes: number
+  classification: ShiftClassification
   color: string
+  minStaffRequired: number
+  idealStaffCount: number
+  maxStaffAllowed: number
+  suggestedRestDays: number
+  isGlobal: boolean
   isActive: boolean
   createdAt: Date
   updatedAt: Date
   _count?: {
     shifts: number
+    areaShiftTypes: number
   }
 }
 
@@ -32,7 +43,7 @@ export const getShiftTypesAction = async (): Promise<ActionResult<ShiftType[]>> 
       where: { organizationId: session.organizationId },
       orderBy: { createdAt: 'desc' },
       include: {
-        _count: { select: { shifts: true } },
+        _count: { select: { shifts: true, areaShiftTypes: true } },
       },
     })
 
@@ -57,7 +68,15 @@ export const getShiftTypesAction = async (): Promise<ActionResult<ShiftType[]>> 
 export const createShiftTypeAction = async (data: {
   name: string
   description?: string
-  color: string
+  icon?: string
+  durationMinutes: number
+  classification?: ShiftClassification
+  color?: string
+  minStaffRequired?: number
+  idealStaffCount?: number
+  maxStaffAllowed?: number
+  suggestedRestDays?: number
+  isGlobal?: boolean
   isActive?: boolean
 }): Promise<ActionResult<ShiftType>> => {
   try {
@@ -68,15 +87,20 @@ export const createShiftTypeAction = async (data: {
         error: 'No tienes una organización asignada',
       }
 
-    
+    const color = data.color ?? '#3b82f6'
     const colorRegex = /^#[0-9A-Fa-f]{6}$/
-    if (!colorRegex.test(data.color))
+    if (!colorRegex.test(color))
       return {
         success: false,
         error: 'El color debe estar en formato hexadecimal (ej: #3b82f6)',
       }
 
-    
+    if (data.durationMinutes < 30 || data.durationMinutes > 1440)
+      return {
+        success: false,
+        error: 'La duración debe estar entre 30 minutos y 24 horas (1440 min)',
+      }
+
     const existingType = await prisma.shiftType.findFirst({
       where: {
         name: data.name,
@@ -94,23 +118,31 @@ export const createShiftTypeAction = async (data: {
       data: {
         name: data.name,
         description: data.description || null,
-        color: data.color,
+        icon: data.icon ?? 'Clock',
+        durationMinutes: data.durationMinutes,
+        classification: data.classification ?? 'DAY',
+        color,
+        minStaffRequired: data.minStaffRequired ?? 1,
+        idealStaffCount: data.idealStaffCount ?? 1,
+        maxStaffAllowed: data.maxStaffAllowed ?? 10,
+        suggestedRestDays: data.suggestedRestDays ?? 1,
+        isGlobal: data.isGlobal ?? true,
         isActive: data.isActive ?? true,
         organizationId: session.organizationId,
       },
+      include: {
+        _count: { select: { shifts: true, areaShiftTypes: true } },
+      },
     })
-
-    
-    const formattedShiftType = {
-      ...shiftType,
-      description: shiftType.description || undefined,
-    }
 
     revalidatePath('/dashboard/shift-types')
 
     return {
       success: true,
-      data: formattedShiftType,
+      data: {
+        ...shiftType,
+        description: shiftType.description ?? undefined,
+      },
       message: 'Tipo de turno creado exitosamente',
     }
   } catch (error) {
@@ -127,7 +159,15 @@ export const updateShiftTypeAction = async (
   data: {
     name?: string
     description?: string
+    icon?: string
+    durationMinutes?: number
+    classification?: ShiftClassification
     color?: string
+    minStaffRequired?: number
+    idealStaffCount?: number
+    maxStaffAllowed?: number
+    suggestedRestDays?: number
+    isGlobal?: boolean
     isActive?: boolean
   }
 ): Promise<ActionResult<ShiftType>> => {
@@ -139,7 +179,6 @@ export const updateShiftTypeAction = async (
         error: 'No tienes una organización asignada',
       }
 
-    
     if (data.color) {
       const colorRegex = /^#[0-9A-Fa-f]{6}$/
       if (!colorRegex.test(data.color))
@@ -149,7 +188,12 @@ export const updateShiftTypeAction = async (
         }
     }
 
-    
+    if (data.durationMinutes !== undefined && (data.durationMinutes < 30 || data.durationMinutes > 1440))
+      return {
+        success: false,
+        error: 'La duración debe estar entre 30 minutos y 24 horas (1440 min)',
+      }
+
     const existingType = await prisma.shiftType.findUnique({
       where: { id },
     })
@@ -186,20 +230,19 @@ export const updateShiftTypeAction = async (
     const updatedShiftType = await prisma.shiftType.update({
       where: { id },
       data,
+      include: {
+        _count: { select: { shifts: true, areaShiftTypes: true } },
+      },
     })
 
-    
-    const formattedShiftType = {
-      ...updatedShiftType,
-      description: updatedShiftType.description || undefined,
-    }
-
     revalidatePath('/dashboard/shift-types')
-    revalidatePath(`/dashboard/shift-types/${id}`)
 
     return {
       success: true,
-      data: formattedShiftType,
+      data: {
+        ...updatedShiftType,
+        description: updatedShiftType.description ?? undefined,
+      },
       message: 'Tipo de turno actualizado exitosamente',
     }
   } catch (error) {

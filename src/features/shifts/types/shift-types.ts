@@ -16,6 +16,7 @@ export interface ShiftWithRelations extends Shift {
     id: string
     name: string
     color: string
+    icon?: string | null
   }
 }
 

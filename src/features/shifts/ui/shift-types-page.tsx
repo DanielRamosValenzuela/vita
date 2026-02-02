@@ -4,7 +4,7 @@ import { useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 
 import { useRouter } from '@/i18n/navigation'
-import { Check, Edit, Palette, Plus, Trash2, X } from 'lucide-react'
+import { Check, Edit, Info, Palette, Plus, Trash2, X } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Badge } from '@/src/shared/ui/badge'
@@ -20,6 +20,7 @@ import {
 } from '@/src/shared/ui/dialog'
 import { Input } from '@/src/shared/ui/input'
 import { Label } from '@/src/shared/ui/label'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/src/shared/ui/tooltip'
 import {
   Table,
   TableBody,
@@ -29,22 +30,34 @@ import {
   TableRow,
 } from '@/src/shared/ui/table'
 
+import { SHIFT_TYPE_ICONS } from '@/src/shared/lib/constants'
+import { IconPicker, renderIcon } from '@/src/shared/ui/icon-picker'
 import {
   createShiftTypeAction,
   deleteShiftTypeAction,
   updateShiftTypeAction,
 } from '../api/shift-type-actions'
 
+type ShiftClassification = 'DAY' | 'NIGHT' | 'MIXED'
+
 interface ShiftType {
   id: string
   name: string
   description?: string
+  icon?: string | null
+  durationMinutes: number
+  classification: ShiftClassification
   color: string
+  minStaffRequired: number
+  idealStaffCount: number
+  maxStaffAllowed: number
+  isGlobal: boolean
   isActive: boolean
   createdAt: Date
   updatedAt: Date
   _count?: {
     shifts: number
+    areaShiftTypes?: number
   }
 }
 
@@ -63,7 +76,15 @@ export function ShiftTypesPage({ shiftTypes }: ShiftTypesPageProps) {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
+    icon: 'Clock' as string,
+    durationHours: '8',
+    durationMinutes: '0',
+    classification: 'DAY' as ShiftClassification,
     color: '#3b82f6',
+    minStaffRequired: '1',
+    idealStaffCount: '1',
+    maxStaffAllowed: '10',
+    isGlobal: true,
     isActive: true,
   })
 
@@ -71,7 +92,15 @@ export function ShiftTypesPage({ shiftTypes }: ShiftTypesPageProps) {
     setFormData({
       name: '',
       description: '',
+      icon: 'Clock',
+      durationHours: '8',
+      durationMinutes: '0',
+      classification: 'DAY',
       color: '#3b82f6',
+      minStaffRequired: '1',
+      idealStaffCount: '1',
+      maxStaffAllowed: '10',
+      isGlobal: true,
       isActive: true,
     })
     setEditingShiftType(null)
@@ -82,11 +111,27 @@ export function ShiftTypesPage({ shiftTypes }: ShiftTypesPageProps) {
     setIsCreateDialogOpen(true)
   }
 
+  const formatDuration = (mins: number) => {
+    const h = Math.floor(mins / 60)
+    const m = mins % 60
+    return m > 0 ? `${h}h ${m}min` : `${h}h`
+  }
+
   const handleEdit = (shiftType: ShiftType) => {
+    const h = Math.floor(shiftType.durationMinutes / 60)
+    const m = shiftType.durationMinutes % 60
     setFormData({
       name: shiftType.name,
       description: shiftType.description || '',
+      icon: shiftType.icon ?? 'Clock',
+      durationHours: String(h),
+      durationMinutes: String(m),
+      classification: shiftType.classification,
       color: shiftType.color,
+      minStaffRequired: String(shiftType.minStaffRequired),
+      idealStaffCount: String(shiftType.idealStaffCount),
+      maxStaffAllowed: String(shiftType.maxStaffAllowed),
+      isGlobal: shiftType.isGlobal,
       isActive: shiftType.isActive,
     })
     setEditingShiftType(shiftType)
@@ -98,10 +143,33 @@ export function ShiftTypesPage({ shiftTypes }: ShiftTypesPageProps) {
       return
     }
 
+    const durationMinutes =
+      parseInt(formData.durationHours || '0', 10) * 60 +
+      parseInt(formData.durationMinutes || '0', 10)
+    if (durationMinutes < 30 || durationMinutes > 1440) {
+      toast.error(t('form.durationInvalid'))
+      return
+    }
+
+    const payload = {
+      name: formData.name.trim(),
+      description: formData.description || undefined,
+      icon: formData.icon,
+      durationMinutes,
+      classification: formData.classification,
+      color: formData.color,
+      minStaffRequired: parseInt(formData.minStaffRequired, 10) || 1,
+      idealStaffCount: parseInt(formData.idealStaffCount, 10) || 1,
+      maxStaffAllowed: parseInt(formData.maxStaffAllowed, 10) || 10,
+      suggestedRestDays: 1,
+      isGlobal: formData.isGlobal,
+      isActive: formData.isActive,
+    }
+
     startTransition(async () => {
       let result
-      if (editingShiftType) result = await updateShiftTypeAction(editingShiftType.id, formData)
-      else result = await createShiftTypeAction(formData)
+      if (editingShiftType) result = await updateShiftTypeAction(editingShiftType.id, payload)
+      else result = await createShiftTypeAction(payload)
 
       if (result.success) {
         toast.success(editingShiftType ? t('toast.updated') : t('toast.created'))
@@ -183,10 +251,14 @@ export function ShiftTypesPage({ shiftTypes }: ShiftTypesPageProps) {
               <TableHeader>
                 <TableRow>
                   <TableHead>{t('table.name')}</TableHead>
+                  <TableHead>{t('table.icon')}</TableHead>
+                  <TableHead>{t('table.duration')}</TableHead>
+                  <TableHead>{t('table.classification')}</TableHead>
                   <TableHead>{t('table.color')}</TableHead>
                   <TableHead>{t('table.description')}</TableHead>
                   <TableHead>{t('table.status')}</TableHead>
                   <TableHead>{t('table.shiftsCount')}</TableHead>
+                  <TableHead>{t('table.areasCount')}</TableHead>
                   <TableHead>{t('table.actions')}</TableHead>
                 </TableRow>
               </TableHeader>
@@ -194,6 +266,13 @@ export function ShiftTypesPage({ shiftTypes }: ShiftTypesPageProps) {
                 {shiftTypes.map((shiftType) => (
                   <TableRow key={shiftType.id}>
                     <TableCell className="font-medium">{shiftType.name}</TableCell>
+                    <TableCell>
+                      <span style={{ color: shiftType.color }}>
+                        {renderIcon(shiftType.icon ?? 'Clock', '', 18)}
+                      </span>
+                    </TableCell>
+                    <TableCell>{formatDuration(shiftType.durationMinutes)}</TableCell>
+                    <TableCell>{t(`classification.${shiftType.classification}`)}</TableCell>
                     <TableCell>
                       <span className="flex items-center gap-2">
                         <span
@@ -208,6 +287,9 @@ export function ShiftTypesPage({ shiftTypes }: ShiftTypesPageProps) {
                     <TableCell>{getStatusBadge(shiftType.isActive)}</TableCell>
                     <TableCell>
                       <span className="text-sm">{shiftType._count?.shifts || 0}</span>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm">{shiftType._count?.areaShiftTypes || 0}</span>
                     </TableCell>
                     <TableCell>
                       <span className="flex items-center gap-2">
@@ -241,7 +323,7 @@ export function ShiftTypesPage({ shiftTypes }: ShiftTypesPageProps) {
           }
         }}
       >
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle>
               {editingShiftType ? t('edit.title') : t('createModal.title')}
@@ -250,7 +332,7 @@ export function ShiftTypesPage({ shiftTypes }: ShiftTypesPageProps) {
               {editingShiftType ? t('edit.description') : t('createModal.description')}
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
+          <div className="grid gap-5 py-5 max-h-[70vh] overflow-y-auto">
             <div className="grid gap-2">
               <Label htmlFor="name">{t('form.name')}</Label>
               <Input
@@ -258,6 +340,63 @@ export function ShiftTypesPage({ shiftTypes }: ShiftTypesPageProps) {
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder={t('form.namePlaceholder')}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="durationHours">{t('form.durationHours')}</Label>
+                <Input
+                  id="durationHours"
+                  type="number"
+                  min={0}
+                  max={24}
+                  value={formData.durationHours}
+                  onChange={(e) => setFormData({ ...formData, durationHours: e.target.value })}
+                  placeholder={t('form.durationPlaceholder')}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="durationMinutes">{t('form.durationMinutes')}</Label>
+                <Input
+                  id="durationMinutes"
+                  type="number"
+                  min={0}
+                  max={59}
+                  value={formData.durationMinutes}
+                  onChange={(e) => setFormData({ ...formData, durationMinutes: e.target.value })}
+                  placeholder="0"
+                />
+              </div>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="classification">{t('form.classification')}</Label>
+              <select
+                id="classification"
+                value={formData.classification}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    classification: e.target.value as ShiftClassification,
+                  })
+                }
+                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              >
+                <option value="DAY">{t('classification.DAY')}</option>
+                <option value="NIGHT">{t('classification.NIGHT')}</option>
+                <option value="MIXED">{t('classification.MIXED')}</option>
+              </select>
+            </div>
+            <div className="grid gap-2">
+              <Label>{t('form.icon')}</Label>
+              <IconPicker
+                value={formData.icon}
+                onChange={(v) => setFormData({ ...formData, icon: v })}
+                icons={SHIFT_TYPE_ICONS}
+                ariaLabel={t('form.iconAria')}
+                searchPlaceholder={t('form.iconSearch')}
+                statusLabel={(showing, total, hasSearch) =>
+                  hasSearch ? t('form.iconShowing', { showing, total }) : t('form.iconTotal', { total })
+                }
               />
             </div>
             <div className="grid gap-2">
@@ -275,7 +414,7 @@ export function ShiftTypesPage({ shiftTypes }: ShiftTypesPageProps) {
                     <button
                       key={color}
                       type="button"
-                      className="w-6 h-6 rounded-full border-2 border-transparent hover:border-gray-300"
+                      className="w-6 h-6 cursor-pointer rounded-full border-2 border-transparent hover:border-gray-300"
                       style={{ backgroundColor: color }}
                       onClick={() => setFormData({ ...formData, color })}
                     />
@@ -291,6 +430,99 @@ export function ShiftTypesPage({ shiftTypes }: ShiftTypesPageProps) {
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 placeholder={t('form.descriptionPlaceholder')}
               />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <div className="flex items-center gap-1.5">
+                  <Label htmlFor="minStaffRequired">{t('form.minStaffRequired')}</Label>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Info className="text-muted-foreground h-3.5 w-3.5 shrink-0 cursor-help" aria-hidden />
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="max-w-xs">
+                      {t('form.minStaffRequiredTooltip')}
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+                <Input
+                  id="minStaffRequired"
+                  type="number"
+                  min={1}
+                  value={formData.minStaffRequired}
+                  onChange={(e) =>
+                    setFormData({ ...formData, minStaffRequired: e.target.value })
+                  }
+                />
+              </div>
+              <div className="grid gap-2">
+                <div className="flex items-center gap-1.5">
+                  <Label htmlFor="idealStaffCount">{t('form.idealStaffCount')}</Label>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Info className="text-muted-foreground h-3.5 w-3.5 shrink-0 cursor-help" aria-hidden />
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="max-w-xs">
+                      {t('form.idealStaffCountTooltip')}
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+                <Input
+                  id="idealStaffCount"
+                  type="number"
+                  min={1}
+                  value={formData.idealStaffCount}
+                  onChange={(e) =>
+                    setFormData({ ...formData, idealStaffCount: e.target.value })
+                  }
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <div className="flex items-center gap-1.5">
+                  <Label htmlFor="maxStaffAllowed">{t('form.maxStaffAllowed')}</Label>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Info className="text-muted-foreground h-3.5 w-3.5 shrink-0 cursor-help" aria-hidden />
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="max-w-xs">
+                      {t('form.maxStaffAllowedTooltip')}
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+                <Input
+                  id="maxStaffAllowed"
+                  type="number"
+                  min={1}
+                  value={formData.maxStaffAllowed}
+                  onChange={(e) =>
+                    setFormData({ ...formData, maxStaffAllowed: e.target.value })
+                  }
+                />
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="isGlobal"
+                checked={formData.isGlobal}
+                onChange={(e) => setFormData({ ...formData, isGlobal: e.target.checked })}
+                className="rounded border-gray-300"
+              />
+              <div className="flex items-center gap-1.5">
+                <Label htmlFor="isGlobal">{t('form.isGlobal')}</Label>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button type="button" className="text-muted-foreground inline-flex cursor-help rounded p-0.5">
+                      <Info className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                      <span className="sr-only">{t('form.isGlobal')}</span>
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="max-w-xs">
+                    {t('form.isGlobalTooltip')}
+                  </TooltipContent>
+                </Tooltip>
+              </div>
             </div>
             <div className="flex items-center space-x-2">
               <input
@@ -335,7 +567,7 @@ export function ShiftTypesPage({ shiftTypes }: ShiftTypesPageProps) {
             <DialogDescription>{t('delete.description')}</DialogDescription>
           </DialogHeader>
           {deleteTarget && (
-            <div className="py-4">
+            <div className="py-5">
               <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
                 <div
                   className="w-6 h-6 rounded-full border"

@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from '@/src/shared/ui/select'
 
-import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover'
+import { Popover, PopoverContent, PopoverTrigger } from '@/src/shared/ui/popover'
 
 interface FilterState {
   search: string
