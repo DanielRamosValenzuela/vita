@@ -67,7 +67,10 @@ export default async function AreaEditPage({ params }: AreaEditPageProps) {
     icon: st.icon ?? undefined,
   }))
 
-  type ChiefsData = { chiefs: { id: string; name: string; email: string }[]; assignedChiefIds: string[] }
+  type ChiefsData = {
+    chiefs: Array<{ id: string; name: string; email: string; docNumber: string | null }>
+    assignedChiefIds: string[]
+  }
   const chiefsPayload =
     chiefsResult && chiefsResult.success && chiefsResult.data
       ? (chiefsResult.data as ChiefsData)

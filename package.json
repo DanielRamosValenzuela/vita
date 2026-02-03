@@ -54,7 +54,6 @@
     "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
     "@sanity/eslint-plugin-i18n": "^1.1.0",
     "@tailwindcss/postcss": "^4.1.18",
-    "@types/bcryptjs": "^3.0.0",
     "@types/node": "^25.2.0",
     "@types/pg": "^8.16.0",
     "@types/react": "^19.2.10",
