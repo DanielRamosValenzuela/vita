@@ -13,6 +13,7 @@ Documentación dividida en archivos enfocados. Ver [README.md](./README.md) para
 | vita-architecture.md | stack, FSD | Next.js, Prisma, estructura |
 | vita-roadmap.md | fases, próximos | Roadmap, prioridades |
 | vita-lessons.md | lecciones | Mejores prácticas |
+| vita-workflows.md | workflows | Flujos por rol y pendientes |
 
 ## Historial por Fase
 

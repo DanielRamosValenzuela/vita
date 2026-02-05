@@ -13,6 +13,7 @@ Sistema de Gestión de Turnos Médicos Multi-Tenant SaaS B2B.
 | [vita-architecture.md](./vita-architecture.md) | Stack, FSD, estructura, i18n |
 | [vita-roadmap.md](./vita-roadmap.md) | Fases, próximos pasos, prioridades |
 | [vita-lessons.md](./vita-lessons.md) | Lecciones aprendidas, mejores prácticas |
+| [vita-workflows.md](./vita-workflows.md) | Workflows por rol y pendientes |
 
 ## Historial de Sesiones (por fase)
 
