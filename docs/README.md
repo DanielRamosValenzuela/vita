@@ -18,6 +18,7 @@ Sistema de Gestión de Turnos Médicos Multi-Tenant SaaS B2B.
 | [SISTEMA-VALIDACION-DOCUMENTOS-EMAILS.md](./SISTEMA-VALIDACION-DOCUMENTOS-EMAILS.md) | Sistema de documentos únicos, múltiples emails e imágenes |
 | [CONFIGURACION-SUPABASE-STORAGE.md](./CONFIGURACION-SUPABASE-STORAGE.md) | Configuración de Supabase Storage para avatares |
 | [REQUERIMIENTOS-DEL-PROYECTO.md](./REQUERIMIENTOS-DEL-PROYECTO.md) | Requerimientos cumplidos y pendientes (sin términos técnicos) |
+| [DICCIONARIO-BASE-DE-DATOS.md](./DICCIONARIO-BASE-DE-DATOS.md) | Descripción de todas las tablas y campos de la base de datos (sin términos técnicos) |
 
 ## Historial de Sesiones (por fase)
 
