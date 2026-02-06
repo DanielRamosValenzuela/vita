@@ -659,13 +659,13 @@
         "MX": "México",
         "US": "Estados Unidos"
       },
-      "actions": {
-        "view": "Ver detalles",
-        "edit": "Editar",
-        "suspend": "Suspender",
-        "reactivate": "Reactivar",
-        "delete": "Eliminar"
+      "roles": {
+        "SUPER_ADMIN": "Super Administrador",
+        "ADMIN_HR": "Administrador RRHH",
+        "CHIEF_AREA": "Jefe de Área",
+        "STAFF_HEALTH": "Personal de Salud"
       },
+      "actions": "Acciones",
       "confirmSuspend": "¿Estás seguro de que deseas suspender la organización {name}?",
       "confirmReactivate": "¿Estás seguro de que deseas reactivar la organización {name}?",
       "confirmDelete": "¿Estás seguro de que deseas eliminar la organización {name}?",
@@ -746,10 +746,8 @@
           "label": "Teléfono del Contacto",
           "placeholder": "+56 9 1234 5678"
         },
-        "address": {
-          "label": "Dirección (opcional)",
-          "placeholder": "Av. Principal 123, Santiago"
-        },
+        "phone": "Teléfono",
+        "address": "Dirección",
         "submit": "Crear Organización",
         "submitting": "Creando...",
         "cancel": "Cancelar"
@@ -1530,7 +1528,16 @@
         "noStaff": "No hay personal. Invita a staff o chiefs primero.",
         "noContract": "Sin asignar"
       },
-      "perMinute": "/min"
+      "perMinute": "/min",
+      "rateTemplateForm": {
+        "createTitle": "Nueva Plantilla de Tarifa",
+        "editTitle": "Editar Plantilla de Tarifa",
+        "name": "Nombre",
+        "namePlaceholder": "ej: Guardia nocturna",
+        "ratePerMinute": "Tarifa por minuto",
+        "baseSalary": "Sueldo base (opcional)",
+        "contractsCount": "{count} contrato(s)"
+      }
     },
     "calendar": {
       "title": "Calendario Organizacional",

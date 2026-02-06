@@ -878,7 +878,8 @@
         "totalShifts": "Total Shifts",
         "limits": "Account Limits",
         "limitsDescription": "View current account usage by role and available limits",
-        "createdAt": "Created At"
+        "createdAt": "Created At",
+        "updatedAt": "Last Updated"
       },
       "adminHR": {
         "title": "HR Administrators",
@@ -1284,6 +1285,9 @@
         "namePlaceholder": "E.g: Emergency, ICU, Pediatrics",
         "icon": "Icon",
         "iconAria": "Select icon",
+        "iconSearch": "Search icon...",
+        "iconShowing": "{showing} of {total}",
+        "iconTotal": "{total} available",
         "color": "Color",
         "description": "Description",
         "descriptionPlaceholder": "Optional area description",
