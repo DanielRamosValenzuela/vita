@@ -14,6 +14,9 @@ Sistema de Gestión de Turnos Médicos Multi-Tenant SaaS B2B.
 | [vita-roadmap.md](./vita-roadmap.md) | Fases, próximos pasos, prioridades |
 | [vita-lessons.md](./vita-lessons.md) | Lecciones aprendidas, mejores prácticas |
 | [vita-workflows.md](./vita-workflows.md) | Workflows por rol y pendientes |
+| [INTERNACIONALIZACION.md](./INTERNACIONALIZACION.md) | Formatos de fecha, moneda y locales por país |
+| [SISTEMA-VALIDACION-DOCUMENTOS-EMAILS.md](./SISTEMA-VALIDACION-DOCUMENTOS-EMAILS.md) | Sistema de documentos únicos, múltiples emails e imágenes |
+| [CONFIGURACION-SUPABASE-STORAGE.md](./CONFIGURACION-SUPABASE-STORAGE.md) | Configuración de Supabase Storage para avatares |
 
 ## Historial de Sesiones (por fase)
 

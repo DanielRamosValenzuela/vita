@@ -2,7 +2,8 @@ import { getTranslations } from 'next-intl/server'
 
 import { getContractsPageDataAction } from '@/src/features/admin-hr/api'
 import { ContractsPage } from '@/src/features/admin-hr/ui'
-import { requireAdminHR } from '@/src/shared/lib/auth/session'
+import { requireAdminHRWithOrg } from '@/src/shared/lib/auth/session'
+import { prisma } from '@/src/shared/lib/db'
 
 interface RatesRouteProps {
   params: Promise<{ locale: string }>
@@ -20,10 +21,15 @@ export async function generateMetadata({ params }: RatesRouteProps) {
 
 export default async function RatesRoute({ params }: RatesRouteProps) {
   const { locale } = await params
-  const session = await requireAdminHR(locale)
+  const session = await requireAdminHRWithOrg(locale)
   const t = await getTranslations('adminHR.rates')
 
-  if (!session.organizationId)
+  const organization = await prisma.organization.findUnique({
+    where: { id: session.organizationId },
+    select: { currency: true },
+  })
+
+  if (!organization)
     return (
       <div className="space-y-8">
         <div>
@@ -52,7 +58,7 @@ export default async function RatesRoute({ params }: RatesRouteProps) {
         <p className="text-muted-foreground mt-2">{t('description')}</p>
       </div>
 
-      <ContractsPage data={result.data} />
+      <ContractsPage data={result.data} currency={organization.currency} />
     </div>
   )
 }

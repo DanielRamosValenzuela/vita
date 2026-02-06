@@ -7,7 +7,7 @@ import type { ActionResult } from '@/src/shared/lib/types'
 import { handleActionError } from '@/src/shared/lib/utils'
 import { revalidatePaths } from '@/src/shared/lib/utils/revalidate-paths'
 
-const RATES_PATHS = ['/dashboard/rates'] as const
+const CONTRACTS_PATHS = ['/dashboard/rates', '/dashboard/staff'] as const
 
 export interface StaffWithContract {
   id: string
@@ -18,17 +18,13 @@ export interface StaffWithContract {
     id: string
     areaId: string | null
     areaName: string | null
-    rateTemplateId: string | null
-    rateTemplateName: string | null
-    ratePerMinute: number | null
-    adjustmentPerMinute: number
-    effectiveRatePerMinute: number
-    baseSalary: number | null
-    baseSalaryUnit: string | null
+    rateTemplateId: string
+    rateTemplateName: string
+    customMultiplier: number | null
     startDate: Date
     endDate: Date | null
     isActive: boolean
-    source: 'template' | 'template_adjusted' | 'custom'
+    notes: string | null
   } | null
 }
 
@@ -37,29 +33,11 @@ export interface ContractsPageData {
   rateTemplates: Array<{
     id: string
     name: string
-    ratePerMinute: number
-    baseSalary: number | null
+    description: string | null
+    componentsCount: number
     _count: { contracts: number }
   }>
   areas: Array<{ id: string; name: string }>
-}
-
-function getEffectiveRate(
-  rateTemplate: { ratePerMinute: number } | null,
-  ratePerMinute: number | null,
-  adjustmentPerMinute: number
-): { effective: number; source: 'template' | 'template_adjusted' | 'custom' } {
-  if (ratePerMinute !== null && ratePerMinute !== undefined)
-    return { effective: ratePerMinute, source: 'custom' }
-  if (rateTemplate) {
-    const base = rateTemplate.ratePerMinute
-    const effective = base + adjustmentPerMinute
-    return {
-      effective,
-      source: adjustmentPerMinute !== 0 ? 'template_adjusted' : 'template',
-    }
-  }
-  return { effective: 0, source: 'custom' }
 }
 
 export const getContractsPageDataAction = async (): Promise<
@@ -88,9 +66,13 @@ export const getContractsPageDataAction = async (): Promise<
         select: {
           id: true,
           name: true,
-          ratePerMinute: true,
-          baseSalary: true,
-          _count: { select: { contracts: true } },
+          description: true,
+          _count: {
+            select: {
+              contracts: true,
+              components: true,
+            },
+          },
         },
         orderBy: { name: 'asc' },
       }),
@@ -110,7 +92,7 @@ export const getContractsPageDataAction = async (): Promise<
       include: {
         user: { select: { id: true } },
         area: { select: { id: true, name: true } },
-        rateTemplate: { select: { id: true, name: true, ratePerMinute: true } },
+        rateTemplate: { select: { id: true, name: true } },
       },
     })
 
@@ -129,12 +111,6 @@ export const getContractsPageDataAction = async (): Promise<
           contract: null,
         }
 
-      const { effective, source } = getEffectiveRate(
-        contract.rateTemplate,
-        contract.ratePerMinute,
-        contract.adjustmentPerMinute
-      )
-
       return {
         id: user.id,
         name: user.name,
@@ -143,18 +119,14 @@ export const getContractsPageDataAction = async (): Promise<
         contract: {
           id: contract.id,
           areaId: contract.areaId,
-          areaName: contract.area?.name ?? null,
+          areaName: contract.area?.name || null,
           rateTemplateId: contract.rateTemplateId,
-          rateTemplateName: contract.rateTemplate?.name ?? null,
-          ratePerMinute: contract.ratePerMinute,
-          adjustmentPerMinute: contract.adjustmentPerMinute,
-          effectiveRatePerMinute: effective,
-          baseSalary: contract.baseSalary,
-          baseSalaryUnit: contract.baseSalaryUnit,
+          rateTemplateName: contract.rateTemplate.name,
+          customMultiplier: contract.customMultiplier,
           startDate: contract.startDate,
           endDate: contract.endDate,
           isActive: contract.isActive,
-          source,
+          notes: contract.notes,
         },
       }
     })
@@ -163,32 +135,37 @@ export const getContractsPageDataAction = async (): Promise<
       success: true,
       data: {
         staff,
-        rateTemplates,
+        rateTemplates: rateTemplates.map((t) => ({
+          ...t,
+          componentsCount: t._count.components,
+        })),
         areas,
       },
     }
   } catch (error) {
-    return handleActionError(error, 'getContractsPageDataAction', 'Error al cargar contratos')
+    return handleActionError(
+      error,
+      'getContractsPageDataAction',
+      'Error al obtener datos de contratos'
+    )
   }
 }
 
 export const getStaffPageDataAction = async (): Promise<
-  ActionResult<ContractsPageData & { isChiefWithNoAreas?: boolean }>
+  ActionResult<ContractsPageData>
 > => {
   try {
     const session = await requireAdminHROrChiefArea()
-    const orgId = session.organizationId!
 
-    if (session.role === ROLES.ADMIN_HR) {
-      const result = await getContractsPageDataAction()
-      return result
-    }
+    if (session.role === ROLES.ADMIN_HR)
+      return await getContractsPageDataAction()
 
-    const chiefAreas = await prisma.userArea.findMany({
+    const userAreas = await prisma.userArea.findMany({
       where: { userId: session.id },
       select: { areaId: true },
     })
-    const areaIds = chiefAreas.map((a) => a.areaId)
+
+    const areaIds = userAreas.map((ua) => ua.areaId)
 
     if (areaIds.length === 0)
       return {
@@ -197,334 +174,265 @@ export const getStaffPageDataAction = async (): Promise<
           staff: [],
           rateTemplates: [],
           areas: [],
-          isChiefWithNoAreas: true,
         },
       }
 
-    const [contractsInAreas, rateTemplates, areas] = await Promise.all([
+    const [contracts, rateTemplates, areas] = await Promise.all([
       prisma.contract.findMany({
         where: {
-          organizationId: orgId,
+          organizationId: session.organizationId!,
           areaId: { in: areaIds },
           isActive: true,
           endDate: null,
         },
         include: {
-          user: { select: { id: true, name: true, email: true, role: true } },
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              role: true,
+            },
+          },
           area: { select: { id: true, name: true } },
-          rateTemplate: { select: { id: true, name: true, ratePerMinute: true } },
+          rateTemplate: { select: { id: true, name: true } },
         },
       }),
       prisma.rateTemplate.findMany({
-        where: { organizationId: orgId, isActive: true },
+        where: {
+          organizationId: session.organizationId!,
+          isActive: true,
+        },
         select: {
           id: true,
           name: true,
-          ratePerMinute: true,
-          baseSalary: true,
-          _count: { select: { contracts: true } },
+          description: true,
+          _count: {
+            select: {
+              contracts: true,
+              components: true,
+            },
+          },
         },
         orderBy: { name: 'asc' },
       }),
       prisma.area.findMany({
-        where: { id: { in: areaIds }, isActive: true },
+        where: {
+          id: { in: areaIds },
+          isActive: true,
+        },
         select: { id: true, name: true },
         orderBy: { name: 'asc' },
       }),
     ])
 
-    const byUser = new Map<string, (typeof contractsInAreas)[0]>()
-    for (const c of contractsInAreas)
-      if (!byUser.has(c.userId)) byUser.set(c.userId, c)
-
-    const staff: StaffWithContract[] = Array.from(byUser.values()).map((contract) => {
-      const { effective, source } = getEffectiveRate(
-        contract.rateTemplate,
-        contract.ratePerMinute,
-        contract.adjustmentPerMinute
-      )
-      return {
-        id: contract.user.id,
-        name: contract.user.name,
-        email: contract.user.email,
-        role: contract.user.role,
-        contract: {
-          id: contract.id,
-          areaId: contract.areaId,
-          areaName: contract.area?.name ?? null,
-          rateTemplateId: contract.rateTemplateId,
-          rateTemplateName: contract.rateTemplate?.name ?? null,
-          ratePerMinute: contract.ratePerMinute,
-          adjustmentPerMinute: contract.adjustmentPerMinute,
-          effectiveRatePerMinute: effective,
-          baseSalary: contract.baseSalary,
-          baseSalaryUnit: contract.baseSalaryUnit,
-          startDate: contract.startDate,
-          endDate: contract.endDate,
-          isActive: contract.isActive,
-          source,
-        },
-      }
-    })
+    const staff: StaffWithContract[] = contracts.map((contract) => ({
+      id: contract.user.id,
+      name: contract.user.name,
+      email: contract.user.email,
+      role: contract.user.role,
+      contract: {
+        id: contract.id,
+        areaId: contract.areaId,
+        areaName: contract.area?.name || null,
+        rateTemplateId: contract.rateTemplateId,
+        rateTemplateName: contract.rateTemplate.name,
+        customMultiplier: contract.customMultiplier,
+        startDate: contract.startDate,
+        endDate: contract.endDate,
+        isActive: contract.isActive,
+        notes: contract.notes,
+      },
+    }))
 
     return {
       success: true,
       data: {
-        staff: staff.sort((a, b) => a.name.localeCompare(b.name)),
-        rateTemplates,
+        staff,
+        rateTemplates: rateTemplates.map((t) => ({
+          ...t,
+          componentsCount: t._count.components,
+        })),
         areas,
       },
     }
   } catch (error) {
-    return handleActionError(error, 'getStaffPageDataAction', 'Error al cargar personal')
+    return handleActionError(
+      error,
+      'getStaffPageDataAction',
+      'Error al obtener datos del personal'
+    )
   }
 }
 
 export const createContractAction = async (data: {
   userId: string
+  rateTemplateId: string
   areaId?: string
-  rateTemplateId?: string
-  ratePerMinute?: number
-  adjustmentPerMinute?: number
-  baseSalary?: number
-  baseSalaryUnit?: 'MONTHLY' | 'DAILY' | 'HOURLY'
-}): Promise<ActionResult<{ id: string }>> => {
+  customMultiplier?: number
+  notes?: string
+}): Promise<ActionResult<null>> => {
   try {
     const session = await requireAdminHRWithOrg()
-    const orgId = session.organizationId
 
-    const hasRateTemplate = !!data.rateTemplateId
-    const hasCustomRate = data.ratePerMinute !== undefined && data.ratePerMinute !== null
-
-    if (!hasRateTemplate && !hasCustomRate)
-      return {
-        success: false,
-        error: 'Debes asignar un tipo de tarifa o una tarifa personalizada',
-      }
-
-    if (hasCustomRate && data.ratePerMinute! < 0)
-      return {
-        success: false,
-        error: 'La tarifa no puede ser negativa',
-      }
-
-    const user = await prisma.user.findUnique({
-      where: { id: data.userId },
-      select: { organizationId: true },
-    })
-
-    if (!user || user.organizationId !== orgId)
-      return {
-        success: false,
-        error: 'El usuario no pertenece a tu organización',
-      }
-
-    const existingActive = await prisma.contract.findFirst({
+    const existingContract = await prisma.contract.findFirst({
       where: {
         userId: data.userId,
-        organizationId: orgId,
+        organizationId: session.organizationId,
         isActive: true,
         endDate: null,
       },
     })
 
-    if (existingActive)
+    if (existingContract)
       return {
         success: false,
-        error: 'Este personal ya tiene un contrato activo',
+        error: 'El usuario ya tiene un contrato activo',
       }
 
-    if (data.areaId) {
-      const area = await prisma.area.findUnique({
-        where: { id: data.areaId },
-      })
-      if (!area || area.organizationId !== orgId)
-        return {
-          success: false,
-          error: 'El área no pertenece a tu organización',
-        }
-    }
-
-    if (data.rateTemplateId) {
-      const rt = await prisma.rateTemplate.findUnique({
-        where: { id: data.rateTemplateId },
-      })
-      if (!rt || rt.organizationId !== orgId)
-        return {
-          success: false,
-          error: 'El tipo de tarifa no pertenece a tu organización',
-        }
-    }
-
-    const contract = await prisma.contract.create({
-      data: {
-        userId: data.userId,
-        organizationId: orgId,
-        areaId: data.areaId || null,
-        rateTemplateId: data.rateTemplateId || null,
-        ratePerMinute: data.ratePerMinute ?? null,
-        adjustmentPerMinute: data.adjustmentPerMinute ?? 0,
-        baseSalary: data.baseSalary ?? null,
-        baseSalaryUnit: data.baseSalaryUnit ?? null,
-      },
-      select: { id: true },
+    const user = await prisma.user.findUnique({
+      where: { id: data.userId },
     })
 
-    revalidatePaths(...RATES_PATHS)
+    if (!user || user.organizationId !== session.organizationId)
+      return {
+        success: false,
+        error: 'Usuario no encontrado en tu organización',
+      }
+
+    const rateTemplate = await prisma.rateTemplate.findFirst({
+      where: {
+        id: data.rateTemplateId,
+        organizationId: session.organizationId,
+      },
+    })
+
+    if (!rateTemplate)
+      return {
+        success: false,
+        error: 'Tarifa no encontrada',
+      }
+
+    await prisma.contract.create({
+      data: {
+        userId: data.userId,
+        organizationId: session.organizationId,
+        rateTemplateId: data.rateTemplateId,
+        areaId: data.areaId || null,
+        customMultiplier: data.customMultiplier || null,
+        notes: data.notes || null,
+      },
+    })
+
+    revalidatePaths(...CONTRACTS_PATHS)
 
     return {
       success: true,
-      data: { id: contract.id },
       message: 'Contrato creado exitosamente',
     }
   } catch (error) {
-    return handleActionError(error, 'createContractAction', 'Error al crear contrato')
+    return handleActionError(
+      error,
+      'createContractAction',
+      'Error al crear contrato'
+    )
   }
 }
 
 export const updateContractAction = async (
-  id: string,
+  contractId: string,
   data: {
-    areaId?: string | null
-    rateTemplateId?: string | null
-    ratePerMinute?: number | null
-    adjustmentPerMinute?: number
-    baseSalary?: number | null
-    baseSalaryUnit?: 'MONTHLY' | 'DAILY' | 'HOURLY' | null
+    rateTemplateId?: string
+    areaId?: string
+    customMultiplier?: number
+    notes?: string
   }
 ): Promise<ActionResult<null>> => {
   try {
     const session = await requireAdminHRWithOrg()
 
-    const existing = await prisma.contract.findUnique({
-      where: { id },
+    const contract = await prisma.contract.findUnique({
+      where: { id: contractId },
     })
 
-    if (!existing)
+    if (!contract)
       return {
         success: false,
         error: 'Contrato no encontrado',
       }
 
-    if (existing.organizationId !== session.organizationId)
+    if (contract.organizationId !== session.organizationId)
       return {
         success: false,
         error: 'El contrato no pertenece a tu organización',
       }
 
-    const ratePerMinute = data.ratePerMinute
-
-    if (ratePerMinute !== undefined && ratePerMinute !== null && ratePerMinute < 0)
-      return {
-        success: false,
-        error: 'La tarifa no puede ser negativa',
-      }
-
     await prisma.contract.update({
-      where: { id },
+      where: { id: contractId },
       data: {
-        areaId: data.areaId ?? undefined,
-        rateTemplateId: data.rateTemplateId ?? undefined,
-        ratePerMinute: data.ratePerMinute ?? undefined,
-        adjustmentPerMinute: data.adjustmentPerMinute ?? undefined,
-        baseSalary: data.baseSalary ?? undefined,
-        baseSalaryUnit:
-          data.baseSalaryUnit != null
-            ? (data.baseSalaryUnit as 'MONTHLY' | 'DAILY' | 'HOURLY')
-            : undefined,
+        rateTemplateId: data.rateTemplateId,
+        areaId: data.areaId !== undefined ? data.areaId : undefined,
+        customMultiplier: data.customMultiplier !== undefined ? data.customMultiplier : undefined,
+        notes: data.notes !== undefined ? data.notes : undefined,
       },
     })
 
-    revalidatePaths(...RATES_PATHS)
+    revalidatePaths(...CONTRACTS_PATHS)
 
     return {
       success: true,
       message: 'Contrato actualizado exitosamente',
     }
   } catch (error) {
-    return handleActionError(error, 'updateContractAction', 'Error al actualizar contrato')
+    return handleActionError(
+      error,
+      'updateContractAction',
+      'Error al actualizar contrato'
+    )
   }
 }
 
-export const endContractAction = async (id: string): Promise<ActionResult<null>> => {
+export const endContractAction = async (
+  contractId: string
+): Promise<ActionResult<null>> => {
   try {
     const session = await requireAdminHRWithOrg()
 
-    const existing = await prisma.contract.findUnique({
-      where: { id },
+    const contract = await prisma.contract.findUnique({
+      where: { id: contractId },
     })
 
-    if (!existing)
+    if (!contract)
       return {
         success: false,
         error: 'Contrato no encontrado',
       }
 
-    if (existing.organizationId !== session.organizationId)
+    if (contract.organizationId !== session.organizationId)
       return {
         success: false,
         error: 'El contrato no pertenece a tu organización',
       }
 
     await prisma.contract.update({
-      where: { id },
+      where: { id: contractId },
       data: {
         endDate: new Date(),
         isActive: false,
       },
     })
 
-    revalidatePaths(...RATES_PATHS)
+    revalidatePaths(...CONTRACTS_PATHS)
 
     return {
       success: true,
       message: 'Contrato finalizado exitosamente',
     }
   } catch (error) {
-    return handleActionError(error, 'endContractAction', 'Error al finalizar contrato')
-  }
-}
-
-export const deleteContractAction = async (id: string): Promise<ActionResult<null>> => {
-  try {
-    const session = await requireAdminHRWithOrg()
-
-    const existing = await prisma.contract.findUnique({
-      where: { id },
-      include: {
-        _count: { select: { shifts: true } },
-      },
-    })
-
-    if (!existing)
-      return {
-        success: false,
-        error: 'Contrato no encontrado',
-      }
-
-    if (existing.organizationId !== session.organizationId)
-      return {
-        success: false,
-        error: 'El contrato no pertenece a tu organización',
-      }
-
-    if (existing._count.shifts > 0)
-      return {
-        success: false,
-        error: 'No se puede eliminar: tiene turnos asociados',
-      }
-
-    await prisma.contract.delete({
-      where: { id },
-    })
-
-    revalidatePaths(...RATES_PATHS)
-
-    return {
-      success: true,
-      message: 'Contrato eliminado exitosamente',
-    }
-  } catch (error) {
-    return handleActionError(error, 'deleteContractAction', 'Error al eliminar contrato')
+    return handleActionError(
+      error,
+      'endContractAction',
+      'Error al finalizar contrato'
+    )
   }
 }

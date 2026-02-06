@@ -7,6 +7,8 @@ import { prisma } from '@/src/shared/lib/db'
 import { requireSuperAdmin } from '@/src/shared/lib/auth/session'
 import type { ActionResult } from '@/src/shared/lib/types'
 import { ROLES } from '@/src/shared/lib/constants'
+import { checkDocumentExistsInOrganization } from '@/src/shared/lib/validation/document-validation'
+import { handleActionError } from '@/src/shared/lib/utils'
 
 import {
   checkOrganizationAdminHRLimit,
@@ -43,11 +45,7 @@ export const searchUserAction = async (
       data: user,
     }
   } catch (error) {
-    console.error('[searchUserAction] Error:', error)
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Error al buscar usuario',
-    }
+    return handleActionError(error, 'searchUserAction', 'Error al buscar usuario')
   }
 }
 
@@ -75,6 +73,9 @@ export const inviteAdminHRAction = async (
       select: {
         role: true,
         organizationId: true,
+        country: true,
+        docType: true,
+        docNumber: true,
       },
     })
 
@@ -92,6 +93,23 @@ export const inviteAdminHRAction = async (
       }
     
 
+    if (user.country && user.docType && user.docNumber) {
+      const docExists = await checkDocumentExistsInOrganization(
+        user.country,
+        user.docType,
+        user.docNumber,
+        organizationId,
+        userId
+      )
+
+      if (docExists) 
+        return {
+          success: false,
+          error: `El documento ${user.docNumber} ya está registrado en esta organización por otro usuario`,
+        }
+      
+    }
+
     const invitationResult = await createAdminHRInvitation(organizationId, userId, session.id)
 
     if (!invitationResult.success) 
@@ -107,11 +125,7 @@ export const inviteAdminHRAction = async (
       message: 'Invitación enviada exitosamente',
     }
   } catch (error) {
-    console.error('[inviteAdminHRAction] Error:', error)
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Error al enviar invitación',
-    }
+    return handleActionError(error, 'inviteAdminHRAction', 'Error al enviar invitación')
   }
 }
 
@@ -140,10 +154,6 @@ export const cancelInvitationAction = async (
       message: 'Invitación cancelada exitosamente',
     }
   } catch (error) {
-    console.error('[cancelInvitationAction] Error:', error)
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Error al cancelar invitación',
-    }
+    return handleActionError(error, 'cancelInvitationAction', 'Error al cancelar invitación')
   }
 }

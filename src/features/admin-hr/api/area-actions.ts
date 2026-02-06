@@ -258,3 +258,111 @@ export async function assignChiefsToAreaAction(
     )
   }
 }
+
+export async function assignChiefToSingleAreaAction(chiefUserId: string, areaId: string): Promise<{
+  success: boolean
+  message?: string
+  error?: string
+}> {
+  try {
+    const user = await requireAdminHRWithOrg()
+
+    const chief = await prisma.user.findFirst({
+      where: {
+        id: chiefUserId,
+        organizationId: user.organizationId,
+        role: ROLES.CHIEF_AREA,
+      },
+    })
+
+    if (!chief)
+      return {
+        success: false,
+        error: 'Jefe no encontrado o sin permisos',
+      }
+
+    const area = await prisma.area.findFirst({
+      where: {
+        id: areaId,
+        organizationId: user.organizationId,
+      },
+    })
+
+    if (!area)
+      return {
+        success: false,
+        error: 'Área no encontrada',
+      }
+
+    await prisma.userArea.upsert({
+      where: {
+        userId_areaId: {
+          userId: chiefUserId,
+          areaId,
+        },
+      },
+      create: {
+        userId: chiefUserId,
+        areaId,
+      },
+      update: {},
+    })
+
+    revalidatePaths(...AREA_PATHS)
+
+    return {
+      success: true,
+      message: 'Jefe asignado al área exitosamente',
+    }
+  } catch (error) {
+    return handleActionError(
+      error,
+      'assignChiefToSingleAreaAction',
+      'Error al asignar jefe al área'
+    )
+  }
+}
+
+export async function removeChiefFromAreaAction(chiefUserId: string, areaId: string): Promise<{
+  success: boolean
+  message?: string
+  error?: string
+}> {
+  try {
+    const user = await requireAdminHRWithOrg()
+
+    const chief = await prisma.user.findFirst({
+      where: {
+        id: chiefUserId,
+        organizationId: user.organizationId,
+        role: ROLES.CHIEF_AREA,
+      },
+    })
+
+    if (!chief)
+      return {
+        success: false,
+        error: 'Jefe no encontrado o sin permisos',
+      }
+
+    await prisma.userArea.deleteMany({
+      where: {
+        userId: chiefUserId,
+        areaId,
+      },
+    })
+
+    revalidatePaths(...AREA_PATHS)
+
+    return {
+      success: true,
+      message: 'Jefe desvinculado del área exitosamente',
+    }
+  } catch (error) {
+    return handleActionError(
+      error,
+      'removeChiefFromAreaAction',
+      'Error al desvincular jefe del área'
+    )
+  }
+}

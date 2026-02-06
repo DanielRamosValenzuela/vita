@@ -81,10 +81,20 @@ Documento de referencia de **flujos funcionales** por rol. Resume qué pasos sig
   - Ve área(s), contratos y tarifas efectivas.
   - Para CHIEF_AREA, la misma página muestra solo personal con contrato en sus áreas.
 
+- **Dashboard ADMIN_HR con métricas reales**
+  - Accede a `/dashboard/admin-hr`.
+  - Visualiza métricas en tiempo real:
+    - Total de áreas
+    - Tipos de turno activos
+    - Total de personal (jefes + staff)
+    - Contratos activos
+    - Turnos activos del mes
+  - Ve límites de organización (Admin HR, Jefes, Staff) con alertas visuales.
+
 ### Workflows pendientes o parciales
 
-- **Dashboard con métricas ADMIN_HR**
-  - Resumen de horas trabajadas, staff por área, alertas de límites de cuentas.
+- **Métricas avanzadas de turnos**
+  - Resumen de horas trabajadas, distribución de staff por área.
 - **Gestión avanzada de personal**
   - UI para cambiar área principal de un staff y reasignaciones masivas.
 - **Reportes exportables**
@@ -144,6 +154,197 @@ Documento de referencia de **flujos funcionales** por rol. Resume qué pasos sig
   - Solicitar intercambio, ver estado, aceptar/rechazar.
 - **Notificaciones**
   - Recordatorios de turnos, avisos de cambios o cancelaciones.
+
+---
+
+## Sistema de Tarifas Flexibles ✅ (v2.0)
+
+### Arquitectura del Sistema
+
+El sistema de tarifas flexibles permite a ADMIN_HR crear tarifas completamente personalizables mediante componentes modulares, adaptándose a cualquier industria (salud, seguridad, construcción, etc.).
+
+### Workflows implementados
+
+#### 1. **Creación de Plantilla de Tarifa** (`/dashboard/rates`)
+
+**Flujo**:
+1. ADMIN_HR accede al módulo de Tarifas
+2. Selecciona un preset predefinido (opcional):
+   - Guardia Salud Estándar
+   - Seguridad 24/7
+   - Freelance por Hora
+   - Personal Administrativo
+   - Operario de Construcción
+   - Y 5 presets más
+3. O crea una plantilla desde cero
+4. Define nombre y descripción
+5. Añade componentes de tarifa:
+   - **Tipo**: BASE_SALARY, PER_MINUTE, NIGHT_SHIFT_BONUS, WEEKEND_MULTIPLIER, etc. (18 tipos + CUSTOM)
+   - **Valor**: monto numérico (con formateo automático según moneda)
+   - **Unidad**: MONTHLY, PER_HOUR, PER_SHIFT, PERCENTAGE, etc.
+   - **Condición**: ALWAYS, NIGHT_SHIFT_ONLY, WEEKEND_ONLY, etc.
+6. Puede añadir, editar o eliminar componentes
+7. Guarda la plantilla
+
+**Características**:
+- ✅ Formateo de moneda dinámico (Chile: $1.000.000, USA: $1,000,000)
+- ✅ Validación de duplicados (no permite dos componentes base salary)
+- ✅ Previsualización de componentes añadidos
+- ✅ Duplicación de plantillas existentes
+
+#### 2. **Asignación de Contrato a Personal** (`/dashboard/rates`)
+
+**Flujo**:
+1. ADMIN_HR desde el módulo de Tarifas ve tabla de personal
+2. Selecciona una plantilla de tarifa
+3. Selecciona área (opcional)
+4. (Opcional) Define multiplicador personalizado (ej: 1.2x para senior)
+5. Añade notas adicionales
+6. Asigna contrato
+
+**Características**:
+- ✅ Muestra personal con y sin contrato
+- ✅ Badge de estado de contrato
+- ✅ Vista de plantilla asignada y multiplicador
+- ✅ Finalizar contratos existentes
+
+#### 3. **Visualización de Personal** (`/dashboard/staff`)
+
+**Flujo**:
+1. ADMIN_HR o CHIEF accede al módulo de Personal
+2. Ve tabla simplificada con:
+   - Nombre y correo
+   - Rol (CHIEF_AREA / STAFF_HEALTH)
+   - Área asignada
+   - Estado de contrato (✓/✗)
+   - Nombre de plantilla de tarifa
+   - Multiplicador personalizado
+3. Si hay personal sin contrato, se muestra alerta
+4. Link directo al módulo de Tarifas para gestionar contratos
+
+**Características**:
+- ✅ Solo visualización (no edita contratos aquí)
+- ✅ Separación clara de responsabilidades
+- ✅ Estadísticas de personal con/sin contrato
+
+#### 4. **Gestión de Componentes de Tarifa**
+
+**Tipos de Componentes Disponibles**:
+- Salarios base (mensual, quincenal, etc.)
+- Tarifas por tiempo (minuto, hora, turno)
+- Bonos específicos (nocturno, fin de semana, feriado)
+- Multiplicadores (horas extra, antigüedad)
+- Bonos fijos y porcentajes
+- Compensaciones por disponibilidad y guardia
+
+**Condiciones de Aplicación**:
+- Siempre
+- Solo en horario diurno/nocturno
+- Solo fin de semana
+- Solo feriados
+- Solo en guardia
+- Y más...
+
+### Workflows pendientes
+
+- **Cálculo automático de pagos**
+  - Calcular pago de un turno basado en sus componentes y condiciones
+  - Aplicar multiplicadores de calendario (feriados irrenunciables)
+  - Generar preview de costo antes de crear turno
+
+- **Gestión del Calendario Organizacional** ✅
+  - ✅ UI para marcar días especiales (feriados, feriados irrenunciables)
+  - ✅ Multiplicadores por tipo de día
+  - ⏳ Días recurrentes (ej: todos los domingos) - pendiente
+  - ⏳ Importar feriados nacionales automáticamente - pendiente
+
+- **Reportes y Analytics**
+  - Vista de costos por personal
+  - Reporte de contratos activos
+  - Análisis de componentes más usados
+  - Exportación a Excel/PDF
+
+---
+
+## Todos los Usuarios (Perfil Avanzado)
+
+### Workflows implementados
+
+#### 1. **Gestión de Perfil Personal** (`/dashboard/profile`)
+
+**Flujo de Actualización de Documento**:
+1. Usuario accede a su perfil
+2. Edita país, tipo de documento o número de documento
+3. El sistema valida:
+   - Si el usuario pertenece a una organización, el documento debe ser único dentro de esa organización
+   - Si el documento ya existe en la organización, muestra error
+4. Al guardar exitosamente:
+   - Se registra el documento anterior en `UserDocumentHistory`
+   - Se actualiza el documento actual
+   - Se registra el nuevo documento en el historial
+
+**Características**:
+- ✅ Validación única por organización (permite duplicados entre organizaciones diferentes)
+- ✅ Historial completo de cambios con auditoría
+- ✅ Validación también aplica en invitaciones (ADMIN_HR/SUPER_ADMIN no pueden invitar usuarios con documento duplicado)
+
+#### 2. **Sistema de Múltiples Emails** (`/dashboard/profile`)
+
+**Flujo de Gestión de Emails**:
+1. Usuario ve todos sus emails registrados
+2. **Agregar nuevo email**:
+   - Ingresa email en formulario
+   - Valida formato y unicidad global
+   - Se añade como email secundario (no verificado)
+3. **Marcar como principal**:
+   - Solo emails verificados pueden ser principales
+   - Al marcar como principal, se actualiza `User.email`
+   - Solo puede haber un email principal
+4. **Eliminar email**:
+   - No se puede eliminar el email principal
+   - Confirma eliminación vía AlertDialog
+   - El email se elimina de `UserEmail`
+
+**Características**:
+- ✅ Email principal sincronizado con `User.email`
+- ✅ Soporte para múltiples proveedores (GOOGLE, CREDENTIALS, etc.)
+- ✅ Preparado para vinculación OAuth (permitirá link de cuenta Google a cuenta existente)
+- ✅ Validación de unicidad global de emails
+
+#### 3. **Sistema de Imágenes Personalizadas** (`/dashboard/profile`)
+
+**Flujo de Upload de Avatar**:
+1. Usuario ve su avatar actual (custom, OAuth o iniciales)
+2. **Subir nueva imagen**:
+   - Selecciona archivo (JPG, PNG, WEBP)
+   - Preview en tiempo real
+   - Valida tamaño (máx 2MB)
+   - Sube a Supabase Storage (`avatars/{userId}`)
+   - Actualiza `User.customImage` con URL pública
+   - Actualiza `User.imageProvider` = `UPLOAD`
+3. **Eliminar imagen custom**:
+   - Solo si tiene imagen personalizada
+   - Elimina de Supabase Storage
+   - Limpia `User.customImage`
+   - Fallback automático a imagen OAuth o iniciales
+
+**Características**:
+- ✅ Integración completa con Supabase Storage
+- ✅ RLS policies para seguridad (solo el usuario puede modificar su avatar)
+- ✅ Prioridad de visualización: Custom > OAuth > Iniciales
+- ✅ Sincronización automática con sesión NextAuth
+- ✅ Preview antes de subir
+- ✅ Límites de tamaño y formato
+
+### Workflows pendientes
+
+- **Verificación de emails secundarios**
+  - Envío de email de confirmación
+  - Link de verificación
+  - Marcar email como verificado
+- **Vinculación OAuth completa**
+  - Link de cuenta Google a cuenta existente sin perder datos
+  - Desvinculación de proveedores OAuth
 
 ---
 

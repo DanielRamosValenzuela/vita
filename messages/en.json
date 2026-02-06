@@ -441,6 +441,45 @@
   "profile": {
     "title": "Profile",
     "description": "Manage your personal information and settings",
+    "avatarTitle": "Profile Photo",
+    "avatarDescription": "Upload a custom photo for your profile",
+    "uploadAvatar": "Upload photo",
+    "changeAvatar": "Change photo",
+    "deleteAvatar": "Delete",
+    "avatarHelp": "JPG, PNG or GIF. Maximum 5MB",
+    "emails": {
+      "title": "Account Emails",
+      "description": "Manage your email addresses and account links",
+      "addEmail": "Add Email",
+      "addEmailPlaceholder": "new@email.com",
+      "noEmails": "No secondary emails",
+      "primary": "Primary",
+      "notVerified": "Not verified",
+      "setPrimary": "Set as primary",
+      "removeEmail": "Remove email",
+      "linkWithGoogle": "Link with Google",
+      "unlinkGoogle": "Unlink Google",
+      "googleLinkSuccess": "Email successfully linked with Google. Your email is now verified.",
+      "googleLinkError": "Error linking with Google. Please try again.",
+      "googleLinkMissingParams": "Missing parameters to complete the link.",
+      "googleLinkInvalidEmail": "The email is invalid or doesn't belong to you.",
+      "googleLinkEmailMismatch": "The Google email doesn't match the one you're trying to link.",
+      "googleLinkServerError": "Server error while processing the link.",
+      "deleteConfirm": {
+        "title": "Delete Email",
+        "description": "Are you sure you want to delete {email}?",
+        "cancel": "Cancel",
+        "confirm": "Delete",
+        "deleting": "Deleting..."
+      },
+      "unlinkConfirm": {
+        "title": "Unlink Google",
+        "description": "Do you want to unlink {email} from Google? The email will no longer be verified.",
+        "cancel": "Cancel",
+        "confirm": "Unlink",
+        "unlinking": "Unlinking..."
+      }
+    },
     "basicInfo": {
       "title": "Basic Information",
       "name": {
@@ -837,11 +876,14 @@
           "noDocNumberWarning": "This user does not have a registered document number",
           "inOtherOrg": "This user is already linked to another organization: {orgName}",
           "inviteWithoutDoc": "The invitation will be sent, but the user must complete their profile with their document number before they can accept it",
+          "actions": "Actions",
           "cancel": "Cancel",
           "inviting": "Sending...",
           "sendInvitation": "Send Invitation",
           "inviteSuccess": "Invitation sent successfully",
-          "inviteError": "Error sending invitation"
+          "inviteError": "Error sending invitation",
+          "alreadyInRole": "This user is already an administrator of this organization",
+          "alreadyInOrg": "This user already belongs to this organization"
         },
         "table": {
           "name": "Name",
@@ -1019,7 +1061,9 @@
   "adminHR": {
     "dashboard": {
       "title": "Control Panel",
-      "description": "Welcome to the human resources administration panel"
+      "description": "Welcome to the human resources administration panel",
+      "errorLoading": "Error loading dashboard statistics",
+      "limitsTitle": "Organization Limits"
     },
     "organization": {
       "title": "My Organization",
@@ -1068,7 +1112,20 @@
           "noAreaAssigned": "No area assigned",
           "createdAt": "Registration Date",
           "actions": "Actions",
-          "unlink": "Unlink"
+          "unlink": "Unlink",
+          "assignArea": "Assign area",
+          "changeArea": "Change area",
+          "removeArea": "Remove area"
+        },
+        "assignAreaForm": {
+          "titleAssign": "Assign area to chief",
+          "titleChange": "Change chief's area",
+          "description": "Select area for {name}",
+          "selectArea": "Area",
+          "selectPlaceholder": "Select an area",
+          "cancel": "Cancel",
+          "assign": "Assign",
+          "assigning": "Assigning..."
         },
         "unlinkConfirm": {
           "title": "Unlink area chief",
@@ -1293,10 +1350,35 @@
         }
       },
       "rateTemplates": {
-        "title": "Rate types",
-        "description": "Reusable templates (e.g. Night guard, Day nurse)",
-        "create": "New type",
-        "empty": "No types yet. Create one to assign to staff."
+        "title": "Rate Templates",
+        "description": "Reusable templates with customizable components",
+        "create": "New Template",
+        "empty": "No templates yet. Create one to assign to staff.",
+        "table": {
+          "name": "Name",
+          "components": "Components",
+          "componentsCount": "components",
+          "contracts": "Contracts",
+          "noContracts": "Not used",
+          "actions": "Actions",
+          "edit": "Edit",
+          "duplicate": "Duplicate",
+          "delete": "Delete"
+        }
+      },
+      "staffTable": {
+        "title": "Staff with Contracts",
+        "description": "View staff and their active contracts",
+        "person": "Person",
+        "area": "Area",
+        "rateTemplate": "Rate Template",
+        "status": "Status",
+        "statusActive": "Active",
+        "statusNoContract": "No contract",
+        "multiplier": "Multiplier",
+        "multiplierValue": "Multiplier: {value}x",
+        "actions": "Actions",
+        "endContract": "End"
       },
       "contract": {
         "create": "Assign rate",
@@ -1320,6 +1402,92 @@
         "useCustom": "Use custom rate",
         "useTemplate": "Use rate type"
       },
+      "templateForm": {
+        "createTitle": "New Rate Template",
+        "editTitle": "Edit Rate Template",
+        "createDescription": "Create a fully customizable rate template with components. Combine base salaries, time-based rates, bonuses, and multipliers as needed.",
+        "editDescription": "Modify the components and configuration of this rate. Changes won't affect existing contracts.",
+        "name": "Rate Name",
+        "namePlaceholder": "e.g. Premium Night Guard",
+        "nameTooltip": "Give this rate a descriptive name. For example: '12hr Health Guard', 'Weekend Security', 'Night Nurse'.",
+        "description": "Description (optional)",
+        "descriptionPlaceholder": "Describe when and how this rate is used",
+        "descriptionTooltip": "Explain what type of staff or situations this rate is designed for. This helps other admins understand its purpose.",
+        "save": "Save Rate",
+        "saving": "Saving...",
+        "cancel": "Cancel",
+        "errors": {
+          "nameRequired": "Name is required",
+          "componentsRequired": "You must add at least one component to create the rate"
+        },
+        "components": {
+          "title": "Rate Components",
+          "add": "Add Component",
+          "emptyTitle": "How is this rate calculated?",
+          "emptyDescription": "Add components to define how staff will be paid. You can combine base salaries, time-based rates, special bonuses, and multipliers.",
+          "addFirst": "Add First Component"
+        },
+        "componentsTooltip": "Components define how payment is calculated. You can combine: base salary (monthly/biweekly), time-based rates (minute/hour), bonuses (night/weekend), and multipliers (overtime/holidays)."
+      },
+      "componentForm": {
+        "type": "Component Type",
+        "typeTooltip": "Select what type of payment this component represents. For example: Base Salary (fixed monthly pay), Per Minute (paid by time worked), Night Bonus (extra for night shifts), etc.",
+        "unit": "Payment Unit",
+        "unitTooltip": "Define how often or per what event this component is paid. For example: Monthly (once a month), Per Shift (each time they work), Per Minute (based on minutes worked).",
+        "value": "Amount",
+        "valueTooltip": "Enter the numeric value. For salaries and bonuses use your country's currency. For multipliers use decimals (e.g. 1.5 = 150%). For percentages use numbers (e.g. 10 = 10%).",
+        "applyCondition": "When It Applies",
+        "applyConditionTooltip": "Define in which situations this component will be applied. 'Always' includes it in all shifts. Other options limit it to night hours, weekends, holidays, etc.",
+        "customName": "Custom Name (optional)",
+        "customNamePlaceholder": "e.g. Long shift bonus",
+        "description": "Description (optional)",
+        "descriptionPlaceholder": "Add notes or clarifications about this component",
+        "types": {
+          "BASE_SALARY": "Base Salary",
+          "PER_MINUTE": "Per Minute",
+          "PER_HOUR": "Per Hour",
+          "PER_SHIFT": "Per Shift",
+          "SHIFT_COMPLETION_BONUS": "Shift Completion Bonus",
+          "NIGHT_SHIFT_BONUS": "Night Shift Bonus",
+          "WEEKEND_BONUS": "Weekend Bonus",
+          "HOLIDAY_BONUS": "Holiday Bonus",
+          "WEEKEND_MULTIPLIER": "Weekend Multiplier",
+          "HOLIDAY_MULTIPLIER": "Holiday Multiplier",
+          "IRRENUNCIABLE_MULTIPLIER": "Mandatory Holiday Multiplier",
+          "NIGHT_MULTIPLIER": "Night Multiplier",
+          "OVERTIME_MULTIPLIER": "Overtime Multiplier",
+          "SENIORITY_BONUS": "Seniority Bonus",
+          "PERFORMANCE_BONUS": "Performance Bonus",
+          "AREA_BONUS": "Area Bonus",
+          "EMERGENCY_BONUS": "Emergency Bonus",
+          "ON_CALL_BONUS": "On-Call Bonus",
+          "CUSTOM": "Custom"
+        },
+        "units": {
+          "MONTHLY": "Monthly",
+          "BIWEEKLY": "Biweekly",
+          "WEEKLY": "Weekly",
+          "DAILY": "Daily",
+          "PER_SHIFT": "Per Shift",
+          "PER_MINUTE": "Per Minute",
+          "PER_HOUR": "Per Hour",
+          "PERCENTAGE": "Percentage",
+          "MULTIPLIER": "Multiplier",
+          "FIXED_AMOUNT": "Fixed Amount"
+        },
+        "conditions": {
+          "ALWAYS": "Always",
+          "WEEKDAY_ONLY": "Weekdays Only",
+          "WEEKEND_ONLY": "Weekend Only",
+          "SATURDAY_ONLY": "Saturday Only",
+          "SUNDAY_ONLY": "Sunday Only",
+          "HOLIDAY_ONLY": "Holidays Only",
+          "IRRENUNCIABLE_ONLY": "Mandatory Holidays Only",
+          "NIGHT_SHIFT_ONLY": "Night Shift Only (10PM-6AM)",
+          "DAY_SHIFT_ONLY": "Day Shift Only",
+          "OVERTIME_ONLY": "Overtime Only"
+        }
+      },
       "rateTemplateForm": {
         "createTitle": "New rate type",
         "editTitle": "Edit rate type",
@@ -1336,11 +1504,12 @@
         "cancel": "Cancel"
       },
       "delete": {
-        "contractTitle": "End contract",
-        "contractDescription": "End this contract? It will remain in history.",
-        "templateTitle": "Delete rate type",
-        "templateDescription": "Delete this type? It cannot have associated contracts.",
+        "contractTitle": "End Contract",
+        "contractDescription": "End {name}'s contract? It will remain in history.",
+        "templateTitle": "Delete Rate Template",
+        "templateDescription": "Delete template '{name}'? You can only delete it if it has no associated contracts.",
         "confirm": "Confirm",
+        "cancel": "Cancel",
         "endContract": "End",
         "deleting": "Processing..."
       },
@@ -1358,6 +1527,85 @@
         "noContract": "Not assigned"
       },
       "perMinute": "/min"
+    },
+    "calendar": {
+      "title": "Organization Calendar",
+      "description": "Manage special days, holidays, and pay multipliers for your organization",
+      "errorLoading": "Error loading calendar",
+      "previousMonth": "Previous Month",
+      "nextMonth": "Next Month",
+      "legend": "Legend",
+      "multiplier": "Multiplier",
+      "multiplierBadge": "{value}x",
+      "thisDay": "this day",
+      "editDescription": "Define the day type, pay multiplier, and custom name",
+      "dayTypes": {
+        "NORMAL": "Normal Day",
+        "WEEKEND": "Weekend",
+        "SATURDAY": "Saturday",
+        "SUNDAY": "Sunday",
+        "HOLIDAY": "Holiday",
+        "IRRENUNCIABLE": "Mandatory Holiday",
+        "ORGANIZATION_HOLIDAY": "Organization Holiday",
+        "CUSTOM": "Custom"
+      },
+      "form": {
+        "dayType": "Day Type",
+        "dayTypeTooltip": "Define what type of day this is. Mandatory holidays have special pay by law. Organization holidays are company-specific days off.",
+        "multiplier": "Pay Multiplier",
+        "multiplierTooltip": "Factor that multiplies the pay for shifts worked on this day. For example: 1.5 = 150% of normal pay, 2.0 = double pay. Mandatory holidays typically use 2.0 or more according to law.",
+        "name": "Day Name (optional)",
+        "nameTooltip": "Give this special day a descriptive name. For example: 'New Year', 'Christmas', 'Company Anniversary Day'.",
+        "namePlaceholder": "e.g. Christmas",
+        "description": "Description (optional)",
+        "descriptionPlaceholder": "Add notes about this day",
+        "save": "Save",
+        "saving": "Saving...",
+        "cancel": "Cancel"
+      },
+      "errors": {
+        "invalidMultiplier": "Multiplier must be a valid number greater than or equal to 0"
+      },
+      "delete": {
+        "title": "Delete special day",
+        "description": "Are you sure you want to delete {name}? Shifts on this date will return to normal pay.",
+        "cancel": "Cancel",
+        "confirm": "Delete",
+        "deleting": "Deleting..."
+      }
+    }
+  },
+  "staff": {
+    "table": {
+      "title": "Organization Staff",
+      "description": "View all staff and their active contracts",
+      "name": "Name",
+      "role": "Role",
+      "area": "Area",
+      "contract": "Contract",
+      "status": "Status",
+      "totalStaff": "people",
+      "hasContract": "With contract",
+      "noContract": "No contract",
+      "noContractStatus": "Not assigned",
+      "multiplierBadge": "{value}x"
+    },
+    "roles": {
+      "chief": "Area Chief",
+      "staff": "Health Staff"
+    },
+    "goToRates": "Manage Rates",
+    "empty": "No staff in the organization",
+    "warnings": {
+      "staffWithoutContract": "Staff Without Assigned Contract",
+      "staffWithoutContractDescription": "{count} person(s) do not have an assigned contract. Assign them a rate from the Rates module.",
+      "assignRate": "Assign Rate"
+    },
+    "stats": {
+      "withContract": "With Contract",
+      "withContractDescription": "Staff with assigned rate",
+      "withoutContract": "Without Contract",
+      "withoutContractDescription": "Require assignment"
     }
   },
   "errors": {

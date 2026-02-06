@@ -6,6 +6,7 @@ import type { Country } from '@prisma/client'
 import { requireAuth } from '@/src/shared/lib/auth/session'
 import type { ActionResult } from '@/src/shared/lib/types'
 import { getLocaleFromHeaders } from '@/src/shared/lib/utils/get-locale'
+import { handleActionError } from '@/src/shared/lib/utils'
 
 import {
   acceptInvitation,
@@ -32,26 +33,20 @@ export async function updateProfileAction(data: {
     const updateProfileSchema = await getUpdateProfileSchema(locale)
 
     const validation = updateProfileSchema.safeParse(data)
-    if (!validation.success) 
+    if (!validation.success)
       return {
         success: false,
         error: validation.error.issues[0].message,
       }
-    
 
     const result = await updateUserProfile(user.id, validation.data)
 
-    if (result.success) 
+    if (result.success)
       revalidatePath('/dashboard/profile')
-    
 
     return result
   } catch (error) {
-    console.error('[updateProfileAction] Error:', error)
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Error al actualizar el perfil',
-    }
+    return handleActionError(error, 'updateProfileAction', 'Error al actualizar el perfil')
   }
 }
 
@@ -66,12 +61,11 @@ export async function changePasswordAction(data: {
     const changePasswordSchema = await getChangePasswordSchema(locale)
 
     const validation = changePasswordSchema.safeParse(data)
-    if (!validation.success) 
+    if (!validation.success)
       return {
         success: false,
         error: validation.error.issues[0].message,
       }
-    
 
     return await changeUserPassword(
       user.id,
@@ -79,11 +73,7 @@ export async function changePasswordAction(data: {
       validation.data.newPassword
     )
   } catch (error) {
-    console.error('[changePasswordAction] Error:', error)
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Error al cambiar la contraseña',
-    }
+    return handleActionError(error, 'changePasswordAction', 'Error al cambiar la contraseña')
   }
 }
 
@@ -97,12 +87,11 @@ export async function updateDocumentAction(data: {
     const updateDocumentSchema = await getUpdateDocumentSchema(locale, data.country)
 
     const validation = updateDocumentSchema.safeParse(data)
-    if (!validation.success) 
+    if (!validation.success)
       return {
         success: false,
         error: validation.error.issues[0].message,
       }
-    
 
     const result = await updateUserDocument(
       user.id,
@@ -110,17 +99,12 @@ export async function updateDocumentAction(data: {
       validation.data.docNumber
     )
 
-    if (result.success) 
+    if (result.success)
       revalidatePath('/dashboard/profile')
-    
 
     return result
   } catch (error) {
-    console.error('[updateDocumentAction] Error:', error)
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Error al actualizar el documento',
-    }
+    return handleActionError(error, 'updateDocumentAction', 'Error al actualizar el documento')
   }
 }
 
@@ -130,8 +114,7 @@ export async function getPendingInvitationsAction(): Promise<ActionResult<unknow
     const invitations = await getPendingInvitations(user.id)
     return { success: true, data: invitations }
   } catch (error) {
-    console.error('[getPendingInvitationsAction] Error:', error)
-    return { success: false, error: 'Error al obtener invitaciones pendientes.' }
+    return handleActionError(error, 'getPendingInvitationsAction', 'Error al obtener invitaciones pendientes')
   }
 }
 
@@ -148,11 +131,7 @@ export async function acceptInvitationAction(invitationId: string): Promise<Acti
 
     return result
   } catch (error) {
-    console.error('[acceptInvitationAction] Error:', error)
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Error al aceptar la invitación',
-    }
+    return handleActionError(error, 'acceptInvitationAction', 'Error al aceptar la invitación')
   }
 }
 
@@ -168,11 +147,7 @@ export async function rejectInvitationAction(invitationId: string): Promise<Acti
 
     return result
   } catch (error) {
-    console.error('[rejectInvitationAction] Error:', error)
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Error al rechazar la invitación',
-    }
+    return handleActionError(error, 'rejectInvitationAction', 'Error al rechazar la invitación')
   }
 }
 
@@ -182,7 +157,6 @@ export async function getUserOrganizationsAction(): Promise<ActionResult<unknown
     const data = await getUserOrganizations(user.id)
     return { success: true, data }
   } catch (error) {
-    console.error('[getUserOrganizationsAction] Error:', error)
-    return { success: false, error: 'Error al obtener organizaciones.' }
+    return handleActionError(error, 'getUserOrganizationsAction', 'Error al obtener organizaciones')
   }
 }

@@ -74,6 +74,7 @@ export default async function AdminHROrganizationPage({ params }: AdminHROrganiz
         defaultRole={ROLES.CHIEF_AREA}
         showAreaColumn
         showUnlinkButton
+        availableAreas={organization.availableAreas}
       />
 
       <OrganizationTeamSection

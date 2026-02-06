@@ -14,6 +14,7 @@ Documentación dividida en archivos enfocados. Ver [README.md](./README.md) para
 | vita-roadmap.md | fases, próximos | Roadmap, prioridades |
 | vita-lessons.md | lecciones | Mejores prácticas |
 | vita-workflows.md | workflows | Flujos por rol y pendientes |
+| INTERNACIONALIZACION.md | i18n, formatos, países | Formatos fecha/moneda por país |
 
 ## Historial por Fase
 

@@ -56,6 +56,10 @@ src/
 - Idiomas: español (default), inglés
 - Keys en `messages/es.json` y `messages/en.json`
 - Build falla si hay literales en JSX (`react/jsx-no-literals`)
+- **Formatos por país**: Fechas, moneda, locales automáticos según `Country`
+  - Latam: `dd/MM/yyyy`, separador miles `.` (punto)
+  - USA: `MM/dd/yyyy`, separador miles `,` (coma)
+  - Ver guía completa en [INTERNACIONALIZACION.md](./INTERNACIONALIZACION.md)
 
 ## Configuración y variables de entorno
 

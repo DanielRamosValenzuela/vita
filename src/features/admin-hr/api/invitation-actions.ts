@@ -8,6 +8,7 @@ import type { ActionResult } from '@/src/shared/lib/types'
 import { ROLES } from '@/src/shared/lib/constants'
 import { handleActionError } from '@/src/shared/lib/utils'
 import { revalidatePaths } from '@/src/shared/lib/utils/revalidate-paths'
+import { checkDocumentExistsInOrganization } from '@/src/shared/lib/validation/document-validation'
 
 import {
   checkOrganizationLimit,
@@ -81,6 +82,9 @@ export const inviteChiefAction = async (
       select: {
         role: true,
         organizationId: true,
+        country: true,
+        docType: true,
+        docNumber: true,
       },
     })
 
@@ -97,6 +101,23 @@ export const inviteChiefAction = async (
         error: 'Este usuario ya es jefe de esta organización',
       }
     
+
+    if (user.country && user.docType && user.docNumber) {
+      const docExists = await checkDocumentExistsInOrganization(
+        user.country,
+        user.docType,
+        user.docNumber,
+        organizationId,
+        userId
+      )
+
+      if (docExists) 
+        return {
+          success: false,
+          error: `El documento ${user.docNumber} ya está registrado en esta organización por otro usuario`,
+        }
+      
+    }
 
     const invitationResult = await createInvitation(
       organizationId,
@@ -152,6 +173,9 @@ export const inviteStaffAction = async (
       select: {
         role: true,
         organizationId: true,
+        country: true,
+        docType: true,
+        docNumber: true,
       },
     })
 
@@ -168,6 +192,23 @@ export const inviteStaffAction = async (
         error: 'Este usuario ya es staff de esta organización',
       }
     
+
+    if (user.country && user.docType && user.docNumber) {
+      const docExists = await checkDocumentExistsInOrganization(
+        user.country,
+        user.docType,
+        user.docNumber,
+        organizationId,
+        userId
+      )
+
+      if (docExists) 
+        return {
+          success: false,
+          error: `El documento ${user.docNumber} ya está registrado en esta organización por otro usuario`,
+        }
+      
+    }
 
     const invitationResult = await createInvitation(
       organizationId,

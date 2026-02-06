@@ -40,6 +40,7 @@ import {
 
 import { removeUserFromOrganizationAction } from '../api/invitation-actions'
 import { InviteUserForm } from './invite-user-form'
+import { ChiefAreaSelector } from './chief-area-selector'
 
 interface OrganizationTeamSectionProps {
   organizationId: string
@@ -58,6 +59,7 @@ interface OrganizationTeamSectionProps {
   defaultRole: Role
   showAreaColumn?: boolean
   showUnlinkButton?: boolean
+  availableAreas?: Array<{ id: string; name: string }>
 }
 
 export function OrganizationTeamSection({
@@ -71,6 +73,7 @@ export function OrganizationTeamSection({
   defaultRole,
   showAreaColumn = false,
   showUnlinkButton = false,
+  availableAreas = [],
 }: OrganizationTeamSectionProps) {
   const t = useTranslations(translationNamespace)
   const router = useRouter()
@@ -171,10 +174,13 @@ export function OrganizationTeamSection({
                       <TableCell className="font-medium">{user.name}</TableCell>
                       <TableCell>{user.email}</TableCell>
                       {showAreaColumn && (
-                        <TableCell className="text-muted-foreground">
-                          {user.areas && user.areas.length > 0
-                            ? user.areas.map((a) => a.name).join(', ')
-                            : t('table.noAreaAssigned')}
+                        <TableCell>
+                          <ChiefAreaSelector
+                            chiefId={user.id}
+                            chiefName={user.name}
+                            currentAreas={user.areas || []}
+                            availableAreas={availableAreas}
+                          />
                         </TableCell>
                       )}
                       <TableCell>

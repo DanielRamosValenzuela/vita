@@ -35,6 +35,10 @@ export interface OrganizationStats {
     email: string
     createdAt: Date
   }>
+  availableAreas: Array<{
+    id: string
+    name: string
+  }>
 }
 
 export async function getAdminHROrganization(organizationId: string): Promise<OrganizationStats | null> {
@@ -72,6 +76,7 @@ export async function getAdminHROrganization(organizationId: string): Promise<Or
     invitations,
     chiefs,
     staff,
+    availableAreas,
   ] = await Promise.all([
     prisma.user.count({
       where: {
@@ -148,6 +153,14 @@ export async function getAdminHROrganization(organizationId: string): Promise<Or
       },
       orderBy: { createdAt: 'desc' },
     }),
+    prisma.area.findMany({
+      where: { organizationId },
+      select: {
+        id: true,
+        name: true,
+      },
+      orderBy: { name: 'asc' },
+    }),
   ])
 
   return {
@@ -174,5 +187,6 @@ export async function getAdminHROrganization(organizationId: string): Promise<Or
       areas: c.userAreas.map((ua) => ({ id: ua.area.id, name: ua.area.name })),
     })),
     staff,
+    availableAreas,
   }
 }

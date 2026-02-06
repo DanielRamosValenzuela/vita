@@ -1,7 +1,7 @@
 import { getTranslations } from 'next-intl/server'
 
 import { getStaffPageDataAction } from '@/src/features/admin-hr/api'
-import { ContractsPage } from '@/src/features/admin-hr/ui'
+import { StaffViewPage } from '@/src/features/admin-hr/ui'
 import { requireAdminHROrChiefArea } from '@/src/shared/lib/auth'
 import { Alert, AlertDescription, AlertTitle } from '@/src/shared/ui/alert'
 
@@ -37,7 +37,21 @@ export default async function StaffPage({ params }: StaffPageProps) {
       </div>
     )
 
-  const { staff, rateTemplates, areas, isChiefWithNoAreas } = result.data
+  const { staff } = result.data
+
+  if (staff.length === 0)
+    return (
+      <div className="container mx-auto py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold tracking-tight">{t('staff')}</h1>
+          <p className="text-muted-foreground mt-2">{t('staffDescription')}</p>
+        </div>
+        <Alert variant="default">
+          <AlertTitle>{t('staff')}</AlertTitle>
+          <AlertDescription>{t('staffNoAreasAssigned')}</AlertDescription>
+        </Alert>
+      </div>
+    )
 
   return (
     <div className="container mx-auto py-8 space-y-8">
@@ -46,14 +60,7 @@ export default async function StaffPage({ params }: StaffPageProps) {
         <p className="text-muted-foreground mt-2">{t('staffDescription')}</p>
       </div>
 
-      {isChiefWithNoAreas ? (
-        <Alert variant="default">
-          <AlertTitle>{t('staff')}</AlertTitle>
-          <AlertDescription>{t('staffNoAreasAssigned')}</AlertDescription>
-        </Alert>
-      ) : (
-        <ContractsPage data={{ staff, rateTemplates, areas }} />
-      )}
+      <StaffViewPage staff={staff} />
     </div>
   )
 }

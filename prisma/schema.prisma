@@ -1,7 +1,7 @@
 generator client {
-  provider        = "prisma-client-js"
-  engineType      = "library"
-  compilerBuild   = "small"
+  provider      = "prisma-client-js"
+  engineType    = "library"
+  compilerBuild = "small"
 }
 
 datasource db {
@@ -9,30 +9,32 @@ datasource db {
 }
 
 model Organization {
-  id           String             @id @default(cuid())
-  name         String
-  country      Country            @default(CL)
-  taxId        String             @unique
-  plan         OrganizationPlan   @default(BASIC)
-  status       OrganizationStatus @default(ACTIVE)
-  monthlyFee   Float              @default(0)
-  maxAdminHR   Int                @default(5)
-  maxChiefs    Int                @default(0)
-  maxStaff     Int                @default(0)
-  nextPayment  DateTime?
-  contactName  String?
-  contactEmail String?
-  contactPhone String?
-  address      String?
-  createdAt    DateTime           @default(now())
-  updatedAt    DateTime           @updatedAt
-  users        User[]
-  areas        Area[]
-  invitations  OrganizationInvitation[]
+  id            String                   @id @default(cuid())
+  name          String
+  country       Country                  @default(CL)
+  currency      Currency                 @default(CLP)
+  taxId         String                   @unique
+  plan          OrganizationPlan         @default(BASIC)
+  status        OrganizationStatus       @default(ACTIVE)
+  monthlyFee    Float                    @default(0)
+  maxAdminHR    Int                      @default(5)
+  maxChiefs     Int                      @default(0)
+  maxStaff      Int                      @default(0)
+  nextPayment   DateTime?
+  contactName   String?
+  contactEmail  String?
+  contactPhone  String?
+  address       String?
+  createdAt     DateTime                 @default(now())
+  updatedAt     DateTime                 @updatedAt
+  users         User[]
+  areas         Area[]
+  invitations   OrganizationInvitation[]
   shiftTypes    ShiftType[]
   shifts        Shift[]
   rateTemplates RateTemplate[]
   contracts     Contract[]
+  calendars     OrganizationCalendar[]
 
   @@index([taxId])
   @@index([country])
@@ -41,26 +43,30 @@ model Organization {
 }
 
 model User {
-  id             String        @id @default(cuid())
-  email          String        @unique
-  name           String
-  country        Country?
-  docType        DocType?
-  docNumber      String?
-  emailVerified  DateTime?
-  image          String?
-  role           Role          @default(STAFF_HEALTH)
-  organizationId String?
-  linkingCode    String        @unique @default(cuid())
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
-  accounts       Account[]
-  sessions       Session[]
-  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  invitations    OrganizationInvitation[]
-  shifts         Shift[]
-  contracts      Contract[]
-  userAreas      UserArea[]
+  id              String                   @id @default(cuid())
+  email           String                   @unique
+  name            String
+  country         Country?
+  docType         DocType?
+  docNumber       String?
+  emailVerified   DateTime?
+  image           String?
+  customImage     String?
+  imageProvider   ImageProvider?
+  role            Role                     @default(STAFF_HEALTH)
+  organizationId  String?
+  linkingCode     String                   @unique @default(cuid())
+  createdAt       DateTime                 @default(now())
+  updatedAt       DateTime                 @updatedAt
+  accounts        Account[]
+  sessions        Session[]
+  organization    Organization?            @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  invitations     OrganizationInvitation[]
+  shifts          Shift[]
+  contracts       Contract[]
+  userAreas       UserArea[]
+  emails          UserEmail[]
+  documentHistory UserDocumentHistory[]
 
   @@unique([country, docType, docNumber])
   @@index([email])
@@ -68,6 +74,37 @@ model User {
   @@index([linkingCode])
   @@index([organizationId])
   @@index([country])
+}
+
+model UserEmail {
+  id         String         @id @default(cuid())
+  userId     String
+  email      String         @unique
+  isPrimary  Boolean        @default(false)
+  isVerified Boolean        @default(false)
+  provider   EmailProvider?
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+  user       User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([email])
+}
+
+model UserDocumentHistory {
+  id           String    @id @default(cuid())
+  userId       String
+  country      Country
+  docType      DocType
+  docNumber    String
+  validFrom    DateTime  @default(now())
+  validUntil   DateTime?
+  changeReason String?
+  createdAt    DateTime  @default(now())
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([docNumber])
 }
 
 model Account {
@@ -148,85 +185,186 @@ enum OrganizationStatus {
   INACTIVE
 }
 
-enum BaseSalaryUnit {
+enum Currency {
+  CLP
+  USD
+  COP
+  ARS
+  MXN
+  PEN
+  EUR
+}
+
+enum ComponentType {
+  BASE_SALARY
+  PER_MINUTE
+  PER_HOUR
+  PER_SHIFT
+  SHIFT_COMPLETION_BONUS
+  NIGHT_SHIFT_BONUS
+  WEEKEND_BONUS
+  HOLIDAY_BONUS
+  WEEKEND_MULTIPLIER
+  HOLIDAY_MULTIPLIER
+  IRRENUNCIABLE_MULTIPLIER
+  NIGHT_MULTIPLIER
+  OVERTIME_MULTIPLIER
+  SENIORITY_BONUS
+  PERFORMANCE_BONUS
+  AREA_BONUS
+  EMERGENCY_BONUS
+  ON_CALL_BONUS
+  CUSTOM
+}
+
+enum ComponentUnit {
   MONTHLY
+  BIWEEKLY
+  WEEKLY
   DAILY
-  HOURLY
+  PER_SHIFT
+  PER_MINUTE
+  PER_HOUR
+  PERCENTAGE
+  MULTIPLIER
+  FIXED_AMOUNT
+}
+
+enum ApplyCondition {
+  ALWAYS
+  WEEKDAY_ONLY
+  WEEKEND_ONLY
+  SATURDAY_ONLY
+  SUNDAY_ONLY
+  HOLIDAY_ONLY
+  IRRENUNCIABLE_ONLY
+  NIGHT_SHIFT_ONLY
+  DAY_SHIFT_ONLY
+  OVERTIME_ONLY
+  SPECIFIC_AREA
+  SPECIFIC_SHIFT_TYPE
+  CUSTOM_RULE
 }
 
 model RateTemplate {
-  id              String          @id @default(cuid())
-  name            String
-  description     String?
-  ratePerMinute   Float
-  ratePerHour     Float?
-  baseSalary      Float?
-  baseSalaryUnit  BaseSalaryUnit?
-  isActive        Boolean         @default(true)
-  organizationId  String
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
-  organization    Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  contracts       Contract[]
+  id             String          @id @default(cuid())
+  name           String
+  description    String?
+  isActive       Boolean         @default(true)
+  organizationId String
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  components     RateComponent[]
+  contracts      Contract[]
 
   @@index([organizationId])
   @@index([isActive])
 }
 
+model RateComponent {
+  id             String         @id @default(cuid())
+  rateTemplateId String
+  type           ComponentType
+  customName     String?
+  value          Float
+  unit           ComponentUnit
+  applyCondition ApplyCondition @default(ALWAYS)
+  conditionValue String?
+  description    String?
+  order          Int            @default(0)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  rateTemplate   RateTemplate   @relation(fields: [rateTemplateId], references: [id], onDelete: Cascade)
+
+  @@index([rateTemplateId])
+  @@index([type])
+}
+
 model Contract {
-  id                 String          @id @default(cuid())
-  userId             String
-  organizationId     String
-  areaId             String?
-  rateTemplateId     String?
-  ratePerMinute      Float?
-  adjustmentPerMinute Float           @default(0)
-  baseSalary         Float?
-  baseSalaryUnit     BaseSalaryUnit?
-  startDate          DateTime        @default(now())
-  endDate            DateTime?
-  isActive           Boolean         @default(true)
-  createdAt          DateTime        @default(now())
-  updatedAt          DateTime        @updatedAt
-  user               User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  organization       Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  area               Area?           @relation(fields: [areaId], references: [id], onDelete: SetNull)
-  rateTemplate       RateTemplate?   @relation(fields: [rateTemplateId], references: [id], onDelete: SetNull)
-  shifts             Shift[]
+  id               String       @id @default(cuid())
+  userId           String
+  organizationId   String
+  areaId           String?
+  rateTemplateId   String
+  customMultiplier Float?
+  startDate        DateTime     @default(now())
+  endDate          DateTime?
+  isActive         Boolean      @default(true)
+  notes            String?
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  user             User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization     Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  area             Area?        @relation(fields: [areaId], references: [id], onDelete: SetNull)
+  rateTemplate     RateTemplate @relation(fields: [rateTemplateId], references: [id], onDelete: Restrict)
+  shifts           Shift[]
 
   @@index([userId, organizationId])
   @@index([organizationId])
   @@index([userId])
   @@index([areaId])
+  @@index([rateTemplateId])
+  @@index([isActive])
+}
+
+enum DayType {
+  NORMAL
+  WEEKEND
+  SATURDAY
+  SUNDAY
+  HOLIDAY
+  IRRENUNCIABLE
+  ORGANIZATION_HOLIDAY
+  CUSTOM
+}
+
+model OrganizationCalendar {
+  id             String       @id @default(cuid())
+  organizationId String
+  date           DateTime
+  type           DayType      @default(NORMAL)
+  name           String?
+  description    String?
+  multiplier     Float        @default(1.0)
+  isRecurring    Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, date])
+  @@index([organizationId])
+  @@index([date])
+  @@index([type])
 }
 
 model Area {
-  id                   String          @id @default(cuid())
-  name                 String
-  description          String?
-  icon                 String?         @default("Building2")
-  color                String          @default("#3b82f6")
-  isActive             Boolean         @default(false)
-  maxConsecutiveHours  Int?
-  minRestHours         Int?
-  organizationId       String
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  shifts         Shift[]
-  contracts      Contract[]
-  shiftTypes     AreaShiftType[]
-  userAreas      UserArea[]
+  id                  String          @id @default(cuid())
+  name                String
+  description         String?
+  icon                String?         @default("Building2")
+  color               String          @default("#3b82f6")
+  isActive            Boolean         @default(false)
+  maxConsecutiveHours Int?
+  minRestHours        Int?
+  organizationId      String
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+  organization        Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  shifts              Shift[]
+  contracts           Contract[]
+  shiftTypes          AreaShiftType[]
+  userAreas           UserArea[]
 
   @@index([organizationId])
   @@index([isActive])
 }
 
 model UserArea {
-  userId   String
-  areaId   String
-  user     User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  area     Area @relation(fields: [areaId], references: [id], onDelete: Cascade)
+  userId String
+  areaId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  area   Area   @relation(fields: [areaId], references: [id], onDelete: Cascade)
 
   @@id([userId, areaId])
   @@index([userId])
@@ -234,17 +372,17 @@ model UserArea {
 }
 
 model OrganizationInvitation {
-  id             String       @id @default(cuid())
+  id             String           @id @default(cuid())
   organizationId String
   userId         String
   role           Role
   status         InvitationStatus @default(PENDING)
   invitedBy      String
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
   acceptedAt     DateTime?
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([organizationId, userId, role])
   @@index([organizationId])
@@ -266,23 +404,23 @@ enum ShiftClassification {
 }
 
 model ShiftType {
-  id                String             @id @default(cuid())
+  id                String              @id @default(cuid())
   name              String
   description       String?
-  icon              String?            @default("Clock")
-  durationMinutes   Int                @default(480)
+  icon              String?             @default("Clock")
+  durationMinutes   Int                 @default(480)
   classification    ShiftClassification @default(DAY)
-  color             String             @default("#3b82f6")
-  minStaffRequired  Int                @default(1)
-  idealStaffCount   Int                @default(1)
-  maxStaffAllowed   Int                @default(10)
-  suggestedRestDays Int                @default(1)
-  isGlobal          Boolean            @default(true)
-  isActive          Boolean            @default(true)
+  color             String              @default("#3b82f6")
+  minStaffRequired  Int                 @default(1)
+  idealStaffCount   Int                 @default(1)
+  maxStaffAllowed   Int                 @default(10)
+  suggestedRestDays Int                 @default(1)
+  isGlobal          Boolean             @default(true)
+  isActive          Boolean             @default(true)
   organizationId    String
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
-  organization      Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  organization      Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   shifts            Shift[]
   areaShiftTypes    AreaShiftType[]
 
@@ -303,25 +441,25 @@ model AreaShiftType {
 }
 
 model Shift {
-  id            String     @id @default(cuid())
-  title         String?
-  startTime     DateTime
-  endTime       DateTime
-  status        ShiftStatus @default(SCHEDULED)
-  notes         String?
-  userId        String
-  areaId        String
-  shiftTypeId   String
+  id             String       @id @default(cuid())
+  title          String?
+  startTime      DateTime
+  endTime        DateTime
+  status         ShiftStatus  @default(SCHEDULED)
+  notes          String?
+  userId         String
+  areaId         String
+  shiftTypeId    String
   organizationId String
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
-  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  area          Area       @relation(fields: [areaId], references: [id], onDelete: Cascade)
-  shiftType     ShiftType  @relation(fields: [shiftTypeId], references: [id], onDelete: Cascade)
-  organization  Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  contractId    String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  area           Area         @relation(fields: [areaId], references: [id], onDelete: Cascade)
+  shiftType      ShiftType    @relation(fields: [shiftTypeId], references: [id], onDelete: Cascade)
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  contractId     String?
 
-  contract      Contract?    @relation(fields: [contractId], references: [id], onDelete: SetNull)
+  contract Contract? @relation(fields: [contractId], references: [id], onDelete: SetNull)
 
   @@index([organizationId])
   @@index([userId])
@@ -339,4 +477,18 @@ enum ShiftStatus {
   COMPLETED
   CANCELLED
   NO_SHOW
+}
+
+enum ImageProvider {
+  OAUTH
+  UPLOAD
+  GRAVATAR
+}
+
+enum EmailProvider {
+  GOOGLE
+  CREDENTIALS
+  GITHUB
+  FACEBOOK
+  APPLE
 }

@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 
 import { requireSuperAdmin } from '@/src/shared/lib/auth/session'
 import { getLocaleFromHeaders } from '@/src/shared/lib/utils/get-locale'
+import { handleActionError } from '@/src/shared/lib/utils'
 
 import {
   changeOrganizationStatus,
@@ -50,20 +51,7 @@ export const createOrganizationAction = async (data: CreateOrganizationInput) =>
       message: 'Organización creada exitosamente',
     }
   } catch (error) {
-    console.error('[createOrganizationAction] Error:', error)
-
-    if (error instanceof Error && 'name' in error && error.name === 'ZodError') 
-      return {
-        success: false,
-        error: 'Datos inválidos',
-        errors: 'errors' in error ? error.errors : [],
-      }
-    
-
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Error al crear la organización',
-    }
+    return handleActionError(error, 'createOrganizationAction', 'Error al crear la organización')
   }
 }
 
@@ -88,20 +76,7 @@ export const updateOrganizationAction = async (data: UpdateOrganizationInput) =>
       message: 'Organización actualizada exitosamente',
     }
   } catch (error) {
-    console.error('[updateOrganizationAction] Error:', error)
-
-    if (error instanceof Error && 'name' in error && error.name === 'ZodError') 
-      return {
-        success: false,
-        error: 'Datos inválidos',
-        errors: 'errors' in error ? error.errors : [],
-      }
-    
-
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Error al actualizar la organización',
-    }
+    return handleActionError(error, 'updateOrganizationAction', 'Error al actualizar la organización')
   }
 }
 
@@ -126,20 +101,7 @@ export const changeOrganizationStatusAction = async (data: ChangeOrganizationSta
       message: `Estado cambiado a ${status} exitosamente`,
     }
   } catch (error) {
-    console.error('[changeOrganizationStatusAction] Error:', error)
-
-    if (error instanceof Error && 'name' in error && error.name === 'ZodError') 
-      return {
-        success: false,
-        error: 'Datos inválidos',
-        errors: 'errors' in error ? error.errors : [],
-      }
-    
-
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Error al cambiar el estado',
-    }
+    return handleActionError(error, 'changeOrganizationStatusAction', 'Error al cambiar el estado')
   }
 }
 
@@ -163,19 +125,6 @@ export const deleteOrganizationAction = async (data: DeleteOrganizationInput) =>
       message: 'Organización eliminada exitosamente',
     }
   } catch (error) {
-    console.error('[deleteOrganizationAction] Error:', error)
-
-    if (error instanceof Error && 'name' in error && error.name === 'ZodError') 
-      return {
-        success: false,
-        error: 'Datos inválidos',
-        errors: 'errors' in error ? error.errors : [],
-      }
-    
-
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Error al eliminar la organización',
-    }
+    return handleActionError(error, 'deleteOrganizationAction', 'Error al eliminar la organización')
   }
 }

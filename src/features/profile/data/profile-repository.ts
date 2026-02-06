@@ -110,6 +110,41 @@ export async function updateUserDocument(
   try {
     const cleanDocNumber = docNumber.replace(/[^0-9A-Za-z]/g, '')
 
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        organizationId: true,
+        country: true,
+        docNumber: true,
+        createdAt: true,
+      },
+    })
+
+    if (!user) 
+      return { success: false, error: 'Usuario no encontrado' }
+    
+
+    if (user.organizationId) {
+      const existingInOrg = await prisma.user.findFirst({
+        where: {
+          AND: [
+            { id: { not: userId } },
+            { organizationId: user.organizationId },
+            { country },
+            { docNumber: cleanDocNumber },
+          ],
+        },
+        select: { name: true, email: true },
+      })
+
+      if (existingInOrg) 
+        return {
+          success: false,
+          error: `Este número de documento ya está registrado en tu organización (${existingInOrg.name})`,
+        }
+      
+    }
+
     const existingDoc = await prisma.user.findFirst({
       where: {
         country,
@@ -122,11 +157,35 @@ export async function updateUserDocument(
       return { success: false, error: 'Este número de documento ya está en uso' }
     
 
+    if (user.docNumber && user.country) 
+      await prisma.userDocumentHistory.create({
+        data: {
+          userId,
+          country: user.country,
+          docType: 'RUT',
+          docNumber: user.docNumber,
+          validFrom: user.createdAt,
+          validUntil: new Date(),
+          changeReason: 'change',
+        },
+      })
+    
+
     await prisma.user.update({
       where: { id: userId },
       data: {
         country,
         docNumber: cleanDocNumber,
+      },
+    })
+
+    await prisma.userDocumentHistory.create({
+      data: {
+        userId,
+        country,
+        docType: 'RUT',
+        docNumber: cleanDocNumber,
+        changeReason: user.docNumber ? 'change' : 'initial',
       },
     })
 

@@ -3,6 +3,7 @@ import {
   BarChart3,
   Building2,
   Calendar,
+  CalendarDays,
   Clock,
   CreditCard,
   DollarSign,
@@ -57,6 +58,12 @@ export function getNavItems(t: (key: string) => string, userRole: Role): NavItem
       href: '/dashboard/rates',
       label: t('rates'),
       icon: DollarSign,
+      roles: [Role.ADMIN_HR],
+    },
+    {
+      href: '/dashboard/calendar',
+      label: t('calendar'),
+      icon: CalendarDays,
       roles: [Role.ADMIN_HR],
     },
     {

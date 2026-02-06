@@ -79,9 +79,10 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id
         token.role = user.role
         token.organizationId = user.organizationId
-        token.country = user.country
-        token.docType = user.docType
-        token.docNumber = user.docNumber
+          token.country = user.country
+          token.docType = user.docType
+          token.docNumber = user.docNumber
+          token.customImage = user.customImage
       } else if (token.id)
         try {
           const currentUser = await prisma.user.findUnique({
@@ -92,6 +93,7 @@ export const authOptions: NextAuthOptions = {
               country: true,
               docType: true,
               docNumber: true,
+              customImage: true,
             },
           })
 
@@ -101,6 +103,7 @@ export const authOptions: NextAuthOptions = {
             token.country = currentUser.country || undefined
             token.docType = currentUser.docType || undefined
             token.docNumber = currentUser.docNumber || undefined
+            token.customImage = currentUser.customImage || undefined
           }
         } catch (error) {
           console.error('[NextAuth jwt] DB error refreshing token:', error)

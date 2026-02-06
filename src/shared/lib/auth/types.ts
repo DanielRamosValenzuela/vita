@@ -5,6 +5,7 @@ export interface CurrentUser {
   email: string
   name: string
   image?: string
+  customImage?: string
   role: Role
   organizationId?: string
   country?: string

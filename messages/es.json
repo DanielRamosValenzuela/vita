@@ -441,6 +441,45 @@
   "profile": {
     "title": "Perfil",
     "description": "Gestiona tu información personal y configuración",
+    "avatarTitle": "Foto de Perfil",
+    "avatarDescription": "Sube una foto personalizada para tu perfil",
+    "uploadAvatar": "Subir foto",
+    "changeAvatar": "Cambiar foto",
+    "deleteAvatar": "Eliminar",
+    "avatarHelp": "JPG, PNG o GIF. Máximo 5MB",
+    "emails": {
+      "title": "Emails de Cuenta",
+      "description": "Administra tus correos electrónicos y vinculaciones",
+      "addEmail": "Agregar Email",
+      "addEmailPlaceholder": "nuevo@email.com",
+      "noEmails": "No tienes emails secundarios",
+      "primary": "Principal",
+      "notVerified": "No verificado",
+      "setPrimary": "Establecer como principal",
+      "removeEmail": "Eliminar email",
+      "linkWithGoogle": "Vincular con Google",
+      "unlinkGoogle": "Desvincular Google",
+      "googleLinkSuccess": "Email vinculado con Google exitosamente. Tu email ahora está verificado.",
+      "googleLinkError": "Error al vincular con Google. Intenta nuevamente.",
+      "googleLinkMissingParams": "Faltan parámetros para completar la vinculación.",
+      "googleLinkInvalidEmail": "El email no es válido o no te pertenece.",
+      "googleLinkEmailMismatch": "El email de Google no coincide con el que intentas vincular.",
+      "googleLinkServerError": "Error del servidor al procesar la vinculación.",
+      "deleteConfirm": {
+        "title": "Eliminar Email",
+        "description": "¿Estás seguro de que deseas eliminar {email}?",
+        "cancel": "Cancelar",
+        "confirm": "Eliminar",
+        "deleting": "Eliminando..."
+      },
+      "unlinkConfirm": {
+        "title": "Desvincular Google",
+        "description": "¿Deseas desvincular {email} de Google? El email dejará de estar verificado.",
+        "cancel": "Cancelar",
+        "confirm": "Desvincular",
+        "unlinking": "Desvinculando..."
+      }
+    },
     "basicInfo": {
       "title": "Información Básica",
       "name": {
@@ -793,11 +832,14 @@
           "noDocNumberWarning": "Este usuario no tiene número de documento registrado",
           "inOtherOrg": "Este usuario ya está vinculado a otra organización: {orgName}",
           "inviteWithoutDoc": "Se enviará la invitación, pero el usuario deberá completar su perfil con su número de documento antes de poder aceptarla",
+          "actions": "Acciones",
           "cancel": "Cancelar",
           "inviting": "Enviando...",
           "sendInvitation": "Enviar Invitación",
           "inviteSuccess": "Invitación enviada exitosamente",
-          "inviteError": "Error al enviar invitación"
+          "inviteError": "Error al enviar invitación",
+          "alreadyInRole": "Este usuario ya es administrador de esta organización",
+          "alreadyInOrg": "Este usuario ya pertenece a esta organización"
         },
         "table": {
           "name": "Nombre",
@@ -995,7 +1037,9 @@
   "adminHR": {
     "dashboard": {
       "title": "Panel de Control",
-      "description": "Bienvenido al panel de administración de recursos humanos"
+      "description": "Bienvenido al panel de administración de recursos humanos",
+      "errorLoading": "Error al cargar las estadísticas del dashboard",
+      "limitsTitle": "Límites de Organización"
     },
     "organization": {
       "title": "Mi Organización",
@@ -1044,7 +1088,20 @@
           "noAreaAssigned": "Sin área asignada",
           "createdAt": "Fecha de Registro",
           "actions": "Acciones",
-          "unlink": "Desvincular"
+          "unlink": "Desvincular",
+          "assignArea": "Asignar área",
+          "changeArea": "Cambiar área",
+          "removeArea": "Quitar área"
+        },
+        "assignAreaForm": {
+          "titleAssign": "Asignar área a jefe",
+          "titleChange": "Cambiar área del jefe",
+          "description": "Selecciona el área para {name}",
+          "selectArea": "Área",
+          "selectPlaceholder": "Selecciona un área",
+          "cancel": "Cancelar",
+          "assign": "Asignar",
+          "assigning": "Asignando..."
         },
         "unlinkConfirm": {
           "title": "Desvincular jefe de área",
@@ -1272,10 +1329,35 @@
         }
       },
       "rateTemplates": {
-        "title": "Tipos de tarifa",
-        "description": "Plantillas reutilizables (ej: Guardia nocturno, Enfermera día)",
-        "create": "Nuevo tipo",
-        "empty": "Sin tipos aún. Crea uno para asignar al personal."
+        "title": "Plantillas de Tarifa",
+        "description": "Plantillas reutilizables con componentes personalizables",
+        "create": "Nueva Plantilla",
+        "empty": "Sin plantillas aún. Crea una para asignar al personal.",
+        "table": {
+          "name": "Nombre",
+          "components": "Componentes",
+          "componentsCount": "componentes",
+          "contracts": "Contratos",
+          "noContracts": "Sin usar",
+          "actions": "Acciones",
+          "edit": "Editar",
+          "duplicate": "Duplicar",
+          "delete": "Eliminar"
+        }
+      },
+      "staffTable": {
+        "title": "Personal con Contratos",
+        "description": "Visualiza el personal y sus contratos activos",
+        "person": "Persona",
+        "area": "Área",
+        "rateTemplate": "Plantilla de Tarifa",
+        "status": "Estado",
+        "statusActive": "Activo",
+        "statusNoContract": "Sin contrato",
+        "multiplier": "Multiplicador",
+        "multiplierValue": "Multiplicador: {value}x",
+        "actions": "Acciones",
+        "endContract": "Finalizar"
       },
       "contract": {
         "create": "Asignar tarifa",
@@ -1299,14 +1381,91 @@
         "useCustom": "Usar tarifa personalizada",
         "useTemplate": "Usar tipo de tarifa"
       },
-      "rateTemplateForm": {
-        "createTitle": "Nuevo tipo de tarifa",
-        "editTitle": "Editar tipo de tarifa",
-        "name": "Nombre",
-        "namePlaceholder": "ej: Guardia nocturno",
-        "ratePerMinute": "Tarifa por minuto",
-        "baseSalary": "Sueldo base (opcional)",
-        "contractsCount": "{count} contrato(s)"
+      "templateForm": {
+        "createTitle": "Nueva Plantilla de Tarifa",
+        "editTitle": "Editar Plantilla de Tarifa",
+        "createDescription": "Crea una plantilla de tarifa completamente personalizable con componentes. Combina salarios base, tarifas por tiempo, bonos y multiplicadores según tus necesidades.",
+        "editDescription": "Modifica los componentes y configuración de esta tarifa. Los cambios no afectarán contratos ya existentes.",
+        "name": "Nombre de la Tarifa",
+        "namePlaceholder": "ej: Guardia Nocturno Premium",
+        "nameTooltip": "Dale un nombre descriptivo a esta tarifa. Por ejemplo: 'Guardia Salud 12hrs', 'Seguridad Fin de Semana', 'Enfermera Nocturna'.",
+        "description": "Descripción (opcional)",
+        "descriptionPlaceholder": "Describe cuándo y cómo se usa esta tarifa",
+        "descriptionTooltip": "Explica para qué tipo de personal o situaciones está pensada esta tarifa. Ayudará a otros administradores a entender su uso.",
+        "save": "Guardar Tarifa",
+        "saving": "Guardando...",
+        "cancel": "Cancelar",
+        "errors": {
+          "nameRequired": "El nombre es obligatorio",
+          "componentsRequired": "Debes añadir al menos un componente para crear la tarifa"
+        },
+        "components": {
+          "title": "Componentes de la Tarifa",
+          "add": "Añadir Componente",
+          "emptyTitle": "¿Cómo se calcula esta tarifa?",
+          "emptyDescription": "Añade componentes para definir cómo se pagará al personal. Puedes combinar salarios base, tarifas por tiempo trabajado, bonos especiales y multiplicadores.",
+          "addFirst": "Añadir Primer Componente"
+        },
+        "componentsTooltip": "Los componentes definen cómo se calcula el pago. Puedes combinar: salario base (mensual/quincenal), tarifas por tiempo (minuto/hora), bonos (nocturno/fin de semana) y multiplicadores (horas extra/feriados)."
+      },
+      "componentForm": {
+        "type": "Tipo de Componente",
+        "typeTooltip": "Selecciona qué tipo de pago representa este componente. Por ejemplo: Sueldo Base (pago fijo mensual), Por Minuto (se paga según tiempo trabajado), Bono Nocturno (extra por turnos de noche), etc.",
+        "unit": "Unidad de Pago",
+        "unitTooltip": "Define cada cuánto tiempo o evento se paga este componente. Por ejemplo: Mensual (una vez al mes), Por Turno (cada vez que trabaje), Por Minuto (según minutos trabajados).",
+        "value": "Monto",
+        "valueTooltip": "Ingresa el valor numérico. Para salarios y bonos usa la moneda de tu país. Para multiplicadores usa decimales (ej: 1.5 = 150%). Para porcentajes usa números (ej: 10 = 10%).",
+        "applyCondition": "Cuándo Aplica",
+        "applyConditionTooltip": "Define en qué situaciones se aplicará este componente. 'Siempre' lo incluye en todos los turnos. Otras opciones lo limitan a horarios nocturnos, fines de semana, feriados, etc.",
+        "customName": "Nombre Personalizado (opcional)",
+        "customNamePlaceholder": "ej: Bono por turno largo",
+        "description": "Descripción (opcional)",
+        "descriptionPlaceholder": "Añade notas o aclaraciones sobre este componente",
+        "types": {
+          "BASE_SALARY": "Sueldo Base",
+          "PER_MINUTE": "Por Minuto",
+          "PER_HOUR": "Por Hora",
+          "PER_SHIFT": "Por Turno",
+          "SHIFT_COMPLETION_BONUS": "Bono por Completar Turno",
+          "NIGHT_SHIFT_BONUS": "Bono Turno Nocturno",
+          "WEEKEND_BONUS": "Bono Fin de Semana",
+          "HOLIDAY_BONUS": "Bono Feriado",
+          "WEEKEND_MULTIPLIER": "Multiplicador Fin de Semana",
+          "HOLIDAY_MULTIPLIER": "Multiplicador Feriado",
+          "IRRENUNCIABLE_MULTIPLIER": "Multiplicador Feriado Irrenunciable",
+          "NIGHT_MULTIPLIER": "Multiplicador Nocturno",
+          "OVERTIME_MULTIPLIER": "Multiplicador Horas Extra",
+          "SENIORITY_BONUS": "Bono por Antigüedad",
+          "PERFORMANCE_BONUS": "Bono por Desempeño",
+          "AREA_BONUS": "Bono por Área",
+          "EMERGENCY_BONUS": "Bono Emergencia",
+          "ON_CALL_BONUS": "Bono Disponibilidad",
+          "CUSTOM": "Personalizado"
+        },
+        "units": {
+          "MONTHLY": "Mensual",
+          "BIWEEKLY": "Quincenal",
+          "WEEKLY": "Semanal",
+          "DAILY": "Diario",
+          "PER_SHIFT": "Por Turno",
+          "PER_MINUTE": "Por Minuto",
+          "PER_HOUR": "Por Hora",
+          "PERCENTAGE": "Porcentaje",
+          "MULTIPLIER": "Multiplicador",
+          "FIXED_AMOUNT": "Monto Fijo"
+        },
+        "conditions": {
+          "ALWAYS": "Siempre",
+          "WEEKDAY_ONLY": "Solo Días de Semana",
+          "WEEKEND_ONLY": "Solo Fin de Semana",
+          "SATURDAY_ONLY": "Solo Sábado",
+          "SUNDAY_ONLY": "Solo Domingo",
+          "HOLIDAY_ONLY": "Solo Feriados",
+          "IRRENUNCIABLE_ONLY": "Solo Feriados Irrenunciables",
+          "NIGHT_SHIFT_ONLY": "Solo Turno Nocturno (22:00-06:00)",
+          "DAY_SHIFT_ONLY": "Solo Turno Diurno",
+          "OVERTIME_ONLY": "Solo Horas Extra"
+        }
       },
       "saveConfirm": {
         "title": "¿Guardar cambios?",
@@ -1315,11 +1474,12 @@
         "cancel": "Cancelar"
       },
       "delete": {
-        "contractTitle": "Finalizar contrato",
-        "contractDescription": "¿Finalizar este contrato? Quedará en el historial.",
-        "templateTitle": "Eliminar tipo de tarifa",
-        "templateDescription": "¿Eliminar este tipo? No puede tener contratos asociados.",
+        "contractTitle": "Finalizar Contrato",
+        "contractDescription": "¿Finalizar el contrato de {name}? Quedará en el historial.",
+        "templateTitle": "Eliminar Plantilla de Tarifa",
+        "templateDescription": "¿Eliminar la plantilla '{name}'? Solo puedes eliminarla si no tiene contratos asociados.",
         "confirm": "Confirmar",
+        "cancel": "Cancelar",
         "endContract": "Finalizar",
         "deleting": "Procesando..."
       },
@@ -1337,6 +1497,85 @@
         "noContract": "Sin asignar"
       },
       "perMinute": "/min"
+    },
+    "calendar": {
+      "title": "Calendario Organizacional",
+      "description": "Gestiona días especiales, feriados y multiplicadores de pago para tu organización",
+      "errorLoading": "Error al cargar el calendario",
+      "previousMonth": "Mes Anterior",
+      "nextMonth": "Mes Siguiente",
+      "legend": "Leyenda",
+      "multiplier": "Multiplicador",
+      "multiplierBadge": "{value}x",
+      "thisDay": "este día",
+      "editDescription": "Define el tipo de día, multiplicador de pago y nombre personalizado",
+      "dayTypes": {
+        "NORMAL": "Día Normal",
+        "WEEKEND": "Fin de Semana",
+        "SATURDAY": "Sábado",
+        "SUNDAY": "Domingo",
+        "HOLIDAY": "Feriado",
+        "IRRENUNCIABLE": "Feriado Irrenunciable",
+        "ORGANIZATION_HOLIDAY": "Feriado Organizacional",
+        "CUSTOM": "Personalizado"
+      },
+      "form": {
+        "dayType": "Tipo de Día",
+        "dayTypeTooltip": "Define qué tipo de día es. Los feriados irrenunciables tienen pago especial por ley. Los feriados organizacionales son días libres específicos de tu empresa.",
+        "multiplier": "Multiplicador de Pago",
+        "multiplierTooltip": "Factor que multiplica el pago de los turnos trabajados este día. Por ejemplo: 1.5 = 150% del pago normal, 2.0 = doble pago. Los feriados irrenunciables suelen usar 2.0 o más según la ley.",
+        "name": "Nombre del Día (opcional)",
+        "nameTooltip": "Dale un nombre descriptivo a este día especial. Por ejemplo: 'Año Nuevo', 'Navidad', 'Día de Aniversario de la Empresa'.",
+        "namePlaceholder": "ej: Navidad",
+        "description": "Descripción (opcional)",
+        "descriptionPlaceholder": "Añade notas sobre este día",
+        "save": "Guardar",
+        "saving": "Guardando...",
+        "cancel": "Cancelar"
+      },
+      "errors": {
+        "invalidMultiplier": "El multiplicador debe ser un número válido mayor o igual a 0"
+      },
+      "delete": {
+        "title": "Eliminar día especial",
+        "description": "¿Estás seguro de que quieres eliminar {name}? Los turnos en esta fecha volverán a pago normal.",
+        "cancel": "Cancelar",
+        "confirm": "Eliminar",
+        "deleting": "Eliminando..."
+      }
+    }
+  },
+  "staff": {
+    "table": {
+      "title": "Personal de la Organización",
+      "description": "Visualiza todo el personal y sus contratos activos",
+      "name": "Nombre",
+      "role": "Rol",
+      "area": "Área",
+      "contract": "Contrato",
+      "status": "Estado",
+      "totalStaff": "personas",
+      "hasContract": "Con contrato",
+      "noContract": "Sin contrato",
+      "noContractStatus": "Sin asignar",
+      "multiplierBadge": "{value}x"
+    },
+    "roles": {
+      "chief": "Jefe de Área",
+      "staff": "Personal de Salud"
+    },
+    "goToRates": "Gestionar Tarifas",
+    "empty": "No hay personal en la organización",
+    "warnings": {
+      "staffWithoutContract": "Personal sin Contrato Asignado",
+      "staffWithoutContractDescription": "{count} persona(s) no tienen contrato asignado. Asígnales una tarifa desde el módulo de Tarifas.",
+      "assignRate": "Asignar Tarifa"
+    },
+    "stats": {
+      "withContract": "Con Contrato",
+      "withContractDescription": "Personal con tarifa asignada",
+      "withoutContract": "Sin Contrato",
+      "withoutContractDescription": "Requieren asignación"
     }
   },
   "errors": {

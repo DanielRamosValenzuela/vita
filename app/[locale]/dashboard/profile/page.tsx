@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import type { Country } from '@prisma/client'
 
 import { getCurrentUser } from '@/src/shared/lib/auth/session'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
 import {
   ChangePasswordForm,
   DocumentSection,
@@ -10,6 +11,8 @@ import {
   OrganizationsSection,
   ProfileForm,
 } from '@/src/features/profile/ui'
+import { AvatarUploadForm } from '@/src/features/profile/ui/avatar-upload-form'
+import { EmailsManagementSection } from '@/src/features/profile/ui/emails-management-section'
 
 interface ProfilePageProps {
   params: Promise<{ locale: string }>
@@ -30,6 +33,20 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
         <p className="text-muted-foreground">{t('description')}</p>
       </div>
 
+      <Card>
+        <CardHeader>
+          <CardTitle>{t('avatarTitle')}</CardTitle>
+          <CardDescription>{t('avatarDescription')}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <AvatarUploadForm
+            currentImage={user.image}
+            customImage={user.customImage}
+            userName={user.name}
+          />
+        </CardContent>
+      </Card>
+
       <ProfileForm
         initialData={{
           name: user.name || '',
@@ -38,6 +55,8 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
       />
 
       <ChangePasswordForm />
+
+      <EmailsManagementSection />
 
       <InvitationsSection />
 
