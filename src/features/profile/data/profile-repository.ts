@@ -208,6 +208,28 @@ export async function rejectInvitation(invitationId: string, userId: string) {
   return await rejectInvitationEntity(invitationId, userId)
 }
 
+export async function updatePersonalInfo(
+  userId: string,
+  data: {
+    name: string
+    phone?: string
+    address?: string
+    additionalInfo?: string
+    birthDate?: Date | null
+  }
+): Promise<void> {
+  await prisma.user.update({
+    where: { id: userId },
+    data: {
+      name: data.name,
+      phone: data.phone || null,
+      address: data.address || null,
+      additionalInfo: data.additionalInfo || null,
+      birthDate: data.birthDate || null,
+    },
+  })
+}
+
 export async function getUserOrganizations(userId: string) {
   return await prisma.user.findUnique({
     where: { id: userId },

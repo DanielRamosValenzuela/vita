@@ -80,10 +80,10 @@ export function DashboardSidebar({ user, className }: DashboardSidebarProps) {
         </div>
 
         <div className="bg-accent flex items-center gap-3 rounded-lg p-3">
-          {user.image ? (
+          {user.customImage || user.image ? (
             <div className="ring-border relative h-10 w-10 overflow-hidden rounded-full ring-2">
               <Image
-                src={user.image}
+                src={user.customImage || user.image || ''}
                 alt={user.name}
                 fill
                 className="rounded-full object-cover"

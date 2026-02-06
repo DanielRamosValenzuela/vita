@@ -170,13 +170,6 @@ export async function setPrimaryEmailAction(emailId: string): Promise<ActionResu
       }
     
 
-    if (!email.isVerified) 
-      return {
-        success: false,
-        error: 'Debes verificar este email antes de establecerlo como principal',
-      }
-    
-
     await prisma.$transaction([
       prisma.userEmail.updateMany({
         where: {

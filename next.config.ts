@@ -4,6 +4,11 @@ import createNextIntlPlugin from 'next-intl/plugin'
 const withNextIntl = createNextIntlPlugin()
 
 const nextConfig: NextConfig = {
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '5mb',
+    },
+  },
   images: {
     remotePatterns: [
       {
@@ -17,6 +22,10 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: '**.microsoft.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.supabase.co',
       },
     ],
   },

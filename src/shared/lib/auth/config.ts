@@ -59,6 +59,7 @@ export const authOptions: NextAuthOptions = {
           email: user.email,
           name: user.name,
           image: user.image || undefined,
+          customImage: user.customImage || undefined,
           role: user.role,
           organizationId: user.organizationId || undefined,
           country: user.country || undefined,
@@ -119,6 +120,7 @@ export const authOptions: NextAuthOptions = {
         session.user.country = token.country
         session.user.docType = token.docType
         session.user.docNumber = token.docNumber
+        session.user.customImage = token.customImage as string | undefined
       }
       return session
     },

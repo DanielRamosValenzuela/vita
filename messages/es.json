@@ -443,10 +443,30 @@
     "description": "Gestiona tu información personal y configuración",
     "avatarTitle": "Foto de Perfil",
     "avatarDescription": "Sube una foto personalizada para tu perfil",
-    "uploadAvatar": "Subir foto",
-    "changeAvatar": "Cambiar foto",
-    "deleteAvatar": "Eliminar",
-    "avatarHelp": "JPG, PNG o GIF. Máximo 5MB",
+    "avatar": {
+      "uploadButton": "Subir foto",
+      "changeButton": "Cambiar foto",
+      "deleteButton": "Eliminar",
+      "help": "JPG, PNG o GIF. Máximo 5MB",
+      "uploadSuccess": "Avatar actualizado exitosamente",
+      "deleteSuccess": "Avatar eliminado exitosamente",
+      "deleteError": "Error al eliminar el avatar",
+      "errors": {
+        "sizeTooLarge": {
+          "title": "Imagen muy pesada",
+          "message": "La imagen seleccionada supera el tamaño máximo permitido de 5MB. Por favor, elige una imagen más pequeña o comprime la actual."
+        },
+        "invalidType": {
+          "title": "Formato no válido",
+          "message": "El archivo seleccionado no es una imagen válida. Por favor, elige un archivo JPG, PNG o GIF."
+        },
+        "uploadFailed": {
+          "title": "Error al subir",
+          "message": "No se pudo subir la imagen. Por favor, inténtalo de nuevo."
+        },
+        "closeButton": "Entendido"
+      }
+    },
     "emails": {
       "title": "Emails de Cuenta",
       "description": "Administra tus correos electrónicos y vinculaciones",
@@ -480,19 +500,33 @@
         "unlinking": "Desvinculando..."
       }
     },
-    "basicInfo": {
-      "title": "Información Básica",
+    "personalInfo": {
+      "title": "Información Personal",
+      "description": "Completa tu información personal (todos los campos son opcionales excepto el nombre)",
       "name": {
-        "label": "Nombre",
+        "label": "Nombre Completo",
         "placeholder": "Tu nombre completo"
       },
-      "email": {
-        "label": "Email",
-        "placeholder": "tu@email.com"
+      "phone": {
+        "label": "Teléfono",
+        "placeholder": "+1 555 123 4567"
+      },
+      "birthDate": {
+        "label": "Fecha de Nacimiento",
+        "placeholder": "Selecciona una fecha"
+      },
+      "address": {
+        "label": "Dirección",
+        "placeholder": "Dirección completa"
+      },
+      "additionalInfo": {
+        "label": "Información Adicional",
+        "placeholder": "Ciudad, región, código postal, u otra información relevante...",
+        "hint": "Puedes incluir ciudad, código postal, región, o cualquier dato adicional que consideres importante"
       },
       "save": "Guardar Cambios",
-      "success": "Perfil actualizado exitosamente",
-      "error": "Error al actualizar el perfil"
+      "success": "Información personal actualizada exitosamente",
+      "error": "Error al actualizar la información personal"
     },
     "password": {
       "title": "Cambiar Contraseña",

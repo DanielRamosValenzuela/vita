@@ -62,10 +62,10 @@ export function MainNavbar() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="h-9 w-9 cursor-pointer rounded-full p-0">
-                  {session.user?.image ? (
+                  {session.user?.customImage || session.user?.image ? (
                     <div className="ring-border relative h-9 w-9 overflow-hidden rounded-full ring-2">
                       <Image
-                        src={session.user.image}
+                        src={session.user.customImage || session.user.image || ''}
                         alt={session.user.name || 'Usuario'}
                         fill
                         className="rounded-full object-cover"

@@ -4,15 +4,16 @@ import type { Country } from '@prisma/client'
 
 import { getCurrentUser } from '@/src/shared/lib/auth/session'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
+import { prisma } from '@/src/shared/lib/db'
 import {
   ChangePasswordForm,
   DocumentSection,
   InvitationsSection,
   OrganizationsSection,
-  ProfileForm,
 } from '@/src/features/profile/ui'
 import { AvatarUploadForm } from '@/src/features/profile/ui/avatar-upload-form'
 import { EmailsManagementSection } from '@/src/features/profile/ui/emails-management-section'
+import { PersonalInfoForm } from '@/src/features/profile/ui/personal-info-form'
 
 interface ProfilePageProps {
   params: Promise<{ locale: string }>
@@ -24,6 +25,24 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   const t = await getTranslations('profile')
 
   if (!user)
+    redirect(`/${locale}/login`)
+
+  const userData = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: {
+      name: true,
+      phone: true,
+      address: true,
+      additionalInfo: true,
+      birthDate: true,
+      country: true,
+      docNumber: true,
+      image: true,
+      customImage: true,
+    },
+  })
+
+  if (!userData)
     redirect(`/${locale}/login`)
 
   return (
@@ -40,17 +59,20 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
         </CardHeader>
         <CardContent>
           <AvatarUploadForm
-            currentImage={user.image}
-            customImage={user.customImage}
-            userName={user.name}
+            currentImage={userData.image}
+            customImage={userData.customImage}
+            userName={userData.name}
           />
         </CardContent>
       </Card>
 
-      <ProfileForm
+      <PersonalInfoForm
         initialData={{
-          name: user.name || '',
-          email: user.email || '',
+          name: userData.name,
+          phone: userData.phone,
+          address: userData.address,
+          additionalInfo: userData.additionalInfo,
+          birthDate: userData.birthDate,
         }}
       />
 
@@ -64,8 +86,8 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
 
       <DocumentSection
         user={
-          user.country && user.docNumber
-            ? { country: user.country as Country, docNumber: user.docNumber }
+          userData.country && userData.docNumber
+            ? { country: userData.country as Country, docNumber: userData.docNumber }
             : null
         }
       />

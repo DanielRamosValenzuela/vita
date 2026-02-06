@@ -29,6 +29,7 @@ import {
   setPrimaryEmailAction,
   initiateGoogleLinkAction,
   unlinkGoogleAction,
+  syncPrimaryEmailAction,
 } from '../api'
 
 interface UserEmail {
@@ -59,7 +60,10 @@ export function EmailsManagementSection() {
   }
 
   useEffect(() => {
-    loadEmails()
+    startTransition(async () => {
+      await syncPrimaryEmailAction()
+      loadEmails()
+    })
 
     const success = searchParams.get('success')
     const error = searchParams.get('error')
@@ -111,13 +115,15 @@ export function EmailsManagementSection() {
     })
   }
 
-  function handleSetPrimary(emailId: string) {
+  const handleSetPrimary = (emailId: string) => {
     startTransition(async () => {
       const result = await setPrimaryEmailAction(emailId)
 
       if (result.success) {
         toast.success(result.message || 'Email principal actualizado')
-        loadEmails()
+        await getUserEmailsAction().then((res) => {
+          if (res.success && res.data) setEmails(res.data)
+        })
       } else toast.error(result.error || 'Error al establecer email principal')
     })
   }
@@ -252,7 +258,7 @@ export function EmailsManagementSection() {
                       </Button>
                     )}
 
-                    {!email.isPrimary && email.isVerified && (
+                    {!email.isPrimary && (
                       <Button
                         variant="ghost"
                         size="sm"

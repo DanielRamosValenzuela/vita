@@ -443,10 +443,30 @@
     "description": "Manage your personal information and settings",
     "avatarTitle": "Profile Photo",
     "avatarDescription": "Upload a custom photo for your profile",
-    "uploadAvatar": "Upload photo",
-    "changeAvatar": "Change photo",
-    "deleteAvatar": "Delete",
-    "avatarHelp": "JPG, PNG or GIF. Maximum 5MB",
+    "avatar": {
+      "uploadButton": "Upload photo",
+      "changeButton": "Change photo",
+      "deleteButton": "Delete",
+      "help": "JPG, PNG or GIF. Maximum 5MB",
+      "uploadSuccess": "Avatar updated successfully",
+      "deleteSuccess": "Avatar deleted successfully",
+      "deleteError": "Error deleting avatar",
+      "errors": {
+        "sizeTooLarge": {
+          "title": "Image Too Large",
+          "message": "The selected image exceeds the maximum allowed size of 5MB. Please choose a smaller image or compress the current one."
+        },
+        "invalidType": {
+          "title": "Invalid Format",
+          "message": "The selected file is not a valid image. Please choose a JPG, PNG, or GIF file."
+        },
+        "uploadFailed": {
+          "title": "Upload Failed",
+          "message": "Could not upload the image. Please try again."
+        },
+        "closeButton": "Understood"
+      }
+    },
     "emails": {
       "title": "Account Emails",
       "description": "Manage your email addresses and account links",
@@ -480,19 +500,33 @@
         "unlinking": "Unlinking..."
       }
     },
-    "basicInfo": {
-      "title": "Basic Information",
+    "personalInfo": {
+      "title": "Personal Information",
+      "description": "Complete your personal information (all fields are optional except name)",
       "name": {
-        "label": "Name",
+        "label": "Full Name",
         "placeholder": "Your full name"
       },
-      "email": {
-        "label": "Email",
-        "placeholder": "your@email.com"
+      "phone": {
+        "label": "Phone",
+        "placeholder": "+1 555 123 4567"
+      },
+      "birthDate": {
+        "label": "Date of Birth",
+        "placeholder": "Select a date"
+      },
+      "address": {
+        "label": "Address",
+        "placeholder": "Full address"
+      },
+      "additionalInfo": {
+        "label": "Additional Information",
+        "placeholder": "City, region, zip code, or other relevant information...",
+        "hint": "You can include city, zip code, region, or any additional data you consider important"
       },
       "save": "Save Changes",
-      "success": "Profile updated successfully",
-      "error": "Error updating profile"
+      "success": "Personal information updated successfully",
+      "error": "Error updating personal information"
     },
     "password": {
       "title": "Change Password",
