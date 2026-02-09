@@ -402,7 +402,8 @@ export function AreaEditForm({
               id="maxConsecutiveHours"
               type="number"
               min={1}
-              max={168}
+              max={99}
+              maxDigits={2}
               placeholder={t('editForm.maxConsecutiveHoursPlaceholder')}
               value={maxConsecutiveHours}
               onChange={(e) => setMaxConsecutiveHours(e.target.value)}
@@ -424,7 +425,8 @@ export function AreaEditForm({
               id="minRestHours"
               type="number"
               min={0}
-              max={72}
+              max={99}
+              maxDigits={2}
               placeholder={t('editForm.minRestHoursPlaceholder')}
               value={minRestHours}
               onChange={(e) => setMinRestHours(e.target.value)}

@@ -20,6 +20,7 @@ export interface RateComponentData {
   conditionValue?: string | null
   description?: string | null
   order?: number
+  applicableShiftTypeIds?: string[]
 }
 
 export interface RateTemplateWithComponents {
@@ -46,6 +47,20 @@ export const getRateTemplatesAction = async (): Promise<
       include: {
         components: {
           orderBy: { order: 'asc' },
+          include: {
+            applicableShiftTypes: {
+              include: {
+                shiftType: {
+                  select: {
+                    id: true,
+                    name: true,
+                    color: true,
+                    icon: true,
+                  },
+                },
+              },
+            },
+          },
         },
         _count: { select: { contracts: true } },
       },
@@ -106,12 +121,33 @@ export const createRateTemplateAction = async (data: {
             conditionValue: comp.conditionValue || null,
             description: comp.description || null,
             order: comp.order ?? index,
+            applicableShiftTypes: comp.applicableShiftTypeIds
+              ? {
+                  create: comp.applicableShiftTypeIds.map((shiftTypeId) => ({
+                    shiftTypeId,
+                  })),
+                }
+              : undefined,
           })),
         },
       },
       include: {
         components: {
           orderBy: { order: 'asc' },
+          include: {
+            applicableShiftTypes: {
+              include: {
+                shiftType: {
+                  select: {
+                    id: true,
+                    name: true,
+                    color: true,
+                    icon: true,
+                  },
+                },
+              },
+            },
+          },
         },
         _count: { select: { contracts: true } },
       },
@@ -201,6 +237,13 @@ export const updateRateTemplateAction = async (
                 conditionValue: comp.conditionValue || null,
                 description: comp.description || null,
                 order: comp.order ?? index,
+                applicableShiftTypes: comp.applicableShiftTypeIds
+                  ? {
+                      create: comp.applicableShiftTypeIds.map((shiftTypeId) => ({
+                        shiftTypeId,
+                      })),
+                    }
+                  : undefined,
               })),
             }
           : undefined,
@@ -208,6 +251,20 @@ export const updateRateTemplateAction = async (
       include: {
         components: {
           orderBy: { order: 'asc' },
+          include: {
+            applicableShiftTypes: {
+              include: {
+                shiftType: {
+                  select: {
+                    id: true,
+                    name: true,
+                    color: true,
+                    icon: true,
+                  },
+                },
+              },
+            },
+          },
         },
         _count: { select: { contracts: true } },
       },
@@ -316,13 +373,30 @@ export const duplicateRateTemplateAction = async (
         error: 'Ya existe una tarifa con ese nombre',
       }
 
+    const existingWithRelations = await prisma.rateTemplate.findUnique({
+      where: { id },
+      include: {
+        components: {
+          include: {
+            applicableShiftTypes: true,
+          },
+        },
+      },
+    })
+
+    if (!existingWithRelations)
+      return {
+        success: false,
+        error: 'Tarifa no encontrada',
+      }
+
     const newTemplate = await prisma.rateTemplate.create({
       data: {
         name: newName,
-        description: existing.description,
+        description: existingWithRelations.description,
         organizationId: session.organizationId,
         components: {
-          create: existing.components.map((comp) => ({
+          create: existingWithRelations.components.map((comp) => ({
             type: comp.type,
             customName: comp.customName,
             value: comp.value,
@@ -331,12 +405,34 @@ export const duplicateRateTemplateAction = async (
             conditionValue: comp.conditionValue,
             description: comp.description,
             order: comp.order,
+            applicableShiftTypes:
+              comp.applicableShiftTypes.length > 0
+                ? {
+                    create: comp.applicableShiftTypes.map((ast) => ({
+                      shiftTypeId: ast.shiftTypeId,
+                    })),
+                  }
+                : undefined,
           })),
         },
       },
       include: {
         components: {
           orderBy: { order: 'asc' },
+          include: {
+            applicableShiftTypes: {
+              include: {
+                shiftType: {
+                  select: {
+                    id: true,
+                    name: true,
+                    color: true,
+                    icon: true,
+                  },
+                },
+              },
+            },
+          },
         },
         _count: { select: { contracts: true } },
       },

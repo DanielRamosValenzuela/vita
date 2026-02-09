@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { Plus, Info } from 'lucide-react'
@@ -29,6 +29,14 @@ import { COMPONENT_TYPES, COMPONENT_UNITS, APPLY_CONDITIONS } from '@/src/shared
 import { RateComponentForm } from './rate-component-form'
 import { createRateTemplateAction, updateRateTemplateAction } from '../api/rate-template-actions'
 import type { RateComponentData, RateTemplateWithComponents } from '../api/rate-template-actions'
+import { getShiftTypesAction } from '@/src/features/shifts/api/shift-type-actions'
+
+interface ShiftTypeOption {
+  id: string
+  name: string
+  color: string
+  icon?: string | null
+}
 
 interface RateTemplateFormProps {
   open: boolean
@@ -48,12 +56,42 @@ export function RateTemplateForm({
   const t = useTranslations('adminHR.rates.templateForm')
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
+  const [shiftTypes, setShiftTypes] = useState<ShiftTypeOption[]>([])
+  const [isLoadingShiftTypes, setIsLoadingShiftTypes] = useState(false)
 
   const [name, setName] = useState(existingTemplate?.name || '')
   const [description, setDescription] = useState(existingTemplate?.description || '')
   const [components, setComponents] = useState<RateComponentData[]>(
-    existingTemplate?.components || []
+    existingTemplate?.components.map((comp) => ({
+      ...comp,
+      applicableShiftTypeIds:
+        'applicableShiftTypes' in comp
+          ? (comp.applicableShiftTypes as Array<{ shiftTypeId: string }>)?.map(
+              (ast) => ast.shiftTypeId
+            ) || []
+          : [],
+    })) || []
   )
+
+  useEffect(() => {
+    if (open) {
+      setIsLoadingShiftTypes(true)
+      getShiftTypesAction()
+        .then((result) => {
+          if (result.success)
+            setShiftTypes(
+              result.data.map((st) => ({
+                id: st.id,
+                name: st.name,
+                color: st.color,
+                icon: st.icon,
+              }))
+            )
+          else toast.error(result.error || 'Error al cargar tipos de turno')
+        })
+        .finally(() => setIsLoadingShiftTypes(false))
+    }
+  }, [open])
 
   function handleAddComponent() {
     setComponents([
@@ -116,12 +154,12 @@ export function RateTemplateForm({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-[95vw] sm:max-w-2xl lg:max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>
+          <DialogTitle className="text-lg sm:text-xl">
             {mode === 'create' ? t('createTitle') : t('editTitle')}
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-sm">
             {mode === 'create' ? t('createDescription') : t('editDescription')}
           </DialogDescription>
         </DialogHeader>
@@ -176,7 +214,7 @@ export function RateTemplateForm({
           </div>
 
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 <Label className="text-base">{t('components.title')}</Label>
                 <TooltipProvider>
@@ -195,13 +233,18 @@ export function RateTemplateForm({
                 variant="outline"
                 size="sm"
                 onClick={handleAddComponent}
+                className="w-full sm:w-auto"
               >
                 <Plus className="h-4 w-4 mr-2" />
                 {t('components.add')}
               </Button>
             </div>
 
-            {components.length === 0 ? (
+            {isLoadingShiftTypes ? (
+              <div className="text-center py-12 px-4 border-2 border-dashed rounded-lg bg-muted/30">
+                <p className="text-muted-foreground">{t('loadingShiftTypes')}</p>
+              </div>
+            ) : components.length === 0 ? (
               <div className="text-center py-12 px-4 border-2 border-dashed rounded-lg bg-muted/30">
                 <div className="max-w-md mx-auto space-y-4">
                   <div className="text-muted-foreground">
@@ -227,6 +270,7 @@ export function RateTemplateForm({
                     component={component}
                     index={index}
                     currency={currency}
+                    shiftTypes={shiftTypes}
                     onUpdate={handleUpdateComponent}
                     onRemove={handleRemoveComponent}
                     canRemove={components.length > 1}
@@ -236,16 +280,17 @@ export function RateTemplateForm({
             )}
           </div>
 
-          <div className="flex justify-end gap-2 pt-4 border-t">
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-4 border-t">
             <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
               disabled={isPending}
+              className="w-full sm:w-auto"
             >
               {t('cancel')}
             </Button>
-            <Button type="submit" disabled={isPending || components.length === 0}>
+            <Button type="submit" disabled={isPending || components.length === 0} className="w-full sm:w-auto">
               {isPending ? t('saving') : t('save')}
             </Button>
           </div>

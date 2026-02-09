@@ -43,8 +43,6 @@ export const APPLY_CONDITIONS = {
   SUNDAY_ONLY: 'SUNDAY_ONLY' as ApplyCondition,
   HOLIDAY_ONLY: 'HOLIDAY_ONLY' as ApplyCondition,
   IRRENUNCIABLE_ONLY: 'IRRENUNCIABLE_ONLY' as ApplyCondition,
-  NIGHT_SHIFT_ONLY: 'NIGHT_SHIFT_ONLY' as ApplyCondition,
-  DAY_SHIFT_ONLY: 'DAY_SHIFT_ONLY' as ApplyCondition,
   OVERTIME_ONLY: 'OVERTIME_ONLY' as ApplyCondition,
   SPECIFIC_AREA: 'SPECIFIC_AREA' as ApplyCondition,
   SPECIFIC_SHIFT_TYPE: 'SPECIFIC_SHIFT_TYPE' as ApplyCondition,

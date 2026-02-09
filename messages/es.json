@@ -1271,7 +1271,7 @@
       "table": {
         "name": "Nombre",
         "description": "Descripción",
-        "shiftTypes": "Tipos",
+        "shiftTypes": "Turnos",
         "chiefs": "Jefes",
         "staff": "Personal",
         "status": "Estado",
@@ -1424,6 +1424,7 @@
         "description": "Descripción (opcional)",
         "descriptionPlaceholder": "Describe cuándo y cómo se usa esta tarifa",
         "descriptionTooltip": "Explica para qué tipo de personal o situaciones está pensada esta tarifa. Ayudará a otros administradores a entender su uso.",
+        "loadingShiftTypes": "Cargando tipos de turno...",
         "save": "Guardar Tarifa",
         "saving": "Guardando...",
         "cancel": "Cancelar",
@@ -1449,6 +1450,9 @@
         "valueTooltip": "Ingresa el valor numérico. Para salarios y bonos usa la moneda de tu país. Para multiplicadores usa decimales (ej: 1.5 = 150%). Para porcentajes usa números (ej: 10 = 10%).",
         "applyCondition": "Cuándo Aplica",
         "applyConditionTooltip": "Define en qué situaciones se aplicará este componente. 'Siempre' lo incluye en todos los turnos. Otras opciones lo limitan a horarios nocturnos, fines de semana, feriados, etc.",
+        "applicableShiftTypes": "Tipos de Turno Aplicables",
+        "applicableShiftTypesTooltip": "Selecciona los tipos de turno a los que se aplicará este componente. Por ejemplo, si es un 'Bono Guardia Larga', selecciona solo el tipo de turno 'Guardia Larga'.",
+        "noShiftTypes": "No hay tipos de turno disponibles. Crea tipos de turno primero.",
         "customName": "Nombre Personalizado (opcional)",
         "customNamePlaceholder": "ej: Bono por turno largo",
         "description": "Descripción (opcional)",
@@ -1494,9 +1498,10 @@
           "SUNDAY_ONLY": "Solo Domingo",
           "HOLIDAY_ONLY": "Solo Feriados",
           "IRRENUNCIABLE_ONLY": "Solo Feriados Irrenunciables",
-          "NIGHT_SHIFT_ONLY": "Solo Turno Nocturno (22:00-06:00)",
-          "DAY_SHIFT_ONLY": "Solo Turno Diurno",
-          "OVERTIME_ONLY": "Solo Horas Extra"
+          "OVERTIME_ONLY": "Solo Horas Extra",
+          "SPECIFIC_AREA": "Solo en Área Específica",
+          "SPECIFIC_SHIFT_TYPE": "Solo para Tipo de Turno Específico",
+          "CUSTOM_RULE": "Regla Personalizada"
         }
       },
       "saveConfirm": {

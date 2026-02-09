@@ -242,8 +242,6 @@ enum ApplyCondition {
   SUNDAY_ONLY
   HOLIDAY_ONLY
   IRRENUNCIABLE_ONLY
-  NIGHT_SHIFT_ONLY
-  DAY_SHIFT_ONLY
   OVERTIME_ONLY
   SPECIFIC_AREA
   SPECIFIC_SHIFT_TYPE
@@ -267,22 +265,36 @@ model RateTemplate {
 }
 
 model RateComponent {
-  id             String         @id @default(cuid())
-  rateTemplateId String
-  type           ComponentType
-  customName     String?
-  value          Float
-  unit           ComponentUnit
-  applyCondition ApplyCondition @default(ALWAYS)
-  conditionValue String?
-  description    String?
-  order          Int            @default(0)
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
-  rateTemplate   RateTemplate   @relation(fields: [rateTemplateId], references: [id], onDelete: Cascade)
+  id                      String                        @id @default(cuid())
+  rateTemplateId          String
+  type                    ComponentType
+  customName              String?
+  value                   Float
+  unit                    ComponentUnit
+  applyCondition          ApplyCondition                @default(ALWAYS)
+  conditionValue          String?
+  description             String?
+  order                   Int                           @default(0)
+  createdAt               DateTime                      @default(now())
+  updatedAt               DateTime                      @updatedAt
+  rateTemplate            RateTemplate                  @relation(fields: [rateTemplateId], references: [id], onDelete: Cascade)
+  applicableShiftTypes    RateComponentApplicableType[]
+  shiftPaymentBreakdowns  ShiftPaymentBreakdown[]
 
   @@index([rateTemplateId])
   @@index([type])
+  @@index([applyCondition])
+}
+
+model RateComponentApplicableType {
+  rateComponentId String
+  shiftTypeId     String
+  rateComponent   RateComponent @relation(fields: [rateComponentId], references: [id], onDelete: Cascade)
+  shiftType       ShiftType     @relation(fields: [shiftTypeId], references: [id], onDelete: Cascade)
+
+  @@id([rateComponentId, shiftTypeId])
+  @@index([rateComponentId])
+  @@index([shiftTypeId])
 }
 
 model Contract {
@@ -408,25 +420,26 @@ enum ShiftClassification {
 }
 
 model ShiftType {
-  id                String              @id @default(cuid())
-  name              String
-  description       String?
-  icon              String?             @default("Clock")
-  durationMinutes   Int                 @default(480)
-  classification    ShiftClassification @default(DAY)
-  color             String              @default("#3b82f6")
-  minStaffRequired  Int                 @default(1)
-  idealStaffCount   Int                 @default(1)
-  maxStaffAllowed   Int                 @default(10)
-  suggestedRestDays Int                 @default(1)
-  isGlobal          Boolean             @default(true)
-  isActive          Boolean             @default(true)
-  organizationId    String
-  createdAt         DateTime            @default(now())
-  updatedAt         DateTime            @updatedAt
-  organization      Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  shifts            Shift[]
-  areaShiftTypes    AreaShiftType[]
+  id                        String                        @id @default(cuid())
+  name                      String
+  description               String?
+  icon                      String?                       @default("Clock")
+  durationMinutes           Int                           @default(480)
+  classification            ShiftClassification           @default(DAY)
+  color                     String                        @default("#3b82f6")
+  minStaffRequired          Int                           @default(1)
+  idealStaffCount           Int                           @default(1)
+  maxStaffAllowed           Int                           @default(10)
+  suggestedRestDays         Int                           @default(1)
+  isGlobal                  Boolean                       @default(true)
+  isActive                  Boolean                       @default(true)
+  organizationId            String
+  createdAt                 DateTime                      @default(now())
+  updatedAt                 DateTime                      @updatedAt
+  organization              Organization                  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  shifts                    Shift[]
+  areaShiftTypes            AreaShiftType[]
+  applicableRateComponents  RateComponentApplicableType[]
 
   @@index([organizationId])
   @@index([isActive])
@@ -445,25 +458,27 @@ model AreaShiftType {
 }
 
 model Shift {
-  id             String       @id @default(cuid())
-  title          String?
-  startTime      DateTime
-  endTime        DateTime
-  status         ShiftStatus  @default(SCHEDULED)
-  notes          String?
-  userId         String
-  areaId         String
-  shiftTypeId    String
-  organizationId String
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  area           Area         @relation(fields: [areaId], references: [id], onDelete: Cascade)
-  shiftType      ShiftType    @relation(fields: [shiftTypeId], references: [id], onDelete: Cascade)
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  contractId     String?
-
-  contract Contract? @relation(fields: [contractId], references: [id], onDelete: SetNull)
+  id              String         @id @default(cuid())
+  title           String?
+  startTime       DateTime
+  endTime         DateTime
+  actualStartTime DateTime?
+  actualEndTime   DateTime?
+  status          ShiftStatus    @default(SCHEDULED)
+  notes           String?
+  userId          String
+  areaId          String
+  shiftTypeId     String
+  organizationId  String
+  contractId      String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  area            Area           @relation(fields: [areaId], references: [id], onDelete: Cascade)
+  shiftType       ShiftType      @relation(fields: [shiftTypeId], references: [id], onDelete: Cascade)
+  organization    Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  contract        Contract?      @relation(fields: [contractId], references: [id], onDelete: SetNull)
+  payment         ShiftPayment?
 
   @@index([organizationId])
   @@index([userId])
@@ -473,6 +488,8 @@ model Shift {
   @@index([status])
   @@index([startTime])
   @@index([endTime])
+  @@index([actualStartTime])
+  @@index([actualEndTime])
 }
 
 enum ShiftStatus {
@@ -481,6 +498,58 @@ enum ShiftStatus {
   COMPLETED
   CANCELLED
   NO_SHOW
+}
+
+enum PaymentStatus {
+  PENDING
+  CALCULATED
+  APPROVED
+  PAID
+  DISPUTED
+}
+
+model ShiftPayment {
+  id                    String                  @id @default(cuid())
+  shiftId               String                  @unique
+  totalAmount           Float
+  baseAmount            Float
+  calendarMultiplier    Float                   @default(1.0)
+  finalAmount           Float
+  minutesWorked         Int
+  isPartialCompletion   Boolean                 @default(false)
+  status                PaymentStatus           @default(PENDING)
+  calculatedAt          DateTime                @default(now())
+  approvedAt            DateTime?
+  approvedBy            String?
+  paidAt                DateTime?
+  notes                 String?
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @updatedAt
+  shift                 Shift                   @relation(fields: [shiftId], references: [id], onDelete: Cascade)
+  breakdowns            ShiftPaymentBreakdown[]
+
+  @@index([shiftId])
+  @@index([status])
+  @@index([calculatedAt])
+  @@index([paidAt])
+}
+
+model ShiftPaymentBreakdown {
+  id              String        @id @default(cuid())
+  shiftPaymentId  String
+  componentId     String
+  componentName   String
+  componentType   ComponentType
+  baseValue       Float
+  calculatedValue Float
+  appliedMinutes  Int?
+  notes           String?
+  createdAt       DateTime      @default(now())
+  shiftPayment    ShiftPayment  @relation(fields: [shiftPaymentId], references: [id], onDelete: Cascade)
+  component       RateComponent @relation(fields: [componentId], references: [id], onDelete: Restrict)
+
+  @@index([shiftPaymentId])
+  @@index([componentId])
 }
 
 enum ImageProvider {

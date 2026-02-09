@@ -6,6 +6,7 @@ import { Trash2, GripVertical, Info } from 'lucide-react'
 import { Button } from '@/src/shared/ui/button'
 import { Input } from '@/src/shared/ui/input'
 import { Label } from '@/src/shared/ui/label'
+import { Checkbox } from '@/src/shared/ui/checkbox'
 import {
   Select,
   SelectContent,
@@ -19,7 +20,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/src/shared/ui/tooltip'
-import { CurrencyInput } from '@/src/shared/ui/atoms'
 import type { Currency } from '@prisma/client'
 import {
   COMPONENT_TYPES,
@@ -29,12 +29,21 @@ import {
   type ComponentUnit,
   type ApplyCondition,
 } from '@/src/shared/lib/constants'
+import { getCurrencyMask } from '@/src/shared/lib/utils/input-masks'
 import type { RateComponentData } from '../api/rate-template-actions'
+
+interface ShiftTypeOption {
+  id: string
+  name: string
+  color: string
+  icon?: string | null
+}
 
 interface RateComponentFormProps {
   component: RateComponentData
   index: number
   currency: Currency
+  shiftTypes: ShiftTypeOption[]
   onUpdate: (index: number, data: Partial<RateComponentData>) => void
   onRemove: (index: number) => void
   canRemove: boolean
@@ -44,15 +53,24 @@ export function RateComponentForm({
   component,
   index,
   currency,
+  shiftTypes,
   onUpdate,
   onRemove,
   canRemove,
 }: RateComponentFormProps) {
   const t = useTranslations('adminHR.rates.componentForm')
 
+  const handleShiftTypeToggle = (shiftTypeId: string, checked: boolean) => {
+    const currentIds = component.applicableShiftTypeIds || []
+    const newIds = checked
+      ? [...currentIds, shiftTypeId]
+      : currentIds.filter((id) => id !== shiftTypeId)
+    onUpdate(index, { applicableShiftTypeIds: newIds })
+  }
+
   return (
-    <div className="border rounded-lg p-4 space-y-4 bg-card relative group">
-      <div className="absolute left-2 top-4 opacity-0 group-hover:opacity-100 transition-opacity">
+    <div className="border rounded-lg p-3 sm:p-4 space-y-4 bg-card relative group">
+      <div className="hidden sm:block absolute left-2 top-4 opacity-0 group-hover:opacity-100 transition-opacity">
         <GripVertical className="h-5 w-5 text-muted-foreground cursor-move" />
       </div>
 
@@ -68,8 +86,8 @@ export function RateComponentForm({
         </Button>
       )}
 
-      <div className="grid gap-4 pl-6">
-        <div className="grid grid-cols-2 gap-4">
+      <div className="grid gap-4 sm:pl-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <div className="flex items-center gap-2 mb-2">
               <Label>{t('type')}</Label>
@@ -133,7 +151,7 @@ export function RateComponentForm({
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <div className="flex items-center gap-2 mb-2">
               <Label>{t('value')}</Label>
@@ -157,11 +175,12 @@ export function RateComponentForm({
                 placeholder={component.unit === COMPONENT_UNITS.MULTIPLIER ? '1.5' : '10'}
               />
             ) : (
-              <CurrencyInput
-                currency={currency}
-                value={component.value}
-                onChange={(value) => onUpdate(index, { value })}
-                showSymbol
+              <Input
+                type="text"
+                mask={getCurrencyMask(currency, true)}
+                value={component.value.toString()}
+                onChange={(e) => onUpdate(index, { value: parseFloat(e.target.value) || 0 })}
+                placeholder="0"
               />
             )}
           </div>
@@ -206,6 +225,53 @@ export function RateComponentForm({
               onChange={(e) => onUpdate(index, { customName: e.target.value })}
               placeholder={t('customNamePlaceholder')}
             />
+          </div>
+        )}
+
+        {component.applyCondition === APPLY_CONDITIONS.SPECIFIC_SHIFT_TYPE && (
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <Label>{t('applicableShiftTypes')}</Label>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs">
+                    <p>{t('applicableShiftTypesTooltip')}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+            {shiftTypes.length === 0 ? (
+              <div className="text-sm text-muted-foreground p-3 sm:p-4 border rounded-md bg-muted/30">
+                {t('noShiftTypes')}
+              </div>
+            ) : (
+              <div className="border rounded-md p-3 sm:p-4 space-y-2 sm:space-y-3 max-h-48 overflow-y-auto">
+                {shiftTypes.map((shiftType) => (
+                  <div key={shiftType.id} className="flex items-center gap-2 sm:gap-3">
+                    <Checkbox
+                      id={`shift-type-${index}-${shiftType.id}`}
+                      checked={component.applicableShiftTypeIds?.includes(shiftType.id) || false}
+                      onCheckedChange={(checked) =>
+                        handleShiftTypeToggle(shiftType.id, checked === true)
+                      }
+                    />
+                    <Label
+                      htmlFor={`shift-type-${index}-${shiftType.id}`}
+                      className="flex items-center gap-2 cursor-pointer flex-1 text-sm sm:text-base"
+                    >
+                      <div
+                        className="w-3 h-3 rounded-full flex-shrink-0"
+                        style={{ backgroundColor: shiftType.color }}
+                      />
+                      <span className="break-words">{shiftType.name}</span>
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 

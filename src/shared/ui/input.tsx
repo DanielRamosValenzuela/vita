@@ -1,20 +1,58 @@
 import * as React from 'react'
+import { IMaskInput } from 'react-imask'
+import type { FactoryArg } from 'imask'
 
 import { cn } from '@/src/shared/lib/utils'
 
-export type InputProps = React.InputHTMLAttributes<HTMLInputElement>
+export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  maxDigits?: number
+  mask?: FactoryArg
+  onMaskAccept?: (value: string, unmaskedValue: string) => void
+}
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, ...props }, ref) => {
+  ({ className, type, maxDigits, mask, onMaskAccept, onChange, ...props }, ref) => {
+    const baseClassName = cn(
+      'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm tracking-wide ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50',
+      type === 'color' && 'cursor-pointer',
+      className
+    )
+
+    if (mask)
+      return (
+        <IMaskInput
+          {...mask}
+          inputRef={ref as React.Ref<HTMLInputElement>}
+          className={baseClassName}
+          onAccept={(value, maskRef) => {
+            const unmaskedValue = maskRef.unmaskedValue
+            if (onMaskAccept) onMaskAccept(value, unmaskedValue)
+            if (onChange) {
+              const event = {
+                target: { value: unmaskedValue },
+              } as React.ChangeEvent<HTMLInputElement>
+              onChange(event)
+            }
+          }}
+          {...props}
+        />
+      )
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (maxDigits && type === 'number') {
+        const value = e.target.value
+        if (value !== '' && value.length > maxDigits) return
+      }
+
+      onChange?.(e)
+    }
+
     return (
       <input
         type={type}
-        className={cn(
-          'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm tracking-wide ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50',
-          type === 'color' && 'cursor-pointer',
-          className
-        )}
+        className={baseClassName}
         ref={ref}
+        onChange={handleChange}
         {...props}
       />
     )

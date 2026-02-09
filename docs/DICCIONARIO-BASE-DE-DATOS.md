@@ -22,8 +22,11 @@
 12. [Turno Programado](#turno-programado)
 13. [Plantilla de Tarifa](#plantilla-de-tarifa)
 14. [Componente de Tarifa](#componente-de-tarifa)
-15. [Contrato Laboral](#contrato-laboral)
-16. [Calendario Organizacional](#calendario-organizacional)
+15. [Vinculación Componente-Tipo de Turno](#vinculación-componente-tipo-de-turno)
+16. [Contrato Laboral](#contrato-laboral)
+17. [Calendario Organizacional](#calendario-organizacional)
+18. [Pago de Turno](#pago-de-turno)
+19. [Desglose de Pago](#desglose-de-pago)
 
 ---
 
@@ -341,8 +344,10 @@ Cada turno específico asignado a una persona en una fecha/hora concreta.
 | Campo | ¿Qué significa? |
 |-------|-----------------|
 | **Título** | Título descriptivo del turno (opcional) |
-| **Hora de inicio** | Cuándo empieza el turno (fecha y hora exacta) |
-| **Hora de fin** | Cuándo termina el turno |
+| **Hora de inicio** | Cuándo empieza el turno (fecha y hora programada) |
+| **Hora de fin** | Cuándo termina el turno (programado) |
+| **Hora de inicio real** | Cuándo el empleado marcó check-in (llegada real) |
+| **Hora de fin real** | Cuándo el empleado marcó check-out (salida real) |
 | **Estado** | Programado, En progreso, Completado, Cancelado o No asistió |
 | **Notas** | Información adicional o instrucciones especiales |
 | **Usuario** | A quién se le asignó el turno |
@@ -359,10 +364,12 @@ Es el registro concreto de "Juan trabaja en UCI el 15/02/2026 de 8:00 a 20:00".
 **Ejemplo:**
 - Enfermera María Pérez
 - Turno: Guardia Nocturna en UCI
-- Desde: 15/02/2026 20:00
-- Hasta: 16/02/2026 08:00
-- Estado: Programado
-- Contrato: "Contrato Enfermería UCI" (para saber cuánto se le paga)
+- Programado: 15/02/2026 20:00 → 16/02/2026 08:00
+- Check-in real: 15/02/2026 19:55 (llegó 5 min antes)
+- Check-out real: 16/02/2026 08:30 (salió 30 min tarde)
+- Estado: Completado
+- Contrato: "Contrato Enfermería UCI" (para calcular pago automáticamente)
+- Pago: $125,000 (calculado según tiempo real trabajado y multiplicadores)
 
 ---
 
@@ -409,8 +416,9 @@ Cada parte individual que conforma el cálculo de pago (salario, bonos, multipli
 | **Nombre personalizado** | Nombre específico si es un componente custom |
 | **Valor** | Monto o porcentaje (ej: 2.000.000 o 1.5) |
 | **Unidad** | Cómo se aplica (mensual, por hora, por turno, porcentaje, etc.) |
-| **Condición de aplicación** | Cuándo se aplica (siempre, solo de noche, solo fines de semana, etc.) |
-| **Valor de condición** | Información adicional de la condición (ej: "UCI" si aplica solo en UCI) |
+| **Condición de aplicación** | Cuándo se aplica (siempre, solo para turnos específicos, solo fines de semana, etc.) |
+| **Turnos aplicables** | A qué tipos de turno aplica (si condición es "SPECIFIC_SHIFT_TYPE") |
+| **Valor de condición** | Información adicional de la condición |
 | **Descripción** | Explicación de este componente |
 | **Orden** | En qué orden se muestra en la lista |
 | **Fecha de creación** | Cuándo se creó |
@@ -424,17 +432,18 @@ Define cada "pieza" del cálculo de pago. Una plantilla puede tener muchos compo
    - Tipo: Salario base
    - Valor: $3.000.000
    - Unidad: Mensual
-   - Condición: Siempre
+   - Condición: Siempre (pago base, independiente de turnos)
 2. Componente 2:
-   - Tipo: Bono nocturno
-   - Valor: $80.000
+   - Tipo: Pago por turno
+   - Valor: $120.000
    - Unidad: Por turno
-   - Condición: Solo turno nocturno
+   - Condición: Solo para tipo de turno específico
+   - Turnos aplicables: "Guardia Médica 24h"
 3. Componente 3:
-   - Tipo: Multiplicador feriado
-   - Valor: 2.5
-   - Unidad: Multiplicador
-   - Condición: Solo feriados irrenunciables
+   - Tipo: Bono fin de semana
+   - Valor: $50.000
+   - Unidad: Monto fijo
+   - Condición: Solo fin de semana
 
 ---
 
@@ -718,6 +727,114 @@ Define qué días se pagan diferente. Los turnos en esos días aplican multiplic
 
 ---
 
+## 15. Vinculación Componente-Tipo de Turno
+
+**Nombre técnico:** `RateComponentApplicableType`
+
+**¿Para qué sirve?**  
+Vincula componentes de pago a tipos de turno específicos. Permite que un componente solo se pague cuando trabajas un tipo de turno en particular.
+
+**Ejemplo práctico:**  
+"El bono de $40,000 solo se paga si trabajas una 'Guardia Larga (12h)', no se paga en otros turnos."
+
+### **Campos:**
+
+| Campo | ¿Qué es? |
+|-------|----------|
+| `rateComponentId` | Qué componente de pago |
+| `shiftTypeId` | A qué tipo de turno aplica |
+
+**Relaciones:**
+- **Pertenece a:** Un componente de tarifa (RateComponent)
+- **Pertenece a:** Un tipo de turno (ShiftType)
+
+---
+
+## 18. Pago de Turno
+
+**Nombre técnico:** `ShiftPayment`
+
+**¿Para qué sirve?**  
+Registra el cálculo automático del pago de cada turno trabajado. Cuando un empleado hace check-out, el sistema calcula cuánto debe cobrar basado en sus componentes de tarifa, tiempo trabajado, y multiplicadores del calendario.
+
+**Ejemplo práctico:**  
+"Juan trabajó una Guardia Larga el 25 de diciembre (Navidad). El sistema calculó: $50,000 (pago base) × 2.5 (multiplicador Navidad) = $125,000."
+
+### **Campos:**
+
+| Campo | ¿Qué es? |
+|-------|----------|
+| `id` | Identificador único del pago |
+| `shiftId` | A qué turno corresponde |
+| `totalAmount` | Suma de componentes (sin multiplicador) |
+| `baseAmount` | Monto base antes de multiplicadores |
+| `calendarMultiplier` | Multiplicador del día (ej: 2.5x en Navidad) |
+| `finalAmount` | Pago final = totalAmount × calendarMultiplier |
+| `minutesWorked` | Minutos realmente trabajados |
+| `isPartialCompletion` | Si trabajó menos de lo programado |
+| `status` | Estado del pago (PENDING, CALCULATED, APPROVED, PAID, DISPUTED) |
+| `calculatedAt` | Cuándo se calculó automáticamente |
+| `approvedAt` | Cuándo aprobó RRHH el pago |
+| `approvedBy` | Quién aprobó el pago |
+| `paidAt` | Cuándo se efectuó el pago real |
+| `notes` | Observaciones sobre el pago |
+| `createdAt` | Fecha de creación |
+| `updatedAt` | Última actualización |
+
+**Relaciones:**
+- **Pertenece a:** Un turno (Shift) - relación 1:1
+- **Tiene muchos:** Desgloses de pago (ShiftPaymentBreakdown)
+
+**Estados del Pago:**
+- `PENDING`: Turno completado, pendiente de cálculo
+- `CALCULATED`: Sistema calculó el pago automáticamente
+- `APPROVED`: RRHH aprobó el pago
+- `PAID`: Pago efectuado al empleado
+- `DISPUTED`: Pago en disputa, requiere revisión
+
+---
+
+## 19. Desglose de Pago
+
+**Nombre técnico:** `ShiftPaymentBreakdown`
+
+**¿Para qué sirve?**  
+Muestra el detalle de cada componente que sumó al pago total del turno. Permite transparencia total: el empleado puede ver exactamente por qué le están pagando X cantidad.
+
+**Ejemplo práctico:**  
+```
+Turno 25-Dic Guardia Larga:
+  • Pago base por turno: $50,000
+  • Bono por 25 min extra: $12,500
+  • Bono fin de año: $20,000
+  ───────────────────────────
+  Total base: $82,500
+  × Multiplicador Navidad (2.5x)
+  ═══════════════════════════
+  TOTAL FINAL: $206,250
+```
+
+### **Campos:**
+
+| Campo | ¿Qué es? |
+|-------|----------|
+| `id` | Identificador único del desglose |
+| `shiftPaymentId` | A qué pago de turno pertenece |
+| `componentId` | Qué componente de tarifa se aplicó |
+| `componentName` | Nombre del componente (guardado para historial) |
+| `componentType` | Tipo (BASE_SALARY, PER_SHIFT, etc.) |
+| `baseValue` | Valor base ($/min, $/turno, etc.) |
+| `calculatedValue` | Valor final calculado |
+| `appliedMinutes` | Minutos aplicados (para componentes por tiempo) |
+| `notes` | Notas adicionales |
+| `createdAt` | Fecha de creación |
+
+**Relaciones:**
+- **Pertenece a:** Un pago de turno (ShiftPayment)
+- **Referencia a:** Un componente de tarifa (RateComponent)
+
+---
+
 ## 🔒 Seguridad y Privacidad
 
 ### **Datos sensibles protegidos:**
@@ -739,7 +856,7 @@ Define qué días se pagan diferente. Los turnos en esos días aplican multiplic
 
 ## 📝 Resumen Ejecutivo
 
-**¿Cuántas tablas hay?** 16 tablas principales
+**¿Cuántas tablas hay?** 19 tablas principales
 
 **¿Qué información se guarda?**
 - 👥 **Personal y usuarios:** Datos personales, documentos, emails, fotos
@@ -753,16 +870,15 @@ Define qué días se pagan diferente. Los turnos en esos días aplican multiplic
 - 🔐 **Seguridad:** Sesiones, métodos de acceso, verificaciones
 
 **¿Qué NO se guarda (aún)?**
-- ❌ Pagos realizados por organizaciones
-- ❌ Historial de facturación
+- ❌ Pagos realizados por organizaciones a VITA
+- ❌ Historial de facturación de clientes
 - ❌ Notificaciones enviadas
 - ❌ Mensajes entre usuarios
 - ❌ Solicitudes de intercambio de turnos
-- ❌ Registro de asistencia real
 - ❌ Postulaciones a turnos abiertos
 
 ---
 
 **Documento creado para:** Gerentes, administradores de hospitales, auditores, personal de cumplimiento  
 **Última actualización:** Febrero 2026  
-**Versión del sistema:** 3.18.0
+**Versión del sistema:** 4.0.0 (Sistema de Pagos y Check-in/Check-out)

@@ -1451,6 +1451,7 @@
         "description": "Description (optional)",
         "descriptionPlaceholder": "Describe when and how this rate is used",
         "descriptionTooltip": "Explain what type of staff or situations this rate is designed for. This helps other admins understand its purpose.",
+        "loadingShiftTypes": "Loading shift types...",
         "save": "Save Rate",
         "saving": "Saving...",
         "cancel": "Cancel",
@@ -1476,6 +1477,9 @@
         "valueTooltip": "Enter the numeric value. For salaries and bonuses use your country's currency. For multipliers use decimals (e.g. 1.5 = 150%). For percentages use numbers (e.g. 10 = 10%).",
         "applyCondition": "When It Applies",
         "applyConditionTooltip": "Define in which situations this component will be applied. 'Always' includes it in all shifts. Other options limit it to night hours, weekends, holidays, etc.",
+        "applicableShiftTypes": "Applicable Shift Types",
+        "applicableShiftTypesTooltip": "Select the shift types to which this component will be applied. For example, if it's a 'Long Shift Bonus', select only the 'Long Shift' type.",
+        "noShiftTypes": "No shift types available. Create shift types first.",
         "customName": "Custom Name (optional)",
         "customNamePlaceholder": "e.g. Long shift bonus",
         "description": "Description (optional)",
@@ -1514,16 +1518,17 @@
           "FIXED_AMOUNT": "Fixed Amount"
         },
         "conditions": {
-          "ALWAYS": "Always",
+          "ALWAYS": "Always (Base pay, independent of shifts)",
           "WEEKDAY_ONLY": "Weekdays Only",
           "WEEKEND_ONLY": "Weekend Only",
           "SATURDAY_ONLY": "Saturday Only",
           "SUNDAY_ONLY": "Sunday Only",
           "HOLIDAY_ONLY": "Holidays Only",
           "IRRENUNCIABLE_ONLY": "Mandatory Holidays Only",
-          "NIGHT_SHIFT_ONLY": "Night Shift Only (10PM-6AM)",
-          "DAY_SHIFT_ONLY": "Day Shift Only",
-          "OVERTIME_ONLY": "Overtime Only"
+          "OVERTIME_ONLY": "Overtime Only",
+          "SPECIFIC_AREA": "Specific Area Only",
+          "SPECIFIC_SHIFT_TYPE": "Specific Shift Type Only",
+          "CUSTOM_RULE": "Custom Rule"
         }
       },
       "rateTemplateForm": {
