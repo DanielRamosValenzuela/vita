@@ -18,13 +18,14 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       className
     )
 
-    if (mask)
+    if (mask) {
+      const maskOpts = mask as Record<string, unknown>
       return (
         <IMaskInput
-          {...mask}
+          {...maskOpts}
           inputRef={ref as React.Ref<HTMLInputElement>}
           className={baseClassName}
-          onAccept={(value, maskRef) => {
+          onAccept={(value: string, maskRef: { unmaskedValue: string }) => {
             const unmaskedValue = maskRef.unmaskedValue
             if (onMaskAccept) onMaskAccept(value, unmaskedValue)
             if (onChange) {
@@ -37,6 +38,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           {...props}
         />
       )
+    }
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       if (maxDigits && type === 'number') {

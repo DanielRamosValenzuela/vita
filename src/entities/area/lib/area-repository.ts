@@ -17,6 +17,8 @@ export type UpdateAreaInput = Partial<
     | 'isActive'
     | 'maxConsecutiveHours'
     | 'minRestHours'
+    | 'dayStartTime'
+    | 'dayEndTime'
   >
 >
 
@@ -90,6 +92,8 @@ export async function updateArea(
   if (data.maxConsecutiveHours !== undefined)
     updateData.maxConsecutiveHours = data.maxConsecutiveHours
   if (data.minRestHours !== undefined) updateData.minRestHours = data.minRestHours
+  if (data.dayStartTime !== undefined) updateData.dayStartTime = data.dayStartTime
+  if (data.dayEndTime !== undefined) updateData.dayEndTime = data.dayEndTime
 
   if (data.isActive !== undefined) {
     if (data.isActive) {

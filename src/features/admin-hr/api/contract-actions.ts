@@ -34,8 +34,24 @@ export interface ContractsPageData {
     id: string
     name: string
     description: string | null
+    isActive: boolean
+    organizationId: string
+    createdAt: Date
+    updatedAt: Date
     componentsCount: number
     _count: { contracts: number }
+    components: Array<{
+      id: string
+      type: string
+      customName: string | null
+      value: number
+      unit: string
+      applyCondition: string
+      conditionValue: string | null
+      description: string | null
+      order: number
+      applicableShiftTypes?: Array<{ shiftTypeId: string }>
+    }>
   }>
   areas: Array<{ id: string; name: string }>
 }
@@ -63,14 +79,17 @@ export const getContractsPageDataAction = async (): Promise<
       }),
       prisma.rateTemplate.findMany({
         where: { organizationId: orgId, isActive: true },
-        select: {
-          id: true,
-          name: true,
-          description: true,
+        include: {
           _count: {
             select: {
               contracts: true,
               components: true,
+            },
+          },
+          components: {
+            orderBy: { order: 'asc' },
+            include: {
+              applicableShiftTypes: { select: { shiftTypeId: true } },
             },
           },
         },
@@ -136,8 +155,16 @@ export const getContractsPageDataAction = async (): Promise<
       data: {
         staff,
         rateTemplates: rateTemplates.map((t) => ({
-          ...t,
+          id: t.id,
+          name: t.name,
+          description: t.description,
+          isActive: t.isActive,
+          organizationId: t.organizationId,
+          createdAt: t.createdAt,
+          updatedAt: t.updatedAt,
           componentsCount: t._count.components,
+          _count: { contracts: t._count.contracts },
+          components: t.components,
         })),
         areas,
       },
@@ -203,14 +230,17 @@ export const getStaffPageDataAction = async (): Promise<
           organizationId: session.organizationId!,
           isActive: true,
         },
-        select: {
-          id: true,
-          name: true,
-          description: true,
+        include: {
           _count: {
             select: {
               contracts: true,
               components: true,
+            },
+          },
+          components: {
+            orderBy: { order: 'asc' },
+            include: {
+              applicableShiftTypes: { select: { shiftTypeId: true } },
             },
           },
         },
@@ -250,8 +280,16 @@ export const getStaffPageDataAction = async (): Promise<
       data: {
         staff,
         rateTemplates: rateTemplates.map((t) => ({
-          ...t,
+          id: t.id,
+          name: t.name,
+          description: t.description,
+          isActive: t.isActive,
+          organizationId: t.organizationId,
+          createdAt: t.createdAt,
+          updatedAt: t.updatedAt,
           componentsCount: t._count.components,
+          _count: { contracts: t._count.contracts },
+          components: t.components,
         })),
         areas,
       },

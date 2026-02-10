@@ -6,7 +6,6 @@ import { getTranslations } from 'next-intl/server'
 import { formatZodErrors } from '@/src/shared/lib/utils'
 
 import {
-  checkDocExists,
   checkEmailExists,
   createUserWithAccount,
   findUserWithCredentials,
@@ -56,17 +55,6 @@ export async function registerAction(formData: FormData): Promise<ActionResult<R
       }
     
 
-    const cleanDocNumber = data.docNumber.replace(/[^a-zA-Z0-9]/g, '')
-    if (await checkDocExists(data.country, data.docType, cleanDocNumber)) 
-      return {
-        success: false,
-        error: t('documentExists'),
-        fieldErrors: {
-          docNumber: [t('documentExists')],
-        },
-      }
-    
-
     const userData = await createUserWithAccount(data)
 
     return {
@@ -92,15 +80,6 @@ export async function registerAction(formData: FormData): Promise<ActionResult<R
           }
         
 
-        if (target?.includes('docNumber') || target?.includes('country')) 
-          return {
-            success: false,
-            error: t('documentExists'),
-            fieldErrors: {
-              docNumber: [t('documentExists')],
-            },
-          }
-        
       }
     
 

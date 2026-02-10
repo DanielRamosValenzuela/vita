@@ -1335,6 +1335,12 @@
         "minRestHours": "Min rest hours",
         "minRestHoursTooltip": "Minimum rest hours a person must have between shifts in this area. E.g. 8h. Leave empty if not applicable.",
         "minRestHoursPlaceholder": "e.g. 8",
+        "dayNightConfig": "Day/night schedule for this area",
+        "dayNightConfigDescription": "Define what is considered daytime and nighttime in this area.",
+        "dayNightConfigTooltip": "These times are used to split worked time into day and night (for example, to pay daytime vs nighttime overtime differently). If left empty, the system will use a default behavior.",
+        "dayNightConfigHelper": "Example: Day from 08:00 to 20:00. Everything outside that range is considered night.",
+        "dayStart": "Day start",
+        "dayEnd": "Day end",
         "separator": "-",
         "status": "Status",
         "statusDescription": "Activate the area to assign shifts",
@@ -1779,6 +1785,41 @@
         "successSaved": "Shift saved successfully",
         "errorDeleting": "Error deleting shift"
       }
+    }
+  },
+  "payments": {
+    "calculation": {
+      "success": "Payment calculated successfully",
+      "recalculated": "Payment recalculated successfully",
+      "bulkSuccess": "{succeeded} payments calculated, {failed} failed",
+      "errorNoOrganization": "No organization assigned",
+      "errorShiftNotFound": "Shift not found or does not belong to your organization",
+      "errorNonPayableStatus": "Cannot calculate payment for cancelled or no-show shifts",
+      "errorNoContract": "No active contract found for this user",
+      "errorContractNotFound": "Contract not found",
+      "errorAreaPermission": "You can only calculate payments for shifts in your areas",
+      "errorViewPermission": "You can only view payments for shifts in your areas",
+      "errorNoPayment": "No payment found for this shift",
+      "errorNoShiftIds": "No shift IDs provided",
+      "errorMaxBulk": "Maximum {max} shifts per bulk operation"
+    },
+    "skipReasons": {
+      "payroll_unit": "Payroll component (not applicable per shift)",
+      "condition_not_met": "Condition not met",
+      "shift_not_weekday": "Shift is not on a weekday",
+      "shift_not_weekend": "Shift is not on a weekend",
+      "shift_not_saturday": "Shift is not on Saturday",
+      "shift_not_sunday": "Shift is not on Sunday",
+      "shift_not_holiday": "Shift is not on a holiday",
+      "shift_not_irrenunciable": "Shift is not on an irrenunciable holiday",
+      "no_overtime": "No overtime hours",
+      "area_mismatch": "Area does not match",
+      "shift_type_mismatch": "Shift type does not match",
+      "unknown_condition": "Unknown condition",
+      "unknown_unit": "Unknown unit"
+    },
+    "warnings": {
+      "noContractAssigned": "Shift created without an assigned contract. Assign a contract before calculating payment."
     }
   }
 }

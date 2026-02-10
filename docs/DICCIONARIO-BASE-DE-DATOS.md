@@ -209,6 +209,7 @@ Mantiene a los usuarios conectados sin pedirles contraseña cada vez. Por seguri
 | **Está activa** | Si el área está operativa o fue desactivada temporalmente |
 | **Máximo de horas seguidas** | Cuántas horas máximo puede trabajar alguien sin descanso en esta área |
 | **Mínimo de horas de descanso** | Cuántas horas mínimas debe descansar entre turnos |
+| **Horario diurno (inicio/fin)** | Desde qué hora hasta qué hora se considera "día" en esta área (ej: 08:00 → 20:00). Fuera de ese rango se considera noche. |
 | **Organización** | A qué hospital pertenece |
 | **Fecha de creación** | Cuándo se creó el área |
 | **Última modificación** | Última actualización |
@@ -217,8 +218,8 @@ Mantiene a los usuarios conectados sin pedirles contraseña cada vez. Por seguri
 Organiza el hospital en departamentos. Cada área tiene sus propios jefes, personal y tipos de turnos permitidos.
 
 **Ejemplo:**
-- UCI Adultos: máximo 12 horas seguidas, mínimo 8 horas de descanso
-- Urgencias: máximo 24 horas seguidas, mínimo 12 horas de descanso
+- UCI Adultos: máximo 12 horas seguidas, mínimo 8 horas de descanso, día de 08:00 a 20:00 (noche el resto).
+- Urgencias: máximo 24 horas seguidas, mínimo 12 horas de descanso, día de 07:00 a 19:00.
 
 ---
 

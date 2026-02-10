@@ -1308,6 +1308,12 @@
         "minRestHours": "Mín. horas descanso",
         "minRestHoursTooltip": "Mínimo de horas de descanso que debe tener una persona entre turnos en esta área. Ej: 8h. Dejar vacío si no aplica.",
         "minRestHoursPlaceholder": "ej. 8",
+        "dayNightConfig": "Horario diurno/nocturno del área",
+        "dayNightConfigDescription": "Define qué se considera día y noche en esta área.",
+        "dayNightConfigTooltip": "Estos horarios se usan para separar horas diurnas y nocturnas (por ejemplo, para diferenciar pago de horas extra diurnas vs nocturnas). Si los dejas vacíos, el sistema usará un comportamiento por defecto.",
+        "dayNightConfigHelper": "Ejemplo: Día de 08:00 a 20:00. Todo lo que quede fuera de ese rango se considera noche.",
+        "dayStart": "Inicio día",
+        "dayEnd": "Fin día",
         "separator": "-",
         "status": "Estado",
         "statusDescription": "Activa el área para asignar turnos",
@@ -1752,6 +1758,41 @@
         "successSaved": "Turno guardado exitosamente",
         "errorDeleting": "Error al eliminar turno"
       }
+    }
+  },
+  "payments": {
+    "calculation": {
+      "success": "Pago calculado exitosamente",
+      "recalculated": "Pago recalculado exitosamente",
+      "bulkSuccess": "{succeeded} pagos calculados, {failed} fallaron",
+      "errorNoOrganization": "No tienes una organización asignada",
+      "errorShiftNotFound": "Turno no encontrado o no pertenece a tu organización",
+      "errorNonPayableStatus": "No se puede calcular pago para turnos cancelados o sin asistencia",
+      "errorNoContract": "No se encontró un contrato activo para este usuario",
+      "errorContractNotFound": "Contrato no encontrado",
+      "errorAreaPermission": "Solo puedes calcular pagos de turnos en tus áreas",
+      "errorViewPermission": "Solo puedes ver pagos de turnos en tus áreas",
+      "errorNoPayment": "No se encontró pago para este turno",
+      "errorNoShiftIds": "No se proporcionaron IDs de turnos",
+      "errorMaxBulk": "Máximo {max} turnos por operación masiva"
+    },
+    "skipReasons": {
+      "payroll_unit": "Componente de nómina (no aplica por turno)",
+      "condition_not_met": "Condición no cumplida",
+      "shift_not_weekday": "El turno no es en día hábil",
+      "shift_not_weekend": "El turno no es en fin de semana",
+      "shift_not_saturday": "El turno no es en sábado",
+      "shift_not_sunday": "El turno no es en domingo",
+      "shift_not_holiday": "El turno no es en feriado",
+      "shift_not_irrenunciable": "El turno no es en feriado irrenunciable",
+      "no_overtime": "No hay horas extra",
+      "area_mismatch": "El área no coincide",
+      "shift_type_mismatch": "El tipo de turno no coincide",
+      "unknown_condition": "Condición desconocida",
+      "unknown_unit": "Unidad desconocida"
+    },
+    "warnings": {
+      "noContractAssigned": "Turno creado sin contrato asignado. Asigne un contrato antes de calcular el pago."
     }
   }
 }

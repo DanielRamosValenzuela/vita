@@ -62,7 +62,7 @@ export function RateTemplateForm({
   const [name, setName] = useState(existingTemplate?.name || '')
   const [description, setDescription] = useState(existingTemplate?.description || '')
   const [components, setComponents] = useState<RateComponentData[]>(
-    existingTemplate?.components.map((comp) => ({
+    existingTemplate?.components?.map((comp) => ({
       ...comp,
       applicableShiftTypeIds:
         'applicableShiftTypes' in comp
@@ -74,11 +74,29 @@ export function RateTemplateForm({
   )
 
   useEffect(() => {
+    if (mode === 'edit' && existingTemplate) {
+      setName(existingTemplate.name || '')
+      setDescription(existingTemplate.description || '')
+      setComponents(
+        existingTemplate.components?.map((comp) => ({
+          ...comp,
+          applicableShiftTypeIds:
+            'applicableShiftTypes' in comp
+              ? (comp.applicableShiftTypes as Array<{ shiftTypeId: string }>)?.map(
+                  (ast) => ast.shiftTypeId
+                ) || []
+              : [],
+        })) || []
+      )
+    }
+  }, [mode, existingTemplate, open])
+
+  useEffect(() => {
     if (open) {
       setIsLoadingShiftTypes(true)
       getShiftTypesAction()
         .then((result) => {
-          if (result.success)
+          if (result.success && result.data)
             setShiftTypes(
               result.data.map((st) => ({
                 id: st.id,

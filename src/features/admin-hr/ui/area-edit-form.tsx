@@ -57,6 +57,8 @@ interface AreaEditFormProps {
     isActive: boolean
     maxConsecutiveHours?: number | null
     minRestHours?: number | null
+    dayStartTime?: string | null
+    dayEndTime?: string | null
     shiftTypes: Array<{
       isActive: boolean
       shiftType: {
@@ -102,6 +104,8 @@ export function AreaEditForm({
   const [minRestHours, setMinRestHours] = useState<string>(
     area.minRestHours != null ? String(area.minRestHours) : ''
   )
+  const [dayStartTime, setDayStartTime] = useState<string>(area.dayStartTime ?? '')
+  const [dayEndTime, setDayEndTime] = useState<string>(area.dayEndTime ?? '')
   const [selectedShiftTypeIds, setSelectedShiftTypeIds] = useState<Set<string>>(
     () => new Set(area.shiftTypes.filter((ast) => ast.isActive).map((ast) => ast.shiftType.id))
   )
@@ -126,6 +130,8 @@ export function AreaEditForm({
     if (maxConsecutiveHours !== maxStr) return true
     const minStr = area.minRestHours != null ? String(area.minRestHours) : ''
     if (minRestHours !== minStr) return true
+    if ((area.dayStartTime ?? '') !== dayStartTime) return true
+    if ((area.dayEndTime ?? '') !== dayEndTime) return true
     if (selectedShiftTypeIds.size !== initialSelectedIds.size) return true
     if ([...selectedShiftTypeIds].some((id) => !initialSelectedIds.has(id))) return true
     if ([...initialSelectedIds].some((id) => !selectedShiftTypeIds.has(id))) return true
@@ -155,6 +161,10 @@ export function AreaEditForm({
     canAssignChiefs,
     selectedChiefIds,
     initialAssignedChiefIds,
+    area.dayStartTime,
+    area.dayEndTime,
+    dayStartTime,
+    dayEndTime,
   ])
 
   const handleSelectionChange = (ids: Set<string>) => {
@@ -194,6 +204,8 @@ export function AreaEditForm({
         color,
         maxConsecutiveHours: maxConsecutiveHours ? parseInt(maxConsecutiveHours, 10) || null : null,
         minRestHours: minRestHours ? parseInt(minRestHours, 10) || null : null,
+        dayStartTime: dayStartTime || null,
+        dayEndTime: dayEndTime || null,
       })
       if (!updateResult.success) {
         toast.error(updateResult.error)
@@ -385,52 +397,98 @@ export function AreaEditForm({
           <CardTitle>{t('editForm.workLimits')}</CardTitle>
           <CardDescription>{t('editForm.workLimitsDescription')}</CardDescription>
         </CardHeader>
-        <CardContent className="grid gap-4 sm:grid-cols-2">
-          <div className="grid gap-2">
-            <div className="flex items-center gap-1.5">
-              <Label htmlFor="maxConsecutiveHours">{t('editForm.maxConsecutiveHours')}</Label>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Info className="text-muted-foreground h-3.5 w-3.5 shrink-0 cursor-help" aria-hidden />
-                </TooltipTrigger>
-                <TooltipContent side="top" className="max-w-xs">
-                  {t('editForm.maxConsecutiveHoursTooltip')}
-                </TooltipContent>
-              </Tooltip>
+        <CardContent className="grid gap-6">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-2">
+              <div className="flex items-center gap-1.5">
+                <Label htmlFor="maxConsecutiveHours">{t('editForm.maxConsecutiveHours')}</Label>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Info className="text-muted-foreground h-3.5 w-3.5 shrink-0 cursor-help" aria-hidden />
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="max-w-xs">
+                    {t('editForm.maxConsecutiveHoursTooltip')}
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+              <Input
+                id="maxConsecutiveHours"
+                type="number"
+                min={1}
+                max={99}
+                maxDigits={2}
+                placeholder={t('editForm.maxConsecutiveHoursPlaceholder')}
+                value={maxConsecutiveHours}
+                onChange={(e) => setMaxConsecutiveHours(e.target.value)}
+              />
             </div>
-            <Input
-              id="maxConsecutiveHours"
-              type="number"
-              min={1}
-              max={99}
-              maxDigits={2}
-              placeholder={t('editForm.maxConsecutiveHoursPlaceholder')}
-              value={maxConsecutiveHours}
-              onChange={(e) => setMaxConsecutiveHours(e.target.value)}
-            />
+            <div className="grid gap-2">
+              <div className="flex items-center gap-1.5">
+                <Label htmlFor="minRestHours">{t('editForm.minRestHours')}</Label>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Info className="text-muted-foreground h-3.5 w-3.5 shrink-0 cursor-help" aria-hidden />
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="max-w-xs">
+                    {t('editForm.minRestHoursTooltip')}
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+              <Input
+                id="minRestHours"
+                type="number"
+                min={0}
+                max={99}
+                maxDigits={2}
+                placeholder={t('editForm.minRestHoursPlaceholder')}
+                value={minRestHours}
+                onChange={(e) => setMinRestHours(e.target.value)}
+              />
+            </div>
           </div>
-          <div className="grid gap-2">
+
+          <div className="grid gap-3">
             <div className="flex items-center gap-1.5">
-              <Label htmlFor="minRestHours">{t('editForm.minRestHours')}</Label>
+              <Label>{t('editForm.dayNightConfig')}</Label>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Info className="text-muted-foreground h-3.5 w-3.5 shrink-0 cursor-help" aria-hidden />
                 </TooltipTrigger>
                 <TooltipContent side="top" className="max-w-xs">
-                  {t('editForm.minRestHoursTooltip')}
+                  {t('editForm.dayNightConfigTooltip')}
                 </TooltipContent>
               </Tooltip>
             </div>
-            <Input
-              id="minRestHours"
-              type="number"
-              min={0}
-              max={99}
-              maxDigits={2}
-              placeholder={t('editForm.minRestHoursPlaceholder')}
-              value={minRestHours}
-              onChange={(e) => setMinRestHours(e.target.value)}
-            />
+            <p className="text-muted-foreground text-xs">
+              {t('editForm.dayNightConfigHelper')}
+            </p>
+            <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center">
+              <div className="grid gap-1.5">
+                <Label htmlFor="dayStartTime" className="text-xs sm:text-sm">
+                  {t('editForm.dayStart')}
+                </Label>
+                <Input
+                  id="dayStartTime"
+                  type="time"
+                  value={dayStartTime}
+                  onChange={(e) => setDayStartTime(e.target.value)}
+                />
+              </div>
+              <span className="hidden sm:flex items-center justify-center text-muted-foreground text-sm">
+                {t('editForm.separator')}
+              </span>
+              <div className="grid gap-1.5">
+                <Label htmlFor="dayEndTime" className="text-xs sm:text-sm">
+                  {t('editForm.dayEnd')}
+                </Label>
+                <Input
+                  id="dayEndTime"
+                  type="time"
+                  value={dayEndTime}
+                  onChange={(e) => setDayEndTime(e.target.value)}
+                />
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>

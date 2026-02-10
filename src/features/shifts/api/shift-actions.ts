@@ -127,11 +127,25 @@ export const createShiftAction = async (
         }
     }
 
+    const activeContract = await prisma.contract.findFirst({
+      where: {
+        userId: validatedData.userId,
+        organizationId: session.organizationId!,
+        isActive: true,
+        OR: [
+          { areaId: validatedData.areaId },
+          { areaId: null },
+        ],
+      },
+      orderBy: [{ areaId: 'desc' }, { startDate: 'desc' }],
+    })
+
     const shift = await prisma.shift.create({
       data: {
         ...validatedData,
         organizationId: session.organizationId!,
         status: 'SCHEDULED',
+        contractId: activeContract?.id ?? undefined,
       },
       include: {
         user: {

@@ -72,7 +72,6 @@ model User {
   emails          UserEmail[]
   documentHistory UserDocumentHistory[]
 
-  @@unique([country, docType, docNumber])
   @@index([email])
   @@index([docNumber])
   @@index([linkingCode])
@@ -363,6 +362,8 @@ model Area {
   isActive            Boolean         @default(false)
   maxConsecutiveHours Int?
   minRestHours        Int?
+  dayStartTime        String?
+  dayEndTime          String?
   organizationId      String
   createdAt           DateTime        @default(now())
   updatedAt           DateTime        @updatedAt

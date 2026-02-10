@@ -22,4 +22,6 @@ export type UpdateAreaInput = {
   isActive?: boolean
   maxConsecutiveHours?: number | null
   minRestHours?: number | null
+  dayStartTime?: string | null
+  dayEndTime?: string | null
 }
