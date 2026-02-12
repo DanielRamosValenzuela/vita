@@ -195,37 +195,46 @@ El sistema de tarifas flexibles permite a ADMIN_HR crear tarifas completamente p
 #### 2. **Asignación de Contrato a Personal** (`/dashboard/rates`)
 
 **Flujo**:
-1. ADMIN_HR desde el módulo de Tarifas ve tabla de personal
-2. Selecciona una plantilla de tarifa
-3. Selecciona área (opcional)
-4. (Opcional) Define multiplicador personalizado (ej: 1.2x para senior)
-5. Añade notas adicionales
-6. Asigna contrato
+1. ADMIN_HR desde el módulo de Tarifas ve la tabla de **Plantillas de Tarifa** y la tabla de **Personal con Contratos**.
+2. En cada persona:
+   - Si **no tiene contrato activo**, puede asignar la primera tarifa con el botón **“Asignar tarifa”**.
+   - Si **ya tiene uno o más contratos activos**:
+     - Ve la tarifa principal (primer contrato activo mostrado en la tabla).
+     - Si hay más de una, aparece un enlace **“Ver tarifas (N)”** que abre un modal con todas las tarifas activas de esa persona y sus acciones (editar / finalizar).
+     - Al hacer clic en **“Agregar otra tarifa”** aparece primero un **modal de advertencia** indicando que múltiples contratos activos por persona son una práctica poco común; solo si confirma se abre el selector de tarifa en modo “agregar”.
+3. En el modal de asignación:
+   - Selecciona una plantilla de tarifa (con buscador por nombre).
+   - Selecciona área (opcional; por defecto se sugiere el área principal si existe).
+   - (Opcional) Define multiplicador personalizado o notas, cuando esa parte esté disponible en UI.
+4. Confirma; se crea un nuevo `Contract` asociado al usuario, la plantilla seleccionada y, si corresponde, al área.
 
-**Características**:
-- ✅ Muestra personal con y sin contrato
-- ✅ Badge de estado de contrato
-- ✅ Vista de plantilla asignada y multiplicador
-- ✅ Finalizar contratos existentes
+**Reglas y características**:
+- ✅ Una **Plantilla de Tarifa** (`RateTemplate`) puede reutilizarse en **muchas personas distintas** al mismo tiempo.
+- ✅ Cada persona puede tener **más de un contrato activo** siempre que sean **tarifas distintas** (múltiples `Contract` activos por `userId` con distintos `rateTemplateId`).
+- ✅ El sistema **no permite** crear dos contratos activos con **la misma plantilla de tarifa para la misma persona**  
+  (validación en `createContractAction`: mismo `userId` + mismo `rateTemplateId` + `isActive = true` + `endDate = null` → se bloquea).
+- ✅ El botón **“Finalizar contrato”** marca el contrato como inactivo (setea `endDate` y `isActive = false`), conservando el historial para cálculos y auditoría.
+- ✅ Ya **no existe** acción de “Eliminar contrato” en la UI; los contratos se finalizan pero no se borran desde el módulo de RRHH.
+- ✅ En la tabla de plantillas de tarifa, la columna **“Contratos”** muestra solo la cantidad de **contratos activos** asociados a esa plantilla (no cuenta históricos).
 
 #### 3. **Visualización de Personal** (`/dashboard/staff`)
 
 **Flujo**:
-1. ADMIN_HR o CHIEF accede al módulo de Personal
+1. ADMIN_HR o CHIEF accede al módulo de Personal.
 2. Ve tabla simplificada con:
-   - Nombre y correo
-   - Rol (CHIEF_AREA / STAFF_HEALTH)
-   - Área asignada
-   - Estado de contrato (✓/✗)
-   - Nombre de plantilla de tarifa
-   - Multiplicador personalizado
-3. Si hay personal sin contrato, se muestra alerta
-4. Link directo al módulo de Tarifas para gestionar contratos
+   - Nombre y correo.
+   - Rol (CHIEF_AREA / STAFF_HEALTH).
+   - Área asignada (según contrato o área principal).
+   - Estado de contrato (✓/✗) calculado en base a si el usuario tiene al menos un `Contract` activo.
+   - Nombre de la **tarifa principal** (primer contrato activo mostrado).
+   - Multiplicador personalizado de ese contrato (si existe).
+3. Si hay personal sin contrato, se muestra una alerta específica con el conteo y un enlace para asignar tarifas.
+4. Hay un enlace directo al módulo de Tarifas para gestionar contratos.
 
 **Características**:
-- ✅ Solo visualización (no edita contratos aquí)
-- ✅ Separación clara de responsabilidades
-- ✅ Estadísticas de personal con/sin contrato
+- ✅ Solo visualización (no edita contratos aquí).
+- ✅ Separación clara de responsabilidades (asignación y edición de contratos ocurre en `/dashboard/rates`).
+- ✅ Estadísticas de personal con y sin contrato basadas en el arreglo completo de contratos (`contracts.length > 0`).
 
 #### 4. **Gestión de Componentes de Tarifa**
 
