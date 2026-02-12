@@ -1394,16 +1394,21 @@
         "statusNoContract": "Sin contrato",
         "multiplier": "Multiplicador",
         "multiplierValue": "Multiplicador: {value}x",
-        "actions": "Acciones",
-        "endContract": "Finalizar"
+      "actions": "Acciones",
+      "endContract": "Finalizar contrato",
+      "viewRates": "Ver tarifas ({count})"
       },
       "contract": {
         "create": "Asignar tarifa",
+        "addAnother": "Agregar otra tarifa",
         "edit": "Editar contrato",
         "createTitle": "Asignar tarifa a {name}",
         "editTitle": "Editar contrato de {name}",
         "rateType": "Tipo de tarifa",
-        "rateTypePlaceholder": "Seleccionar tipo (opcional)",
+        "rateTypePlaceholder": "Seleccionar tipo",
+        "searchRatePlaceholder": "Buscar tarifa...",
+        "createDescription": "Selecciona la tarifa que se aplicará a esta persona. Siempre que sea posible, prefiere una sola tarifa activa por persona.",
+        "noRatesFound": "No se encontraron tarifas para esa búsqueda.",
         "customRate": "Tarifa personalizada ($/min)",
         "adjustment": "Ajuste adicional ($/min)",
         "adjustmentHelp": "Suma al tipo base si aplica",
@@ -1417,7 +1422,19 @@
           "HOURLY": "Por hora"
         },
         "useCustom": "Usar tarifa personalizada",
-        "useTemplate": "Usar tipo de tarifa"
+        "useTemplate": "Usar tipo de tarifa",
+        "multipleWarning": "Estás asignando más de una tarifa activa a esta persona. Es una práctica poco común; asegúrate de que realmente necesitas múltiples contratos vigentes.",
+        "multipleWarningTitle": "Estás por asignar más de una tarifa",
+        "multipleWarningConfirm": "Continuar de todas formas",
+        "tooltips": {
+          "edit": "Editar la tarifa actual de esta persona",
+          "end": "Finalizar contrato: dejar de usar esta tarifa, pero mantener el registro histórico",
+          "delete": "Eliminar contrato: borrar esta tarifa por completo. Úsalo solo si fue creada por error.",
+          "assign": "Asignar la primera tarifa a esta persona",
+          "add": "Cambiar la tarifa actual por otra nueva"
+          },
+        "viewAllTitle": "Tarifas asignadas a {name}",
+        "viewAllDescription": "Esta persona tiene más de una tarifa activa. Revisa cada contrato y realiza cambios solo cuando estés seguro de su impacto en los pagos."
       },
       "templateForm": {
         "createTitle": "Nueva Plantilla de Tarifa",
@@ -1793,6 +1810,12 @@
     },
     "warnings": {
       "noContractAssigned": "Turno creado sin contrato asignado. Asigne un contrato antes de calcular el pago."
+    }
+  },
+  "notifications": {
+    "invitationPending": "Tienes una invitación pendiente de {organization}",
+    "actions": {
+      "view": "Ver"
     }
   }
 }

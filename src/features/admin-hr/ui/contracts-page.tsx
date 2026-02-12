@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
-import { Edit, Plus, Trash2, Copy } from 'lucide-react'
+import { Edit, Plus, Copy, Trash2, XCircle } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Button } from '@/src/shared/ui/button'
@@ -27,14 +27,26 @@ import {
   AlertDialogTitle,
 } from '@/src/shared/ui/alert-dialog'
 import { Badge } from '@/src/shared/ui/badge'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/src/shared/ui/dialog'
+import { Input } from '@/src/shared/ui/input'
+import { cn } from '@/src/shared/lib/utils/cn'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/src/shared/ui/tooltip'
 
 import type { ContractsPageData } from '../api/contract-actions'
+import { deleteRateTemplateAction, duplicateRateTemplateAction } from '../api/rate-template-actions'
 import {
-  deleteRateTemplateAction,
-  duplicateRateTemplateAction,
-} from '../api/rate-template-actions'
+  createContractAction,
+  endContractAction,
+  updateContractAction,
+} from '../api/contract-actions'
 import { RateTemplateForm } from './rate-template-form'
-import { endContractAction } from '../api/contract-actions'
 
 interface ContractsPageProps {
   data: ContractsPageData
@@ -56,6 +68,27 @@ export function ContractsPage({ data, currency }: ContractsPageProps) {
     id: string
     userName: string
   } | null>(null)
+  const [createContractTarget, setCreateContractTarget] = useState<{
+    userId: string
+    userName: string
+    hasActiveContract: boolean
+    primaryAreaId: string | null
+    mode: 'create' | 'add' | 'edit'
+    contractId?: string
+    currentRateTemplateId?: string
+  } | null>(null)
+  const [multipleContractWarningTarget, setMultipleContractWarningTarget] = useState<{
+    userId: string
+    userName: string
+    primaryAreaId: string | null
+  } | null>(null)
+  const [viewContractsTarget, setViewContractsTarget] = useState<{
+    userId: string
+    userName: string
+    contracts: ContractsPageData['staff'][number]['contracts']
+  } | null>(null)
+  const [selectedRateTemplateId, setSelectedRateTemplateId] = useState<string>('')
+  const [rateFilter, setRateFilter] = useState('')
 
   async function handleDeleteTemplate() {
     if (!deleteTemplateTarget) return
@@ -97,7 +130,44 @@ export function ContractsPage({ data, currency }: ContractsPageProps) {
     })
   }
 
+  async function handleCreateContract() {
+    if (!createContractTarget || !selectedRateTemplateId) return
+
+    startTransition(async () => {
+      const result =
+        createContractTarget.mode === 'edit' && createContractTarget.contractId
+          ? await updateContractAction(createContractTarget.contractId, {
+              rateTemplateId: selectedRateTemplateId,
+            })
+          : await createContractAction({
+              userId: createContractTarget.userId,
+              rateTemplateId: selectedRateTemplateId,
+              areaId: createContractTarget.primaryAreaId || undefined,
+            })
+
+      if (result.success) {
+        if (createContractTarget.mode === 'add')
+          toast.warning(t('contract.multipleWarning'))
+
+        toast.success(
+          result.message ||
+            t(createContractTarget.mode === 'edit' ? 'contract.edit' : 'contract.create')
+        )
+        setCreateContractTarget(null)
+        setSelectedRateTemplateId('')
+        router.refresh()
+      } else
+        toast.error(result.error || t('loadError'))
+    })
+  }
+
   const editingTemplate = data.rateTemplates.find((t) => t.id === editTemplateId)
+  const filteredRateTemplates =
+    rateFilter.trim().length === 0
+      ? data.rateTemplates
+      : data.rateTemplates.filter((template) =>
+          template.name.toLowerCase().includes(rateFilter.toLowerCase())
+        )
 
   return (
     <div className="space-y-8">
@@ -230,7 +300,12 @@ export function ContractsPage({ data, currency }: ContractsPageProps) {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {data.staff.map((person) => (
+                  {data.staff.map((person) => {
+                    const primaryContract = person.contracts[0] ?? null
+                    const hasContract = !!primaryContract
+                    const hasMultipleContracts = person.contracts.length > 1
+
+                    return (
                     <TableRow key={person.id}>
                       <TableCell>
                         <div>
@@ -239,18 +314,35 @@ export function ContractsPage({ data, currency }: ContractsPageProps) {
                         </div>
                       </TableCell>
                       <TableCell>
-                        {person.contract?.areaName || (
-                          <span className="text-muted-foreground">-</span>
-                        )}
+                        {primaryContract?.areaName ||
+                          person.primaryAreaName || (
+                            <span className="text-muted-foreground">-</span>
+                          )}
                       </TableCell>
                       <TableCell>
-                        {person.contract ? (
-                          <div>
-                            <div>{person.contract.rateTemplateName}</div>
-                            {person.contract.customMultiplier && (
+                        {primaryContract ? (
+                          <div className="space-y-1">
+                            <div>{primaryContract.rateTemplateName}</div>
+                            {primaryContract.customMultiplier && (
                               <div className="text-xs text-muted-foreground">
-                                {t('staffTable.multiplierValue', { value: person.contract.customMultiplier })}
+                                {t('staffTable.multiplierValue', { value: primaryContract.customMultiplier })}
                               </div>
+                            )}
+                            {hasMultipleContracts && (
+                              <Button
+                                variant="link"
+                                size="sm"
+                                className="h-auto px-0 text-xs"
+                                onClick={() =>
+                                  setViewContractsTarget({
+                                    userId: person.id,
+                                    userName: person.name,
+                                    contracts: person.contracts,
+                                  })
+                                }
+                              >
+                                {t('staffTable.viewRates', { count: person.contracts.length })}
+                              </Button>
                             )}
                           </div>
                         ) : (
@@ -258,31 +350,114 @@ export function ContractsPage({ data, currency }: ContractsPageProps) {
                         )}
                       </TableCell>
                       <TableCell>
-                        {person.contract ? (
+                        {hasContract ? (
                           <Badge variant="default">{t('staffTable.statusActive')}</Badge>
                         ) : (
                           <Badge variant="secondary">{t('staffTable.statusNoContract')}</Badge>
                         )}
                       </TableCell>
                       <TableCell>
-                        {person.contract && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-destructive hover:text-destructive"
-                            onClick={() =>
-                              setEndContractTarget({
-                                id: person.contract!.id,
-                                userName: person.name,
-                              })
-                            }
-                          >
-                            {t('staffTable.endContract')}
-                          </Button>
-                        )}
+                        <div className="flex items-center justify-end gap-1">
+                          {hasContract && primaryContract && (
+                            <>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => {
+                                      setCreateContractTarget({
+                                        userId: person.id,
+                                        userName: person.name,
+                                        hasActiveContract: hasContract,
+                                        primaryAreaId:
+                                          primaryContract.areaId ?? person.primaryAreaId,
+                                        mode: 'edit',
+                                        contractId: primaryContract.id,
+                                        currentRateTemplateId: primaryContract.rateTemplateId,
+                                      })
+                                      setSelectedRateTemplateId(
+                                        primaryContract.rateTemplateId ?? ''
+                                      )
+                                      setRateFilter('')
+                                    }}
+                                    disabled={isPending}
+                                    aria-label={t('contract.tooltips.edit')}
+                                  >
+                                    <Edit className="h-4 w-4" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent sideOffset={4}>
+                                  {t('contract.tooltips.edit')}
+                                </TooltipContent>
+                              </Tooltip>
+
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="text-destructive hover:text-destructive"
+                                    onClick={() =>
+                                      setEndContractTarget({
+                                        id: primaryContract.id,
+                                        userName: person.name,
+                                      })
+                                    }
+                                    disabled={isPending}
+                                    aria-label={t('contract.tooltips.end')}
+                                  >
+                                    <XCircle className="h-4 w-4" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent sideOffset={4}>
+                                  {t('contract.tooltips.end')}
+                                </TooltipContent>
+                              </Tooltip>
+
+                            </>
+                          )}
+
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  if (hasContract) {
+                                    setMultipleContractWarningTarget({
+                                      userId: person.id,
+                                      userName: person.name,
+                                      primaryAreaId: person.primaryAreaId,
+                                    })
+                                  } else {
+                                    setCreateContractTarget({
+                                      userId: person.id,
+                                      userName: person.name,
+                                      hasActiveContract: false,
+                                      primaryAreaId: person.primaryAreaId,
+                                      mode: 'create',
+                                    })
+                                    setSelectedRateTemplateId('')
+                                    setRateFilter('')
+                                  }
+                                }}
+                                disabled={isPending || data.rateTemplates.length === 0}
+                              >
+                                {hasContract ? t('contract.addAnother') : t('contract.create')}
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent sideOffset={4}>
+                              {hasContract
+                                ? t('contract.tooltips.add')
+                                : t('contract.tooltips.assign')}
+                            </TooltipContent>
+                          </Tooltip>
+                        </div>
                       </TableCell>
                     </TableRow>
-                  ))}
+                    )
+                  })}
                 </TableBody>
               </Table>
             </div>
@@ -364,6 +539,244 @@ export function ContractsPage({ data, currency }: ContractsPageProps) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <AlertDialog
+        open={!!multipleContractWarningTarget}
+        onOpenChange={(open) => {
+          if (!open)
+            setMultipleContractWarningTarget(null)
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('contract.multipleWarningTitle')}</AlertDialogTitle>
+            <AlertDialogDescription>{t('contract.multipleWarning')}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              disabled={isPending}
+            >
+              {t('delete.cancel')}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              disabled={isPending}
+              onClick={(event) => {
+                event.preventDefault()
+                if (!multipleContractWarningTarget)
+                  return
+
+                setCreateContractTarget({
+                  userId: multipleContractWarningTarget.userId,
+                  userName: multipleContractWarningTarget.userName,
+                  hasActiveContract: true,
+                  primaryAreaId: multipleContractWarningTarget.primaryAreaId,
+                  mode: 'add',
+                })
+                setSelectedRateTemplateId('')
+                setRateFilter('')
+                setMultipleContractWarningTarget(null)
+              }}
+            >
+              {t('contract.multipleWarningConfirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <Dialog
+        open={!!viewContractsTarget}
+        onOpenChange={(open) => {
+          if (!open)
+            setViewContractsTarget(null)
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {viewContractsTarget
+                ? t('contract.viewAllTitle', { name: viewContractsTarget.userName })
+                : ''}
+            </DialogTitle>
+            <DialogDescription>{t('contract.viewAllDescription')}</DialogDescription>
+          </DialogHeader>
+
+          {viewContractsTarget && (
+            <div className="rounded-md border mt-4">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>{t('staffTable.rateTemplate')}</TableHead>
+                    <TableHead>{t('staffTable.area')}</TableHead>
+                    <TableHead>{t('staffTable.multiplier')}</TableHead>
+                    <TableHead className="w-[120px]">{t('staffTable.actions')}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {viewContractsTarget.contracts.map((contract) => (
+                    <TableRow key={contract.id}>
+                      <TableCell>{contract.rateTemplateName}</TableCell>
+                      <TableCell>{contract.areaName || t('empty.noContract')}</TableCell>
+                      <TableCell>
+                        {contract.customMultiplier ? (
+                          <Badge variant="secondary" className="text-xs">
+                            {t('staffTable.multiplierValue', { value: contract.customMultiplier })}
+                          </Badge>
+                        ) : (
+                          <span className="text-muted-foreground text-xs">
+                            {t('staffTable.multiplier')}
+                          </span>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1 justify-end">
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => {
+                                  setCreateContractTarget({
+                                    userId: viewContractsTarget.userId,
+                                    userName: viewContractsTarget.userName,
+                                    hasActiveContract: true,
+                                    primaryAreaId: contract.areaId,
+                                    mode: 'edit',
+                                    contractId: contract.id,
+                                    currentRateTemplateId: contract.rateTemplateId,
+                                  })
+                                  setSelectedRateTemplateId(contract.rateTemplateId)
+                                  setRateFilter('')
+                                  setViewContractsTarget(null)
+                                }}
+                                disabled={isPending}
+                                aria-label={t('contract.tooltips.edit')}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent sideOffset={4}>
+                              {t('contract.tooltips.edit')}
+                            </TooltipContent>
+                          </Tooltip>
+
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-destructive hover:text-destructive"
+                                onClick={() => {
+                                  setEndContractTarget({
+                                    id: contract.id,
+                                    userName: viewContractsTarget.userName,
+                                  })
+                                  setViewContractsTarget(null)
+                                }}
+                                disabled={isPending}
+                                aria-label={t('contract.tooltips.end')}
+                              >
+                                <XCircle className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent sideOffset={4}>
+                              {t('contract.tooltips.end')}
+                            </TooltipContent>
+                          </Tooltip>
+
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={!!createContractTarget}
+        onOpenChange={(open) => {
+          if (!open) {
+            setCreateContractTarget(null)
+            setSelectedRateTemplateId('')
+          }
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {createContractTarget
+                ? t('contract.createTitle', { name: createContractTarget.userName })
+                : ''}
+            </DialogTitle>
+            <DialogDescription>{t('contract.createDescription')}</DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">{t('contract.rateType')}</label>
+              <Input
+                value={rateFilter}
+                onChange={(event) => setRateFilter(event.target.value)}
+                placeholder={t('contract.searchRatePlaceholder')}
+              />
+                            <div className="rounded-md border max-h-60 overflow-y-auto">
+                {filteredRateTemplates.length === 0 ? (
+                  <p className="text-muted-foreground py-4 text-center text-sm">
+                    {t('contract.noRatesFound')}
+                  </p>
+                ) : (
+                  <ul className="divide-y" role="listbox" aria-label={t('contract.rateType')}>
+                    {filteredRateTemplates.map((template) => {
+                      const isSelected = template.id === selectedRateTemplateId
+                      return (
+                        <li key={template.id}>
+                          <button
+                            type="button"
+                            onClick={() => setSelectedRateTemplateId(template.id)}
+                            className={cn(
+                              'w-full px-3 py-2 text-left text-sm transition-colors hover:bg-accent',
+                              isSelected ? 'bg-accent' : ''
+                            )}
+                          >
+                            <div className="font-medium">{template.name}</div>
+                            {template.description && (
+                              <div className="text-muted-foreground text-xs line-clamp-2">
+                                {template.description}
+                              </div>
+                            )}
+                          </button>
+                        </li>
+                      )
+                    })}
+                  </ul>
+                )}
+              </div>
+            </div>
+
+          </div>
+
+          <DialogFooter className="mt-6">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setCreateContractTarget(null)
+                setSelectedRateTemplateId('')
+              }}
+              disabled={isPending}
+            >
+              {t('templateForm.cancel')}
+            </Button>
+            <Button
+              onClick={handleCreateContract}
+              disabled={isPending || !selectedRateTemplateId}
+            >
+              {isPending ? t('templateForm.saving') : t('contract.create')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

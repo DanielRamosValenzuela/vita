@@ -1421,16 +1421,21 @@
         "statusNoContract": "No contract",
         "multiplier": "Multiplier",
         "multiplierValue": "Multiplier: {value}x",
-        "actions": "Actions",
-        "endContract": "End"
+      "actions": "Actions",
+      "endContract": "End contract",
+      "viewRates": "View rates ({count})"
       },
       "contract": {
         "create": "Assign rate",
+        "addAnother": "Add another rate",
         "edit": "Edit contract",
         "createTitle": "Assign rate to {name}",
         "editTitle": "Edit {name}'s contract",
         "rateType": "Rate type",
-        "rateTypePlaceholder": "Select type (optional)",
+        "rateTypePlaceholder": "Select type",
+        "searchRatePlaceholder": "Search rate...",
+        "createDescription": "Select the rate that will be applied to this person. Whenever possible, prefer a single active rate per person.",
+        "noRatesFound": "No rates found for that search.",
         "customRate": "Custom rate ($/min)",
         "adjustment": "Additional adjustment ($/min)",
         "adjustmentHelp": "Adds to base type if applicable",
@@ -1444,7 +1449,19 @@
           "HOURLY": "Hourly"
         },
         "useCustom": "Use custom rate",
-        "useTemplate": "Use rate type"
+        "useTemplate": "Use rate type",
+        "multipleWarning": "You are assigning more than one active rate to this person. This is uncommon; make sure you really need multiple active contracts.",
+        "multipleWarningTitle": "You are about to assign more than one rate",
+        "multipleWarningConfirm": "Continue anyway",
+        "tooltips": {
+          "edit": "Edit this person's current rate",
+          "end": "End contract: stop using this rate but keep the historical record",
+          "delete": "Delete contract: remove this rate completely. Use only if it was created by mistake.",
+          "assign": "Assign the first rate to this person",
+          "add": "Replace the current rate with a new one"
+        },
+        "viewAllTitle": "Rates assigned to {name}",
+        "viewAllDescription": "This person has more than one active rate. Review each contract carefully and change them only when you are sure of the impact on payments."
       },
       "templateForm": {
         "createTitle": "New Rate Template",
@@ -1820,6 +1837,12 @@
     },
     "warnings": {
       "noContractAssigned": "Shift created without an assigned contract. Assign a contract before calculating payment."
+    }
+  },
+  "notifications": {
+    "invitationPending": "You have a pending invitation from {organization}",
+    "actions": {
+      "view": "View"
     }
   }
 }

@@ -1,0 +1,5 @@
+export const NOTIFICATIONS_LIMITS = {
+  INVITATIONS_PER_USER: 3,
+  TOASTS_PER_LOAD: 3,
+} as const
+

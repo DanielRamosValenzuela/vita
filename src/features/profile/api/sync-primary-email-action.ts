@@ -1,27 +1,45 @@
 'use server'
 
+import { EmailProvider } from '@prisma/client'
+
 import { requireAuth } from '@/src/shared/lib/auth/session'
 import type { ActionResult } from '@/src/shared/lib/types'
 import { prisma } from '@/src/shared/lib/db'
 import { handleActionError } from '@/src/shared/lib/utils'
+import { AUTH_PROVIDERS } from '@/src/shared/lib/constants'
 
 export async function syncPrimaryEmailAction(): Promise<ActionResult<{ synced: boolean }>> {
   try {
     const user = await requireAuth()
 
-    const existingPrimaryInEmails = await prisma.userEmail.findFirst({
+    const existingEmail = await prisma.userEmail.findFirst({
       where: {
         userId: user.id,
         email: user.email,
       },
     })
 
-    if (existingPrimaryInEmails) {
-      if (!existingPrimaryInEmails.isPrimary)
-        await prisma.userEmail.update({
-          where: { id: existingPrimaryInEmails.id },
+    if (existingEmail?.isPrimary)
+      return {
+        success: true,
+        data: { synced: false },
+      }
+
+    if (existingEmail && !existingEmail.isPrimary) {
+      await prisma.$transaction([
+        prisma.userEmail.updateMany({
+          where: {
+            userId: user.id,
+            isPrimary: true,
+            NOT: { id: existingEmail.id },
+          },
+          data: { isPrimary: false },
+        }),
+        prisma.userEmail.update({
+          where: { id: existingEmail.id },
           data: { isPrimary: true },
-        })
+        }),
+      ])
 
       return {
         success: true,
@@ -29,23 +47,23 @@ export async function syncPrimaryEmailAction(): Promise<ActionResult<{ synced: b
       }
     }
 
-    const hasOtherPrimary = await prisma.userEmail.findFirst({
+    const currentPrimary = await prisma.userEmail.findFirst({
       where: {
         userId: user.id,
         isPrimary: true,
       },
     })
 
-    if (hasOtherPrimary)
+    if (currentPrimary)
       await prisma.userEmail.update({
-        where: { id: hasOtherPrimary.id },
+        where: { id: currentPrimary.id },
         data: { isPrimary: false },
       })
 
     const account = await prisma.account.findFirst({
       where: {
         userId: user.id,
-        provider: 'google',
+        provider: AUTH_PROVIDERS.GOOGLE,
       },
     })
 
@@ -55,7 +73,7 @@ export async function syncPrimaryEmailAction(): Promise<ActionResult<{ synced: b
         email: user.email,
         isPrimary: true,
         isVerified: !!account,
-        provider: account ? 'GOOGLE' : 'CREDENTIALS',
+        provider: account ? EmailProvider.GOOGLE : EmailProvider.CREDENTIALS,
       },
     })
 

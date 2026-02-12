@@ -25,8 +25,8 @@ interface StaffViewPageProps {
 export function StaffViewPage({ staff }: StaffViewPageProps) {
   const t = useTranslations('staff')
 
-  const staffWithContract = staff.filter((s) => s.contract !== null)
-  const staffWithoutContract = staff.filter((s) => s.contract === null)
+  const staffWithContract = staff.filter((s) => s.contracts.length > 0)
+  const staffWithoutContract = staff.filter((s) => s.contracts.length === 0)
 
   return (
     <div className="space-y-6">
@@ -66,8 +66,11 @@ export function StaffViewPage({ staff }: StaffViewPageProps) {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {staff.map((person) => (
-                    <TableRow key={person.id}>
+                  {staff.map((person) => {
+                    const currentContract = person.contracts[0] ?? null
+
+                    return (
+                  <TableRow key={person.id}>
                       <TableCell>
                         <div>
                           <div className="font-medium">{person.name}</div>
@@ -80,17 +83,17 @@ export function StaffViewPage({ staff }: StaffViewPageProps) {
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        {person.contract?.areaName || (
+                        {currentContract?.areaName || (
                           <span className="text-muted-foreground">-</span>
                         )}
                       </TableCell>
                       <TableCell>
-                        {person.contract ? (
+                        {currentContract ? (
                           <div className="flex items-center gap-2">
-                            <span>{person.contract.rateTemplateName}</span>
-                            {person.contract.customMultiplier && (
+                            <span>{currentContract.rateTemplateName}</span>
+                            {currentContract.customMultiplier && (
                               <Badge variant="secondary" className="text-xs">
-                                {t('table.multiplierBadge', { value: person.contract.customMultiplier })}
+                                {t('table.multiplierBadge', { value: currentContract.customMultiplier })}
                               </Badge>
                             )}
                           </div>
@@ -99,7 +102,7 @@ export function StaffViewPage({ staff }: StaffViewPageProps) {
                         )}
                       </TableCell>
                       <TableCell>
-                        {person.contract ? (
+                        {currentContract ? (
                           <div className="flex items-center gap-2 text-green-600">
                             <CheckCircle2 className="h-4 w-4" />
                             <span className="text-sm">{t('table.hasContract')}</span>
@@ -112,7 +115,8 @@ export function StaffViewPage({ staff }: StaffViewPageProps) {
                         )}
                       </TableCell>
                     </TableRow>
-                  ))}
+                    )
+                  })}
                 </TableBody>
               </Table>
             </div>

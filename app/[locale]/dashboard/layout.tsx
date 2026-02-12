@@ -1,13 +1,15 @@
 import { getCurrentUser } from '@/src/shared/lib/auth'
 import { DashboardShell } from '@/src/widgets/dashboard-sidebar/dashboard-shell'
+import { getUserPendingNotifications } from '@/src/entities/notification/lib/pending-notifications'
+import { PendingNotificationsToaster } from '@/src/features/notifications/ui/pending-notifications-toaster'
 
 interface DashboardLayoutProps {
   children: React.ReactNode
   params: Promise<{ locale: string }>
 }
 
-export default async function DashboardLayout({ children }: DashboardLayoutProps) {
-  const user = await getCurrentUser()
+export default async function DashboardLayout({ children, params }: DashboardLayoutProps) {
+  const [, user] = await Promise.all([params, getCurrentUser()])
 
   if (!user)
     return (
@@ -16,5 +18,14 @@ export default async function DashboardLayout({ children }: DashboardLayoutProps
       </div>
     )
 
-  return <DashboardShell user={user}>{children}</DashboardShell>
+  const pendingNotifications = await getUserPendingNotifications({
+    userId: user.id,
+  })
+
+  return (
+    <DashboardShell user={user}>
+      <PendingNotificationsToaster notifications={pendingNotifications} />
+      {children}
+    </DashboardShell>
+  )
 }

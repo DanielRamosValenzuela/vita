@@ -9,23 +9,27 @@ import { revalidatePaths } from '@/src/shared/lib/utils/revalidate-paths'
 
 const CONTRACTS_PATHS = ['/dashboard/rates', '/dashboard/staff'] as const
 
+export interface StaffContractSummary {
+  id: string
+  areaId: string | null
+  areaName: string | null
+  rateTemplateId: string
+  rateTemplateName: string
+  customMultiplier: number | null
+  startDate: Date
+  endDate: Date | null
+  isActive: boolean
+  notes: string | null
+}
+
 export interface StaffWithContract {
   id: string
   name: string
   email: string
   role: string
-  contract: {
-    id: string
-    areaId: string | null
-    areaName: string | null
-    rateTemplateId: string
-    rateTemplateName: string
-    customMultiplier: number | null
-    startDate: Date
-    endDate: Date | null
-    isActive: boolean
-    notes: string | null
-  } | null
+  primaryAreaId: string | null
+  primaryAreaName: string | null
+  contracts: StaffContractSummary[]
 }
 
 export interface ContractsPageData {
@@ -74,6 +78,16 @@ export const getContractsPageDataAction = async (): Promise<
           name: true,
           email: true,
           role: true,
+          userAreas: {
+            select: {
+              area: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+            },
+          },
         },
         orderBy: { name: 'asc' },
       }),
@@ -109,33 +123,51 @@ export const getContractsPageDataAction = async (): Promise<
         endDate: null,
       },
       include: {
-        user: { select: { id: true } },
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+          },
+        },
         area: { select: { id: true, name: true } },
         rateTemplate: { select: { id: true, name: true } },
       },
+      orderBy: {
+        startDate: 'desc',
+      },
     })
 
-    const contractByUserId = new Map(
-      contracts.map((c) => [c.userId, c])
-    )
+    const contractsByUserId = new Map<string, typeof contracts>()
+
+    contracts.forEach((contract) => {
+      const existing = contractsByUserId.get(contract.userId)
+      if (existing)
+        existing.push(contract)
+      else
+        contractsByUserId.set(contract.userId, [contract])
+    })
+
+    const contractsCountByRateTemplateId = new Map<string, number>()
+
+    contracts.forEach((contract) => {
+      const current = contractsCountByRateTemplateId.get(contract.rateTemplateId) || 0
+      contractsCountByRateTemplateId.set(contract.rateTemplateId, current + 1)
+    })
 
     const staff: StaffWithContract[] = users.map((user) => {
-      const contract = contractByUserId.get(user.id)
-      if (!contract)
-        return {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          contract: null,
-        }
+      const userContracts = contractsByUserId.get(user.id) || []
+      const primaryArea = user.userAreas[0]?.area
 
       return {
         id: user.id,
         name: user.name,
         email: user.email,
         role: user.role,
-        contract: {
+        primaryAreaId: primaryArea?.id ?? null,
+        primaryAreaName: primaryArea?.name ?? null,
+        contracts: userContracts.map((contract) => ({
           id: contract.id,
           areaId: contract.areaId,
           areaName: contract.area?.name || null,
@@ -146,7 +178,7 @@ export const getContractsPageDataAction = async (): Promise<
           endDate: contract.endDate,
           isActive: contract.isActive,
           notes: contract.notes,
-        },
+        })),
       }
     })
 
@@ -163,7 +195,9 @@ export const getContractsPageDataAction = async (): Promise<
           createdAt: t.createdAt,
           updatedAt: t.updatedAt,
           componentsCount: t._count.components,
-          _count: { contracts: t._count.contracts },
+          _count: {
+            contracts: contractsCountByRateTemplateId.get(t.id) || 0,
+          },
           components: t.components,
         })),
         areas,
@@ -256,24 +290,49 @@ export const getStaffPageDataAction = async (): Promise<
       }),
     ])
 
-    const staff: StaffWithContract[] = contracts.map((contract) => ({
-      id: contract.user.id,
-      name: contract.user.name,
-      email: contract.user.email,
-      role: contract.user.role,
-      contract: {
-        id: contract.id,
-        areaId: contract.areaId,
-        areaName: contract.area?.name || null,
-        rateTemplateId: contract.rateTemplateId,
-        rateTemplateName: contract.rateTemplate.name,
-        customMultiplier: contract.customMultiplier,
-        startDate: contract.startDate,
-        endDate: contract.endDate,
-        isActive: contract.isActive,
-        notes: contract.notes,
-      },
-    }))
+    const contractsByUserId = new Map<string, typeof contracts>()
+
+    contracts.forEach((contract) => {
+      const existing = contractsByUserId.get(contract.userId)
+      if (existing)
+        existing.push(contract)
+      else
+        contractsByUserId.set(contract.userId, [contract])
+    })
+
+    const contractsCountByRateTemplateId = new Map<string, number>()
+
+    contracts.forEach((contract) => {
+      const current = contractsCountByRateTemplateId.get(contract.rateTemplateId) || 0
+      contractsCountByRateTemplateId.set(contract.rateTemplateId, current + 1)
+    })
+
+    const staff: StaffWithContract[] = Array.from(contractsByUserId.values()).map(
+      (userContracts) => {
+        const first = userContracts[0]
+
+        return {
+          id: first.user.id,
+          name: first.user.name,
+          email: first.user.email,
+          role: first.user.role,
+          primaryAreaId: first.area?.id ?? null,
+          primaryAreaName: first.area?.name ?? null,
+          contracts: userContracts.map((contract) => ({
+            id: contract.id,
+            areaId: contract.areaId,
+            areaName: contract.area?.name || null,
+            rateTemplateId: contract.rateTemplateId,
+            rateTemplateName: contract.rateTemplate.name,
+            customMultiplier: contract.customMultiplier,
+            startDate: contract.startDate,
+            endDate: contract.endDate,
+            isActive: contract.isActive,
+            notes: contract.notes,
+          })),
+        }
+      }
+    )
 
     return {
       success: true,
@@ -288,7 +347,9 @@ export const getStaffPageDataAction = async (): Promise<
           createdAt: t.createdAt,
           updatedAt: t.updatedAt,
           componentsCount: t._count.components,
-          _count: { contracts: t._count.contracts },
+          _count: {
+            contracts: contractsCountByRateTemplateId.get(t.id) || 0,
+          },
           components: t.components,
         })),
         areas,
@@ -313,21 +374,6 @@ export const createContractAction = async (data: {
   try {
     const session = await requireAdminHRWithOrg()
 
-    const existingContract = await prisma.contract.findFirst({
-      where: {
-        userId: data.userId,
-        organizationId: session.organizationId,
-        isActive: true,
-        endDate: null,
-      },
-    })
-
-    if (existingContract)
-      return {
-        success: false,
-        error: 'El usuario ya tiene un contrato activo',
-      }
-
     const user = await prisma.user.findUnique({
       where: { id: data.userId },
     })
@@ -349,6 +395,22 @@ export const createContractAction = async (data: {
       return {
         success: false,
         error: 'Tarifa no encontrada',
+      }
+
+    const existingSameRate = await prisma.contract.findFirst({
+      where: {
+        userId: data.userId,
+        organizationId: session.organizationId,
+        rateTemplateId: data.rateTemplateId,
+        isActive: true,
+        endDate: null,
+      },
+    })
+
+    if (existingSameRate)
+      return {
+        success: false,
+        error: 'Esta tarifa ya está asignada a esta persona',
       }
 
     await prisma.contract.create({
@@ -471,6 +533,47 @@ export const endContractAction = async (
       error,
       'endContractAction',
       'Error al finalizar contrato'
+    )
+  }
+}
+
+export const deleteContractAction = async (
+  contractId: string
+): Promise<ActionResult<null>> => {
+  try {
+    const session = await requireAdminHRWithOrg()
+
+    const contract = await prisma.contract.findUnique({
+      where: { id: contractId },
+    })
+
+    if (!contract)
+      return {
+        success: false,
+        error: 'Contrato no encontrado',
+      }
+
+    if (contract.organizationId !== session.organizationId)
+      return {
+        success: false,
+        error: 'El contrato no pertenece a tu organización',
+      }
+
+    await prisma.contract.delete({
+      where: { id: contractId },
+    })
+
+    revalidatePaths(...CONTRACTS_PATHS)
+
+    return {
+      success: true,
+      message: 'Contrato eliminado exitosamente',
+    }
+  } catch (error) {
+    return handleActionError(
+      error,
+      'deleteContractAction',
+      'Error al eliminar contrato'
     )
   }
 }
