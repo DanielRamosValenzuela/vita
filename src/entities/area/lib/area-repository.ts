@@ -2,6 +2,27 @@ import type { Area, Prisma } from '@prisma/client'
 
 import { prisma } from '@/src/shared/lib/db'
 
+export type AreaWithShiftTypes = Prisma.AreaGetPayload<{
+  include: {
+    shiftTypes: {
+      select: {
+        isActive: true
+        shiftType: {
+          select: {
+            id: true
+            name: true
+            durationMinutes: true
+            classification: true
+            color: true
+          }
+        }
+      }
+    }
+  }
+}>
+
+export type AreaShiftTypeItem = AreaWithShiftTypes['shiftTypes'][number]
+
 export type CreateAreaInput = Pick<
   Prisma.AreaUncheckedCreateInput,
   'name' | 'description' | 'icon' | 'color'

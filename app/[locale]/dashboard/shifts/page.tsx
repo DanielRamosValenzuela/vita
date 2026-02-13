@@ -3,6 +3,8 @@ import { ShiftStatus } from '@prisma/client'
 import { endOfMonth, format, startOfMonth } from 'date-fns'
 
 import { requireAdminHROrChiefArea } from '@/src/shared/lib/auth/session'
+import { isChiefArea } from '@/src/shared/lib/auth/rbac'
+import { prisma } from '@/src/shared/lib/db'
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/src/shared/ui/card'
@@ -14,7 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/src/shared/ui/table'
-import { getAreasAction } from '@/src/features/admin-hr/api'
+import { getAreasAction } from '@/src/features/area/api'
 import {
   getShiftsAction,
   getShiftTypesAction,
@@ -42,7 +44,16 @@ export default async function ShiftsPage({ params }: ShiftsPageProps) {
   const session = await requireAdminHROrChiefArea(locale)
   const t = await getTranslations('shifts')
 
-  if (!session.organizationId)
+  let organizationId: string | null = session.organizationId ?? null
+  if (isChiefArea(session) && !organizationId) {
+    const firstArea = await prisma.userArea.findFirst({
+      where: { userId: session.id },
+      select: { area: { select: { organizationId: true } } },
+    })
+    organizationId = firstArea?.area?.organizationId ?? null
+  }
+
+  if (!organizationId)
     return (
       <div className="space-y-8">
         <div>
@@ -147,7 +158,7 @@ export default async function ShiftsPage({ params }: ShiftsPageProps) {
         </div>
 
         <ShiftFormDialog
-          organizationId={session.organizationId!}
+          organizationId={organizationId}
           users={users}
           areas={areas}
           shiftTypes={shiftTypes}
@@ -209,7 +220,6 @@ export default async function ShiftsPage({ params }: ShiftsPageProps) {
             users={users}
             areas={areas}
             shiftTypes={shiftTypes}
-            onFiltersChange={() => {}}
           />
         </CardContent>
       </Card>
@@ -221,11 +231,7 @@ export default async function ShiftsPage({ params }: ShiftsPageProps) {
             <CardTitle>{t('calendar.title')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <ShiftCalendar
-              shifts={calendarShifts}
-              onDateSelect={(_date) => {}}
-              onShiftClick={(_shift) => {}}
-            />
+            <ShiftCalendar shifts={calendarShifts} />
           </CardContent>
         </Card>
 

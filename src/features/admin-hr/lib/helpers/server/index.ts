@@ -1,1 +1,1 @@
-export * from './area-schemas'
+export {}

@@ -28,7 +28,10 @@ export function DashboardSidebar({ user, className }: DashboardSidebarProps) {
   }
 
   const navItems = getNavItems(t, user.role)
-  const filteredNavItems = navItems.filter((item) => item.roles.includes(user.role))
+  const userRoleStr = String(user.role)
+  const filteredNavItems = navItems.filter((item) =>
+    item.roles.some((role) => String(role) === userRoleStr)
+  )
 
   return (
     <aside

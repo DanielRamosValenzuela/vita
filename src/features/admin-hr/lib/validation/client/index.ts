@@ -1,1 +1,1 @@
-export * from './area-messages'
+export {}

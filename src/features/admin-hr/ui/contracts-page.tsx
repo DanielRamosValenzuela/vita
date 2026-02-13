@@ -424,13 +424,13 @@ export function ContractsPage({ data, currency }: ContractsPageProps) {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => {
-                                  if (hasContract) {
+                                  if (hasContract)
                                     setMultipleContractWarningTarget({
                                       userId: person.id,
                                       userName: person.name,
                                       primaryAreaId: person.primaryAreaId,
                                     })
-                                  } else {
+                                  else {
                                     setCreateContractTarget({
                                       userId: person.id,
                                       userName: person.name,

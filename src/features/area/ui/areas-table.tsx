@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { Eye, Plus, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 
-import { deleteAreaAction } from '@/src/features/admin-hr/api'
+import { deleteAreaAction } from '@/src/features/area/api'
 import { renderIcon } from '@/src/shared/ui/icon-picker'
 import {
   AlertDialog,

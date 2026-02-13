@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl'
 
-import type { AreaValidationMessages } from '../../schemas/admin-hr-schema'
+import type { AreaValidationMessages } from '../../schemas/area-schema'
 
 export function useAreaValidationMessages(): AreaValidationMessages {
   const t = useTranslations('validation')

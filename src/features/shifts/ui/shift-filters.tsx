@@ -7,6 +7,9 @@ import { endOfDay, format, startOfDay } from 'date-fns'
 import { Calendar, Clock, Filter, Search, Users, X } from 'lucide-react'
 
 import { SHIFT_STATUS } from '@/src/shared/lib/constants'
+
+const FILTER_ALL = '__all__'
+const FILTER_CUSTOM = '__custom__'
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 import { Input } from '@/src/shared/ui/input'
@@ -34,7 +37,7 @@ interface ShiftFiltersProps {
   users: Array<{ id: string; name: string; role: string }>
   areas: Array<{ id: string; name: string }>
   shiftTypes: Array<{ id: string; name: string; color: string }>
-  onFiltersChange: (filters: FilterState) => void
+  onFiltersChange?: (filters: FilterState) => void
   initialFilters?: Partial<FilterState>
 }
 
@@ -54,6 +57,7 @@ export function ShiftFilters({
     shiftTypeId: '',
     ...initialFilters,
   })
+  const [quickRange, setQuickRange] = useState<'' | 'today' | 'week' | 'month'>('')
 
   const hasActiveFilters = useMemo(() => {
     return (
@@ -69,10 +73,11 @@ export function ShiftFilters({
   const updateFilters = (newFilters: Partial<FilterState>) => {
     const updatedFilters = { ...filters, ...newFilters }
     setFilters(updatedFilters)
-    onFiltersChange(updatedFilters)
+    onFiltersChange?.(updatedFilters)
   }
 
   const clearFilters = () => {
+    setQuickRange('')
     const clearedFilters: FilterState = {
       search: '',
       status: '',
@@ -81,7 +86,7 @@ export function ShiftFilters({
       shiftTypeId: '',
     }
     setFilters(clearedFilters)
-    onFiltersChange(clearedFilters)
+    onFiltersChange?.(clearedFilters)
   }
 
   const getStatusColor = (status: ShiftStatus) => {
@@ -144,14 +149,16 @@ export function ShiftFilters({
 
         {}
         <Select
-          value={filters.status}
-          onValueChange={(value) => updateFilters({ status: value as ShiftStatus | '' })}
+          value={filters.status || FILTER_ALL}
+          onValueChange={(value) =>
+            updateFilters({ status: value === FILTER_ALL ? '' : (value as ShiftStatus) })
+          }
         >
           <SelectTrigger>
             <SelectValue placeholder={t('statusPlaceholder')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">{t('allStatuses')}</SelectItem>
+            <SelectItem value={FILTER_ALL}>{t('allStatuses')}</SelectItem>
             <SelectItem value={SHIFT_STATUS.SCHEDULED}>
               <Badge className={`mr-2 ${getStatusColor(SHIFT_STATUS.SCHEDULED)}`}>
                 {t('status.scheduled')}
@@ -181,12 +188,15 @@ export function ShiftFilters({
         </Select>
 
         {}
-        <Select value={filters.userId} onValueChange={(value) => updateFilters({ userId: value })}>
+        <Select
+          value={filters.userId || FILTER_ALL}
+          onValueChange={(value) => updateFilters({ userId: value === FILTER_ALL ? '' : value })}
+        >
           <SelectTrigger>
             <SelectValue placeholder={t('userPlaceholder')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">{t('allUsers')}</SelectItem>
+            <SelectItem value={FILTER_ALL}>{t('allUsers')}</SelectItem>
             {users.map((user) => (
               <SelectItem key={user.id} value={user.id}>
                 <div className="flex items-center gap-2">
@@ -199,12 +209,15 @@ export function ShiftFilters({
         </Select>
 
         {}
-        <Select value={filters.areaId} onValueChange={(value) => updateFilters({ areaId: value })}>
+        <Select
+          value={filters.areaId || FILTER_ALL}
+          onValueChange={(value) => updateFilters({ areaId: value === FILTER_ALL ? '' : value })}
+        >
           <SelectTrigger>
             <SelectValue placeholder={t('areaPlaceholder')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">{t('allAreas')}</SelectItem>
+            <SelectItem value={FILTER_ALL}>{t('allAreas')}</SelectItem>
             {areas.map((area) => (
               <SelectItem key={area.id} value={area.id}>
                 {area.name}
@@ -217,14 +230,16 @@ export function ShiftFilters({
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {}
         <Select
-          value={filters.shiftTypeId}
-          onValueChange={(value) => updateFilters({ shiftTypeId: value })}
+          value={filters.shiftTypeId || FILTER_ALL}
+          onValueChange={(value) =>
+            updateFilters({ shiftTypeId: value === FILTER_ALL ? '' : value })
+          }
         >
           <SelectTrigger>
             <SelectValue placeholder={t('shiftTypePlaceholder')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">{t('allShiftTypes')}</SelectItem>
+            <SelectItem value={FILTER_ALL}>{t('allShiftTypes')}</SelectItem>
             {shiftTypes.map((type) => (
               <SelectItem key={type.id} value={type.id}>
                 <div className="flex items-center gap-2">
@@ -268,15 +283,24 @@ export function ShiftFilters({
 
         {}
         <Select
+          value={quickRange || FILTER_CUSTOM}
           onValueChange={(value) => {
             const now = new Date()
             let startDate: Date | undefined
             let endDate: Date | undefined
+            let range: '' | 'today' | 'week' | 'month' = ''
+
+            if (value === FILTER_CUSTOM) {
+              setQuickRange('')
+              updateFilters({ startDate: undefined, endDate: undefined })
+              return
+            }
 
             switch (value) {
               case 'today':
                 startDate = startOfDay(now)
                 endDate = endOfDay(now)
+                range = 'today'
                 break
               case 'week':
                 startDate = new Date(
@@ -285,16 +309,19 @@ export function ShiftFilters({
                   now.getDate() - now.getDay()
                 )
                 endDate = new Date(startDate.getTime() + 6 * 24 * 60 * 60 * 1000)
+                range = 'week'
                 break
               case 'month':
                 startDate = new Date(now.getFullYear(), now.getMonth(), 1)
                 endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0)
+                range = 'month'
                 break
               default:
                 startDate = undefined
                 endDate = undefined
             }
 
+            setQuickRange(range)
             updateFilters({ startDate, endDate })
           }}
         >
@@ -302,7 +329,7 @@ export function ShiftFilters({
             <SelectValue placeholder={t('quickDatePlaceholder')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">{t('customDates')}</SelectItem>
+            <SelectItem value={FILTER_CUSTOM}>{t('customDates')}</SelectItem>
             <SelectItem value="today">
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4" />

@@ -1,6 +1,6 @@
 'use client'
 
-import { createAreaSchema, createUpdateAreaSchema } from '../../schemas/admin-hr-schema'
+import { createAreaSchema, createUpdateAreaSchema } from '../../schemas/area-schema'
 import { useAreaValidationMessages } from '../../validation/client/area-messages'
 
 export function useCreateAreaSchema() {

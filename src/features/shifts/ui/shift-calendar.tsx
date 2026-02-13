@@ -166,9 +166,11 @@ export function ShiftCalendar({
           components={{
             Day: ({ day, ...props }) => {
               return (
-                <div {...props} className="h-24 w-full p-0">
-                  {renderDay(day.date)}
-                </div>
+                <td {...props}>
+                  <div className="h-24 w-full p-0">
+                    {renderDay(day.date)}
+                  </div>
+                </td>
               )
             },
           }}

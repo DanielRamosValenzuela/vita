@@ -2,7 +2,7 @@
 
 import { prisma } from '@/src/shared/lib/db'
 import { requireAdminHRWithOrg, requireAdminHROrChiefArea } from '@/src/shared/lib/auth'
-import { ROLES } from '@/src/shared/lib/constants'
+import { isChiefArea } from '@/src/shared/lib/auth/rbac'
 import type { ActionResult } from '@/src/shared/lib/types'
 import { handleActionError } from '@/src/shared/lib/utils'
 import { revalidatePaths } from '@/src/shared/lib/utils/revalidate-paths'
@@ -41,18 +41,27 @@ interface ShiftType {
 export const getShiftTypesAction = async (): Promise<ActionResult<ShiftType[]>> => {
   try {
     const session = await requireAdminHROrChiefArea()
-    const orgId = session.organizationId
+    let orgId: string | null = session.organizationId ?? null
+    if (isChiefArea(session) && !orgId) {
+      const firstArea = await prisma.userArea.findFirst({
+        where: { userId: session.id },
+        select: { area: { select: { organizationId: true } } },
+      })
+      const derived: string | null = firstArea?.area?.organizationId ?? null
+      orgId = derived
+    }
     if (!orgId)
       return {
         success: false,
         error: 'No tienes una organización asignada',
       }
 
+    const effectiveOrgId = orgId
     const where: { organizationId: string; OR?: Array<{ isGlobal: boolean } | { areaShiftTypes: { some: { areaId: { in: string[] }; isActive: boolean } } }> } = {
-      organizationId: orgId,
+      organizationId: effectiveOrgId,
     }
 
-    if (session.role === ROLES.CHIEF_AREA) {
+    if (isChiefArea(session)) {
       const chiefAreas = await prisma.userArea.findMany({
         where: { userId: session.id },
         select: { areaId: true },
@@ -67,6 +76,14 @@ export const getShiftTypesAction = async (): Promise<ActionResult<ShiftType[]>> 
             some: {
               areaId: { in: chiefAreaIds },
               isActive: true,
+            },
+          },
+        },
+        {
+          areaShiftTypes: {
+            some: {
+              areaId: { in: chiefAreaIds },
+              isActive: false,
             },
           },
         },

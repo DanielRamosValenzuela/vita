@@ -22,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/src/shared/ui/select'
-import { assignChiefToSingleAreaAction, removeChiefFromAreaAction } from '../api/area-actions'
+import { assignChiefToSingleAreaAction, removeChiefFromAreaAction } from '@/src/features/area/api'
 
 interface ChiefAreaSelectorProps {
   chiefId: string

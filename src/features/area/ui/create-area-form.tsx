@@ -17,8 +17,9 @@ import { Input } from '@/src/shared/ui/input'
 import { Label } from '@/src/shared/ui/label'
 import { Textarea } from '@/src/shared/ui/textarea'
 
-import { createAreaAction } from '../api/area-actions'
-import { useCreateAreaSchema, type CreateAreaInput } from '../lib/schemas'
+import { createAreaAction } from '../api'
+import type { CreateAreaInput } from '../lib/types'
+import { useCreateAreaSchema } from '../lib/helpers/client'
 
 export function CreateAreaForm() {
   const t = useTranslations('adminHR.areas')

@@ -1,7 +1,4 @@
 export { DashboardStatsCards } from './dashboard-stats-cards'
-export { AreaEditForm } from './area-edit-form'
-export { AreasTable } from './areas-table'
-export { CreateAreaForm } from './create-area-form'
 export { OrganizationView } from './organization-view'
 export { OrganizationTeamSection } from './organization-team-section'
 export { InviteUserForm } from './invite-user-form'

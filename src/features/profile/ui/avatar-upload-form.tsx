@@ -90,7 +90,8 @@ export function AvatarUploadForm({ currentImage, customImage, userName }: Avatar
       if (result.success) {
         toast.success(result.message || t('uploadSuccess'))
         setPreviewUrl(null)
-        await update()
+        const newUrl = result.data?.url
+        if (newUrl) await update({ user: { customImage: newUrl } })
         router.refresh()
       } else {
         showError(t('errors.uploadFailed.title'), result.error || t('errors.uploadFailed.message'))
@@ -108,7 +109,7 @@ export function AvatarUploadForm({ currentImage, customImage, userName }: Avatar
       if (result.success) {
         toast.success(result.message || t('deleteSuccess'))
         setPreviewUrl(null)
-        await update()
+        await update({ user: { customImage: undefined } })
         router.refresh()
       } else 
         toast.error(result.error || t('deleteError'))

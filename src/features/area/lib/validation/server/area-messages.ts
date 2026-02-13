@@ -1,6 +1,6 @@
 import { getTranslations } from 'next-intl/server'
 
-import type { AreaValidationMessages } from '../../schemas/admin-hr-schema'
+import type { AreaValidationMessages } from '../../schemas/area-schema'
 
 export async function getAreaValidationMessages(locale: string): Promise<AreaValidationMessages> {
   const t = await getTranslations({ locale, namespace: 'validation' })

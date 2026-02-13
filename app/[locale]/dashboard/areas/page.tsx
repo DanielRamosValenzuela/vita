@@ -1,9 +1,10 @@
 import { getTranslations } from 'next-intl/server'
-import { Role } from '@prisma/client'
 
-import { getAreasAction } from '@/src/features/admin-hr/api'
-import { AreasTable } from '@/src/features/admin-hr/ui'
+import { getAreasAction } from '@/src/features/area/api'
+import { AreasTable } from '@/src/features/area/ui'
 import { requireAdminHROrChiefArea } from '@/src/shared/lib/auth'
+import { isChiefArea } from '@/src/shared/lib/auth/rbac'
+import { prisma } from '@/src/shared/lib/db'
 
 interface AreasPageProps {
   params: Promise<{ locale: string }>
@@ -24,7 +25,16 @@ export default async function AreasPage({ params }: AreasPageProps) {
   const user = await requireAdminHROrChiefArea(locale)
   const t = await getTranslations('adminHR.areas')
 
-  if (!user.organizationId)
+  let organizationId: string | null = user.organizationId ?? null
+  if (isChiefArea(user) && !organizationId) {
+    const firstArea = await prisma.userArea.findFirst({
+      where: { userId: user.id },
+      select: { area: { select: { organizationId: true } } },
+    })
+    organizationId = firstArea?.area?.organizationId ?? null
+  }
+
+  if (!organizationId)
     return (
       <div className="space-y-6">
         <div>
@@ -57,8 +67,8 @@ export default async function AreasPage({ params }: AreasPageProps) {
 
       <AreasTable
         areas={areas}
-        canCreate={user.role === Role.ADMIN_HR}
-        canDelete={user.role === Role.ADMIN_HR}
+        canCreate={!isChiefArea(user)}
+        canDelete={!isChiefArea(user)}
       />
     </div>
   )

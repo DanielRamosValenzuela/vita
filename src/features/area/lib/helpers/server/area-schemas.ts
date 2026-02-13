@@ -1,4 +1,4 @@
-import { createAreaSchema, createUpdateAreaSchema } from '../../schemas/admin-hr-schema'
+import { createAreaSchema, createUpdateAreaSchema } from '../../schemas/area-schema'
 import { getAreaValidationMessages } from '../../validation/server/area-messages'
 
 export async function getCreateAreaSchema(locale: string) {

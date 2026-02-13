@@ -1,13 +1,15 @@
 import { notFound } from 'next/navigation'
 
 import { getTranslations } from 'next-intl/server'
-import { Role } from '@prisma/client'
+
+import type { ShiftType } from '@prisma/client'
 
 import { prisma } from '@/src/shared/lib/db'
 import { requireAdminHROrChiefArea } from '@/src/shared/lib/auth'
-import { getAreaById } from '@/src/entities/area'
-import { getChiefsForAreaAction } from '@/src/features/admin-hr/api'
-import { AreaEditForm } from '@/src/features/admin-hr/ui'
+import { isChiefArea } from '@/src/shared/lib/auth/rbac'
+import { getAreaById, type AreaShiftTypeItem } from '@/src/entities/area'
+import { getChiefsForAreaAction } from '@/src/features/area/api'
+import { AreaEditForm } from '@/src/features/area/ui'
 import { getShiftTypesAction } from '@/src/features/shifts/api'
 
 interface AreaEditPageProps {
@@ -29,7 +31,16 @@ export default async function AreaEditPage({ params }: AreaEditPageProps) {
   const user = await requireAdminHROrChiefArea(locale)
   const t = await getTranslations('adminHR.areas')
 
-  if (!user.organizationId)
+  let organizationId: string | null = user.organizationId ?? null
+  if (isChiefArea(user) && !organizationId) {
+    const firstArea = await prisma.userArea.findFirst({
+      where: { userId: user.id },
+      select: { area: { select: { organizationId: true } } },
+    })
+    organizationId = (firstArea?.area?.organizationId ?? null) as string | null
+  }
+
+  if (!organizationId)
     return (
       <div className="space-y-6">
         <div>
@@ -39,33 +50,38 @@ export default async function AreaEditPage({ params }: AreaEditPageProps) {
       </div>
     )
 
+  const effectiveOrgId = organizationId
+
   const [area, shiftTypesResult, chiefAreaCheck, chiefsResult] = await Promise.all([
-    getAreaById(id, user.organizationId),
+    getAreaById(id, effectiveOrgId),
     getShiftTypesAction(),
-    user.role === Role.CHIEF_AREA
+    isChiefArea(user)
       ? prisma.userArea.findFirst({ where: { userId: user.id, areaId: id } })
       : Promise.resolve(true),
-    user.role === Role.ADMIN_HR ? getChiefsForAreaAction(id) : Promise.resolve(null),
+    !isChiefArea(user) ? getChiefsForAreaAction(id) : Promise.resolve(null),
   ])
 
   if (!area)
     notFound()
 
-  if (user.role === Role.CHIEF_AREA && !chiefAreaCheck)
+  if (isChiefArea(user) && !chiefAreaCheck)
     notFound()
 
-  const allShiftTypes = shiftTypesResult.success && shiftTypesResult.data ? shiftTypesResult.data : []
-  const areaShiftTypeIds = new Set(area.shiftTypes.map((ast) => ast.shiftType.id))
-  const shiftTypes = allShiftTypes.filter(
-    (st) => st.isGlobal || areaShiftTypeIds.has(st.id)
-  ).map((st) => ({
-    id: st.id,
-    name: st.name,
-    durationMinutes: st.durationMinutes,
-    classification: st.classification,
-    color: st.color,
-    icon: st.icon ?? undefined,
-  }))
+  const allShiftTypes: ShiftType[] =
+    shiftTypesResult.success && shiftTypesResult.data ? shiftTypesResult.data : []
+  const areaShiftTypeIds = new Set(
+    area.shiftTypes.map((ast: AreaShiftTypeItem) => ast.shiftType.id)
+  )
+  const shiftTypes = allShiftTypes
+    .filter((st) => st.isGlobal || areaShiftTypeIds.has(st.id))
+    .map((st) => ({
+      id: st.id,
+      name: st.name,
+      durationMinutes: st.durationMinutes,
+      classification: st.classification,
+      color: st.color,
+      icon: st.icon ?? undefined,
+    }))
 
   type ChiefsData = {
     chiefs: Array<{ id: string; name: string; email: string; docNumber: string | null }>
@@ -90,7 +106,7 @@ export default async function AreaEditPage({ params }: AreaEditPageProps) {
       <AreaEditForm
         area={area}
         shiftTypes={shiftTypes}
-        canAssignChiefs={user.role === Role.ADMIN_HR}
+        canAssignChiefs={!isChiefArea(user)}
         chiefs={chiefs}
         initialAssignedChiefIds={assignedChiefIds}
       />

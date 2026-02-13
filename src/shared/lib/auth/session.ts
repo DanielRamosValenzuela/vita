@@ -76,11 +76,13 @@ export async function requireAdminHROrChiefArea(
   locale: string = 'es'
 ): Promise<CurrentUser & { organizationId: string | null }> {
   const user = await requireAuth(locale)
+  const isAdminHR = user.role === Role.ADMIN_HR
+  const isChief = String(user.role) === 'CHIEF_AREA'
 
-  if (user.role !== Role.ADMIN_HR && user.role !== Role.CHIEF_AREA)
+  if (!isAdminHR && !isChief)
     redirect(`/${locale}/dashboard`)
 
-  if (user.role === Role.ADMIN_HR && !user.organizationId)
+  if (isAdminHR && !user.organizationId)
     throw new Error('No estás vinculado a una organización')
 
   return user as CurrentUser & { organizationId: string | null }
