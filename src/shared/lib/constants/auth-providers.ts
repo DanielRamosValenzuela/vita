@@ -4,4 +4,3 @@ export const AUTH_PROVIDERS = {
 } as const
 
 export type AuthProviderId = (typeof AUTH_PROVIDERS)[keyof typeof AUTH_PROVIDERS]
-

@@ -25,15 +25,12 @@ export async function generateMetadata({ params }: EditOrganizationPageProps) {
 export default async function EditOrganizationPage({ params }: EditOrganizationPageProps) {
   const { id, locale } = await params
   const user = await requireSuperAdmin()
-  if (!user) 
-    redirect(`/${locale}/login`)
-  
+  if (!user) redirect(`/${locale}/login`)
+
   const t = await getTranslations({ locale, namespace: 'superAdmin.editOrganization' })
   const organization = await getOrganizationById(id)
 
-  if (!organization) 
-    notFound()
-  
+  if (!organization) notFound()
 
   return (
     <div className="container mx-auto py-8">

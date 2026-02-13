@@ -1,4 +1,4 @@
-import { ComponentType, ComponentUnit, ApplyCondition } from '@prisma/client'
+import { ApplyCondition, ComponentType, ComponentUnit } from '@prisma/client'
 
 export const COMPONENT_TYPES = {
   BASE_SALARY: 'BASE_SALARY' as ComponentType,

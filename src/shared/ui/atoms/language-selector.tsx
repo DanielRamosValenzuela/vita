@@ -1,7 +1,7 @@
 'use client'
 
-import { useParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
+import { useParams } from 'next/navigation'
 import { Globe } from 'lucide-react'
 
 import { Button } from '@/src/shared/ui/button'

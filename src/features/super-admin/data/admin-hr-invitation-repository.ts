@@ -8,9 +8,7 @@ import {
 } from '@/src/entities/invitation'
 import { checkOrganizationRoleLimit } from '@/src/entities/organization'
 
-export async function getPendingInvitationsForOrganization(
-  organizationId: string
-) {
+export async function getPendingInvitationsForOrganization(organizationId: string) {
   return await getPendingInvitationsForOrganizationEntity(organizationId, Role.ADMIN_HR)
 }
 

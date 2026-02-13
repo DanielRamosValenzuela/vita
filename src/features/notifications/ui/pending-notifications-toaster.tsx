@@ -4,11 +4,10 @@ import { useEffect } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 
-import {
-  NOTIFICATION_TYPES,
-  type PendingNotification,
-} from '@/src/entities/notification/lib/types'
 import { NOTIFICATIONS_LIMITS } from '@/src/shared/lib/constants'
+
+import { NOTIFICATION_TYPES, type PendingNotification } from '@/src/entities/notification/lib/types'
+
 const STORAGE_KEY = 'vita:pending-notifications:shown-ids'
 
 interface PendingNotificationsToasterProps {
@@ -20,8 +19,7 @@ export function PendingNotificationsToaster({ notifications }: PendingNotificati
   const locale = useLocale()
 
   useEffect(() => {
-    if (!notifications?.length)
-      return
+    if (!notifications?.length) return
 
     let shownIds: string[] = []
 
@@ -35,13 +33,10 @@ export function PendingNotificationsToaster({ notifications }: PendingNotificati
 
     const unseen = notifications
       .filter((n) => !shownIds.includes(n.id))
-      .sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      )
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       .slice(0, NOTIFICATIONS_LIMITS.TOASTS_PER_LOAD)
 
-    if (!unseen.length)
-      return
+    if (!unseen.length) return
 
     unseen.forEach((notification) => {
       let message: string | null = null
@@ -60,17 +55,16 @@ export function PendingNotificationsToaster({ notifications }: PendingNotificati
           break
       }
 
-      if (!message)
-        return
+      if (!message) return
 
       toast.info(message, {
         action: href
           ? {
-            label: t('actions.view'),
-            onClick: () => {
-              window.location.href = href as string
-            },
-          }
+              label: t('actions.view'),
+              onClick: () => {
+                window.location.href = href as string
+              },
+            }
           : undefined,
       })
     })
@@ -83,4 +77,3 @@ export function PendingNotificationsToaster({ notifications }: PendingNotificati
 
   return null
 }
-

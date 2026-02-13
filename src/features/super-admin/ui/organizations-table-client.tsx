@@ -149,9 +149,8 @@ export function OrganizationsTableClient({
       if (result.success) {
         toast.success(result.message || t('suspendSuccess'))
         router.refresh()
-      } else 
-        toast.error(result.error || t('suspendError'))
-      
+      } else toast.error(result.error || t('suspendError'))
+
       setSuspendDialog({ open: false, id: '', name: '' })
     })
   }
@@ -166,9 +165,8 @@ export function OrganizationsTableClient({
       if (result.success) {
         toast.success(result.message || t('reactivateSuccess'))
         router.refresh()
-      } else 
-        toast.error(result.error || t('reactivateError'))
-      
+      } else toast.error(result.error || t('reactivateError'))
+
       setReactivateDialog({ open: false, id: '', name: '' })
     })
   }
@@ -188,9 +186,8 @@ export function OrganizationsTableClient({
       if (result.success) {
         toast.success(result.message || t('deleteSuccess'))
         router.refresh()
-      } else 
-        toast.error(result.error || t('deleteError'))
-      
+      } else toast.error(result.error || t('deleteError'))
+
       setDeleteDialog({ open: false, id: '', name: '' })
       setDeleteReason('')
     })
@@ -299,9 +296,7 @@ export function OrganizationsTableClient({
                     </TableCell>
                     <TableCell className="text-right">{formatCurrency(org.monthlyFee)}</TableCell>
                     <TableCell>
-                      {org.nextPayment
-                        ? formatDate(new Date(org.nextPayment), locale)
-                        : '-'}
+                      {org.nextPayment ? formatDate(new Date(org.nextPayment), locale) : '-'}
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="hidden md:flex items-center justify-end gap-2">

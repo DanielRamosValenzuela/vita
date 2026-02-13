@@ -1,16 +1,14 @@
+import { getTranslations } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 
-import { getTranslations } from 'next-intl/server'
-
-import type { ShiftType } from '@prisma/client'
-
-import { prisma } from '@/src/shared/lib/db'
 import { requireAdminHROrChiefArea } from '@/src/shared/lib/auth'
 import { isChiefArea } from '@/src/shared/lib/auth/rbac'
-import { getAreaById, type AreaShiftTypeItem } from '@/src/entities/area'
-import { getChiefsForAreaAction } from '@/src/features/area/api'
+import { prisma } from '@/src/shared/lib/db'
+import { getChiefsForAreaAction, getStaffForAreaAction } from '@/src/features/area/api'
 import { AreaEditForm } from '@/src/features/area/ui'
 import { getShiftTypesAction } from '@/src/features/shifts/api'
+
+import { getAreaById, type AreaShiftTypeItem } from '@/src/entities/area'
 
 interface AreaEditPageProps {
   params: Promise<{ locale: string; id: string }>
@@ -52,22 +50,21 @@ export default async function AreaEditPage({ params }: AreaEditPageProps) {
 
   const effectiveOrgId = organizationId
 
-  const [area, shiftTypesResult, chiefAreaCheck, chiefsResult] = await Promise.all([
+  const [area, shiftTypesResult, chiefAreaCheck, chiefsResult, staffResult] = await Promise.all([
     getAreaById(id, effectiveOrgId),
     getShiftTypesAction(),
     isChiefArea(user)
       ? prisma.userArea.findFirst({ where: { userId: user.id, areaId: id } })
       : Promise.resolve(true),
-    !isChiefArea(user) ? getChiefsForAreaAction(id) : Promise.resolve(null),
+    getChiefsForAreaAction(id),
+    getStaffForAreaAction(id),
   ])
 
-  if (!area)
-    notFound()
+  if (!area) notFound()
 
-  if (isChiefArea(user) && !chiefAreaCheck)
-    notFound()
+  if (isChiefArea(user) && !chiefAreaCheck) notFound()
 
-  const allShiftTypes: ShiftType[] =
+  const allShiftTypes =
     shiftTypesResult.success && shiftTypesResult.data ? shiftTypesResult.data : []
   const areaShiftTypeIds = new Set(
     area.shiftTypes.map((ast: AreaShiftTypeItem) => ast.shiftType.id)
@@ -96,6 +93,17 @@ export default async function AreaEditPage({ params }: AreaEditPageProps) {
     ? new Set(chiefsPayload.assignedChiefIds)
     : new Set<string>()
 
+  type StaffData = {
+    staff: Array<{ id: string; name: string; email: string; docNumber: string | null }>
+    assignedStaffIds: string[]
+  }
+  const staffPayload =
+    staffResult?.success && staffResult.data ? (staffResult.data as StaffData) : null
+  const staff = staffPayload?.staff ?? []
+  const assignedStaffIds = staffPayload?.assignedStaffIds
+    ? new Set(staffPayload.assignedStaffIds)
+    : new Set<string>()
+
   return (
     <div className="space-y-6">
       <div>
@@ -109,6 +117,8 @@ export default async function AreaEditPage({ params }: AreaEditPageProps) {
         canAssignChiefs={!isChiefArea(user)}
         chiefs={chiefs}
         initialAssignedChiefIds={assignedChiefIds}
+        staff={staff}
+        initialAssignedStaffIds={assignedStaffIds}
       />
     </div>
   )

@@ -1,8 +1,8 @@
 'use server'
 
-import { prisma } from '@/src/shared/lib/db'
-import { requireAdminHRWithOrg, requireAdminHROrChiefArea } from '@/src/shared/lib/auth'
+import { requireAdminHROrChiefArea, requireAdminHRWithOrg } from '@/src/shared/lib/auth'
 import { isChiefArea } from '@/src/shared/lib/auth/rbac'
+import { prisma } from '@/src/shared/lib/db'
 import type { ActionResult } from '@/src/shared/lib/types'
 import { handleActionError } from '@/src/shared/lib/utils'
 import { revalidatePaths } from '@/src/shared/lib/utils/revalidate-paths'
@@ -57,7 +57,13 @@ export const getShiftTypesAction = async (): Promise<ActionResult<ShiftType[]>> 
       }
 
     const effectiveOrgId = orgId
-    const where: { organizationId: string; OR?: Array<{ isGlobal: boolean } | { areaShiftTypes: { some: { areaId: { in: string[] }; isActive: boolean } } }> } = {
+    const where: {
+      organizationId: string
+      OR?: Array<
+        | { isGlobal: boolean }
+        | { areaShiftTypes: { some: { areaId: { in: string[] }; isActive: boolean } } }
+      >
+    } = {
       organizationId: effectiveOrgId,
     }
 
@@ -67,8 +73,7 @@ export const getShiftTypesAction = async (): Promise<ActionResult<ShiftType[]>> 
         select: { areaId: true },
       })
       const chiefAreaIds = chiefAreas.map((a) => a.areaId)
-      if (chiefAreaIds.length === 0)
-        return { success: true, data: [] }
+      if (chiefAreaIds.length === 0) return { success: true, data: [] }
       where.OR = [
         { isGlobal: true },
         {
@@ -111,11 +116,7 @@ export const getShiftTypesAction = async (): Promise<ActionResult<ShiftType[]>> 
       data: formattedShiftTypes,
     }
   } catch (error) {
-    return handleActionError(
-      error,
-      'getShiftTypesAction',
-      'Error al obtener tipos de turno'
-    )
+    return handleActionError(error, 'getShiftTypesAction', 'Error al obtener tipos de turno')
   }
 }
 
@@ -241,11 +242,7 @@ export const createShiftTypeAction = async (data: {
       message: 'Tipo de turno creado exitosamente',
     }
   } catch (error) {
-    return handleActionError(
-      error,
-      'createShiftTypeAction',
-      'Error al crear tipo de turno'
-    )
+    return handleActionError(error, 'createShiftTypeAction', 'Error al crear tipo de turno')
   }
 }
 
@@ -279,7 +276,10 @@ export const updateShiftTypeAction = async (
         }
     }
 
-    if (data.durationMinutes !== undefined && (data.durationMinutes < 30 || data.durationMinutes > 1440))
+    if (
+      data.durationMinutes !== undefined &&
+      (data.durationMinutes < 30 || data.durationMinutes > 1440)
+    )
       return {
         success: false,
         error: 'La duración debe estar entre 30 minutos y 24 horas (1440 min)',
@@ -377,11 +377,7 @@ export const updateShiftTypeAction = async (
       message: 'Tipo de turno actualizado exitosamente',
     }
   } catch (error) {
-    return handleActionError(
-      error,
-      'updateShiftTypeAction',
-      'Error al actualizar tipo de turno'
-    )
+    return handleActionError(error, 'updateShiftTypeAction', 'Error al actualizar tipo de turno')
   }
 }
 
@@ -412,7 +408,6 @@ export const deleteShiftTypeAction = async (id: string): Promise<ActionResult<nu
         error: 'El tipo de turno no pertenece a tu organización',
       }
 
-    
     if (existingType._count.shifts > 0)
       return {
         success: false,
@@ -430,10 +425,6 @@ export const deleteShiftTypeAction = async (id: string): Promise<ActionResult<nu
       message: 'Tipo de turno eliminado exitosamente',
     }
   } catch (error) {
-    return handleActionError(
-      error,
-      'deleteShiftTypeAction',
-      'Error al eliminar tipo de turno'
-    )
+    return handleActionError(error, 'deleteShiftTypeAction', 'Error al eliminar tipo de turno')
   }
 }

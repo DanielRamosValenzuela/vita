@@ -1,8 +1,8 @@
 import { Country, DocType } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
-import { prisma } from '@/src/shared/lib/db'
 import { ROLES } from '@/src/shared/lib/constants'
+import { prisma } from '@/src/shared/lib/db'
 
 import type { RegisterInput } from '../lib/schemas'
 

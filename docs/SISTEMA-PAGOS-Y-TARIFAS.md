@@ -32,17 +32,21 @@ El sistema permite a cada organización definir sus propias estructuras de pago 
 ## Conceptos Clave
 
 ### 1. **Plantilla de Tarifa (RateTemplate)**
+
 Una plantilla reutilizable que contiene múltiples componentes de pago.
 
 **Ejemplo:** "Tarifa Enfermería UCI"
+
 - Componente 1: Sueldo Base $500,000 mensual
 - Componente 2: $20,000 por turno completado de "Guardia Larga"
 - Componente 3: $500 por minuto extra trabajado
 
 ### 2. **Componente de Tarifa (RateComponent)**
+
 Un elemento individual de pago dentro de una plantilla.
 
 **Propiedades:**
+
 - `type`: Tipo de componente (BASE_SALARY, PER_SHIFT, PER_MINUTE, etc.)
 - `value`: Monto a pagar
 - `unit`: Unidad de pago (MONTHLY, PER_SHIFT, PER_MINUTE, etc.)
@@ -50,15 +54,19 @@ Un elemento individual de pago dentro de una plantilla.
 - `applicableShiftTypes`: A qué tipos de turno aplica (relación muchos a muchos)
 
 ### 3. **Contrato (Contract)**
+
 Asigna una plantilla de tarifa a un empleado específico.
 
 ### 4. **Turno (Shift)**
+
 Un turno de trabajo con:
+
 - Horario programado (`startTime`, `endTime`)
 - Horario real trabajado (`actualStartTime`, `actualEndTime`)
 - Tipo de turno asociado
 
 ### 5. **Pago de Turno (ShiftPayment)**
+
 Registro del cálculo automático del pago de un turno, con desglose completo.
 
 ---
@@ -94,6 +102,7 @@ model RateComponentApplicableType {
 **Uso:** Permite anexar un componente a turnos específicos.
 
 **Ejemplo:**
+
 - Componente "Bono Guardia Larga" → Aplica solo a ShiftType "Guardia Larga (12h)"
 - Componente "Bono Noche" → Aplica solo a ShiftType "Guardia Nocturna"
 
@@ -156,11 +165,13 @@ model ShiftPaymentBreakdown {
 ### 1. **Componentes de Contrato Base (`applyCondition: ALWAYS`)**
 
 ✅ **Características:**
+
 - Se pagan independientemente de los turnos trabajados
 - Son pagos fijos mensuales/quincenales
 - NO se suman al cálculo de turnos individuales
 
 **Ejemplos:**
+
 ```
 Componente: Sueldo Base
 - Type: BASE_SALARY
@@ -182,11 +193,13 @@ Componente: Bono Antigüedad
 ### 2. **Componentes por Turno Específico (`applyCondition: SPECIFIC_SHIFT_TYPE`)**
 
 ✅ **Características:**
+
 - Se anexan a tipos de turno específicos
 - Solo se pagan cuando trabajas ese tipo de turno
 - Pueden ser montos fijos o por tiempo
 
 **Ejemplo 1: Pago fijo por turno completado**
+
 ```
 Componente: Pago Guardia Larga
 - Type: PER_SHIFT
@@ -198,6 +211,7 @@ Componente: Pago Guardia Larga
 ```
 
 **Ejemplo 2: Pago por minuto para turno específico**
+
 ```
 Componente: Pago por Minuto Guardia Nocturna
 - Type: PER_MINUTE
@@ -211,6 +225,7 @@ Componente: Pago por Minuto Guardia Nocturna
 ### 3. **Componentes por Tiempo (Todos los Turnos)**
 
 **Ejemplo:**
+
 ```
 Componente: Pago por Hora Extra
 - Type: PER_HOUR
@@ -223,6 +238,7 @@ Componente: Pago por Hora Extra
 ### 4. **Componentes por Calendario**
 
 **Ejemplo:**
+
 ```
 Componente: Bono Fin de Semana
 - Type: WEEKEND_BONUS
@@ -239,6 +255,7 @@ Componente: Bono Fin de Semana
 ### Paso 1: Configuración Inicial (ADMIN_HR)
 
 1. **Crear Plantillas de Tarifa**
+
    ```
    Plantilla: "Tarifa Enfermería Estándar"
    ├─ Componente 1: Sueldo Base $500,000 (MONTHLY, ALWAYS)
@@ -247,6 +264,7 @@ Componente: Bono Fin de Semana
    ```
 
 2. **Asignar Contrato al Empleado**
+
    ```
    Contract:
    - User: Juan Pérez
@@ -326,13 +344,13 @@ ShiftPayment:
   minutesWorked: 745
   isPartialCompletion: false
   status: CALCULATED
-  
+
   breakdowns:
     - componentName: "Pago Guardia Larga"
       baseValue: 50000
       calculatedValue: 50000
       appliedMinutes: 720
-    
+
     - componentName: "Pago por Minuto Extra"
       baseValue: 500
       calculatedValue: 12500
@@ -363,6 +381,7 @@ TOTAL MES: $856,250
 **Escenario:** Empleado administrativo con sueldo fijo mensual, no trabaja turnos.
 
 **Configuración:**
+
 ```
 Plantilla: "Tarifa Administrativa"
 └─ Componente: Sueldo Base
@@ -381,6 +400,7 @@ Plantilla: "Tarifa Administrativa"
 **Escenario:** Médico que cobra por guardia completada, no por horas.
 
 **Configuración:**
+
 ```
 Plantilla: "Tarifa Médico por Guardia"
 └─ Componente: Pago Guardia Médica
@@ -391,7 +411,8 @@ Plantilla: "Tarifa Médico por Guardia"
    - ApplicableShiftTypes: ["Guardia Médica 24h"]
 ```
 
-**Resultado:** 
+**Resultado:**
+
 - Trabaja 3 guardias en el mes
 - Pago: $120,000 × 3 = **$360,000**
 
@@ -402,6 +423,7 @@ Plantilla: "Tarifa Médico por Guardia"
 **Escenario:** Enfermera con sueldo base + bono por guardias nocturnas.
 
 **Configuración:**
+
 ```
 Plantilla: "Tarifa Enfermería Mixta"
 ├─ Componente 1: Sueldo Base
@@ -419,6 +441,7 @@ Plantilla: "Tarifa Enfermería Mixta"
 ```
 
 **Resultado:**
+
 - Sueldo base: $400,000
 - 4 guardias nocturnas: $40,000 × 4 = $160,000
 - **Total:** $560,000
@@ -430,6 +453,7 @@ Plantilla: "Tarifa Enfermería Mixta"
 **Escenario:** Personal que cobra por minuto trabajado, se enfermó a mitad de turno.
 
 **Configuración:**
+
 ```
 Plantilla: "Tarifa por Tiempo"
 └─ Componente: Pago por Minuto
@@ -440,10 +464,12 @@ Plantilla: "Tarifa por Tiempo"
 ```
 
 **Turno:**
+
 - Programado: 08:00 - 20:00 (720 minutos)
 - Real: 08:00 - 12:00 (240 minutos) ← Se retiró enfermo
 
 **Cálculo:**
+
 ```
 minutesWorked: 240
 totalAmount: $300 × 240 = $72,000
@@ -458,6 +484,7 @@ finalAmount: $72,000
 **Escenario:** Guardia en feriado irrenunciable con multiplicador.
 
 **Configuración:**
+
 ```
 Plantilla: "Tarifa Estándar"
 └─ Componente: Pago por Turno
@@ -471,6 +498,7 @@ Calendario:
 ```
 
 **Cálculo:**
+
 ```
 baseAmount: $60,000
 calendarMultiplier: 3.0
@@ -494,39 +522,32 @@ async function calculateShiftPayment(shiftId: string) {
             include: {
               components: {
                 include: {
-                  applicableShiftTypes: true
-                }
-              }
-            }
-          }
-        }
-      }
-    }
+                  applicableShiftTypes: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
   })
 
   // 1. Calcular minutos trabajados
-  const minutesWorked = calculateMinutes(
-    shift.actualStartTime,
-    shift.actualEndTime
-  )
+  const minutesWorked = calculateMinutes(shift.actualStartTime, shift.actualEndTime)
 
   // 2. Filtrar componentes que aplican
-  const applicableComponents = shift.contract.rateTemplate.components.filter(
-    component => {
-      // Si es ALWAYS, NO incluir en el pago de turno (es pago base mensual)
-      if (component.applyCondition === 'ALWAYS') return false
+  const applicableComponents = shift.contract.rateTemplate.components.filter((component) => {
+    // Si es ALWAYS, NO incluir en el pago de turno (es pago base mensual)
+    if (component.applyCondition === 'ALWAYS') return false
 
-      // Si es SPECIFIC_SHIFT_TYPE, verificar si aplica a este turno
-      if (component.applyCondition === 'SPECIFIC_SHIFT_TYPE') {
-        return component.applicableShiftTypes.some(
-          ast => ast.shiftTypeId === shift.shiftTypeId
-        )
-      }
-
-      // Si es por calendario (WEEKEND_ONLY, HOLIDAY_ONLY, etc.)
-      return checkCalendarCondition(component, shift.startTime)
+    // Si es SPECIFIC_SHIFT_TYPE, verificar si aplica a este turno
+    if (component.applyCondition === 'SPECIFIC_SHIFT_TYPE') {
+      return component.applicableShiftTypes.some((ast) => ast.shiftTypeId === shift.shiftTypeId)
     }
-  )
+
+    // Si es por calendario (WEEKEND_ONLY, HOLIDAY_ONLY, etc.)
+    return checkCalendarCondition(component, shift.startTime)
+  })
 
   // 3. Calcular valor de cada componente
   let totalAmount = 0
@@ -556,7 +577,7 @@ async function calculateShiftPayment(shiftId: string) {
       componentType: component.type,
       baseValue: component.value,
       calculatedValue,
-      appliedMinutes: minutesWorked
+      appliedMinutes: minutesWorked,
     })
   }
 
@@ -565,9 +586,9 @@ async function calculateShiftPayment(shiftId: string) {
     where: {
       organizationId_date: {
         organizationId: shift.organizationId,
-        date: startOfDay(shift.startTime)
-      }
-    }
+        date: startOfDay(shift.startTime),
+      },
+    },
   })
 
   const calendarMultiplier = calendarDay?.multiplier || 1.0
@@ -585,9 +606,9 @@ async function calculateShiftPayment(shiftId: string) {
       isPartialCompletion: minutesWorked < shift.shiftType.durationMinutes,
       status: 'CALCULATED',
       breakdowns: {
-        create: breakdowns
-      }
-    }
+        create: breakdowns,
+      },
+    },
   })
 
   return payment
@@ -598,13 +619,13 @@ async function calculateShiftPayment(shiftId: string) {
 
 ## Estados de Pago
 
-| Estado | Descripción |
-|--------|-------------|
-| `PENDING` | Turno completado, pendiente de cálculo |
-| `CALCULATED` | Pago calculado automáticamente |
-| `APPROVED` | Pago aprobado por supervisor/RRHH |
-| `PAID` | Pago efectuado al empleado |
-| `DISPUTED` | Pago en disputa, requiere revisión |
+| Estado       | Descripción                            |
+| ------------ | -------------------------------------- |
+| `PENDING`    | Turno completado, pendiente de cálculo |
+| `CALCULATED` | Pago calculado automáticamente         |
+| `APPROVED`   | Pago aprobado por supervisor/RRHH      |
+| `PAID`       | Pago efectuado al empleado             |
+| `DISPUTED`   | Pago en disputa, requiere revisión     |
 
 ---
 

@@ -125,11 +125,7 @@ export function IconPicker({
   const showingCount = filteredIcons.length
 
   return (
-    <div
-      className={cn('space-y-3', className)}
-      role="group"
-      aria-label={ariaLabel}
-    >
+    <div className={cn('space-y-3', className)} role="group" aria-label={ariaLabel}>
       <div className="relative">
         <L.Search
           className="text-muted-foreground pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"

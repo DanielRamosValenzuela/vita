@@ -2,7 +2,10 @@ import type { Currency } from '@prisma/client'
 import type { FactoryArg } from 'imask'
 
 export function getCurrencyMask(currency: Currency, _showSymbol = false): FactoryArg {
-  const configs: Record<Currency, { thousandsSeparator: string; radix: string; scale: number; symbol: string }> = {
+  const configs: Record<
+    Currency,
+    { thousandsSeparator: string; radix: string; scale: number; symbol: string }
+  > = {
     CLP: { thousandsSeparator: '.', radix: ',', scale: 0, symbol: '$' },
     USD: { thousandsSeparator: ',', radix: '.', scale: 2, symbol: '$' },
     COP: { thousandsSeparator: '.', radix: ',', scale: 0, symbol: '$' },

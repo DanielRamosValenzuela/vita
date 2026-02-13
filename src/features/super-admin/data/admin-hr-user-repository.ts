@@ -1,8 +1,8 @@
 import { Country, DocType, type Prisma } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
-import { prisma } from '@/src/shared/lib/db'
 import { ROLES } from '@/src/shared/lib/constants'
+import { prisma } from '@/src/shared/lib/db'
 
 import type { CreateAdminHRUserInput, UpdateAdminHRUserInput } from '../lib/schemas'
 
@@ -22,16 +22,13 @@ export async function getAdminHRUsers(params: GetAdminHRUsersParams = {}) {
     role: ROLES.ADMIN_HR,
   }
 
-  if (search) 
+  if (search)
     where.OR = [
       { name: { contains: search, mode: 'insensitive' } },
       { email: { contains: search, mode: 'insensitive' } },
     ]
-  
 
-  if (organizationId) 
-    where.organizationId = organizationId
-  
+  if (organizationId) where.organizationId = organizationId
 
   const [users, total] = await Promise.all([
     prisma.user.findMany({
@@ -112,11 +109,10 @@ export async function updateAdminHRUser(id: string, data: UpdateAdminHRUserInput
 
   if (data.name !== undefined) updateData.name = data.name
   if (data.email !== undefined) updateData.email = data.email
-  if (data.organizationId !== undefined) 
+  if (data.organizationId !== undefined)
     updateData.organization = data.organizationId
       ? { connect: { id: data.organizationId } }
       : { disconnect: true }
-  
 
   if (data.password) {
     const hashedPassword = await bcrypt.hash(data.password, 12)

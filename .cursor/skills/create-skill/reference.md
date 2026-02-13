@@ -16,10 +16,10 @@ skill-name/
 
 ## Storage
 
-| Type    | Path                     | Scope              |
-|---------|--------------------------|--------------------|
-| Personal| ~/.cursor/skills/name/   | All your projects  |
-| Project | .cursor/skills/name/     | Repo only          |
+| Type     | Path                   | Scope             |
+| -------- | ---------------------- | ----------------- |
+| Personal | ~/.cursor/skills/name/ | All your projects |
+| Project  | .cursor/skills/name/   | Repo only         |
 
 Do **not** create skills under `~/.cursor/skills-cursor/`; that is reserved for Cursor.
 
@@ -38,6 +38,7 @@ Do **not** create skills under `~/.cursor/skills-cursor/`; that is reserved for 
 ## When to use
 
 Apply this skill when:
+
 - Designing or redesigning screens or components
 - Reviewing or improving styles (CSS, Tailwind, design system)
 - Working on HTML semantics or accessibility (a11y)

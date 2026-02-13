@@ -1,6 +1,6 @@
 import { ApplyCondition, DayType } from '@prisma/client'
 
-import type { ShiftContext, ConditionResult } from './types'
+import type { ConditionResult, ShiftContext } from './types'
 
 const HOLIDAY_DAY_TYPES: DayType[] = [
   DayType.HOLIDAY,

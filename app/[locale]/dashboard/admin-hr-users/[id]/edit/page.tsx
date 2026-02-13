@@ -1,8 +1,8 @@
 import { getTranslations } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 
-import { prisma } from '@/src/shared/lib/db'
 import { requireSuperAdmin } from '@/src/shared/lib/auth/session'
+import { prisma } from '@/src/shared/lib/db'
 import { getAdminHRUserById } from '@/src/features/super-admin/data'
 import { EditAdminHRUserForm } from '@/src/features/super-admin/ui'
 
@@ -25,9 +25,7 @@ export default async function EditAdminHRUserPage({ params }: EditAdminHRUserPag
   const { id } = await params
   const user = await getAdminHRUserById(id)
 
-  if (!user) 
-    notFound()
-  
+  if (!user) notFound()
 
   const organizations = await prisma.organization.findMany({
     where: { status: 'ACTIVE' },

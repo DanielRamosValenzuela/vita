@@ -8,6 +8,7 @@ description: Guides the agent to discover, enumerate, and document project workf
 ## When to use
 
 Apply this skill when:
+
 - The user asks to document or explain the project workflows.
 - The user wants to know how many workflows there are and how they work end-to-end.
 - The user wants documentation that is both human-readable and AI-friendly for later code development.
@@ -18,6 +19,7 @@ Apply this skill when:
 ## Goal of this skill
 
 This skill makes the agent:
+
 - Discover and list all relevant workflows in the project (at the right level of abstraction).
 - For each workflow, explain how it works from start to finish, in clear language.
 - Include enough structure and technical detail so that both:
@@ -59,7 +61,6 @@ When this skill is active, the agent should:
 4. Document each workflow in detail
 
    For each workflow, create a section with at least:
-
    - Title
      - ## [WF-XX] <Workflow name>
 
@@ -104,15 +105,13 @@ When this skill is active, the agent should:
        - Any non-obvious constraints that a coding agent must know before changing this flow.
 
 5. Link workflows to code and docs
-
    - Whenever possible, provide:
      - Route examples: e.g. /dashboard/shifts, /dashboard/areas.
      - Feature/entity modules: e.g. src/features/shifts/, src/entities/organization/.
-     - Existing docs: link to relevant docs/*.md sections if they deepen understanding.
+     - Existing docs: link to relevant docs/\*.md sections if they deepen understanding.
    - The goal is that a future AI agent can jump from the workflow docs to the exact parts of the code or docs it needs.
 
 6. Keep language and structure consistent
-
    - Use consistent headings and ordering across all workflows.
    - Use concise, neutral, and technical English.
    - Avoid project-specific slang; prefer clear domain language (e.g. "shift", "area", "contract" if those are domain terms).
@@ -161,4 +160,3 @@ This structure should be stable over time, so new workflows can be appended in t
 
 - If the project has existing architecture or product docs, reference them explicitly in the generated workflow doc (e.g. See architecture overview for domain context.).
 - Consider creating a dedicated workflows/ section in the docs where these files will live.
-

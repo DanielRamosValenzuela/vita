@@ -8,6 +8,7 @@
 ## Resumen
 
 Sistema completo para gestionar:
+
 1. **Documentos únicos por organización**
 2. **Múltiples emails por usuario**
 3. **Imágenes de perfil** (Google OAuth + subida personalizada)
@@ -20,10 +21,12 @@ Sistema completo para gestionar:
 ### Reglas de Validación
 
 **Sin organización**:
+
 - ✅ Dos personas pueden tener el mismo número de documento
 - ⚠️ Solo si **no** pertenecen a ninguna organización
 
 **Con organización**:
+
 - ❌ El número debe ser **único dentro de cada organización**
 - ❌ Error al invitar si ya existe en la org
 - ❌ Error al modificar si ya existe en alguna org del usuario
@@ -34,12 +37,14 @@ Sistema completo para gestionar:
 #### Caso 1: Invitar Usuario a Organización
 
 **Validaciones**:
+
 1. Usuario ya tiene cuenta en plataforma
 2. Usuario tiene número de documento registrado
 3. Documento NO existe en la organización destino
 4. Usuario no está en otra organización actualmente
 
 **Archivos**:
+
 - `features/admin-hr/api/invitation-actions.ts` (CHIEF y STAFF)
 - `features/super-admin/api/admin-hr-invitation-actions.ts` (ADMIN_HR)
 
@@ -68,6 +73,7 @@ if (user.country && user.docType && user.docNumber) {
 #### Caso 2: Modificar Documento en Perfil
 
 **Validaciones**:
+
 1. Usuario tiene organización → validar unicidad en la org
 2. Usuario sin organización → validar solo globalmente
 3. Guardar historial del documento anterior
@@ -92,7 +98,7 @@ if (user.organizationId) {
 
   if (existingInOrg) {
     return {
-      error: `Este número ya está registrado en tu organización (${existingInOrg.name})`
+      error: `Este número ya está registrado en tu organización (${existingInOrg.name})`,
     }
   }
 }
@@ -195,6 +201,7 @@ enum EmailProvider {
 **Componente**: `features/profile/ui/emails-management-section.tsx`
 
 Características:
+
 - ✅ Lista de emails con badges (Primario, Verificado, Provider)
 - ✅ Agregar email con validación en tiempo real
 - ✅ Marcar como primario (solo verificados)
@@ -225,9 +232,9 @@ enum ImageProvider {
 
 ```typescript
 function getProfileImage(user: User): string | null {
-  if (user.customImage) return user.customImage    // 1. Custom (prioritario)
-  if (user.image) return user.image                // 2. OAuth
-  return null                                      // 3. Initials (UI)
+  if (user.customImage) return user.customImage // 1. Custom (prioritario)
+  if (user.image) return user.image // 2. OAuth
+  return null // 3. Initials (UI)
 }
 ```
 
@@ -236,6 +243,7 @@ function getProfileImage(user: User): string | null {
 **Bucket**: `avatars` (público)
 
 **Estructura**:
+
 ```
 avatars/
   {userId}/
@@ -244,6 +252,7 @@ avatars/
 ```
 
 **Políticas RLS**:
+
 - Usuarios pueden subir/actualizar/eliminar solo su avatar
 - Todos pueden ver avatars (público)
 
@@ -259,9 +268,10 @@ avatars/
 **Componente**: `features/profile/ui/avatar-upload-form.tsx`
 
 Características:
+
 - ✅ Preview de imagen actual (custom > OAuth > initials)
 - ✅ Subida drag & drop / click
-- ✅ Validación: tamaño (5MB) y formato (image/*)
+- ✅ Validación: tamaño (5MB) y formato (image/\*)
 - ✅ Preview instantáneo antes de subir
 - ✅ Botón eliminar (solo para custom)
 - ✅ Loading state durante upload
@@ -287,17 +297,17 @@ buildAvatarUrl(user: UserImageData): { url, fallback, source }
 
 ```typescript
 interface User {
-  customImage?: string  // ← Nuevo
+  customImage?: string // ← Nuevo
 }
 
 interface Session {
   user: {
-    customImage?: string  // ← Nuevo
+    customImage?: string // ← Nuevo
   }
 }
 
 interface JWT {
-  customImage?: string  // ← Nuevo
+  customImage?: string // ← Nuevo
 }
 ```
 
@@ -328,10 +338,12 @@ Usuario A: docNumber = "12345678", organizationId = null
 **Acción**: Cambiar a "87654321"
 
 **Validación**:
+
 - ✅ No tiene organización → solo validar globalmente
 - ✅ "87654321" no existe → OK
 
 **Resultado**:
+
 - ✅ Se actualiza el documento
 - ✅ Se guarda en historial
 
@@ -345,9 +357,11 @@ Usuario B: docNumber = "12345678", organizationId = null
 **Acción**: ADMIN_HR de org-123 invita a Usuario B
 
 **Validación**:
+
 - ❌ "12345678" ya existe en org-123 (Usuario A)
 
 **Resultado**:
+
 - ❌ Error: "El documento 12345678 ya está registrado en esta organización por otro usuario"
 
 ### Caso 3: Usuario Tiene 2 Organizaciones
@@ -361,9 +375,11 @@ Usuario A:
 **Acción**: Cambiar documento a "87654321" que ya existe en org-123
 
 **Validación**:
+
 - ❌ "87654321" ya existe en org-123
 
 **Resultado**:
+
 - ❌ Error: "Este número de documento ya está registrado en tu organización (Nombre del otro usuario)"
 
 ### Caso 4: Usuario Agrega Email Ya Registrado
@@ -374,6 +390,7 @@ Usuario B: intenta agregar "juan@email.com"
 ```
 
 **Resultado**:
+
 - ❌ Error: "Este email ya está en uso por otro usuario"
 
 ### Caso 5: Usuario Establece Email Secundario como Primario
@@ -387,6 +404,7 @@ Usuario A:
 **Acción**: Establecer "juan@trabajo.com" como primario
 
 **Resultado**:
+
 - ✅ "juan@trabajo.com" → `isPrimary = true`
 - ✅ "juan@email.com" → `isPrimary = false`
 - ✅ `User.email` = "juan@trabajo.com"
@@ -396,21 +414,26 @@ Usuario A:
 ## 6. Archivos Creados/Modificados
 
 ### Schema
+
 - ✅ `prisma/schema.prisma` - Nuevos modelos y campos
 
 ### Validación
+
 - ✅ `shared/lib/validation/document-validation.ts` - Validaciones de documento
 - ✅ `shared/lib/validation/index.ts` - Exports
 
 ### Storage
+
 - ✅ `shared/lib/storage/supabase-storage.ts` - Cliente de Supabase
 - ✅ `shared/lib/storage/index.ts` - Exports
 
 ### Utils
+
 - ✅ `shared/lib/utils/profile-image.ts` - Helpers de imagen
 - ✅ `shared/config/env.server.ts` - Variables Supabase
 
 ### API Actions
+
 - ✅ `features/profile/api/email-actions.ts` - CRUD de emails
 - ✅ `features/profile/api/profile-image-actions.ts` - Upload/delete avatar
 - ✅ `features/profile/data/profile-repository.ts` - Historial de documentos
@@ -418,14 +441,17 @@ Usuario A:
 - ✅ `features/super-admin/api/admin-hr-invitation-actions.ts` - Validación en invitaciones
 
 ### UI Components
+
 - ✅ `features/profile/ui/avatar-upload-form.tsx` - Subida de avatar
 - ✅ `features/profile/ui/emails-management-section.tsx` - Gestión de emails
 - ✅ `shared/ui/avatar.tsx` - Componente Avatar (shadcn/ui)
 
 ### Pages
+
 - ✅ `app/[locale]/dashboard/profile/page.tsx` - Incluye nuevas secciones
 
 ### Types
+
 - ✅ `types/next-auth.d.ts` - Soporte customImage
 - ✅ `types/currentUser.ts` - Soporte customImage
 - ✅ `shared/lib/auth/types.ts` - Soporte customImage
@@ -433,10 +459,12 @@ Usuario A:
 - ✅ `shared/lib/auth/session.ts` - getCurrentUser con customImage
 
 ### Traducciones
+
 - ✅ `messages/es.json` - Traducciones completas
 - ✅ `messages/en.json` - Traducciones completas
 
 ### Documentación
+
 - ✅ `docs/CONFIGURACION-SUPABASE-STORAGE.md` - Guía de configuración
 - ✅ `docs/SCHEMA-USER-MULTI-EMAIL-DOC.md` - Diseño técnico
 
@@ -469,11 +497,13 @@ Ver guía completa: [CONFIGURACION-SUPABASE-STORAGE.md](./CONFIGURACION-SUPABASE
 ### Escenario A: Hospital Invita Dos Médicos con Mismo RUT
 
 **Contexto**:
+
 - Dr. Juan Pérez: RUT 12.345.678-9
 - Dr. Pedro López: También registró RUT 12.345.678-9 (error humano)
 - Ambos sin organización
 
 **Flujo**:
+
 1. ADMIN_HR invita a Dr. Juan → ✅ Aceptado
 2. ADMIN_HR invita a Dr. Pedro → ❌ Error: "El documento 12345678-9 ya está registrado en esta organización"
 
@@ -482,11 +512,13 @@ Ver guía completa: [CONFIGURACION-SUPABASE-STORAGE.md](./CONFIGURACION-SUPABASE
 ### Escenario B: Médico Trabaja en 2 Hospitales
 
 **Contexto**:
+
 - Dra. María González: RUT 98.765.432-1
 - Trabaja en Hospital A (org-123)
 - Quiere trabajar en Hospital B (org-456)
 
 **Flujo**:
+
 1. Hospital A la contrató con RUT 98.765.432-1 → ✅
 2. Hospital B la invita → ✅ Puede aceptar (organizaciones diferentes)
 3. Tiene mismo RUT en ambas organizaciones → ✅ Válido
@@ -496,10 +528,12 @@ Ver guía completa: [CONFIGURACION-SUPABASE-STORAGE.md](./CONFIGURACION-SUPABASE
 ### Escenario C: Usuario Agrega Email de Google
 
 **Contexto**:
+
 - Juan: Registrado con juan@email.com (credentials)
 - Tiene cuenta Google: juan.perez@gmail.com
 
 **Flujo**:
+
 1. Va a `/dashboard/profile`
 2. Click en "Vincular con Google" (futuro)
 3. OAuth de Google → obtiene juan.perez@gmail.com
@@ -515,18 +549,21 @@ Ver guía completa: [CONFIGURACION-SUPABASE-STORAGE.md](./CONFIGURACION-SUPABASE
 ## 9. Mejoras Futuras (No Implementadas)
 
 ### Corto Plazo
+
 - [ ] Botón "Vincular con Google" en pantalla de perfil
 - [ ] Verificación de email por código
 - [ ] Envío de email de confirmación
 - [ ] Soporte para múltiples organizaciones por usuario
 
 ### Mediano Plazo
+
 - [ ] Redimensionamiento automático de imágenes
 - [ ] Conversión a WebP
 - [ ] Thumbnails (128x128px)
 - [ ] CDN edge caching
 
 ### Largo Plazo
+
 - [ ] Gravatar fallback
 - [ ] Detección de duplicados de documentos con IA
 - [ ] Historial de cambios de email

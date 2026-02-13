@@ -4,8 +4,8 @@ import { useLayoutEffect, useState } from 'react'
 import { useTheme } from 'next-themes'
 import { Moon, Sun } from 'lucide-react'
 
-import { Switch } from '@/src/shared/ui/switch'
 import { cn } from '@/src/shared/lib/utils/cn'
+import { Switch } from '@/src/shared/ui/switch'
 
 export function ThemeToggle() {
   const { setTheme, resolvedTheme } = useTheme()
@@ -15,7 +15,7 @@ export function ThemeToggle() {
     setMounted(true)
   }, [])
 
-  if (!mounted) 
+  if (!mounted)
     return (
       <div className="flex items-center gap-2" suppressHydrationWarning>
         <Sun className="h-4 w-4 opacity-50" suppressHydrationWarning />
@@ -23,7 +23,6 @@ export function ThemeToggle() {
         <Moon className="h-4 w-4 opacity-50" suppressHydrationWarning />
       </div>
     )
-  
 
   const isDark = resolvedTheme === 'dark'
 

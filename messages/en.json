@@ -1374,8 +1374,19 @@
         "chiefDocNumber": "Document",
         "assignedChiefsLabel": "Chiefs assigned to this area",
         "noChiefs": "No area chiefs in the organization. Invite a chief from My Organization.",
+        "chiefsReadOnlyDescription": "Chiefs assigned to this area. Only ADMIN HR can change assignments.",
+        "noChiefsAssigned": "No chiefs assigned to this area.",
         "removeChief": "Remove {name}",
-        "chiefsAssignedCount": "{count} chief(s) assigned"
+        "chiefsAssignedCount": "{count} chief(s) assigned",
+        "staff": "Area staff",
+        "staffDescription": "Assign staff who can receive shifts in this area. You can only assign shifts to people listed here.",
+        "staffSearch": "Search by name, email or document...",
+        "staffDocNumber": "Document",
+        "assignedStaffLabel": "Staff assigned to this area",
+        "noStaffInOrg": "No staff in the organization. Staff you invite with Staff role will appear here.",
+        "noStaffInArea": "None assigned yet",
+        "removeStaff": "Remove {name}",
+        "staffAssignedCount": "{count} person(s) assigned"
       },
       "back": "Back",
       "save": "Save",
@@ -1444,9 +1455,9 @@
         "statusNoContract": "No contract",
         "multiplier": "Multiplier",
         "multiplierValue": "Multiplier: {value}x",
-      "actions": "Actions",
-      "endContract": "End contract",
-      "viewRates": "View rates ({count})"
+        "actions": "Actions",
+        "endContract": "End contract",
+        "viewRates": "View rates ({count})"
       },
       "contract": {
         "create": "Assign rate",

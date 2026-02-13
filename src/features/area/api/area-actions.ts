@@ -1,22 +1,39 @@
 'use server'
 
-import { prisma } from '@/src/shared/lib/db'
-import { requireAdminHRWithOrg, requireAdminHROrChiefArea } from '@/src/shared/lib/auth'
+import { requireAdminHROrChiefArea, requireAdminHRWithOrg } from '@/src/shared/lib/auth'
 import { isChiefArea } from '@/src/shared/lib/auth/rbac'
 import { ROLES } from '@/src/shared/lib/constants'
+import { prisma } from '@/src/shared/lib/db'
 import { handleActionError } from '@/src/shared/lib/utils'
-import { revalidatePaths } from '@/src/shared/lib/utils/revalidate-paths'
 import { getLocaleFromHeaders } from '@/src/shared/lib/utils/get-locale'
-import {
-  createArea,
-  deleteArea,
-  getAreas,
-  updateArea,
-} from '@/src/entities/area'
-import type { CreateAreaInput, UpdateAreaInput } from '../lib/types'
+import { revalidatePaths } from '@/src/shared/lib/utils/revalidate-paths'
+
+import { createArea, deleteArea, getAreas, updateArea } from '@/src/entities/area'
+
 import { getCreateAreaSchema, getUpdateAreaSchema } from '../lib/helpers/server'
+import type { CreateAreaInput, UpdateAreaInput } from '../lib/types'
 
 const AREA_PATHS = ['/dashboard/areas', '/dashboard/admin-hr'] as const
+
+async function enrichAreasWithChiefsAndStaffCount(areaIds: string[]) {
+  if (areaIds.length === 0)
+    return { chiefsByArea: new Map<string, number>(), staffByArea: new Map<string, number>() }
+  const [chiefsGroup, staffGroup] = await Promise.all([
+    prisma.userArea.groupBy({
+      by: ['areaId'],
+      where: { areaId: { in: areaIds }, user: { role: ROLES.CHIEF_AREA } },
+      _count: { userId: true },
+    }),
+    prisma.userArea.groupBy({
+      by: ['areaId'],
+      where: { areaId: { in: areaIds }, user: { role: ROLES.STAFF_HEALTH } },
+      _count: { userId: true },
+    }),
+  ])
+  const chiefsByArea = new Map(chiefsGroup.map((g) => [g.areaId, g._count.userId]))
+  const staffByArea = new Map(staffGroup.map((g) => [g.areaId, g._count.userId]))
+  return { chiefsByArea, staffByArea }
+}
 
 export async function createAreaAction(data: CreateAreaInput) {
   try {
@@ -36,14 +53,12 @@ export async function updateAreaAction(id: string, data: UpdateAreaInput) {
   try {
     const user = await requireAdminHROrChiefArea()
     const orgId = user.organizationId
-    if (!orgId)
-      return { success: false, error: 'No tienes una organización asignada' }
+    if (!orgId) return { success: false, error: 'No tienes una organización asignada' }
     if (isChiefArea(user)) {
       const chiefArea = await prisma.userArea.findFirst({
         where: { userId: user.id, areaId: id },
       })
-      if (!chiefArea)
-        return { success: false, error: 'No tienes permiso para editar esta área' }
+      if (!chiefArea) return { success: false, error: 'No tienes permiso para editar esta área' }
     }
     const locale = await getLocaleFromHeaders()
     const updateAreaSchema = await getUpdateAreaSchema(locale)
@@ -78,8 +93,7 @@ export async function getAreasAction() {
       })
       orgId = firstArea?.area?.organizationId ?? null
     }
-    if (!orgId)
-      return { success: false, error: 'No tienes una organización asignada' }
+    if (!orgId) return { success: false, error: 'No tienes una organización asignada' }
     const effectiveOrgId = orgId as string
     if (isChiefArea(user)) {
       const chiefAreas = await prisma.userArea.findMany({
@@ -97,13 +111,25 @@ export async function getAreasAction() {
               shiftType: { select: { id: true, name: true, durationMinutes: true } },
             },
           },
-          _count: { select: { shiftTypes: true, userAreas: true, contracts: true } },
+          _count: { select: { shiftTypes: true } },
         },
       })
-      return { success: true, data: areas }
+      const enriched = await enrichAreasWithChiefsAndStaffCount(areas.map((a) => a.id))
+      const data = areas.map((a) => ({
+        ...a,
+        chiefsCount: enriched.chiefsByArea.get(a.id) ?? 0,
+        staffCount: enriched.staffByArea.get(a.id) ?? 0,
+      }))
+      return { success: true, data }
     }
     const areas = await getAreas(effectiveOrgId)
-    return { success: true, data: areas }
+    const enriched = await enrichAreasWithChiefsAndStaffCount(areas.map((a) => a.id))
+    const data = areas.map((a) => ({
+      ...a,
+      chiefsCount: enriched.chiefsByArea.get(a.id) ?? 0,
+      staffCount: enriched.staffByArea.get(a.id) ?? 0,
+    }))
+    return { success: true, data }
   } catch (error) {
     return handleActionError(error, 'getAreasAction', 'Error al obtener las áreas')
   }
@@ -123,29 +149,48 @@ export interface GetChiefsForAreaResult {
 
 export async function getChiefsForAreaAction(areaId: string) {
   try {
-    const user = await requireAdminHRWithOrg()
+    const user = await requireAdminHROrChiefArea()
     const area = await prisma.area.findFirst({
-      where: { id: areaId, organizationId: user.organizationId },
+      where: { id: areaId },
+      select: { id: true, organizationId: true },
     })
     if (!area) return { success: false, error: 'Área no encontrada' }
-    const [orgChiefs, assignedUserAreas] = await Promise.all([
-      prisma.user.findMany({
+    if (isChiefArea(user)) {
+      const chiefArea = await prisma.userArea.findFirst({
+        where: { userId: user.id, areaId },
+      })
+      if (!chiefArea) return { success: false, error: 'No tienes permiso para ver esta área' }
+    }
+    const assignedUserAreas = await prisma.userArea.findMany({
+      where: { areaId },
+      select: { userId: true },
+    })
+    const assignedChiefIds = assignedUserAreas.map((ua) => ua.userId)
+    if (isChiefArea(user)) {
+      const chiefs = await prisma.user.findMany({
         where: {
-          organizationId: user.organizationId,
+          id: { in: assignedChiefIds },
           role: ROLES.CHIEF_AREA,
         },
         select: { id: true, name: true, email: true, docNumber: true },
         orderBy: { name: 'asc' },
-      }),
-      prisma.userArea.findMany({
-        where: { areaId },
-        select: { userId: true },
-      }),
-    ])
-    const assignedChiefIds = new Set(assignedUserAreas.map((ua) => ua.userId))
+      })
+      return {
+        success: true,
+        data: { chiefs, assignedChiefIds },
+      }
+    }
+    const orgChiefs = await prisma.user.findMany({
+      where: {
+        organizationId: area.organizationId,
+        role: ROLES.CHIEF_AREA,
+      },
+      select: { id: true, name: true, email: true, docNumber: true },
+      orderBy: { name: 'asc' },
+    })
     return {
       success: true,
-      data: { chiefs: orgChiefs, assignedChiefIds: Array.from(assignedChiefIds) },
+      data: { chiefs: orgChiefs, assignedChiefIds },
     }
   } catch (error) {
     return handleActionError(error, 'getChiefsForAreaAction', 'Error al obtener jefes')
@@ -169,7 +214,9 @@ export async function assignChiefsToAreaAction(areaId: string, chiefUserIds: str
     })
     const validIds = validChiefs.map((u) => u.id)
     await prisma.$transaction([
-      prisma.userArea.deleteMany({ where: { areaId } }),
+      prisma.userArea.deleteMany({
+        where: { areaId, user: { role: ROLES.CHIEF_AREA } },
+      }),
       ...validIds.map((userId) => prisma.userArea.create({ data: { areaId, userId } })),
     ])
     revalidatePaths(...AREA_PATHS)
@@ -236,5 +283,117 @@ export async function removeChiefFromAreaAction(
       'removeChiefFromAreaAction',
       'Error al desvincular jefe del área'
     )
+  }
+}
+
+export interface StaffOption {
+  id: string
+  name: string
+  email: string
+  docNumber: string | null
+}
+
+export interface GetStaffForAreaResult {
+  staff: StaffOption[]
+  assignedStaffIds: string[]
+}
+
+export async function getStaffForAreaAction(areaId: string) {
+  try {
+    const user = await requireAdminHROrChiefArea()
+    let orgId: string | null = user.organizationId ?? null
+    if (isChiefArea(user) && !orgId) {
+      const firstArea = await prisma.userArea.findFirst({
+        where: { userId: user.id },
+        select: { area: { select: { organizationId: true } } },
+      })
+      orgId = firstArea?.area?.organizationId ?? null
+    }
+    if (!orgId) return { success: false, error: 'No tienes una organización asignada' }
+
+    const area = await prisma.area.findFirst({
+      where: { id: areaId, organizationId: orgId },
+    })
+    if (!area) return { success: false, error: 'Área no encontrada' }
+
+    if (isChiefArea(user)) {
+      const chiefArea = await prisma.userArea.findFirst({
+        where: { userId: user.id, areaId },
+      })
+      if (!chiefArea) return { success: false, error: 'No tienes permiso para editar esta área' }
+    }
+
+    const [orgStaff, assignedUserAreas] = await Promise.all([
+      prisma.user.findMany({
+        where: {
+          organizationId: orgId,
+          role: ROLES.STAFF_HEALTH,
+        },
+        select: { id: true, name: true, email: true, docNumber: true },
+        orderBy: { name: 'asc' },
+      }),
+      prisma.userArea.findMany({
+        where: { areaId, user: { role: ROLES.STAFF_HEALTH } },
+        select: { userId: true },
+      }),
+    ])
+
+    const assignedStaffIds = assignedUserAreas.map((ua) => ua.userId)
+
+    return {
+      success: true,
+      data: { staff: orgStaff, assignedStaffIds },
+    }
+  } catch (error) {
+    return handleActionError(error, 'getStaffForAreaAction', 'Error al obtener personal del área')
+  }
+}
+
+export async function assignStaffToAreaAction(areaId: string, staffUserIds: string[]) {
+  try {
+    const user = await requireAdminHROrChiefArea()
+    let orgId: string | null = user.organizationId ?? null
+    if (isChiefArea(user) && !orgId) {
+      const firstArea = await prisma.userArea.findFirst({
+        where: { userId: user.id },
+        select: { area: { select: { organizationId: true } } },
+      })
+      orgId = firstArea?.area?.organizationId ?? null
+    }
+    if (!orgId) return { success: false, error: 'No tienes una organización asignada' }
+
+    const area = await prisma.area.findFirst({
+      where: { id: areaId, organizationId: orgId },
+    })
+    if (!area) return { success: false, error: 'Área no encontrada' }
+
+    if (isChiefArea(user)) {
+      const chiefArea = await prisma.userArea.findFirst({
+        where: { userId: user.id, areaId },
+      })
+      if (!chiefArea) return { success: false, error: 'No tienes permiso para editar esta área' }
+    }
+
+    const validStaff = await prisma.user.findMany({
+      where: {
+        id: { in: staffUserIds },
+        organizationId: orgId,
+        role: ROLES.STAFF_HEALTH,
+      },
+      select: { id: true },
+    })
+    const validIds = validStaff.map((u) => u.id)
+
+    await prisma.$transaction([
+      prisma.userArea.deleteMany({
+        where: { areaId, user: { role: ROLES.STAFF_HEALTH } },
+      }),
+      ...validIds.map((userId) => prisma.userArea.create({ data: { areaId, userId } })),
+    ])
+
+    revalidatePaths(...AREA_PATHS)
+    return { success: true, message: 'Personal del área actualizado' }
+  } catch (error) {
+    return handleActionError(error, 'assignStaffToAreaAction', 'Error al asignar personal al área')
   }
 }

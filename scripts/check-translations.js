@@ -1,5 +1,3 @@
-
-
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
@@ -15,11 +13,9 @@ function flattenObject(obj, prefix = '') {
     const value = obj[key]
     const newKey = prefix ? `${prefix}.${key}` : key
 
-    if (value && typeof value === 'object' && !Array.isArray(value)) 
+    if (value && typeof value === 'object' && !Array.isArray(value))
       Object.assign(acc, flattenObject(value, newKey))
-     else 
-      acc[newKey] = value
-    
+    else acc[newKey] = value
 
     return acc
   }, {})
@@ -39,7 +35,6 @@ function main() {
   // eslint-disable-next-line no-console
   console.log('🔍 Verificando traducciones...\n')
 
-  
   const translations = {}
   const flatTranslations = {}
 
@@ -48,33 +43,23 @@ function main() {
     flatTranslations[locale] = flattenObject(translations[locale])
   }
 
-  
   let hasErrors = false
   const allKeys = new Set()
 
-  
-  for (const locale of LOCALES) 
+  for (const locale of LOCALES)
     Object.keys(flatTranslations[locale]).forEach((key) => allKeys.add(key))
-  
 
   // eslint-disable-next-line no-console
   console.log(`📊 Total de claves únicas: ${allKeys.size}\n`)
 
-  
   for (const locale of LOCALES) {
     const missingKeys = []
     const emptyKeys = []
 
-    for (const key of allKeys) 
-      if (!(key in flatTranslations[locale])) 
-        missingKeys.push(key)
-       else if (
-        flatTranslations[locale][key] === '' ||
-        flatTranslations[locale][key] === null
-      ) 
+    for (const key of allKeys)
+      if (!(key in flatTranslations[locale])) missingKeys.push(key)
+      else if (flatTranslations[locale][key] === '' || flatTranslations[locale][key] === null)
         emptyKeys.push(key)
-      
-    
 
     if (missingKeys.length > 0 || emptyKeys.length > 0) {
       hasErrors = true
@@ -101,21 +86,16 @@ function main() {
 
       // eslint-disable-next-line no-console
       console.log('')
-    } else 
+    } else
       // eslint-disable-next-line no-console
       console.log(`✅ [${locale.toUpperCase()}]: Todo correcto`)
-    
-    
   }
 
-  
-  const baseLocale = LOCALES[0] 
+  const baseLocale = LOCALES[0]
   const baseKeys = Object.keys(flatTranslations[baseLocale])
 
   for (const locale of LOCALES.slice(1)) {
-    const extraKeys = Object.keys(flatTranslations[locale]).filter(
-      (key) => !baseKeys.includes(key)
-    )
+    const extraKeys = Object.keys(flatTranslations[locale]).filter((key) => !baseKeys.includes(key))
 
     if (extraKeys.length > 0) {
       hasErrors = true
@@ -137,13 +117,11 @@ function main() {
     console.log('\n✅ ¡Todas las traducciones están completas!')
     process.exit(0)
   }
-  
+
   // eslint-disable-next-line no-console
   console.log('\n❌ Se encontraron problemas en las traducciones.')
   // eslint-disable-next-line no-console
-  console.log(
-    '   Por favor, corrige los archivos en la carpeta "messages/"\n'
-  )
+  console.log('   Por favor, corrige los archivos en la carpeta "messages/"\n')
   process.exit(1)
 }
 

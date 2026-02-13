@@ -1,10 +1,10 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
 import { MapPin, X } from 'lucide-react'
+import { toast } from 'sonner'
 
 import { Button } from '@/src/shared/ui/button'
 import {
@@ -54,8 +54,7 @@ export function ChiefAreaSelector({
         toast.success(result.message)
         setOpen(false)
         router.refresh()
-      } else
-        toast.error(result.error)
+      } else toast.error(result.error)
     })
   }
 
@@ -65,8 +64,7 @@ export function ChiefAreaSelector({
       if (result.success) {
         toast.success(result.message)
         router.refresh()
-      } else
-        toast.error(result.error)
+      } else toast.error(result.error)
     })
   }
 

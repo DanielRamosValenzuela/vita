@@ -40,14 +40,10 @@ export function OrganizationsSection() {
         const orgs: Organization[] = []
         const data = result.data as UserOrganizationsData
 
-        if (data.organization) 
-          orgs.push(data.organization)
-        
+        if (data.organization) orgs.push(data.organization)
 
         data.invitations.forEach((inv) => {
-          if (!orgs.find((o) => o.id === inv.organization.id)) 
-            orgs.push(inv.organization)
-          
+          if (!orgs.find((o) => o.id === inv.organization.id)) orgs.push(inv.organization)
         })
 
         setOrganizations(orgs)
@@ -57,7 +53,7 @@ export function OrganizationsSection() {
     loadOrganizations()
   }, [])
 
-  if (loading) 
+  if (loading)
     return (
       <Card>
         <CardHeader>
@@ -70,9 +66,8 @@ export function OrganizationsSection() {
         </CardContent>
       </Card>
     )
-  
 
-  if (organizations.length === 0) 
+  if (organizations.length === 0)
     return (
       <Card>
         <CardHeader>
@@ -84,10 +79,15 @@ export function OrganizationsSection() {
         </CardContent>
       </Card>
     )
-  
 
   const getStatusBadge = (status: string) => (
-    <Badge variant={ORGANIZATION_STATUS_BADGE_VARIANTS[status as keyof typeof ORGANIZATION_STATUS_BADGE_VARIANTS] ?? 'outline'}>
+    <Badge
+      variant={
+        ORGANIZATION_STATUS_BADGE_VARIANTS[
+          status as keyof typeof ORGANIZATION_STATUS_BADGE_VARIANTS
+        ] ?? 'outline'
+      }
+    >
       {t(
         `statuses.${status}` as
           | 'statuses.ACTIVE'
@@ -107,12 +107,12 @@ export function OrganizationsSection() {
       <CardContent>
         <ul className="space-y-4 list-none p-0 m-0">
           {organizations.map((org) => (
-            <li
-              key={org.id}
-              className="flex items-center justify-between rounded-lg border p-4"
-            >
+            <li key={org.id} className="flex items-center justify-between rounded-lg border p-4">
               <div className="flex items-center gap-3">
-                <span className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-lg" aria-hidden>
+                <span
+                  className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-lg"
+                  aria-hidden
+                >
                   <Building2 className="text-primary h-5 w-5" />
                 </span>
                 <div>

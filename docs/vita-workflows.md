@@ -168,6 +168,7 @@ El sistema de tarifas flexibles permite a ADMIN_HR crear tarifas completamente p
 #### 1. **Creación de Plantilla de Tarifa** (`/dashboard/rates`)
 
 **Flujo**:
+
 1. ADMIN_HR accede al módulo de Tarifas
 2. Selecciona un preset predefinido (opcional):
    - Guardia Salud Estándar
@@ -187,6 +188,7 @@ El sistema de tarifas flexibles permite a ADMIN_HR crear tarifas completamente p
 7. Guarda la plantilla
 
 **Características**:
+
 - ✅ Formateo de moneda dinámico (Chile: $1.000.000, USA: $1,000,000)
 - ✅ Validación de duplicados (no permite dos componentes base salary)
 - ✅ Previsualización de componentes añadidos
@@ -195,6 +197,7 @@ El sistema de tarifas flexibles permite a ADMIN_HR crear tarifas completamente p
 #### 2. **Asignación de Contrato a Personal** (`/dashboard/rates`)
 
 **Flujo**:
+
 1. ADMIN_HR desde el módulo de Tarifas ve la tabla de **Plantillas de Tarifa** y la tabla de **Personal con Contratos**.
 2. En cada persona:
    - Si **no tiene contrato activo**, puede asignar la primera tarifa con el botón **“Asignar tarifa”**.
@@ -209,6 +212,7 @@ El sistema de tarifas flexibles permite a ADMIN_HR crear tarifas completamente p
 4. Confirma; se crea un nuevo `Contract` asociado al usuario, la plantilla seleccionada y, si corresponde, al área.
 
 **Reglas y características**:
+
 - ✅ Una **Plantilla de Tarifa** (`RateTemplate`) puede reutilizarse en **muchas personas distintas** al mismo tiempo.
 - ✅ Cada persona puede tener **más de un contrato activo** siempre que sean **tarifas distintas** (múltiples `Contract` activos por `userId` con distintos `rateTemplateId`).
 - ✅ El sistema **no permite** crear dos contratos activos con **la misma plantilla de tarifa para la misma persona**  
@@ -220,6 +224,7 @@ El sistema de tarifas flexibles permite a ADMIN_HR crear tarifas completamente p
 #### 3. **Visualización de Personal** (`/dashboard/staff`)
 
 **Flujo**:
+
 1. ADMIN_HR o CHIEF accede al módulo de Personal.
 2. Ve tabla simplificada con:
    - Nombre y correo.
@@ -232,6 +237,7 @@ El sistema de tarifas flexibles permite a ADMIN_HR crear tarifas completamente p
 4. Hay un enlace directo al módulo de Tarifas para gestionar contratos.
 
 **Características**:
+
 - ✅ Solo visualización (no edita contratos aquí).
 - ✅ Separación clara de responsabilidades (asignación y edición de contratos ocurre en `/dashboard/rates`).
 - ✅ Estadísticas de personal con y sin contrato basadas en el arreglo completo de contratos (`contracts.length > 0`).
@@ -239,6 +245,7 @@ El sistema de tarifas flexibles permite a ADMIN_HR crear tarifas completamente p
 #### 4. **Gestión de Componentes de Tarifa**
 
 **Tipos de Componentes Disponibles**:
+
 - Salarios base (mensual, quincenal, etc.)
 - Tarifas por tiempo (minuto, hora, turno)
 - Bonos específicos (nocturno, fin de semana, feriado)
@@ -247,6 +254,7 @@ El sistema de tarifas flexibles permite a ADMIN_HR crear tarifas completamente p
 - Compensaciones por disponibilidad y guardia
 
 **Condiciones de Aplicación**:
+
 - Siempre
 - Solo en horario diurno/nocturno
 - Solo fin de semana
@@ -282,6 +290,7 @@ El sistema de tarifas flexibles permite a ADMIN_HR crear tarifas completamente p
 #### 1. **Gestión de Perfil Personal** (`/dashboard/profile`)
 
 **Flujo de Actualización de Documento**:
+
 1. Usuario accede a su perfil
 2. Edita país, tipo de documento o número de documento
 3. El sistema valida:
@@ -293,6 +302,7 @@ El sistema de tarifas flexibles permite a ADMIN_HR crear tarifas completamente p
    - Se registra el nuevo documento en el historial
 
 **Características**:
+
 - ✅ Validación única por organización (permite duplicados entre organizaciones diferentes)
 - ✅ Historial completo de cambios con auditoría
 - ✅ Validación también aplica en invitaciones (ADMIN_HR/SUPER_ADMIN no pueden invitar usuarios con documento duplicado)
@@ -300,6 +310,7 @@ El sistema de tarifas flexibles permite a ADMIN_HR crear tarifas completamente p
 #### 2. **Sistema de Múltiples Emails** (`/dashboard/profile`)
 
 **Flujo de Gestión de Emails**:
+
 1. Usuario ve todos sus emails registrados
 2. **Agregar nuevo email**:
    - Ingresa email en formulario
@@ -315,6 +326,7 @@ El sistema de tarifas flexibles permite a ADMIN_HR crear tarifas completamente p
    - El email se elimina de `UserEmail`
 
 **Características**:
+
 - ✅ Email principal sincronizado con `User.email`
 - ✅ Soporte para múltiples proveedores (GOOGLE, CREDENTIALS, etc.)
 - ✅ Preparado para vinculación OAuth (permitirá link de cuenta Google a cuenta existente)
@@ -323,6 +335,7 @@ El sistema de tarifas flexibles permite a ADMIN_HR crear tarifas completamente p
 #### 3. **Sistema de Imágenes Personalizadas** (`/dashboard/profile`)
 
 **Flujo de Upload de Avatar**:
+
 1. Usuario ve su avatar actual (custom, OAuth o iniciales)
 2. **Subir nueva imagen**:
    - Selecciona archivo (JPG, PNG, WEBP)
@@ -338,6 +351,7 @@ El sistema de tarifas flexibles permite a ADMIN_HR crear tarifas completamente p
    - Fallback automático a imagen OAuth o iniciales
 
 **Características**:
+
 - ✅ Integración completa con Supabase Storage
 - ✅ RLS policies para seguridad (solo el usuario puede modificar su avatar)
 - ✅ Prioridad de visualización: Custom > OAuth > Iniciales
@@ -391,4 +405,3 @@ El sistema de tarifas flexibles permite a ADMIN_HR crear tarifas completamente p
 
 4. **Reportes de Cumplimiento Legal**
    - Reportes de horas trabajadas vs límites legales por país.
-

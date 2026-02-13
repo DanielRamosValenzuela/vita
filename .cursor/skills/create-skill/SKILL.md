@@ -8,6 +8,7 @@ description: Guides creation of Cursor Agent Skills using a standard template. U
 ## When to use
 
 Apply this skill when:
+
 - The user asks to **create** or **write** a new skill
 - The user asks for a **template** or **structure** for skills
 - The user mentions **skill format**, **SKILL.md**, or **when to use** for skills
@@ -39,6 +40,7 @@ description: [Third person] What the skill does. Use when [trigger scenario 1], 
 ## When to use
 
 Apply this skill when:
+
 - [Trigger 1: e.g. "Designing or implementing interfaces"]
 - [Trigger 2: e.g. "User mentions UI, UX, or accessibility"]
 - [Trigger 3: specific scenario or keyword]
@@ -102,6 +104,7 @@ description: [Third person] [What it does]. Use when [scenario 1], [scenario 2],
 ## When to use
 
 Apply this skill when:
+
 - [Specific trigger 1]
 - [Specific trigger 2]
 - [Specific trigger 3 or keyword]

@@ -1,22 +1,53 @@
 'use server'
 
+import { requireAdminHROrChiefArea } from '@/src/shared/lib/auth'
+import { isChiefArea } from '@/src/shared/lib/auth/rbac'
 import { prisma } from '@/src/shared/lib/db'
-import { requireAdminHRWithOrg } from '@/src/shared/lib/auth'
 import type { ActionResult } from '@/src/shared/lib/types'
 import { handleActionError } from '@/src/shared/lib/utils'
 import { revalidatePaths } from '@/src/shared/lib/utils/revalidate-paths'
 
 const AREA_PATHS = ['/dashboard/areas', '/dashboard/admin-hr'] as const
 
+async function resolveOrgIdAndCheckArea(
+  areaId: string
+): Promise<{ success: false; error: string } | { success: true; organizationId: string }> {
+  const user = await requireAdminHROrChiefArea()
+  let orgId: string | null = user.organizationId ?? null
+  if (isChiefArea(user) && !orgId) {
+    const firstArea = await prisma.userArea.findFirst({
+      where: { userId: user.id },
+      select: { area: { select: { organizationId: true } } },
+    })
+    orgId = firstArea?.area?.organizationId ?? null
+  }
+  if (!orgId) return { success: false, error: 'No tienes una organización asignada' }
+
+  const area = await prisma.area.findFirst({
+    where: { id: areaId, organizationId: orgId },
+  })
+  if (!area) return { success: false, error: 'Área no encontrada' }
+
+  if (isChiefArea(user)) {
+    const chiefArea = await prisma.userArea.findFirst({
+      where: { userId: user.id, areaId },
+    })
+    if (!chiefArea) return { success: false, error: 'No tienes permiso para editar esta área' }
+  }
+
+  return { success: true, organizationId: orgId }
+}
+
 export const assignShiftTypesToAreaAction = async (
   areaId: string,
   shiftTypeIds: string[]
 ): Promise<ActionResult<null>> => {
   try {
-    const session = await requireAdminHRWithOrg()
+    const check = await resolveOrgIdAndCheckArea(areaId)
+    if (!check.success) return { success: false, error: check.error }
 
     const area = await prisma.area.findFirst({
-      where: { id: areaId, organizationId: session.organizationId },
+      where: { id: areaId, organizationId: check.organizationId },
     })
 
     if (!area)
@@ -28,7 +59,7 @@ export const assignShiftTypesToAreaAction = async (
     const validShiftTypes = await prisma.shiftType.findMany({
       where: {
         id: { in: shiftTypeIds },
-        organizationId: session.organizationId,
+        organizationId: check.organizationId,
         isActive: true,
       },
       select: { id: true },
@@ -87,10 +118,11 @@ export const setAreaActiveAction = async (
   isActive: boolean
 ): Promise<ActionResult<null>> => {
   try {
-    const session = await requireAdminHRWithOrg()
+    const check = await resolveOrgIdAndCheckArea(areaId)
+    if (!check.success) return { success: false, error: check.error }
 
     const area = await prisma.area.findFirst({
-      where: { id: areaId, organizationId: session.organizationId },
+      where: { id: areaId, organizationId: check.organizationId },
     })
 
     if (!area)
@@ -122,10 +154,6 @@ export const setAreaActiveAction = async (
       message: isActive ? 'Área activada' : 'Área desactivada',
     }
   } catch (error) {
-    return handleActionError(
-      error,
-      'setAreaActiveAction',
-      'Error al actualizar estado'
-    )
+    return handleActionError(error, 'setAreaActiveAction', 'Error al actualizar estado')
   }
 }

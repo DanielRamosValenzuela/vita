@@ -1,9 +1,10 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { Link } from '@/i18n/navigation'
-import { ExternalLink, CheckCircle2, XCircle } from 'lucide-react'
+import { CheckCircle2, ExternalLink, XCircle } from 'lucide-react'
 
+import { Badge } from '@/src/shared/ui/badge'
+import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
 import {
   Table,
@@ -13,8 +14,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/src/shared/ui/table'
-import { Badge } from '@/src/shared/ui/badge'
-import { Button } from '@/src/shared/ui/button'
+
+import { Link } from '@/i18n/navigation'
 
 import type { StaffWithContract } from '../api/contract-actions'
 
@@ -70,51 +71,53 @@ export function StaffViewPage({ staff }: StaffViewPageProps) {
                     const currentContract = person.contracts[0] ?? null
 
                     return (
-                  <TableRow key={person.id}>
-                      <TableCell>
-                        <div>
-                          <div className="font-medium">{person.name}</div>
-                          <div className="text-sm text-muted-foreground">{person.email}</div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">
-                          {person.role === 'CHIEF_AREA' ? t('roles.chief') : t('roles.staff')}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        {currentContract?.areaName || (
-                          <span className="text-muted-foreground">-</span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {currentContract ? (
-                          <div className="flex items-center gap-2">
-                            <span>{currentContract.rateTemplateName}</span>
-                            {currentContract.customMultiplier && (
-                              <Badge variant="secondary" className="text-xs">
-                                {t('table.multiplierBadge', { value: currentContract.customMultiplier })}
-                              </Badge>
-                            )}
+                      <TableRow key={person.id}>
+                        <TableCell>
+                          <div>
+                            <div className="font-medium">{person.name}</div>
+                            <div className="text-sm text-muted-foreground">{person.email}</div>
                           </div>
-                        ) : (
-                          <span className="text-muted-foreground">{t('table.noContract')}</span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {currentContract ? (
-                          <div className="flex items-center gap-2 text-green-600">
-                            <CheckCircle2 className="h-4 w-4" />
-                            <span className="text-sm">{t('table.hasContract')}</span>
-                          </div>
-                        ) : (
-                          <div className="flex items-center gap-2 text-muted-foreground">
-                            <XCircle className="h-4 w-4" />
-                            <span className="text-sm">{t('table.noContractStatus')}</span>
-                          </div>
-                        )}
-                      </TableCell>
-                    </TableRow>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline">
+                            {person.role === 'CHIEF_AREA' ? t('roles.chief') : t('roles.staff')}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {currentContract?.areaName || (
+                            <span className="text-muted-foreground">-</span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {currentContract ? (
+                            <div className="flex items-center gap-2">
+                              <span>{currentContract.rateTemplateName}</span>
+                              {currentContract.customMultiplier && (
+                                <Badge variant="secondary" className="text-xs">
+                                  {t('table.multiplierBadge', {
+                                    value: currentContract.customMultiplier,
+                                  })}
+                                </Badge>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="text-muted-foreground">{t('table.noContract')}</span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {currentContract ? (
+                            <div className="flex items-center gap-2 text-green-600">
+                              <CheckCircle2 className="h-4 w-4" />
+                              <span className="text-sm">{t('table.hasContract')}</span>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                              <XCircle className="h-4 w-4" />
+                              <span className="text-sm">{t('table.noContractStatus')}</span>
+                            </div>
+                          )}
+                        </TableCell>
+                      </TableRow>
                     )
                   })}
                 </TableBody>

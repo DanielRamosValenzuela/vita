@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { Role } from '@prisma/client'
 
 import { prisma } from '@/src/shared/lib/db'
+
 import { authOptions } from './config'
 import type { CurrentUser } from './types'
 
@@ -36,9 +37,7 @@ export async function requireAuth(locale: string = 'es'): Promise<CurrentUser> {
 export async function requireSuperAdmin(locale: string = 'es'): Promise<CurrentUser> {
   const user = await requireAuth(locale)
 
-  if (user.role !== Role.SUPER_ADMIN) 
-    redirect(`/${locale}/dashboard`)
-  
+  if (user.role !== Role.SUPER_ADMIN) redirect(`/${locale}/dashboard`)
 
   return user
 }
@@ -46,8 +45,7 @@ export async function requireSuperAdmin(locale: string = 'es'): Promise<CurrentU
 export async function requireAdminHR(locale: string = 'es'): Promise<CurrentUser> {
   const user = await requireAuth(locale)
 
-  if (user.role !== Role.ADMIN_HR)
-    redirect(`/${locale}/dashboard`)
+  if (user.role !== Role.ADMIN_HR) redirect(`/${locale}/dashboard`)
 
   return user
 }
@@ -57,8 +55,7 @@ export async function requireAdminHRWithOrg(
 ): Promise<CurrentUser & { organizationId: string }> {
   const user = await requireAdminHR(locale)
 
-  if (!user.organizationId)
-    throw new Error('No estás vinculado a una organización')
+  if (!user.organizationId) throw new Error('No estás vinculado a una organización')
 
   return user as CurrentUser & { organizationId: string }
 }
@@ -66,8 +63,7 @@ export async function requireAdminHRWithOrg(
 export async function requireChiefArea(locale: string = 'es'): Promise<CurrentUser> {
   const user = await requireAuth(locale)
 
-  if (user.role !== Role.CHIEF_AREA)
-    redirect(`/${locale}/dashboard`)
+  if (user.role !== Role.CHIEF_AREA) redirect(`/${locale}/dashboard`)
 
   return user
 }
@@ -79,11 +75,9 @@ export async function requireAdminHROrChiefArea(
   const isAdminHR = user.role === Role.ADMIN_HR
   const isChief = String(user.role) === 'CHIEF_AREA'
 
-  if (!isAdminHR && !isChief)
-    redirect(`/${locale}/dashboard`)
+  if (!isAdminHR && !isChief) redirect(`/${locale}/dashboard`)
 
-  if (isAdminHR && !user.organizationId)
-    throw new Error('No estás vinculado a una organización')
+  if (isAdminHR && !user.organizationId) throw new Error('No estás vinculado a una organización')
 
   return user as CurrentUser & { organizationId: string | null }
 }
@@ -91,9 +85,7 @@ export async function requireAdminHROrChiefArea(
 export async function requireStaffHealth(locale: string = 'es'): Promise<CurrentUser> {
   const user = await requireAuth(locale)
 
-  if (user.role !== Role.STAFF_HEALTH) 
-    redirect(`/${locale}/dashboard`)
-  
+  if (user.role !== Role.STAFF_HEALTH) redirect(`/${locale}/dashboard`)
 
   return user
 }

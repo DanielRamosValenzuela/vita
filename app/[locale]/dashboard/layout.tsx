@@ -1,7 +1,8 @@
 import { getCurrentUser } from '@/src/shared/lib/auth'
 import { DashboardShell } from '@/src/widgets/dashboard-sidebar/dashboard-shell'
-import { getUserPendingNotifications } from '@/src/entities/notification/lib/pending-notifications'
 import { PendingNotificationsToaster } from '@/src/features/notifications/ui/pending-notifications-toaster'
+
+import { getUserPendingNotifications } from '@/src/entities/notification/lib/pending-notifications'
 
 interface DashboardLayoutProps {
   children: React.ReactNode

@@ -6,11 +6,10 @@ import { addMonths, format, isSameMonth, isToday, subMonths } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
-import { renderIcon } from '@/src/shared/ui/icon-picker'
 import { Button } from '@/src/shared/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/src/shared/ui/card'
-
 import { Calendar } from '@/src/shared/ui/calendar'
+import { Card, CardContent, CardHeader, CardTitle } from '@/src/shared/ui/card'
+import { renderIcon } from '@/src/shared/ui/icon-picker'
 
 interface CalendarEvent {
   id: string
@@ -40,7 +39,6 @@ export function ShiftCalendar({
   const t = useTranslations('shifts')
   const [currentMonth, setCurrentMonth] = useState(new Date())
 
-  
   const shiftsByDay = useMemo(() => {
     return shifts.reduce(
       (acc, shift) => {
@@ -54,17 +52,14 @@ export function ShiftCalendar({
     )
   }, [shifts])
 
-  
   const getEventsForDay = (date: Date) => {
     const dateKey = format(date, 'yyyy-MM-dd')
     return shiftsByDay[dateKey] || []
   }
 
-  
   const handlePreviousMonth = () => setCurrentMonth(subMonths(currentMonth, 1))
   const handleNextMonth = () => setCurrentMonth(addMonths(currentMonth, 1))
 
-  
   const renderDay = (day: Date) => {
     const dayShifts = getEventsForDay(day)
     const isSelected = selectedDate && isSameMonth(day, selectedDate) && isToday(day)
@@ -167,9 +162,7 @@ export function ShiftCalendar({
             Day: ({ day, ...props }) => {
               return (
                 <td {...props}>
-                  <div className="h-24 w-full p-0">
-                    {renderDay(day.date)}
-                  </div>
+                  <div className="h-24 w-full p-0">{renderDay(day.date)}</div>
                 </td>
               )
             },

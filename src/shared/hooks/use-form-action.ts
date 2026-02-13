@@ -1,10 +1,11 @@
 'use client'
 
 import { useCallback, useState, useTransition } from 'react'
-import { useRouter } from '@/i18n/navigation'
 
 import type { ActionResult } from '@/src/shared/lib/types'
 import { toastActionResult } from '@/src/shared/lib/utils/toast-action-result'
+
+import { useRouter } from '@/i18n/navigation'
 
 export interface UseFormActionOptions<TData, TInput> {
   action: (input: TInput) => Promise<ActionResult<TData>>
@@ -33,13 +34,9 @@ export function useFormAction<TData = unknown, TInput = unknown>(
         })
 
         if (result.success) {
-          if (onSuccess && result.data !== undefined)
-            onSuccess(result.data)
-          if (redirectTo)
-            router.push(redirectTo)
-        }
-        else
-          setError(result.error ?? errorMessage ?? 'Error')
+          if (onSuccess && result.data !== undefined) onSuccess(result.data)
+          if (redirectTo) router.push(redirectTo)
+        } else setError(result.error ?? errorMessage ?? 'Error')
       })
     },
     [action, successMessage, errorMessage, redirectTo, onSuccess, router]

@@ -1,15 +1,16 @@
 'use server'
 
-import { prisma } from '@/src/shared/lib/db'
-import { requireAdminHROrChiefArea } from '@/src/shared/lib/auth/session'
 import { isChiefArea } from '@/src/shared/lib/auth/rbac'
+import { requireAdminHROrChiefArea } from '@/src/shared/lib/auth/session'
+import { prisma } from '@/src/shared/lib/db'
 import type { ActionResult } from '@/src/shared/lib/types'
 
-interface ShiftUser {
+export interface ShiftUser {
   id: string
   name: string
   email: string
   role: string
+  areaIds?: string[]
 }
 
 export const getUsersForShiftsAction = async (): Promise<ActionResult<ShiftUser[]>> => {
@@ -41,14 +42,24 @@ export const getUsersForShiftsAction = async (): Promise<ActionResult<ShiftUser[
         name: true,
         email: true,
         role: true,
-        createdAt: true,
+        userAreas: { select: { areaId: true } },
       },
       orderBy: [{ role: 'asc' }, { name: 'asc' }],
     })
 
+    const data: ShiftUser[] = users.map((u) => ({
+      id: u.id,
+      name: u.name,
+      email: u.email,
+      role: u.role,
+      ...(u.role === 'STAFF_HEALTH' && {
+        areaIds: u.userAreas.map((ua) => ua.areaId),
+      }),
+    }))
+
     return {
       success: true,
-      data: users,
+      data,
     }
   } catch (error) {
     console.error('[getUsersForShiftsAction] Error:', error)

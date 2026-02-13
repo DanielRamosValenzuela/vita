@@ -3,11 +3,11 @@
 import { revalidatePath } from 'next/cache'
 import { PaymentStatus, ShiftStatus } from '@prisma/client'
 
-import { prisma } from '@/src/shared/lib/db'
 import { requireAdminHROrChiefArea } from '@/src/shared/lib/auth/session'
-import { handleActionError } from '@/src/shared/lib/utils/action-error-handler'
 import { ROLES } from '@/src/shared/lib/constants'
+import { prisma } from '@/src/shared/lib/db'
 import type { ActionResult } from '@/src/shared/lib/types'
+import { handleActionError } from '@/src/shared/lib/utils/action-error-handler'
 
 import {
   calculatePayment,
@@ -36,11 +36,7 @@ interface BulkPaymentResult {
   failed: { shiftId: string; error: string }[]
 }
 
-async function resolveContractForShift(
-  userId: string,
-  organizationId: string,
-  areaId: string
-) {
+async function resolveContractForShift(userId: string, organizationId: string, areaId: string) {
   const areaContract = await prisma.contract.findFirst({
     where: {
       userId,
@@ -142,8 +138,7 @@ export async function calculateShiftPaymentAction(
 ): Promise<ActionResult<ShiftPaymentResult>> {
   try {
     const session = await requireAdminHROrChiefArea()
-    if (!session.organizationId)
-      return { success: false, error: 'No organization assigned' }
+    if (!session.organizationId) return { success: false, error: 'No organization assigned' }
 
     const shift = await fetchShiftForPayment(shiftId, session.organizationId)
     if (!shift)
@@ -167,8 +162,7 @@ export async function calculateShiftPaymentAction(
         session.organizationId,
         shift.areaId
       )
-      if (!resolved)
-        return { success: false, error: 'No active contract found for this user' }
+      if (!resolved) return { success: false, error: 'No active contract found for this user' }
 
       contractId = resolved.id
 
@@ -179,8 +173,7 @@ export async function calculateShiftPaymentAction(
     }
 
     const contractData = await fetchContractWithComponents(contractId)
-    if (!contractData)
-      return { success: false, error: 'Contract not found' }
+    if (!contractData) return { success: false, error: 'Contract not found' }
 
     const calendarDay = await fetchCalendarDay(session.organizationId, shift.startTime)
 
@@ -267,9 +260,7 @@ export async function recalculateShiftPaymentAction(
   return calculateShiftPaymentAction(shiftId)
 }
 
-export async function getShiftPaymentAction(
-  shiftId: string
-): Promise<
+export async function getShiftPaymentAction(shiftId: string): Promise<
   ActionResult<{
     payment: {
       id: string
@@ -295,16 +286,14 @@ export async function getShiftPaymentAction(
 > {
   try {
     const session = await requireAdminHROrChiefArea()
-    if (!session.organizationId)
-      return { success: false, error: 'No organization assigned' }
+    if (!session.organizationId) return { success: false, error: 'No organization assigned' }
 
     const shift = await prisma.shift.findFirst({
       where: { id: shiftId, organizationId: session.organizationId },
       select: { id: true, areaId: true },
     })
 
-    if (!shift)
-      return { success: false, error: 'Shift not found' }
+    if (!shift) return { success: false, error: 'Shift not found' }
 
     if (session.role === ROLES.CHIEF_AREA) {
       const chiefArea = await prisma.userArea.findFirst({
@@ -332,8 +321,7 @@ export async function getShiftPaymentAction(
       },
     })
 
-    if (!payment)
-      return { success: false, error: 'No payment found for this shift' }
+    if (!payment) return { success: false, error: 'No payment found for this shift' }
 
     return {
       success: true,
@@ -362,11 +350,9 @@ export async function calculateBulkShiftPaymentsAction(
 ): Promise<ActionResult<BulkPaymentResult>> {
   try {
     const session = await requireAdminHROrChiefArea()
-    if (!session.organizationId)
-      return { success: false, error: 'No organization assigned' }
+    if (!session.organizationId) return { success: false, error: 'No organization assigned' }
 
-    if (shiftIds.length === 0)
-      return { success: false, error: 'No shift IDs provided' }
+    if (shiftIds.length === 0) return { success: false, error: 'No shift IDs provided' }
 
     if (shiftIds.length > MAX_BULK_SHIFTS)
       return { success: false, error: `Maximum ${MAX_BULK_SHIFTS} shifts per bulk operation` }

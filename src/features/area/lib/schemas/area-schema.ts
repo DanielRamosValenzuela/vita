@@ -19,7 +19,10 @@ export function createAreaSchema(messages: AreaValidationMessages) {
       .optional()
       .or(z.literal('')),
     icon: z.string().optional(),
-    color: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional(),
+    color: z
+      .string()
+      .regex(/^#[0-9A-Fa-f]{6}$/)
+      .optional(),
     isActive: z.boolean(),
     dayStartTime: z
       .string()
@@ -47,7 +50,10 @@ export function createUpdateAreaSchema(messages: AreaValidationMessages) {
       .optional()
       .or(z.literal('')),
     icon: z.string().optional(),
-    color: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional(),
+    color: z
+      .string()
+      .regex(/^#[0-9A-Fa-f]{6}$/)
+      .optional(),
     isActive: z.boolean().optional(),
     maxConsecutiveHours: z.number().int().min(1).max(168).nullable().optional(),
     minRestHours: z.number().int().min(0).max(72).nullable().optional(),

@@ -18,12 +18,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/src/shared/ui/table'
-import { getOrganizationById } from '@/src/features/super-admin/data'
-import {
-  InvitationsTable,
-  OrganizationAdminHRSection,
-} from '@/src/features/super-admin/ui'
 import { OrganizationLimitsCard } from '@/src/widgets/organization-limits-card'
+import { getOrganizationById } from '@/src/features/super-admin/data'
+import { InvitationsTable, OrganizationAdminHRSection } from '@/src/features/super-admin/ui'
 
 import { Link } from '@/i18n/navigation'
 

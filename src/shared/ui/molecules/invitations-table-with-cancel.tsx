@@ -6,8 +6,6 @@ import type { Role } from '@prisma/client'
 import { toast } from 'sonner'
 
 import type { ActionResult } from '@/src/shared/lib/types'
-import { useRouter } from '@/i18n/navigation'
-
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,6 +20,8 @@ import {
   InvitationsTableBase,
   type InvitationWithUser,
 } from '@/src/shared/ui/molecules/invitations-table-base'
+
+import { useRouter } from '@/i18n/navigation'
 
 export interface InvitationsTableWithCancelProps {
   invitations: InvitationWithUser[]

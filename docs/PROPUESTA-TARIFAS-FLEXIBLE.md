@@ -5,11 +5,13 @@
 ### Estado Actual
 
 **Módulo Personal (`/dashboard/staff`)**:
+
 - Muestra personas, áreas, contratos
 - Permite editar contratos
 - Permite desvincular personas
 
 **Módulo Tarifas (`/dashboard/rates`)**:
+
 - Gestiona plantillas de tarifas (RateTemplate)
 - Gestiona contratos individuales (Contract)
 - Muestra toda la información de personal
@@ -28,9 +30,11 @@
 ### 1. Separación Clara de Responsabilidades
 
 #### Módulo Personal (`/dashboard/staff`)
+
 **Objetivo**: Gestión de personas y su vinculación a la organización
 
 **Funcionalidades**:
+
 - ✅ Visualizar lista de personal (jefes + staff)
 - ✅ Ver áreas asignadas
 - ✅ Ver si tienen contrato activo (sí/no, nombre de tarifa)
@@ -39,9 +43,11 @@
 - ❌ NO editar tarifas aquí
 
 #### Módulo Tarifas (`/dashboard/rates`)
+
 **Objetivo**: Gestión exclusiva de tarifas y contratos
 
 **Funcionalidades**:
+
 - ✅ CRUD completo de plantillas de tarifas (RateTemplate)
 - ✅ Asignar/editar contratos a personal
 - ✅ Ver resumen de contratos activos
@@ -68,6 +74,7 @@ enum RateCalculationType {
 #### Cambios al Schema de Prisma
 
 **RateTemplate (antes)**:
+
 ```prisma
 model RateTemplate {
   ratePerMinute   Float           // ❌ OBLIGATORIO
@@ -78,18 +85,19 @@ model RateTemplate {
 ```
 
 **RateTemplate (propuesto)**:
+
 ```prisma
 model RateTemplate {
   name               String
   description        String?
   calculationType    RateCalculationType @default(BASE_PLUS_MINUTE)
-  
+
   // Todos opcionales, dependen de calculationType
   ratePerMinute      Float?
   ratePerHour        Float?
   baseSalary         Float?
   baseSalaryUnit     BaseSalaryUnit?
-  
+
   // Validación a nivel de lógica de negocio:
   // - ONLY_BASE_SALARY: requiere baseSalary y baseSalaryUnit
   // - ONLY_PER_MINUTE: requiere ratePerMinute
@@ -100,6 +108,7 @@ model RateTemplate {
 ```
 
 **Contract (cambios mínimos)**:
+
 ```prisma
 model Contract {
   // ... campos actuales
@@ -113,7 +122,7 @@ model Contract {
 ✅ **Flexibilidad total**: Cada organización define su modelo  
 ✅ **Escalabilidad**: Fácil añadir nuevos tipos de cálculo  
 ✅ **Claridad**: El tipo de cálculo está explícito  
-✅ **Validación**: Se valida según el tipo elegido  
+✅ **Validación**: Se valida según el tipo elegido
 
 ---
 
@@ -124,6 +133,7 @@ model Contract {
 **Ubicación**: `src/shared/ui/currency-input.tsx`
 
 **Características**:
+
 - Acepta solo números
 - Formatea automáticamente con separador de miles
 - Usa la configuración del país de la organización
@@ -132,14 +142,15 @@ model Contract {
 
 **Formatos por País** (ejemplos):
 
-| País        | Separador Miles | Separador Decimal | Ejemplo      |
-|-------------|-----------------|-------------------|--------------|
-| Chile       | `.`             | `,`               | $1.000.000   |
-| USA         | `,`             | `.`               | $1,000,000   |
-| Colombia    | `.`             | `,`               | $1.000.000   |
-| España      | `.`             | `,`               | €1.000.000   |
+| País     | Separador Miles | Separador Decimal | Ejemplo    |
+| -------- | --------------- | ----------------- | ---------- |
+| Chile    | `.`             | `,`               | $1.000.000 |
+| USA      | `,`             | `.`               | $1,000,000 |
+| Colombia | `.`             | `,`               | $1.000.000 |
+| España   | `.`             | `,`               | €1.000.000 |
 
 **Implementación**:
+
 ```typescript
 // Usa Intl.NumberFormat con la locale del país
 const formatter = new Intl.NumberFormat(locale, {
@@ -244,6 +255,7 @@ Columna "Contrato":
 ## 🚀 Estado de Implementación
 
 ### Fase 1: Infraestructura ✅ COMPLETADA
+
 1. ✅ Schema con sistema de componentes (Enfoque C)
 2. ✅ `RateTemplate` con relación a `RateComponent`
 3. ✅ Enums: `ComponentType`, `ComponentUnit`, `ApplyCondition`, `DayType`, `Currency`
@@ -254,6 +266,7 @@ Columna "Contrato":
 8. ✅ Base de datos reseteada y cliente Prisma generado
 
 ### Fase 2: API de Tarifas ✅ COMPLETADA
+
 1. ✅ `getRateTemplatesAction` con componentes
 2. ✅ `createRateTemplateAction` con componentes
 3. ✅ `updateRateTemplateAction` con componentes
@@ -261,17 +274,20 @@ Columna "Contrato":
 5. ✅ `duplicateRateTemplateAction` para copiar tarifas
 
 ### Fase 3: Módulo Tarifas UI (En Progreso)
+
 1. ⏳ Actualizar formulario de RateTemplate con componentes
 2. ⏳ UI para añadir/editar/eliminar componentes
 3. ⏳ Presets de tarifas comunes
 4. ⏳ Vista de lista mejorada con componentes
 
 ### Fase 4: Módulo Personal (Pendiente)
+
 1. ⏳ Simplificar tabla: solo mostrar si tiene contrato (✓/✗)
 2. ⏳ Eliminar edición de contratos desde Personal
 3. ⏳ Añadir link a Tarifas desde columna de contrato
 
 ### Fase 5: Testing y Documentación (Pendiente)
+
 1. ⏳ Testing manual de todos los flujos
 2. ⏳ Actualizar documentación de usuario
 3. ⏳ Ejemplos de uso de componentes
@@ -309,6 +325,7 @@ Columna "Contrato":
 
 **¿Procedo con la implementación?**  
 Por favor revisa la propuesta y dame feedback sobre:
+
 1. ¿Te gusta el enfoque de `RateCalculationType`?
 2. ¿Algo que cambiarías o añadirías?
 3. ¿Empezamos por la Fase 1 (infraestructura)?

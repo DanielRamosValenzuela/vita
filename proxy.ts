@@ -3,6 +3,7 @@ import createMiddleware from 'next-intl/middleware'
 import { NextResponse, type NextRequest } from 'next/server'
 
 import { env } from '@/src/shared/config'
+
 import { routing } from './i18n/routing'
 
 const { defaultLocale } = routing

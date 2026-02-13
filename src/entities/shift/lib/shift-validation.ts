@@ -23,65 +23,55 @@ export async function checkShiftConflicts(
   endTime: Date,
   excludeShiftId?: string
 ): Promise<ShiftConflict> {
-  
-  if (endTime <= startTime) 
+  if (endTime <= startTime)
     return {
       hasConflict: true,
       conflictType: 'outside_hours',
       message: 'La hora de fin debe ser posterior a la hora de inicio',
     }
-  
 
-  
   const now = new Date()
   const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000)
-  if (startTime < oneHourAgo) 
+  if (startTime < oneHourAgo)
     return {
       hasConflict: true,
       conflictType: 'future_shift',
       message: 'No se pueden programar turnos en el pasado',
     }
-  
 
-  
   const shiftDuration = endTime.getTime() - startTime.getTime()
-  const maxDuration = 12 * 60 * 60 * 1000 
-  if (shiftDuration > maxDuration) 
+  const maxDuration = 12 * 60 * 60 * 1000
+  if (shiftDuration > maxDuration)
     return {
       hasConflict: true,
       conflictType: 'outside_hours',
       message: 'Los turnos no pueden durar más de 12 horas',
     }
-  
 
-  
-  const minDuration = 30 * 60 * 1000 
-  if (shiftDuration < minDuration) 
+  const minDuration = 30 * 60 * 1000
+  if (shiftDuration < minDuration)
     return {
       hasConflict: true,
       conflictType: 'outside_hours',
       message: 'Los turnos deben durar al menos 30 minutos',
     }
-  
 
-  
   const whereClause: Prisma.ShiftWhereInput = {
     userId,
     status: {
       in: ['SCHEDULED', 'IN_PROGRESS'],
     },
     OR: [
-      
       {
         startTime: { lte: startTime },
         endTime: { gt: startTime },
       },
-      
+
       {
         startTime: { lt: endTime },
         endTime: { gte: endTime },
       },
-      
+
       {
         startTime: { gte: startTime },
         endTime: { lte: endTime },
@@ -89,10 +79,7 @@ export async function checkShiftConflicts(
     ],
   }
 
-  
-  if (excludeShiftId) 
-    whereClause.id = { not: excludeShiftId }
-  
+  if (excludeShiftId) whereClause.id = { not: excludeShiftId }
 
   const conflictingShifts = await prisma.shift.findMany({
     where: whereClause,
@@ -111,7 +98,7 @@ export async function checkShiftConflicts(
       },
     },
     orderBy: { startTime: 'asc' },
-    take: 1, 
+    take: 1,
   })
 
   if (conflictingShifts.length > 0) {
@@ -183,24 +170,20 @@ export async function checkMultipleUserShiftsConflicts(
     }>
   }> = []
 
-  
   const shiftsByUser = shifts.reduce(
     (acc, shift) => {
-      if (!acc[shift.userId]) 
-        acc[shift.userId] = []
-      
+      if (!acc[shift.userId]) acc[shift.userId] = []
+
       acc[shift.userId].push(shift)
       return acc
     },
     {} as Record<string, typeof shifts>
   )
 
-  for (const [userId, userShifts] of Object.entries(shiftsByUser)) 
-    
+  for (const [userId, userShifts] of Object.entries(shiftsByUser))
     for (let i = 0; i < userShifts.length; i++) {
       const currentShift = userShifts[i]
 
-      
       const conflictResult = await checkShiftConflicts(
         currentShift.userId,
         currentShift.areaId,
@@ -209,7 +192,6 @@ export async function checkMultipleUserShiftsConflicts(
       )
 
       if (conflictResult.hasConflict) {
-        
         const user = await prisma.user.findUnique({
           where: { id: userId },
           select: { name: true },
@@ -229,7 +211,6 @@ export async function checkMultipleUserShiftsConflicts(
         })
       }
 
-      
       for (let j = i + 1; j < userShifts.length; j++) {
         const nextShift = userShifts[j]
 
@@ -258,15 +239,13 @@ export async function checkMultipleUserShiftsConflicts(
         }
       }
     }
-  
 
-  if (conflicts.length > 0) 
+  if (conflicts.length > 0)
     return {
       hasConflict: true,
       conflicts,
       message: `Se detectaron conflictos de horario para ${conflicts.length} usuario(s)`,
     }
-  
 
   return {
     hasConflict: false,

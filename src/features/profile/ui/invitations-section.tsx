@@ -37,9 +37,9 @@ export function InvitationsSection() {
   useEffect(() => {
     const loadInvitations = async () => {
       const result = await getPendingInvitationsAction()
-      if (result.success && result.data && Array.isArray(result.data)) 
+      if (result.success && result.data && Array.isArray(result.data))
         setInvitations(result.data as Invitation[])
-      
+
       setLoading(false)
     }
     loadInvitations()
@@ -55,9 +55,7 @@ export function InvitationsSection() {
         setTimeout(() => {
           window.location.reload()
         }, 1000)
-      } else 
-        toast.error(result.error || t('acceptError'))
-      
+      } else toast.error(result.error || t('acceptError'))
     })
   }
 
@@ -68,13 +66,11 @@ export function InvitationsSection() {
       if (result.success) {
         toast.success(t('rejectSuccess'))
         setInvitations((prev) => prev.filter((inv) => inv.id !== invitationId))
-      } else 
-        toast.error(result.error || t('rejectError'))
-      
+      } else toast.error(result.error || t('rejectError'))
     })
   }
 
-  if (loading) 
+  if (loading)
     return (
       <Card>
         <CardHeader>
@@ -87,9 +83,8 @@ export function InvitationsSection() {
         </CardContent>
       </Card>
     )
-  
 
-  if (invitations.length === 0) 
+  if (invitations.length === 0)
     return (
       <Card>
         <CardHeader>
@@ -100,7 +95,6 @@ export function InvitationsSection() {
         </CardContent>
       </Card>
     )
-  
 
   return (
     <Card>

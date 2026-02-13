@@ -6,6 +6,7 @@ import type { Role } from '@prisma/client'
 import { AlertCircle, CheckCircle2, Loader2, Mail, Search, User } from 'lucide-react'
 
 import { formatTaxId, getTaxIdConfig, validateTaxId } from '@/src/shared/lib/utils/tax-id-config'
+import { validateEmail } from '@/src/shared/lib/validation'
 import { Alert, AlertDescription } from '@/src/shared/ui/alert'
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
@@ -19,8 +20,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/src/shared/ui/select'
-
-import { validateEmail } from '@/src/shared/lib/validation'
 
 export interface FoundUser {
   id: string
@@ -97,7 +96,9 @@ export function InviteUserFormBase({
 
   const hasDocNumber = foundUser?.docNumber !== null && foundUser?.docNumber !== undefined
   const isAlreadyInRole =
-    foundUser?.role === selectedRole && foundUser?.organizationId !== undefined && foundUser?.organizationId !== null
+    foundUser?.role === selectedRole &&
+    foundUser?.organizationId !== undefined &&
+    foundUser?.organizationId !== null
 
   return (
     <section className="space-y-4">
@@ -135,9 +136,7 @@ export function InviteUserFormBase({
               value={emailValue}
               onChange={(e) => handleEmailChange(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === 'Enter' && canSearch && !isSearching) 
-                  onSearch()
-                
+                if (e.key === 'Enter' && canSearch && !isSearching) onSearch()
               }}
               disabled={isSearching || isPending || !!docValue}
               className={
@@ -169,9 +168,7 @@ export function InviteUserFormBase({
             value={docValue}
             onChange={(e) => handleDocChange(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === 'Enter' && canSearch && !isSearching) 
-                onSearch()
-              
+              if (e.key === 'Enter' && canSearch && !isSearching) onSearch()
             }}
             disabled={isSearching || isPending || !!emailValue}
             className={docValue ? (isValidDoc ? '' : 'border-destructive') : ''}
@@ -269,7 +266,10 @@ export function InviteUserFormBase({
               <Button variant="outline" onClick={onCancel} disabled={isPending}>
                 {t('cancel')}
               </Button>
-              <Button onClick={() => onInvite(selectedRole)} disabled={isPending || isAlreadyInRole}>
+              <Button
+                onClick={() => onInvite(selectedRole)}
+                disabled={isPending || isAlreadyInRole}
+              >
                 {isPending ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />

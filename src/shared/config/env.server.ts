@@ -11,8 +11,7 @@ const {
 } = process.env
 
 function required(value: string | undefined, key: string): string {
-  if (value === undefined || value === '')
-    throw new Error(`Missing or empty env: ${key}`)
+  if (value === undefined || value === '') throw new Error(`Missing or empty env: ${key}`)
   return value
 }
 

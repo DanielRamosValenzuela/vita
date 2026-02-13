@@ -96,9 +96,7 @@ export const TAX_ID_CONFIG: Record<Country, TaxIdConfig> = {
       const primes = [3, 7, 13, 17, 19, 23, 29, 37, 41, 43, 47, 53, 59, 67, 71]
       let sum = 0
 
-      for (let i = 0; i < nit.length; i++) 
-        sum += parseInt(nit[nit.length - 1 - i]) * primes[i]
-      
+      for (let i = 0; i < nit.length; i++) sum += parseInt(nit[nit.length - 1 - i]) * primes[i]
 
       const remainder = sum % 11
       const expectedDv = remainder > 1 ? 11 - remainder : remainder
@@ -117,9 +115,7 @@ export const TAX_ID_CONFIG: Record<Country, TaxIdConfig> = {
       const cleaned = value.replace(/[^0-9]/g, '')
       if (cleaned.length === 0) return ''
       if (cleaned.length <= 2) return cleaned
-      if (cleaned.length <= 10) 
-        return `${cleaned.slice(0, 2)}-${cleaned.slice(2)}`
-      
+      if (cleaned.length <= 10) return `${cleaned.slice(0, 2)}-${cleaned.slice(2)}`
 
       return `${cleaned.slice(0, 2)}-${cleaned.slice(2, 10)}-${cleaned.slice(10, 11)}`
     },
@@ -130,9 +126,7 @@ export const TAX_ID_CONFIG: Record<Country, TaxIdConfig> = {
       const multipliers = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2]
       let sum = 0
 
-      for (let i = 0; i < 10; i++) 
-        sum += parseInt(cleaned[i]) * multipliers[i]
-      
+      for (let i = 0; i < 10; i++) sum += parseInt(cleaned[i]) * multipliers[i]
 
       const remainder = sum % 11
       const expectedDv = remainder === 0 ? 0 : remainder === 1 ? 9 : 11 - remainder
@@ -195,17 +189,14 @@ export const getTaxIdConfig = (country: Country): TaxIdConfig => {
 
 export const formatTaxId = (value: string, country: Country): string => {
   const config = getTaxIdConfig(country)
-  if (config.formatFunction) 
-    return config.formatFunction(value)
-  
+  if (config.formatFunction) return config.formatFunction(value)
+
   return value
 }
 
 export const validateTaxId = (value: string, country: Country): boolean => {
   const config = getTaxIdConfig(country)
-  if (config.validateFunction) 
-    return config.validateFunction(value)
-  
+  if (config.validateFunction) return config.validateFunction(value)
 
   const cleaned = value.replace(/[^a-zA-Z0-9]/g, '')
   return cleaned.length >= config.minLength && cleaned.length <= config.maxLength

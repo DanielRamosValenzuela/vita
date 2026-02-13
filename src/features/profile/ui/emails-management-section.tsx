@@ -3,14 +3,18 @@
 import { useEffect, useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 import { useSearchParams } from 'next/navigation'
-import { Mail, Plus, Trash2, Star, CheckCircle2, Loader2, Link as LinkIcon, Unlink } from 'lucide-react'
+import {
+  CheckCircle2,
+  Link as LinkIcon,
+  Loader2,
+  Mail,
+  Plus,
+  Star,
+  Trash2,
+  Unlink,
+} from 'lucide-react'
 import { toast } from 'sonner'
 
-import { Button } from '@/src/shared/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
-import { Input } from '@/src/shared/ui/input'
-import { Badge } from '@/src/shared/ui/badge'
-import { GoogleIcon } from '@/src/shared/ui/icons'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,15 +25,20 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/src/shared/ui/alert-dialog'
+import { Badge } from '@/src/shared/ui/badge'
+import { Button } from '@/src/shared/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
+import { GoogleIcon } from '@/src/shared/ui/icons'
+import { Input } from '@/src/shared/ui/input'
 
 import {
-  getUserEmailsAction,
   addEmailAction,
+  getUserEmailsAction,
+  initiateGoogleLinkAction,
   removeEmailAction,
   setPrimaryEmailAction,
-  initiateGoogleLinkAction,
-  unlinkGoogleAction,
   syncPrimaryEmailAction,
+  unlinkGoogleAction,
 } from '../api'
 
 interface UserEmail {
@@ -132,8 +141,7 @@ export function EmailsManagementSection() {
     startTransition(async () => {
       const result = await initiateGoogleLinkAction(emailId)
 
-      if (result.success && result.data?.authUrl)
-        window.location.href = result.data.authUrl
+      if (result.success && result.data?.authUrl) window.location.href = result.data.authUrl
       else toast.error(result.error || 'Error al vincular con Google')
     })
   }
@@ -169,9 +177,7 @@ export function EmailsManagementSection() {
               value={newEmail}
               onChange={(e) => setNewEmail(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === 'Enter' && !isPending) 
-                  handleAddEmail()
-                
+                if (e.key === 'Enter' && !isPending) handleAddEmail()
               }}
               disabled={isPending}
               className="pl-10"
@@ -214,9 +220,7 @@ export function EmailsManagementSection() {
                             {t('primary')}
                           </Badge>
                         )}
-                        {email.isVerified && (
-                          <CheckCircle2 className="text-green-600 h-4 w-4" />
-                        )}
+                        {email.isVerified && <CheckCircle2 className="text-green-600 h-4 w-4" />}
                         {email.provider && (
                           <Badge variant="outline" className="text-xs">
                             {email.provider}

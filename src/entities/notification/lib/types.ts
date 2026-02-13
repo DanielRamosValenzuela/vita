@@ -10,4 +10,3 @@ export interface PendingNotification {
   createdAt: Date
   meta?: Record<string, unknown>
 }
-

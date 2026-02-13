@@ -12,14 +12,14 @@
 
 ## Features Confirmados de Rflex
 
-| Categoría   | Features                                                                 |
-| ----------- | ------------------------------------------------------------------------ |
-| Gestión     | Turnos y jornadas, ofertador de turnos, cambio de turnos                 |
-| Asistencia  | Web, app móvil+GPS, app offline, biometría (integración), tarjeta/pin    |
-| Cálculo     | Remuneraciones automáticas con reglas de negocio                         |
-| Validación  | Pre-liquidación validada por colaboradores                               |
-| Mobile      | App móvil (iOS + Android)                                                |
-| Integración | API para cualquier sistema, portabilidad de asistencia                   |
+| Categoría   | Features                                                              |
+| ----------- | --------------------------------------------------------------------- |
+| Gestión     | Turnos y jornadas, ofertador de turnos, cambio de turnos              |
+| Asistencia  | Web, app móvil+GPS, app offline, biometría (integración), tarjeta/pin |
+| Cálculo     | Remuneraciones automáticas con reglas de negocio                      |
+| Validación  | Pre-liquidación validada por colaboradores                            |
+| Mobile      | App móvil (iOS + Android)                                             |
+| Integración | API para cualquier sistema, portabilidad de asistencia                |
 
 **Resultados según Testimonios:**
 

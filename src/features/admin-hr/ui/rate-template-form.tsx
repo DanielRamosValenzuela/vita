@@ -1,16 +1,14 @@
 'use client'
 
-import { useState, useTransition, useEffect } from 'react'
+import { useEffect, useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
-import { Plus, Info } from 'lucide-react'
-import { toast } from 'sonner'
 import type { Currency } from '@prisma/client'
+import { Info, Plus } from 'lucide-react'
+import { toast } from 'sonner'
 
+import { APPLY_CONDITIONS, COMPONENT_TYPES, COMPONENT_UNITS } from '@/src/shared/lib/constants'
 import { Button } from '@/src/shared/ui/button'
-import { Input } from '@/src/shared/ui/input'
-import { Label } from '@/src/shared/ui/label'
-import { Textarea } from '@/src/shared/ui/textarea'
 import {
   Dialog,
   DialogContent,
@@ -18,18 +16,19 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/src/shared/ui/dialog'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/src/shared/ui/tooltip'
-
-import { COMPONENT_TYPES, COMPONENT_UNITS, APPLY_CONDITIONS } from '@/src/shared/lib/constants'
-import { RateComponentForm } from './rate-component-form'
-import { createRateTemplateAction, updateRateTemplateAction } from '../api/rate-template-actions'
-import type { RateComponentData, RateTemplateWithComponents } from '../api/rate-template-actions'
+import { Input } from '@/src/shared/ui/input'
+import { Label } from '@/src/shared/ui/label'
+import { Textarea } from '@/src/shared/ui/textarea'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/src/shared/ui/tooltip'
 import { getShiftTypesAction } from '@/src/features/shifts/api/shift-type-actions'
+
+import {
+  createRateTemplateAction,
+  updateRateTemplateAction,
+  type RateComponentData,
+  type RateTemplateWithComponents,
+} from '../api/rate-template-actions'
+import { RateComponentForm } from './rate-component-form'
 
 interface ShiftTypeOption {
   id: string
@@ -165,8 +164,7 @@ export function RateTemplateForm({
         toast.success(result.message)
         onOpenChange(false)
         router.refresh()
-      } else
-        toast.error(result.error)
+      } else toast.error(result.error)
     })
   }
 
@@ -269,12 +267,7 @@ export function RateTemplateForm({
                     <p className="font-medium text-foreground mb-2">{t('components.emptyTitle')}</p>
                     <p className="text-sm">{t('components.emptyDescription')}</p>
                   </div>
-                  <Button
-                    type="button"
-                    variant="default"
-                    size="lg"
-                    onClick={handleAddComponent}
-                  >
+                  <Button type="button" variant="default" size="lg" onClick={handleAddComponent}>
                     <Plus className="h-5 w-5 mr-2" />
                     {t('components.addFirst')}
                   </Button>
@@ -308,7 +301,11 @@ export function RateTemplateForm({
             >
               {t('cancel')}
             </Button>
-            <Button type="submit" disabled={isPending || components.length === 0} className="w-full sm:w-auto">
+            <Button
+              type="submit"
+              disabled={isPending || components.length === 0}
+              className="w-full sm:w-auto"
+            >
               {isPending ? t('saving') : t('save')}
             </Button>
           </div>

@@ -1,7 +1,7 @@
 import type { Country } from '@prisma/client'
 
+import { INVITATION_STATUS, ROLES } from '@/src/shared/lib/constants'
 import { prisma } from '@/src/shared/lib/db'
-import { ROLES, INVITATION_STATUS } from '@/src/shared/lib/constants'
 import type { InvitationWithUser } from '@/src/shared/ui/molecules'
 
 export type { InvitationWithUser }
@@ -41,7 +41,9 @@ export interface OrganizationStats {
   }>
 }
 
-export async function getAdminHROrganization(organizationId: string): Promise<OrganizationStats | null> {
+export async function getAdminHROrganization(
+  organizationId: string
+): Promise<OrganizationStats | null> {
   const organization = await prisma.organization.findUnique({
     where: { id: organizationId },
     select: {
@@ -64,9 +66,7 @@ export async function getAdminHROrganization(organizationId: string): Promise<Or
     },
   })
 
-  if (!organization) 
-    return null
-  
+  if (!organization) return null
 
   const [
     chiefsCount,

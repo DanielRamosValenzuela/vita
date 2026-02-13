@@ -38,9 +38,7 @@ export function OrganizationAlerts({ organizationId, alerts }: OrganizationAlert
     ? alerts.alerts.filter((alert) => alert.organizationId === organizationId)
     : alerts.alerts
 
-  if (filteredAlerts.length === 0) 
-    return null
-  
+  if (filteredAlerts.length === 0) return null
 
   const criticalAlerts = filteredAlerts.filter((alert) => alert.alertType === 'critical')
   const warningAlerts = filteredAlerts.filter((alert) => alert.alertType === 'warning')
@@ -77,7 +75,10 @@ export function OrganizationAlerts({ organizationId, alerts }: OrganizationAlert
 
         {criticalAlerts.length > 0 && (
           <section className="space-y-2" aria-labelledby="alerts-critical-heading" role="alert">
-            <h3 id="alerts-critical-heading" className="flex items-center gap-2 text-sm font-medium text-destructive">
+            <h3
+              id="alerts-critical-heading"
+              className="flex items-center gap-2 text-sm font-medium text-destructive"
+            >
               <AlertCircle className="h-4 w-4" aria-hidden />
               {t('limitsReached', { count: criticalAlerts.length })}
             </h3>
@@ -104,7 +105,10 @@ export function OrganizationAlerts({ organizationId, alerts }: OrganizationAlert
 
         {warningAlerts.length > 0 && (
           <section className="space-y-2" aria-labelledby="alerts-warning-heading">
-            <h3 id="alerts-warning-heading" className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+            <h3
+              id="alerts-warning-heading"
+              className="flex items-center gap-2 text-sm font-medium text-muted-foreground"
+            >
               <AlertTriangle className="h-4 w-4" aria-hidden />
               {t('nearLimit', { count: warningAlerts.length })}
             </h3>

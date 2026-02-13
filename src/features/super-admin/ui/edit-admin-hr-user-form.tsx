@@ -60,9 +60,7 @@ export function EditAdminHRUserForm({ user, organizations }: EditAdminHRUserForm
   const onSubmit = async (data: UpdateAdminHRUserInput) => {
     setError(null)
 
-    if (!data.password || data.password === '') 
-      delete data.password
-    
+    if (!data.password || data.password === '') delete data.password
 
     startTransition(async () => {
       const result = await updateAdminHRUserAction(user.id, data)

@@ -7,7 +7,6 @@ import { Edit, Plus, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { formatDate } from '@/src/shared/lib/utils/format'
-
 import {
   AlertDialog,
   AlertDialogAction,
@@ -65,9 +64,7 @@ export function AdminHRUsersTableClient({ users }: AdminHRUsersTableClientProps)
         toast.success(t('deleteSuccess'))
         setDeleteDialog({ open: false, id: '', name: '' })
         router.refresh()
-      } else 
-        toast.error(result.error || t('deleteError'))
-      
+      } else toast.error(result.error || t('deleteError'))
     })
   }
 
@@ -75,7 +72,9 @@ export function AdminHRUsersTableClient({ users }: AdminHRUsersTableClientProps)
     <section className="space-y-4" aria-labelledby="admin-hr-users-heading">
       <header className="flex items-center justify-between">
         <div>
-          <h2 id="admin-hr-users-heading" className="text-2xl font-bold tracking-tight">{t('title')}</h2>
+          <h2 id="admin-hr-users-heading" className="text-2xl font-bold tracking-tight">
+            {t('title')}
+          </h2>
           <p className="text-muted-foreground mt-1">{t('description')}</p>
         </div>
         <Button onClick={() => router.push('/dashboard/admin-hr-users/new')}>
@@ -85,63 +84,64 @@ export function AdminHRUsersTableClient({ users }: AdminHRUsersTableClientProps)
       </header>
 
       {users.length === 0 ? (
-        <section className="text-muted-foreground rounded-lg border p-8 text-center" aria-label={t('empty')}>
-            <p className="mb-4">{t('empty')}</p>
-            <Button variant="outline" onClick={() => router.push('/dashboard/admin-hr-users/new')}>
-              {t('createFirst')}
-            </Button>
-          </section>
-        ) : (
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{t('table.name')}</TableHead>
-                  <TableHead>{t('table.email')}</TableHead>
-                  <TableHead>{t('table.organization')}</TableHead>
-                  <TableHead>{t('table.createdAt')}</TableHead>
-                  <TableHead className="text-right">{t('table.actions')}</TableHead>
+        <section
+          className="text-muted-foreground rounded-lg border p-8 text-center"
+          aria-label={t('empty')}
+        >
+          <p className="mb-4">{t('empty')}</p>
+          <Button variant="outline" onClick={() => router.push('/dashboard/admin-hr-users/new')}>
+            {t('createFirst')}
+          </Button>
+        </section>
+      ) : (
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>{t('table.name')}</TableHead>
+                <TableHead>{t('table.email')}</TableHead>
+                <TableHead>{t('table.organization')}</TableHead>
+                <TableHead>{t('table.createdAt')}</TableHead>
+                <TableHead className="text-right">{t('table.actions')}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {users.map((user) => (
+                <TableRow key={user.id}>
+                  <TableCell className="font-medium">{user.name}</TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>
+                    {user.organization ? (
+                      <Badge variant="outline">{user.organization.name}</Badge>
+                    ) : (
+                      <span className="text-muted-foreground text-sm">{t('noOrganization')}</span>
+                    )}
+                  </TableCell>
+                  <TableCell>{formatDate(new Date(user.createdAt), locale)}</TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => router.push(`/dashboard/admin-hr-users/${user.id}/edit`)}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDelete(user.id, user.name)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {users.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell className="font-medium">{user.name}</TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>
-                      {user.organization ? (
-                        <Badge variant="outline">{user.organization.name}</Badge>
-                      ) : (
-                        <span className="text-muted-foreground text-sm">{t('noOrganization')}</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {formatDate(new Date(user.createdAt), locale)}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => router.push(`/dashboard/admin-hr-users/${user.id}/edit`)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDelete(user.id, user.name)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        )}
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
 
       <AlertDialog
         open={deleteDialog.open}

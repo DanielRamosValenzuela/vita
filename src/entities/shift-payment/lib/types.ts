@@ -1,10 +1,10 @@
 import type {
+  ApplyCondition,
   ComponentType,
   ComponentUnit,
-  ApplyCondition,
-  ShiftClassification,
-  DayType,
   Currency,
+  DayType,
+  ShiftClassification,
 } from '@prisma/client'
 
 export interface PaymentComponent {

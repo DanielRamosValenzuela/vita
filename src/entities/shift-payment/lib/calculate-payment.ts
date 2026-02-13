@@ -1,13 +1,13 @@
 import { ComponentUnit, Currency, DayType } from '@prisma/client'
 
+import { calculateComponentValue } from './calculate-component'
+import { evaluateCondition } from './evaluate-condition'
 import type {
+  ComponentCalculation,
   PaymentCalculationInput,
   PaymentCalculationOutput,
   ShiftContext,
-  ComponentCalculation,
 } from './types'
-import { evaluateCondition } from './evaluate-condition'
-import { calculateComponentValue } from './calculate-component'
 
 const RELATIVE_UNITS: ComponentUnit[] = [ComponentUnit.PERCENTAGE, ComponentUnit.MULTIPLIER]
 
@@ -24,9 +24,7 @@ function roundForCurrency(amount: number, currency: Currency): number {
   return Math.round(amount * 100) / 100
 }
 
-export function calculatePayment(
-  input: PaymentCalculationInput
-): PaymentCalculationOutput {
+export function calculatePayment(input: PaymentCalculationInput): PaymentCalculationOutput {
   const { shift, shiftType, contract, components, calendarDay, currency } = input
 
   const scheduledMinutes = Math.round(
@@ -91,8 +89,7 @@ export function calculatePayment(
     const calc = calculateComponentValue(component, context, 0)
     breakdowns.push(calc)
 
-    if (!calc.skipped)
-      baseAmount += calc.calculatedValue
+    if (!calc.skipped) baseAmount += calc.calculatedValue
   }
 
   let bonusAmount = 0
@@ -125,8 +122,7 @@ export function calculatePayment(
     const calc = calculateComponentValue(component, context, baseAmount)
     breakdowns.push(calc)
 
-    if (!calc.skipped)
-      bonusAmount += calc.calculatedValue
+    if (!calc.skipped) bonusAmount += calc.calculatedValue
   }
 
   const customMultiplier = contract.customMultiplier ?? 1

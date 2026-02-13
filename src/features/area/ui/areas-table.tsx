@@ -2,13 +2,10 @@
 
 import { useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
-import { useRouter } from '@/i18n/navigation'
 import Link from 'next/link'
 import { Eye, Plus, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 
-import { deleteAreaAction } from '@/src/features/area/api'
-import { renderIcon } from '@/src/shared/ui/icon-picker'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,7 +19,11 @@ import {
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
+import { renderIcon } from '@/src/shared/ui/icon-picker'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/src/shared/ui/tooltip'
+import { deleteAreaAction } from '@/src/features/area/api'
+
+import { useRouter } from '@/i18n/navigation'
 
 interface AreasTableProps {
   areas: Array<{
@@ -32,7 +33,9 @@ interface AreasTableProps {
     icon: string | null
     color: string
     isActive: boolean
-    _count?: { shiftTypes: number; userAreas?: number; contracts?: number }
+    _count?: { shiftTypes: number }
+    chiefsCount?: number
+    staffCount?: number
   }>
   canCreate?: boolean
   canDelete?: boolean
@@ -128,15 +131,9 @@ export function AreasTable({ areas, canCreate = true, canDelete = true }: AreasT
                     <td className="text-muted-foreground py-4 text-sm">
                       {area.description || '-'}
                     </td>
-                    <td className="py-4 text-sm">
-                      {area._count?.shiftTypes ?? 0}
-                    </td>
-                    <td className="py-4 text-sm">
-                      {area._count?.userAreas ?? 0}
-                    </td>
-                    <td className="py-4 text-sm">
-                      {area._count?.contracts ?? 0}
-                    </td>
+                    <td className="py-4 text-sm">{area._count?.shiftTypes ?? 0}</td>
+                    <td className="py-4 text-sm">{area.chiefsCount ?? 0}</td>
+                    <td className="py-4 text-sm">{area.staffCount ?? 0}</td>
                     <td className="py-4">
                       <Badge variant={area.isActive ? 'default' : 'secondary'}>
                         {area.isActive ? t('status.active') : t('status.inactive')}

@@ -3,15 +3,13 @@
 import { useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
+import type { Country } from '@prisma/client'
+import { format } from 'date-fns'
 import { Info } from 'lucide-react'
 import { toast } from 'sonner'
-import { format } from 'date-fns'
-import type { Country } from '@prisma/client'
 
+import { DAY_TYPES, getLocaleByCountry, type DayType } from '@/src/shared/lib/constants'
 import { Button } from '@/src/shared/ui/button'
-import { Input } from '@/src/shared/ui/input'
-import { Label } from '@/src/shared/ui/label'
-import { Textarea } from '@/src/shared/ui/textarea'
 import {
   Dialog,
   DialogContent,
@@ -19,6 +17,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/src/shared/ui/dialog'
+import { Input } from '@/src/shared/ui/input'
+import { Label } from '@/src/shared/ui/label'
 import {
   Select,
   SelectContent,
@@ -26,13 +26,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/src/shared/ui/select'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/src/shared/ui/tooltip'
-import { DAY_TYPES, getLocaleByCountry, type DayType } from '@/src/shared/lib/constants'
+import { Textarea } from '@/src/shared/ui/textarea'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/src/shared/ui/tooltip'
 
 import { upsertCalendarDayAction } from '../api/calendar-actions'
 
@@ -93,8 +88,7 @@ export function CalendarDayForm({
         toast.success(result.message)
         onOpenChange(false)
         router.refresh()
-      } else
-        toast.error(result.error)
+      } else toast.error(result.error)
     })
   }
 

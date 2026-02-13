@@ -1,8 +1,8 @@
 'use server'
 
-import { prisma } from '@/src/shared/lib/db'
-import { requireAdminHRWithOrg, requireAdminHROrChiefArea } from '@/src/shared/lib/auth'
+import { requireAdminHROrChiefArea, requireAdminHRWithOrg } from '@/src/shared/lib/auth'
 import { ROLES } from '@/src/shared/lib/constants'
+import { prisma } from '@/src/shared/lib/db'
 import type { ActionResult } from '@/src/shared/lib/types'
 import { handleActionError } from '@/src/shared/lib/utils'
 import { revalidatePaths } from '@/src/shared/lib/utils/revalidate-paths'
@@ -60,9 +60,7 @@ export interface ContractsPageData {
   areas: Array<{ id: string; name: string }>
 }
 
-export const getContractsPageDataAction = async (): Promise<
-  ActionResult<ContractsPageData>
-> => {
+export const getContractsPageDataAction = async (): Promise<ActionResult<ContractsPageData>> => {
   try {
     const session = await requireAdminHRWithOrg()
     const orgId = session.organizationId
@@ -143,10 +141,8 @@ export const getContractsPageDataAction = async (): Promise<
 
     contracts.forEach((contract) => {
       const existing = contractsByUserId.get(contract.userId)
-      if (existing)
-        existing.push(contract)
-      else
-        contractsByUserId.set(contract.userId, [contract])
+      if (existing) existing.push(contract)
+      else contractsByUserId.set(contract.userId, [contract])
     })
 
     const contractsCountByRateTemplateId = new Map<string, number>()
@@ -212,14 +208,11 @@ export const getContractsPageDataAction = async (): Promise<
   }
 }
 
-export const getStaffPageDataAction = async (): Promise<
-  ActionResult<ContractsPageData>
-> => {
+export const getStaffPageDataAction = async (): Promise<ActionResult<ContractsPageData>> => {
   try {
     const session = await requireAdminHROrChiefArea()
 
-    if (session.role === ROLES.ADMIN_HR)
-      return await getContractsPageDataAction()
+    if (session.role === ROLES.ADMIN_HR) return await getContractsPageDataAction()
 
     const userAreas = await prisma.userArea.findMany({
       where: { userId: session.id },
@@ -294,10 +287,8 @@ export const getStaffPageDataAction = async (): Promise<
 
     contracts.forEach((contract) => {
       const existing = contractsByUserId.get(contract.userId)
-      if (existing)
-        existing.push(contract)
-      else
-        contractsByUserId.set(contract.userId, [contract])
+      if (existing) existing.push(contract)
+      else contractsByUserId.set(contract.userId, [contract])
     })
 
     const contractsCountByRateTemplateId = new Map<string, number>()
@@ -356,11 +347,7 @@ export const getStaffPageDataAction = async (): Promise<
       },
     }
   } catch (error) {
-    return handleActionError(
-      error,
-      'getStaffPageDataAction',
-      'Error al obtener datos del personal'
-    )
+    return handleActionError(error, 'getStaffPageDataAction', 'Error al obtener datos del personal')
   }
 }
 
@@ -431,11 +418,7 @@ export const createContractAction = async (data: {
       message: 'Contrato creado exitosamente',
     }
   } catch (error) {
-    return handleActionError(
-      error,
-      'createContractAction',
-      'Error al crear contrato'
-    )
+    return handleActionError(error, 'createContractAction', 'Error al crear contrato')
   }
 }
 
@@ -484,17 +467,11 @@ export const updateContractAction = async (
       message: 'Contrato actualizado exitosamente',
     }
   } catch (error) {
-    return handleActionError(
-      error,
-      'updateContractAction',
-      'Error al actualizar contrato'
-    )
+    return handleActionError(error, 'updateContractAction', 'Error al actualizar contrato')
   }
 }
 
-export const endContractAction = async (
-  contractId: string
-): Promise<ActionResult<null>> => {
+export const endContractAction = async (contractId: string): Promise<ActionResult<null>> => {
   try {
     const session = await requireAdminHRWithOrg()
 
@@ -529,17 +506,11 @@ export const endContractAction = async (
       message: 'Contrato finalizado exitosamente',
     }
   } catch (error) {
-    return handleActionError(
-      error,
-      'endContractAction',
-      'Error al finalizar contrato'
-    )
+    return handleActionError(error, 'endContractAction', 'Error al finalizar contrato')
   }
 }
 
-export const deleteContractAction = async (
-  contractId: string
-): Promise<ActionResult<null>> => {
+export const deleteContractAction = async (contractId: string): Promise<ActionResult<null>> => {
   try {
     const session = await requireAdminHRWithOrg()
 
@@ -570,10 +541,6 @@ export const deleteContractAction = async (
       message: 'Contrato eliminado exitosamente',
     }
   } catch (error) {
-    return handleActionError(
-      error,
-      'deleteContractAction',
-      'Error al eliminar contrato'
-    )
+    return handleActionError(error, 'deleteContractAction', 'Error al eliminar contrato')
   }
 }

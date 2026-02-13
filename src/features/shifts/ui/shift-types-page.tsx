@@ -1,12 +1,11 @@
 'use client'
 
-import { useState, useTransition, useMemo } from 'react'
+import { useMemo, useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
-
-import { useRouter } from '@/i18n/navigation'
 import { Check, Edit, Info, Loader2, Palette, Plus, Trash2, X } from 'lucide-react'
 import { toast } from 'sonner'
 
+import { SHIFT_TYPE_ICONS } from '@/src/shared/lib/constants'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,8 +27,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/src/shared/ui/dialog'
+import { IconPicker, renderIcon } from '@/src/shared/ui/icon-picker'
 import { Input } from '@/src/shared/ui/input'
 import { Label } from '@/src/shared/ui/label'
+import { SearchableAddableList } from '@/src/shared/ui/molecules'
 import {
   Select,
   SelectContent,
@@ -37,7 +38,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/src/shared/ui/select'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/src/shared/ui/tooltip'
 import {
   Table,
   TableBody,
@@ -46,10 +46,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/src/shared/ui/table'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/src/shared/ui/tooltip'
 
-import { SHIFT_TYPE_ICONS } from '@/src/shared/lib/constants'
-import { IconPicker, renderIcon } from '@/src/shared/ui/icon-picker'
-import { SearchableAddableList } from '@/src/shared/ui/molecules'
+import { useRouter } from '@/i18n/navigation'
+
 import {
   createShiftTypeAction,
   deleteShiftTypeAction,
@@ -321,22 +321,24 @@ export function ShiftTypesPage({ shiftTypes, areas }: ShiftTypesPageProps) {
   )
 
   const predefinedColors = [
-    '#3b82f6', 
-    '#10b981', 
-    '#f59e0b', 
-    '#ef4444', 
-    '#8b5cf6', 
-    '#ec4899', 
-    '#6b7280', 
-    '#14b8a6', 
-    '#f97316', 
+    '#3b82f6',
+    '#10b981',
+    '#f59e0b',
+    '#ef4444',
+    '#8b5cf6',
+    '#ec4899',
+    '#6b7280',
+    '#14b8a6',
+    '#f97316',
   ]
 
   return (
     <section className="space-y-6" aria-labelledby="shift-types-heading">
       <header className="flex items-center justify-between">
         <div>
-          <h2 id="shift-types-heading" className="text-2xl font-bold">{t('title')}</h2>
+          <h2 id="shift-types-heading" className="text-2xl font-bold">
+            {t('title')}
+          </h2>
           <p className="text-muted-foreground mt-1">{t('description')}</p>
         </div>
         <Button onClick={handleCreate}>
@@ -353,7 +355,9 @@ export function ShiftTypesPage({ shiftTypes, areas }: ShiftTypesPageProps) {
           {shiftTypes.length === 0 ? (
             <section className="text-center py-8" aria-labelledby="shift-types-empty-heading">
               <Palette className="mx-auto h-12 w-12 text-muted-foreground mb-4" aria-hidden />
-              <h3 id="shift-types-empty-heading" className="text-lg font-medium">{t('empty.title')}</h3>
+              <h3 id="shift-types-empty-heading" className="text-lg font-medium">
+                {t('empty.title')}
+              </h3>
               <p className="text-muted-foreground mt-2">{t('empty.description')}</p>
               <Button onClick={handleCreate} className="mt-4">
                 <Plus className="mr-2 h-4 w-4" />
@@ -412,7 +416,9 @@ export function ShiftTypesPage({ shiftTypes, areas }: ShiftTypesPageProps) {
                       <span className="text-sm">
                         {shiftType.isGlobal
                           ? '-'
-                          : (shiftType._count?.areaShiftTypes ?? shiftType.areaShiftTypes?.length ?? 0)}
+                          : (shiftType._count?.areaShiftTypes ??
+                            shiftType.areaShiftTypes?.length ??
+                            0)}
                       </span>
                     </TableCell>
                     <TableCell>
@@ -449,9 +455,7 @@ export function ShiftTypesPage({ shiftTypes, areas }: ShiftTypesPageProps) {
       >
         <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
-            <DialogTitle>
-              {editingShiftType ? t('edit.title') : t('createModal.title')}
-            </DialogTitle>
+            <DialogTitle>{editingShiftType ? t('edit.title') : t('createModal.title')}</DialogTitle>
             <DialogDescription>
               {editingShiftType ? t('edit.description') : t('createModal.description')}
             </DialogDescription>
@@ -522,7 +526,9 @@ export function ShiftTypesPage({ shiftTypes, areas }: ShiftTypesPageProps) {
                 ariaLabel={t('form.iconAria')}
                 searchPlaceholder={t('form.iconSearch')}
                 statusLabel={(showing, total, hasSearch) =>
-                  hasSearch ? t('form.iconShowing', { showing, total }) : t('form.iconTotal', { total })
+                  hasSearch
+                    ? t('form.iconShowing', { showing, total })
+                    : t('form.iconTotal', { total })
                 }
               />
             </div>
@@ -564,7 +570,10 @@ export function ShiftTypesPage({ shiftTypes, areas }: ShiftTypesPageProps) {
                   <Label htmlFor="minStaffRequired">{t('form.minStaffRequired')}</Label>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Info className="text-muted-foreground h-3.5 w-3.5 shrink-0 cursor-help" aria-hidden />
+                      <Info
+                        className="text-muted-foreground h-3.5 w-3.5 shrink-0 cursor-help"
+                        aria-hidden
+                      />
                     </TooltipTrigger>
                     <TooltipContent side="top" className="max-w-xs">
                       {t('form.minStaffRequiredTooltip')}
@@ -576,9 +585,7 @@ export function ShiftTypesPage({ shiftTypes, areas }: ShiftTypesPageProps) {
                   type="number"
                   min={1}
                   value={formData.minStaffRequired}
-                  onChange={(e) =>
-                    setFormData({ ...formData, minStaffRequired: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, minStaffRequired: e.target.value })}
                 />
               </div>
               <div className="grid gap-2">
@@ -586,7 +593,10 @@ export function ShiftTypesPage({ shiftTypes, areas }: ShiftTypesPageProps) {
                   <Label htmlFor="idealStaffCount">{t('form.idealStaffCount')}</Label>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Info className="text-muted-foreground h-3.5 w-3.5 shrink-0 cursor-help" aria-hidden />
+                      <Info
+                        className="text-muted-foreground h-3.5 w-3.5 shrink-0 cursor-help"
+                        aria-hidden
+                      />
                     </TooltipTrigger>
                     <TooltipContent side="top" className="max-w-xs">
                       {t('form.idealStaffCountTooltip')}
@@ -598,9 +608,7 @@ export function ShiftTypesPage({ shiftTypes, areas }: ShiftTypesPageProps) {
                   type="number"
                   min={1}
                   value={formData.idealStaffCount}
-                  onChange={(e) =>
-                    setFormData({ ...formData, idealStaffCount: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, idealStaffCount: e.target.value })}
                 />
               </div>
             </div>
@@ -610,7 +618,10 @@ export function ShiftTypesPage({ shiftTypes, areas }: ShiftTypesPageProps) {
                   <Label htmlFor="maxStaffAllowed">{t('form.maxStaffAllowed')}</Label>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Info className="text-muted-foreground h-3.5 w-3.5 shrink-0 cursor-help" aria-hidden />
+                      <Info
+                        className="text-muted-foreground h-3.5 w-3.5 shrink-0 cursor-help"
+                        aria-hidden
+                      />
                     </TooltipTrigger>
                     <TooltipContent side="top" className="max-w-xs">
                       {t('form.maxStaffAllowedTooltip')}
@@ -622,9 +633,7 @@ export function ShiftTypesPage({ shiftTypes, areas }: ShiftTypesPageProps) {
                   type="number"
                   min={1}
                   value={formData.maxStaffAllowed}
-                  onChange={(e) =>
-                    setFormData({ ...formData, maxStaffAllowed: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, maxStaffAllowed: e.target.value })}
                 />
               </div>
             </div>
@@ -640,7 +649,10 @@ export function ShiftTypesPage({ shiftTypes, areas }: ShiftTypesPageProps) {
                 <Label htmlFor="isGlobal">{t('form.isGlobal')}</Label>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <button type="button" className="text-muted-foreground inline-flex cursor-help rounded p-0.5">
+                    <button
+                      type="button"
+                      className="text-muted-foreground inline-flex cursor-help rounded p-0.5"
+                    >
                       <Info className="h-3.5 w-3.5 shrink-0" aria-hidden />
                       <span className="sr-only">{t('form.isGlobal')}</span>
                     </button>
@@ -715,7 +727,9 @@ export function ShiftTypesPage({ shiftTypes, areas }: ShiftTypesPageProps) {
             <AlertDialogDescription>{t('form.saveConfirm.description')}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isPending}>{t('form.saveConfirm.cancel')}</AlertDialogCancel>
+            <AlertDialogCancel disabled={isPending}>
+              {t('form.saveConfirm.cancel')}
+            </AlertDialogCancel>
             <AlertDialogAction onClick={performSave} disabled={isPending}>
               {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {t('form.saveConfirm.confirm')}
@@ -748,9 +762,7 @@ export function ShiftTypesPage({ shiftTypes, areas }: ShiftTypesPageProps) {
                 <div>
                   <div className="font-medium">{deleteTarget.name}</div>
                   {deleteTarget.description && (
-                    <div className="text-sm text-muted-foreground">
-                      {deleteTarget.description}
-                    </div>
+                    <div className="text-sm text-muted-foreground">{deleteTarget.description}</div>
                   )}
                   <div className="text-xs text-muted-foreground">
                     {t('delete.shiftsCount', { count: deleteTarget._count?.shifts ?? 0 })}
@@ -785,8 +797,7 @@ export function ShiftTypesPage({ shiftTypes, areas }: ShiftTypesPageProps) {
               variant="destructive"
               onClick={confirmDelete}
               disabled={
-                isPending ||
-                Boolean(deleteTarget && (deleteTarget._count?.shifts ?? 0) > 0)
+                isPending || Boolean(deleteTarget && (deleteTarget._count?.shifts ?? 0) > 0)
               }
             >
               {isPending ? t('delete.deleting') : t('delete.confirm')}

@@ -3,10 +3,10 @@
 import { EmailProvider } from '@prisma/client'
 
 import { requireAuth } from '@/src/shared/lib/auth/session'
-import type { ActionResult } from '@/src/shared/lib/types'
-import { prisma } from '@/src/shared/lib/db'
-import { handleActionError } from '@/src/shared/lib/utils'
 import { AUTH_PROVIDERS } from '@/src/shared/lib/constants'
+import { prisma } from '@/src/shared/lib/db'
+import type { ActionResult } from '@/src/shared/lib/types'
+import { handleActionError } from '@/src/shared/lib/utils'
 
 export async function syncPrimaryEmailAction(): Promise<ActionResult<{ synced: boolean }>> {
   try {
@@ -83,6 +83,10 @@ export async function syncPrimaryEmailAction(): Promise<ActionResult<{ synced: b
       message: 'Email principal sincronizado',
     }
   } catch (error) {
-    return handleActionError(error, 'syncPrimaryEmailAction', 'Error al sincronizar email principal')
+    return handleActionError(
+      error,
+      'syncPrimaryEmailAction',
+      'Error al sincronizar email principal'
+    )
   }
 }

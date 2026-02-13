@@ -1,7 +1,7 @@
 import type { Role } from '@prisma/client'
 
-import { prisma } from '@/src/shared/lib/db'
 import { ROLES } from '@/src/shared/lib/constants'
+import { prisma } from '@/src/shared/lib/db'
 
 interface LimitAlert {
   organizationId: string
@@ -160,7 +160,7 @@ export async function getOrganizationLimitAlerts(organizationId: string): Promis
 
     const usagePercentage = (currentCount / maxLimit) * 100
 
-    if (usagePercentage >= 80) 
+    if (usagePercentage >= 80)
       alerts.push({
         organizationId: organization.id,
         organizationName: organization.name,
@@ -171,7 +171,6 @@ export async function getOrganizationLimitAlerts(organizationId: string): Promis
         alertType: usagePercentage >= 100 ? 'critical' : 'warning',
         message: `${usagePercentage >= 100 ? 'Límite alcanzado' : 'Cerca del límite'}: ${currentCount}/${maxLimit} para ${getRoleLabel(role)}`,
       })
-    
   }
 
   return alerts.sort((a, b) => b.usagePercentage - a.usagePercentage)

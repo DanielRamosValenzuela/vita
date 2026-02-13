@@ -8,6 +8,7 @@
 ## 📋 Problema
 
 Antes, las traducciones faltantes solo se detectaban cuando el usuario veía un error en la pantalla, causando:
+
 - Mala experiencia de usuario
 - Pérdida de tiempo en debugging
 - Traducciones incompletas en producción
@@ -37,6 +38,7 @@ El sistema ahora incluye:
 ```
 
 **En la UI verás:**
+
 ```
 [MISSING: profile.personalInfo.phone]
 ```
@@ -48,6 +50,7 @@ Esto te permite identificar **inmediatamente** qué traducción falta sin tener 
 **Script creado:** `scripts/check-translations.js`
 
 **Uso:**
+
 ```bash
 npm run i18n:check
 ```
@@ -83,11 +86,13 @@ npm run i18n:check
 **Archivo modificado:** `package.json`
 
 El script `npm run build` ahora ejecuta:
+
 ```bash
 npm run lint && npm run i18n:check && next build
 ```
 
 **Esto significa:**
+
 - ❌ **No puedes hacer build si faltan traducciones**
 - ✅ Garantiza que producción siempre tiene traducciones completas
 - ✅ Detecta errores antes de desplegar
@@ -96,11 +101,11 @@ npm run lint && npm run i18n:check && next build
 
 ## 🚀 Comandos Disponibles
 
-| Comando | Descripción |
-|---------|-------------|
-| `npm run i18n:check` | Valida traducciones (sin hacer build) |
-| `npm run build` | Valida traducciones + lint + build |
-| `npm run dev` | Desarrollo (logs en consola cuando falta traducción) |
+| Comando              | Descripción                                          |
+| -------------------- | ---------------------------------------------------- |
+| `npm run i18n:check` | Valida traducciones (sin hacer build)                |
+| `npm run build`      | Valida traducciones + lint + build                   |
+| `npm run dev`        | Desarrollo (logs en consola cuando falta traducción) |
 
 ---
 
@@ -131,6 +136,7 @@ messages/
 ```
 
 **Reglas:**
+
 - ✅ Todas las claves en `es.json` **deben** estar en `en.json`
 - ✅ Todas las claves en `en.json` **deben** estar en `es.json`
 - ❌ No dejar claves vacías (`""` o `null`)
@@ -141,6 +147,7 @@ messages/
 ## 🔍 Ejemplo: Agregar Nueva Traducción
 
 **1. Agrega la clave en `messages/es.json`:**
+
 ```json
 {
   "profile": {
@@ -154,6 +161,7 @@ messages/
 ```
 
 **2. Agrega la misma estructura en `messages/en.json`:**
+
 ```json
 {
   "profile": {
@@ -167,23 +175,20 @@ messages/
 ```
 
 **3. Valida:**
+
 ```bash
 npm run i18n:check
 ```
 
 **4. Usa en tu código:**
+
 ```tsx
 import { useTranslations } from 'next-intl'
 
 export function PhoneInput() {
   const t = useTranslations('profile.personalInfo')
-  
-  return (
-    <Input
-      label={t('phoneLabel')}
-      placeholder={t('phonePlaceholder')}
-    />
-  )
+
+  return <Input label={t('phoneLabel')} placeholder={t('phonePlaceholder')} />
 }
 ```
 
@@ -194,6 +199,7 @@ export function PhoneInput() {
 ### El script dice que falta una clave pero yo la veo en el archivo
 
 **Posibles causas:**
+
 1. **Espacios en blanco extra**: `"key "` vs `"key"`
 2. **Mayúsculas/minúsculas**: `"Phone"` vs `"phone"`
 3. **Anidamiento incorrecto**: Verifica que la estructura JSON coincida
@@ -201,6 +207,7 @@ export function PhoneInput() {
 ### El script pasa pero sigo viendo `[MISSING: ...]` en la UI
 
 **Posibles causas:**
+
 1. **Reinicia el servidor**: `npm run dev` (Ctrl+C y volver a ejecutar)
 2. **Borra `.next`**: `rm -rf .next` (Windows: `rmdir /s .next`)
 3. **Verifica el namespace**: Asegúrate de usar el namespace correcto en `useTranslations()`
@@ -208,6 +215,7 @@ export function PhoneInput() {
 ### Quiero deshabilitar la validación temporalmente
 
 **Para desarrollo:**
+
 ```json
 // package.json
 "scripts": {
@@ -233,6 +241,7 @@ export function PhoneInput() {
 **Resultado:** ❌ 25 traducciones faltantes detectadas
 
 ### Traducciones faltantes en ES (14):
+
 - `superAdmin.organizations.roles.*` (4 claves)
 - `superAdmin.organizations.actions`
 - `superAdmin.createOrganization.form.address`
@@ -240,6 +249,7 @@ export function PhoneInput() {
 - `adminHR.rates.rateTemplateForm.*` (7 claves)
 
 ### Traducciones faltantes en EN (11):
+
 - `superAdmin.organizations.actions.*` (5 claves)
 - `superAdmin.createOrganization.form.address.*` (2 claves)
 - `superAdmin.organizationDetails.overview.updatedAt`

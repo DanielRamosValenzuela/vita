@@ -47,9 +47,7 @@ export function SearchableAddableList<T>({
   const filteredItems = useMemo(() => {
     if (!search.trim()) return availableItems
     const q = search.trim().toLowerCase()
-    return availableItems.filter((item) =>
-      getSearchableText(item).toLowerCase().includes(q)
-    )
+    return availableItems.filter((item) => getSearchableText(item).toLowerCase().includes(q))
   }, [availableItems, search, getSearchableText])
 
   const selectedItems = useMemo(() => {
@@ -123,9 +121,7 @@ export function SearchableAddableList<T>({
 
       {selectedItems.length > 0 && (
         <div className="space-y-2">
-          {selectedLabel && (
-            <p className="text-sm font-medium">{selectedLabel}</p>
-          )}
+          {selectedLabel && <p className="text-sm font-medium">{selectedLabel}</p>}
           <ul
             className="flex flex-wrap gap-2 rounded-md border bg-muted/30 p-3"
             role="list"

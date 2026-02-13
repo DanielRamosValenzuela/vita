@@ -2,9 +2,9 @@
 
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
+import { useRouter } from 'next/navigation'
 import type { Country } from '@prisma/client'
 import { CheckCircle2, Pencil } from 'lucide-react'
-import { useRouter } from 'next/navigation'
 
 import { formatTaxId, getTaxIdConfig } from '@/src/shared/lib/utils/tax-id-config'
 import { Button } from '@/src/shared/ui/button'
@@ -55,9 +55,7 @@ export function DocumentSection({ user }: DocumentSectionProps) {
           </span>
           {t('registeredTitle')}
         </CardTitle>
-        <CardDescription className="mt-1">
-          {t('registeredDescription')}
-        </CardDescription>
+        <CardDescription className="mt-1">{t('registeredDescription')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <dl
@@ -68,9 +66,7 @@ export function DocumentSection({ user }: DocumentSectionProps) {
             <dt className="text-muted-foreground text-xs font-medium uppercase tracking-wider">
               {t('country.label')}
             </dt>
-            <dd className="font-medium">
-              {tOrgs(`countries.${docUser.country}`)}
-            </dd>
+            <dd className="font-medium">{tOrgs(`countries.${docUser.country}`)}</dd>
           </div>
           <div className="space-y-1">
             <dt className="text-muted-foreground text-xs font-medium uppercase tracking-wider">

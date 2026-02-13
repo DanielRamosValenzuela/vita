@@ -1,7 +1,7 @@
 'use client'
 
-import { Building2, Users, UserCheck, UserX } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { Building2, UserCheck, Users, UserX } from 'lucide-react'
 
 import { ORGANIZATION_STATUS_BADGE_VARIANTS } from '@/src/shared/lib/constants'
 import { Badge } from '@/src/shared/ui/badge'
@@ -15,7 +15,10 @@ interface OrganizationViewProps {
 
 export function OrganizationView({ organization }: OrganizationViewProps) {
   const t = useTranslations('adminHR.organization')
-  const statusVariant = ORGANIZATION_STATUS_BADGE_VARIANTS[organization.status as keyof typeof ORGANIZATION_STATUS_BADGE_VARIANTS] ?? 'secondary'
+  const statusVariant =
+    ORGANIZATION_STATUS_BADGE_VARIANTS[
+      organization.status as keyof typeof ORGANIZATION_STATUS_BADGE_VARIANTS
+    ] ?? 'secondary'
 
   return (
     <section className="space-y-6" aria-labelledby="org-overview-heading">
@@ -25,7 +28,9 @@ export function OrganizationView({ organization }: OrganizationViewProps) {
             <div className="flex items-center gap-3">
               <Building2 className="h-6 w-6 text-primary" aria-hidden />
               <div>
-                <CardTitle id="org-overview-heading" className="text-2xl">{organization.name}</CardTitle>
+                <CardTitle id="org-overview-heading" className="text-2xl">
+                  {organization.name}
+                </CardTitle>
                 <CardDescription className="mt-1">{t('organizationInfo')}</CardDescription>
               </div>
             </div>
@@ -46,9 +51,7 @@ export function OrganizationView({ organization }: OrganizationViewProps) {
             <div className="text-2xl font-bold">
               {organization.currentAdminHR} / {organization.maxAdminHR}
             </div>
-            <p className="text-muted-foreground text-xs">
-              {t('stats.adminHR.description')}
-            </p>
+            <p className="text-muted-foreground text-xs">{t('stats.adminHR.description')}</p>
           </CardContent>
         </Card>
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useEffect } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { format } from 'date-fns'
@@ -10,9 +10,12 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { Button } from '@/src/shared/ui/button'
+import { Calendar } from '@/src/shared/ui/calendar'
 import { Card, CardContent, CardHeader, CardTitle } from '@/src/shared/ui/card'
+import { Checkbox } from '@/src/shared/ui/checkbox'
 import { Input } from '@/src/shared/ui/input'
 import { Label } from '@/src/shared/ui/label'
+import { Popover, PopoverContent, PopoverTrigger } from '@/src/shared/ui/popover'
 import {
   Select,
   SelectContent,
@@ -22,9 +25,6 @@ import {
 } from '@/src/shared/ui/select'
 import { Textarea } from '@/src/shared/ui/textarea'
 
-import { Calendar } from '@/src/shared/ui/calendar'
-import { Checkbox } from '@/src/shared/ui/checkbox'
-import { Popover, PopoverContent, PopoverTrigger } from '@/src/shared/ui/popover'
 import { checkShiftConflictsClient } from '@/src/entities/shift/lib/shift-validation-client'
 
 import type { CreateShiftData, CreateShiftFormData } from '../types/shift-types'
@@ -55,7 +55,7 @@ export type ShiftTypeOption = {
 
 interface ShiftFormProps {
   _organizationId: string
-  users: Array<{ id: string; name: string; role: string }>
+  users: Array<{ id: string; name: string; role: string; areaIds?: string[] }>
   areas: Array<{ id: string; name: string; description?: string }>
   shiftTypes: ShiftTypeOption[]
   initialData?: Partial<ShiftFormData>
@@ -102,18 +102,32 @@ export function ShiftForm({
     )
   }, [shiftTypes, areaId])
 
+  const availableUsers = useMemo(() => {
+    if (!areaId) return []
+    return users.filter(
+      (u) => u.role !== 'STAFF_HEALTH' || (Array.isArray(u.areaIds) && u.areaIds.includes(areaId))
+    )
+  }, [users, areaId])
+
   useEffect(() => {
     const currentId = form.getValues('shiftTypeId')
     if (currentId && !availableShiftTypes.some((st) => st.id === currentId))
       form.setValue('shiftTypeId', '')
   }, [availableShiftTypes, form])
 
-  const selectedUser = users.find((user) => user.id === form.watch('userId'))
+  useEffect(() => {
+    const currentUserId = form.getValues('userId')
+    if (currentUserId && !availableUsers.some((u) => u.id === currentUserId))
+      form.setValue('userId', '')
+  }, [availableUsers, form])
+
+  const selectedUser = availableUsers.find((user) => user.id === form.watch('userId'))
   const selectedArea = areas.find((area) => area.id === areaId)
-  const selectedShiftType = availableShiftTypes.find((type) => type.id === form.watch('shiftTypeId'))
+  const selectedShiftType = availableShiftTypes.find(
+    (type) => type.id === form.watch('shiftTypeId')
+  )
 
   const handleSubmit = async (data: CreateShiftFormData) => {
-    
     const startDateTime = new Date(data.startDate)
     const [startHour, startMinute] = data.startTime.split(':')
     startDateTime.setHours(parseInt(startHour), parseInt(startMinute), 0, 0)
@@ -122,7 +136,6 @@ export function ShiftForm({
     const [endHour, endMinute] = data.endTime.split(':')
     endDateTime.setHours(parseInt(endHour), parseInt(endMinute), 0, 0)
 
-    
     setIsCheckingConflicts(true)
     try {
       const conflictResult = checkShiftConflictsClient(startDateTime, endDateTime)
@@ -132,7 +145,6 @@ export function ShiftForm({
         return
       }
 
-      
       const shiftData: CreateShiftData = {
         ...data,
         startTime: startDateTime,
@@ -169,7 +181,7 @@ export function ShiftForm({
                   <SelectValue placeholder={t('userPlaceholder')} />
                 </SelectTrigger>
                 <SelectContent>
-                  {users.map((user) => (
+                  {availableUsers.map((user) => (
                     <SelectItem key={user.id} value={user.id}>
                       {user.name} ({user.role})
                     </SelectItem>

@@ -1,7 +1,7 @@
 import type { Country, OrganizationPlan, OrganizationStatus, Prisma } from '@prisma/client'
 
-import { prisma } from '@/src/shared/lib/db'
 import { ROLES } from '@/src/shared/lib/constants'
+import { prisma } from '@/src/shared/lib/db'
 
 export type OrganizationWithDetails = Prisma.OrganizationGetPayload<{
   include: {
@@ -29,25 +29,18 @@ export const getOrganizations = async (params: GetOrganizationsParams = {}) => {
 
   const where: Prisma.OrganizationWhereInput = {}
 
-  if (search) 
+  if (search)
     where.OR = [
       { name: { contains: search, mode: 'insensitive' } },
       { taxId: { contains: search, mode: 'insensitive' } },
       { contactEmail: { contains: search, mode: 'insensitive' } },
     ]
-  
 
-  if (status) 
-    where.status = status
-  
+  if (status) where.status = status
 
-  if (plan) 
-    where.plan = plan
-  
+  if (plan) where.plan = plan
 
-  if (country) 
-    where.country = country
-  
+  if (country) where.country = country
 
   const [organizations, total] = await Promise.all([
     prisma.organization.findMany({
@@ -80,9 +73,7 @@ export const getOrganizations = async (params: GetOrganizationsParams = {}) => {
   }
 }
 
-export const getOrganizationById = async (
-  id: string
-): Promise<OrganizationWithDetails | null> => {
+export const getOrganizationById = async (id: string): Promise<OrganizationWithDetails | null> => {
   const organization = await prisma.organization.findUnique({
     where: { id },
     include: {
@@ -122,9 +113,7 @@ export const getOrganizationById = async (
 export const checkTaxIdExists = async (taxId: string, excludeId?: string) => {
   const where: Prisma.OrganizationWhereInput = { taxId }
 
-  if (excludeId) 
-    where.id = { not: excludeId }
-  
+  if (excludeId) where.id = { not: excludeId }
 
   const count = await prisma.organization.count({ where })
   return count > 0
@@ -178,9 +167,7 @@ export const updateOrganization = async (
 ) => {
   if (data.taxId) {
     const taxIdExists = await checkTaxIdExists(data.taxId, id)
-    if (taxIdExists) 
-      throw new Error('Ya existe una organización con ese RUT/Tax ID')
-    
+    if (taxIdExists) throw new Error('Ya existe una organización con ese RUT/Tax ID')
   }
 
   if (
@@ -202,23 +189,20 @@ export const updateOrganization = async (
     const currentChiefs = userCounts.find((u) => u.role === ROLES.CHIEF_AREA)?._count.id || 0
     const currentStaff = userCounts.find((u) => u.role === ROLES.STAFF_HEALTH)?._count.id || 0
 
-    if (data.maxAdminHR !== undefined && data.maxAdminHR < currentAdminHR) 
+    if (data.maxAdminHR !== undefined && data.maxAdminHR < currentAdminHR)
       throw new Error(
         `No puedes reducir el límite de Admin HR a ${data.maxAdminHR} porque ya tienes ${currentAdminHR} usuarios con ese rol`
       )
-    
 
-    if (data.maxChiefs !== undefined && data.maxChiefs < currentChiefs) 
+    if (data.maxChiefs !== undefined && data.maxChiefs < currentChiefs)
       throw new Error(
         `No puedes reducir el límite de Jefes a ${data.maxChiefs} porque ya tienes ${currentChiefs} usuarios con ese rol`
       )
-    
 
-    if (data.maxStaff !== undefined && data.maxStaff < currentStaff) 
+    if (data.maxStaff !== undefined && data.maxStaff < currentStaff)
       throw new Error(
         `No puedes reducir el límite de Staff a ${data.maxStaff} porque ya tienes ${currentStaff} usuarios con ese rol`
       )
-    
   }
 
   const updateData = Object.fromEntries(

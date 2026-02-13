@@ -16,9 +16,7 @@ export default async function LoginPage({
   const session = await getServerSession(authOptions)
   const t = await getTranslations({ locale, namespace: 'auth' })
 
-  if (session) 
-    redirect(`/${locale}`)
-  
+  if (session) redirect(`/${locale}`)
 
   const { registered } = await searchParams
 

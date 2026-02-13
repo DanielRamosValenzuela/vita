@@ -1,5 +1,7 @@
-import { getPendingInvitationsForUser } from '@/src/entities/invitation'
 import { NOTIFICATIONS_LIMITS } from '@/src/shared/lib/constants'
+
+import { getPendingInvitationsForUser } from '@/src/entities/invitation'
+
 import { NOTIFICATION_TYPES, type PendingNotification } from './types'
 
 interface GetUserPendingNotificationsParams {
@@ -13,8 +15,7 @@ export async function getUserPendingNotifications({
 
   const invitations = await getPendingInvitationsForUser(userId)
 
-  if (!invitations.length)
-    return notifications
+  if (!invitations.length) return notifications
 
   invitations.slice(0, NOTIFICATIONS_LIMITS.INVITATIONS_PER_USER).forEach((invitation) => {
     const organizationName = invitation.organization?.name
@@ -32,4 +33,3 @@ export async function getUserPendingNotifications({
 
   return notifications
 }
-

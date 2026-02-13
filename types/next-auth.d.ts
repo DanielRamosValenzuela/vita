@@ -16,18 +16,18 @@ declare module 'next-auth' {
     }
   }
 
-    interface User {
-      id: string
-      email: string
-      name: string
-      image?: string
-      customImage?: string
-      role: Role
-      organizationId?: string
-      country?: Country
-      docType?: DocType
-      docNumber?: string
-    }
+  interface User {
+    id: string
+    email: string
+    name: string
+    image?: string
+    customImage?: string
+    role: Role
+    organizationId?: string
+    country?: Country
+    docType?: DocType
+    docNumber?: string
+  }
 }
 
 declare module 'next-auth/jwt' {

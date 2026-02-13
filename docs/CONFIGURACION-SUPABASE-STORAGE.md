@@ -57,7 +57,7 @@ VALUES ('avatars', 'avatars', true);
 CREATE POLICY "Users can upload their own avatar"
 ON storage.objects FOR INSERT
 WITH CHECK (
-  bucket_id = 'avatars' 
+  bucket_id = 'avatars'
   AND (storage.foldername(name))[1] = auth.uid()::text
 );
 
@@ -70,7 +70,7 @@ USING (bucket_id = 'avatars');
 CREATE POLICY "Users can update their own avatar"
 ON storage.objects FOR UPDATE
 USING (
-  bucket_id = 'avatars' 
+  bucket_id = 'avatars'
   AND (storage.foldername(name))[1] = auth.uid()::text
 );
 
@@ -78,7 +78,7 @@ USING (
 CREATE POLICY "Users can delete their own avatar"
 ON storage.objects FOR DELETE
 USING (
-  bucket_id = 'avatars' 
+  bucket_id = 'avatars'
   AND (storage.foldername(name))[1] = auth.uid()::text
 );
 ```
@@ -115,16 +115,19 @@ Cada usuario solo puede acceder a su propia carpeta debido a las políticas de R
 ## Límites y Consideraciones
 
 ### Supabase Storage (Free Tier)
+
 - **Almacenamiento**: 1 GB
 - **Transferencia**: 2 GB/mes
 - **Tamaño máximo por archivo**: 50 MB (límite del servicio)
 
 ### Límites Configurados en la App
+
 - **Tamaño máximo**: 5 MB por imagen
 - **Formatos**: JPG, PNG, GIF, WebP
 - **Optimización**: Ninguna (por ahora)
 
 ### Mejoras Futuras
+
 - [ ] Redimensionamiento automático a 512x512px
 - [ ] Conversión a WebP para mejor compresión
 - [ ] Thumbnails (128x128px)
@@ -135,15 +138,19 @@ Cada usuario solo puede acceder a su propia carpeta debido a las políticas de R
 ## Troubleshooting
 
 ### Error: "Missing Supabase credentials"
+
 **Solución**: Asegúrate de que las variables están en `.env` y reinicia el servidor.
 
 ### Error: "Error al subir la imagen"
+
 **Posibles causas**:
+
 1. Bucket `avatars` no existe → Créalo en el dashboard
 2. Políticas RLS no configuradas → Ejecuta el SQL de arriba
 3. Service role key incorrecta → Verifica que copiaste la correcta
 
 ### La imagen se sube pero no se ve
+
 **Solución**: Asegúrate de que el bucket sea **público** (checkbox activado al crear).
 
 ---

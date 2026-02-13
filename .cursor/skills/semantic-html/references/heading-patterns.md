@@ -18,13 +18,13 @@ Make heading level a prop/parameter with a sensible default.
 ```jsx
 // React example
 function Card({ title, headingLevel = 3, children }) {
-  const Heading = `h${headingLevel}`;
+  const Heading = `h${headingLevel}`
   return (
     <article className="card">
       <Heading>{title}</Heading>
       {children}
     </article>
-  );
+  )
 }
 ```
 
@@ -61,7 +61,7 @@ function Section({ title, children }) {
       <h2 id="section-title">{title}</h2>
       {children}
     </section>
-  );
+  )
 }
 
 // Cards within sections default to h3
@@ -74,7 +74,7 @@ function CardList({ cards }) {
         </li>
       ))}
     </ul>
-  );
+  )
 }
 ```
 
@@ -95,17 +95,17 @@ function CardList({ cards }) {
 Create a heading component that handles both semantic and visual concerns.
 
 ```jsx
-function Heading({ level, visualLevel = level, children, className = "" }) {
-  const Tag = `h${level}`;
-  const visualClass = `u-heading-${visualLevel}`;
+function Heading({ level, visualLevel = level, children, className = '' }) {
+  const Tag = `h${level}`
+  const visualClass = `u-heading-${visualLevel}`
 
-  return <Tag className={`${visualClass} ${className}`}>{children}</Tag>;
+  return <Tag className={`${visualClass} ${className}`}>{children}</Tag>
 }
 
 // Usage: semantic h3, visual appearance of h2
-<Heading level={3} visualLevel={2}>
+;<Heading level={3} visualLevel={2}>
   Section Title
-</Heading>;
+</Heading>
 ```
 
 ### When to Use
@@ -127,27 +127,23 @@ Generic components inherit heading config when specialised.
 ```jsx
 // Generic card
 function Card({ title, headingLevel = 3, headingClass, children }) {
-  const Heading = `h${headingLevel}`;
+  const Heading = `h${headingLevel}`
   return (
     <article className="card">
       <Heading className={headingClass}>{title}</Heading>
       {children}
     </article>
-  );
+  )
 }
 
 // Specialised product card - knows its context
 function ProductCard({ product, headingLevel = 3 }) {
   return (
-    <Card
-      title={product.name}
-      headingLevel={headingLevel}
-      headingClass="product-card__title"
-    >
+    <Card title={product.name} headingLevel={headingLevel} headingClass="product-card__title">
       <p className="product-card__price">{product.price}</p>
       <p className="product-card__description">{product.description}</p>
     </Card>
-  );
+  )
 }
 
 // Page section - sets context for children
@@ -163,7 +159,7 @@ function FeaturedProducts({ products }) {
         ))}
       </ul>
     </section>
-  );
+  )
 }
 ```
 
@@ -244,7 +240,7 @@ function Card({ title }) {
     <article>
       <h3>{title}</h3> {/* What if this is used at h2 level? */}
     </article>
-  );
+  )
 }
 ```
 
@@ -263,13 +259,13 @@ function Card({ title }) {
 ```jsx
 // Dangerous: undefined heading level
 function Card({ title, headingLevel }) {
-  const Heading = `h${headingLevel}`; // h undefined if not passed
-  return <Heading>{title}</Heading>;
+  const Heading = `h${headingLevel}` // h undefined if not passed
+  return <Heading>{title}</Heading>
 }
 
 // Safe: always has a valid level
 function Card({ title, headingLevel = 3 }) {
-  const Heading = `h${headingLevel}`;
-  return <Heading>{title}</Heading>;
+  const Heading = `h${headingLevel}`
+  return <Heading>{title}</Heading>
 }
 ```

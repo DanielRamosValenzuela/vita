@@ -1,6 +1,6 @@
 import { ApplyCondition, ComponentUnit } from '@prisma/client'
 
-import type { PaymentComponent, ShiftContext, ComponentCalculation } from './types'
+import type { ComponentCalculation, PaymentComponent, ShiftContext } from './types'
 
 const PAYROLL_UNITS: ComponentUnit[] = [
   ComponentUnit.MONTHLY,

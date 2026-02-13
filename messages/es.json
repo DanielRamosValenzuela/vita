@@ -1347,8 +1347,19 @@
         "chiefDocNumber": "Documento",
         "assignedChiefsLabel": "Jefes asignados a esta área",
         "noChiefs": "No hay jefes de área en la organización. Invita a un jefe desde Mi Organización.",
+        "chiefsReadOnlyDescription": "Jefes asignados a esta área. Solo el ADMIN HR puede modificar la asignación.",
+        "noChiefsAssigned": "Ningún jefe asignado a esta área.",
         "removeChief": "Quitar {name}",
-        "chiefsAssignedCount": "{count} jefe(s) asignado(s)"
+        "chiefsAssignedCount": "{count} jefe(s) asignado(s)",
+        "staff": "Personal del área",
+        "staffDescription": "Asigna el personal que puede recibir turnos en esta área. Solo podrás dar turnos a quienes estén asignados aquí.",
+        "staffSearch": "Buscar por nombre, email o documento...",
+        "staffDocNumber": "Documento",
+        "assignedStaffLabel": "Personal asignado a esta área",
+        "noStaffInOrg": "No hay personal en la organización. El personal que invites con rol Staff aparecerá aquí.",
+        "noStaffInArea": "Ninguno asignado aún",
+        "removeStaff": "Quitar {name}",
+        "staffAssignedCount": "{count} persona(s) asignada(s)"
       },
       "back": "Volver",
       "save": "Guardar",
@@ -1417,9 +1428,9 @@
         "statusNoContract": "Sin contrato",
         "multiplier": "Multiplicador",
         "multiplierValue": "Multiplicador: {value}x",
-      "actions": "Acciones",
-      "endContract": "Finalizar contrato",
-      "viewRates": "Ver tarifas ({count})"
+        "actions": "Acciones",
+        "endContract": "Finalizar contrato",
+        "viewRates": "Ver tarifas ({count})"
       },
       "contract": {
         "create": "Asignar tarifa",
@@ -1455,7 +1466,7 @@
           "delete": "Eliminar contrato: borrar esta tarifa por completo. Úsalo solo si fue creada por error.",
           "assign": "Asignar la primera tarifa a esta persona",
           "add": "Cambiar la tarifa actual por otra nueva"
-          },
+        },
         "viewAllTitle": "Tarifas asignadas a {name}",
         "viewAllDescription": "Esta persona tiene más de una tarifa activa. Revisa cada contrato y realiza cambios solo cuando estés seguro de su impacto en los pagos."
       },

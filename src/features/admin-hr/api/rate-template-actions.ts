@@ -1,9 +1,9 @@
 'use server'
 
-import type { ComponentType, ComponentUnit, ApplyCondition } from '@prisma/client'
+import type { ApplyCondition, ComponentType, ComponentUnit } from '@prisma/client'
 
-import { prisma } from '@/src/shared/lib/db'
 import { requireAdminHRWithOrg } from '@/src/shared/lib/auth'
+import { prisma } from '@/src/shared/lib/db'
 import type { ActionResult } from '@/src/shared/lib/types'
 import { handleActionError } from '@/src/shared/lib/utils'
 import { revalidatePaths } from '@/src/shared/lib/utils/revalidate-paths'
@@ -161,11 +161,7 @@ export const createRateTemplateAction = async (data: {
       message: 'Tarifa creada exitosamente',
     }
   } catch (error) {
-    return handleActionError(
-      error,
-      'createRateTemplateAction',
-      'Error al crear tarifa'
-    )
+    return handleActionError(error, 'createRateTemplateAction', 'Error al crear tarifa')
   }
 }
 
@@ -278,17 +274,11 @@ export const updateRateTemplateAction = async (
       message: 'Tarifa actualizada exitosamente',
     }
   } catch (error) {
-    return handleActionError(
-      error,
-      'updateRateTemplateAction',
-      'Error al actualizar tarifa'
-    )
+    return handleActionError(error, 'updateRateTemplateAction', 'Error al actualizar tarifa')
   }
 }
 
-export const deleteRateTemplateAction = async (
-  id: string
-): Promise<ActionResult<null>> => {
+export const deleteRateTemplateAction = async (id: string): Promise<ActionResult<null>> => {
   try {
     const session = await requireAdminHRWithOrg()
 
@@ -328,11 +318,7 @@ export const deleteRateTemplateAction = async (
       message: 'Tarifa eliminada exitosamente',
     }
   } catch (error) {
-    return handleActionError(
-      error,
-      'deleteRateTemplateAction',
-      'Error al eliminar tarifa'
-    )
+    return handleActionError(error, 'deleteRateTemplateAction', 'Error al eliminar tarifa')
   }
 }
 
@@ -446,10 +432,6 @@ export const duplicateRateTemplateAction = async (
       message: 'Tarifa duplicada exitosamente',
     }
   } catch (error) {
-    return handleActionError(
-      error,
-      'duplicateRateTemplateAction',
-      'Error al duplicar tarifa'
-    )
+    return handleActionError(error, 'duplicateRateTemplateAction', 'Error al duplicar tarifa')
   }
 }

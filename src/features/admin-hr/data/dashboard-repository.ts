@@ -1,5 +1,5 @@
-import { prisma } from '@/src/shared/lib/db'
 import { ROLES } from '@/src/shared/lib/constants'
+import { prisma } from '@/src/shared/lib/db'
 
 import type { AdminHRDashboardStats } from '../lib'
 
@@ -10,8 +10,8 @@ export async function getAdminHRDashboardStats(
   const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
   const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59)
 
-  const [totalAreas, totalShiftTypes, totalStaff, totalContracts, activeShifts] =
-    await Promise.all([
+  const [totalAreas, totalShiftTypes, totalStaff, totalContracts, activeShifts] = await Promise.all(
+    [
       prisma.area.count({
         where: { organizationId },
       }),
@@ -36,7 +36,8 @@ export async function getAdminHRDashboardStats(
           status: { in: ['SCHEDULED', 'IN_PROGRESS'] },
         },
       }),
-    ])
+    ]
+  )
 
   return {
     totalAreas,

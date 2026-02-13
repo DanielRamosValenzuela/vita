@@ -1,7 +1,7 @@
 import type { Role } from '@prisma/client'
 
-import { prisma } from '@/src/shared/lib/db'
 import { ROLES } from '@/src/shared/lib/constants'
+import { prisma } from '@/src/shared/lib/db'
 
 interface RoleUsage {
   role: Role
@@ -41,7 +41,6 @@ export async function getOrganizationUsageSummary(
   })
 
   if (!organization) throw new Error('Organization not found')
-  
 
   const userCounts = organization.users.reduce(
     (acc, user) => {
@@ -115,7 +114,6 @@ export async function getRoleUsageForOrganization(
   const roleUsage = summary.roleUsage.find((usage) => usage.role === role)
 
   if (!roleUsage) throw new Error(`Role ${role} not found in organization`)
-  
 
   return roleUsage
 }

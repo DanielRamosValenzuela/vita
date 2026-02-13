@@ -1,8 +1,7 @@
 'use client'
 
-import { useState, useTransition, useMemo } from 'react'
+import { useMemo, useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
-import { useRouter } from '@/i18n/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Info, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
@@ -21,22 +20,24 @@ import {
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
+import { IconPicker, renderIcon } from '@/src/shared/ui/icon-picker'
 import { Input } from '@/src/shared/ui/input'
 import { Label } from '@/src/shared/ui/label'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/src/shared/ui/tooltip'
+import { SearchableAddableList } from '@/src/shared/ui/molecules'
 import { Switch } from '@/src/shared/ui/switch'
 import { Textarea } from '@/src/shared/ui/textarea'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/src/shared/ui/tooltip'
 
-import { IconPicker } from '@/src/shared/ui/icon-picker'
-import { SearchableAddableList } from '@/src/shared/ui/molecules'
-import { renderIcon } from '@/src/shared/ui/icon-picker'
+import { useRouter } from '@/i18n/navigation'
+
 import {
   assignChiefsToAreaAction,
   assignShiftTypesToAreaAction,
+  assignStaffToAreaAction,
   setAreaActiveAction,
   updateAreaAction,
 } from '../api'
-import type { ChiefOption } from '../api/area-actions'
+import type { ChiefOption, StaffOption } from '../api/area-actions'
 
 interface ShiftTypeOption {
   id: string
@@ -74,6 +75,8 @@ interface AreaEditFormProps {
   canAssignChiefs?: boolean
   chiefs?: ChiefOption[]
   initialAssignedChiefIds?: Set<string>
+  staff?: StaffOption[]
+  initialAssignedStaffIds?: Set<string>
 }
 
 function formatDuration(mins: number) {
@@ -88,6 +91,8 @@ export function AreaEditForm({
   canAssignChiefs = false,
   chiefs = [],
   initialAssignedChiefIds = new Set(),
+  staff = [],
+  initialAssignedStaffIds = new Set(),
 }: AreaEditFormProps) {
   const t = useTranslations('adminHR.areas')
   const tShifts = useTranslations('shifts.shiftTypes')
@@ -109,7 +114,12 @@ export function AreaEditForm({
   const [selectedShiftTypeIds, setSelectedShiftTypeIds] = useState<Set<string>>(
     () => new Set(area.shiftTypes.filter((ast) => ast.isActive).map((ast) => ast.shiftType.id))
   )
-  const [selectedChiefIds, setSelectedChiefIds] = useState<Set<string>>(() => new Set(initialAssignedChiefIds))
+  const [selectedChiefIds, setSelectedChiefIds] = useState<Set<string>>(
+    () => new Set(initialAssignedChiefIds)
+  )
+  const [selectedStaffIds, setSelectedStaffIds] = useState<Set<string>>(
+    () => new Set(initialAssignedStaffIds)
+  )
   const [showSaveConfirm, setShowSaveConfirm] = useState(false)
 
   const initialSelectedIds = useMemo(
@@ -140,6 +150,9 @@ export function AreaEditForm({
       if ([...selectedChiefIds].some((id) => !initialAssignedChiefIds.has(id))) return true
       if ([...initialAssignedChiefIds].some((id) => !selectedChiefIds.has(id))) return true
     }
+    if (selectedStaffIds.size !== initialAssignedStaffIds.size) return true
+    if ([...selectedStaffIds].some((id) => !initialAssignedStaffIds.has(id))) return true
+    if ([...initialAssignedStaffIds].some((id) => !selectedStaffIds.has(id))) return true
     return false
   }, [
     name,
@@ -161,6 +174,8 @@ export function AreaEditForm({
     canAssignChiefs,
     selectedChiefIds,
     initialAssignedChiefIds,
+    selectedStaffIds,
+    initialAssignedStaffIds,
     area.dayStartTime,
     area.dayEndTime,
     dayStartTime,
@@ -195,6 +210,12 @@ export function AreaEditForm({
           toast.error(chiefsResult.error)
           return
         }
+      }
+
+      const staffResult = await assignStaffToAreaAction(area.id, Array.from(selectedStaffIds))
+      if (!staffResult.success) {
+        toast.error(staffResult.error)
+        return
       }
 
       const updateResult = await updateAreaAction(area.id, {
@@ -277,7 +298,9 @@ export function AreaEditForm({
               ariaLabel={t('form.iconAria')}
               searchPlaceholder={t('form.iconSearch')}
               statusLabel={(showing, total, hasSearch) =>
-                hasSearch ? t('form.iconShowing', { showing, total }) : t('form.iconTotal', { total })
+                hasSearch
+                  ? t('form.iconShowing', { showing, total })
+                  : t('form.iconTotal', { total })
               }
             />
           </div>
@@ -327,9 +350,7 @@ export function AreaEditForm({
                     aria-hidden
                   />
                   {st.icon && (
-                    <span style={{ color: st.color }}>
-                      {renderIcon(st.icon, '', 16)}
-                    </span>
+                    <span style={{ color: st.color }}>{renderIcon(st.icon, '', 16)}</span>
                   )}
                   <span className="font-medium">{st.name}</span>
                   <span className="text-muted-foreground text-sm">
@@ -351,14 +372,14 @@ export function AreaEditForm({
         </CardContent>
       </Card>
 
-      {canAssignChiefs && (
-        <Card>
-          <CardHeader>
-            <CardTitle>{t('editForm.chiefs')}</CardTitle>
-            <CardDescription>{t('editForm.chiefsDescription')}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {chiefs.length === 0 ? (
+      <Card>
+        <CardHeader>
+          <CardTitle>{t('editForm.chiefs')}</CardTitle>
+          <CardDescription>{t('editForm.chiefsDescription')}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {canAssignChiefs ? (
+            chiefs.length === 0 ? (
               <p className="text-muted-foreground text-sm">{t('editForm.noChiefs')}</p>
             ) : (
               <SearchableAddableList<ChiefOption>
@@ -384,13 +405,82 @@ export function AreaEditForm({
                 selectedLabel={t('editForm.assignedChiefsLabel')}
                 removeItemAriaLabel={(c) => t('editForm.removeChief', { name: c.name })}
               />
-            )}
-            <p className="text-muted-foreground mt-4 text-sm">
-              {t('editForm.chiefsAssignedCount', { count: selectedChiefIds.size })}
-            </p>
-          </CardContent>
-        </Card>
-      )}
+            )
+          ) : (
+            <>
+              <p className="text-muted-foreground mb-3 text-sm">
+                {t('editForm.chiefsReadOnlyDescription')}
+              </p>
+              {chiefs.filter((c) => initialAssignedChiefIds.has(c.id)).length === 0 ? (
+                <p className="text-muted-foreground text-sm">{t('editForm.noChiefsAssigned')}</p>
+              ) : (
+                <ul className="space-y-2" role="list">
+                  {chiefs
+                    .filter((c) => initialAssignedChiefIds.has(c.id))
+                    .map((c) => (
+                      <li
+                        key={c.id}
+                        className="flex flex-col gap-0.5 rounded-lg border bg-muted/30 px-3 py-2 text-sm"
+                      >
+                        <span className="font-medium">{c.name}</span>
+                        <span className="text-muted-foreground text-xs">{c.email}</span>
+                        {c.docNumber && (
+                          <span className="text-muted-foreground text-xs">
+                            {t('editForm.chiefDocNumber')}: {c.docNumber}
+                          </span>
+                        )}
+                      </li>
+                    ))}
+                </ul>
+              )}
+            </>
+          )}
+          <p className="text-muted-foreground mt-4 text-sm">
+            {t('editForm.chiefsAssignedCount', {
+              count: canAssignChiefs ? selectedChiefIds.size : initialAssignedChiefIds.size,
+            })}
+          </p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>{t('editForm.staff')}</CardTitle>
+          <CardDescription>{t('editForm.staffDescription')}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {staff.length === 0 ? (
+            <p className="text-muted-foreground text-sm">{t('editForm.noStaffInOrg')}</p>
+          ) : (
+            <SearchableAddableList<StaffOption>
+              items={staff}
+              selectedIds={selectedStaffIds}
+              onSelectionChange={setSelectedStaffIds}
+              getItemId={(s) => s.id}
+              getSearchableText={(s) => `${s.name} ${s.email} ${s.docNumber ?? ''}`.trim()}
+              renderItem={(s) => (
+                <span className="flex flex-col gap-0.5">
+                  <span className="font-medium">{s.name}</span>
+                  <span className="text-muted-foreground text-sm">{s.email}</span>
+                  {s.docNumber && (
+                    <span className="text-muted-foreground text-xs">
+                      {t('editForm.staffDocNumber')}: {s.docNumber}
+                    </span>
+                  )}
+                </span>
+              )}
+              searchPlaceholder={t('editForm.staffSearch')}
+              emptyMessage={t('editForm.noStaffInArea')}
+              noResultsMessage={t('editForm.noMatch')}
+              selectedLabel={t('editForm.assignedStaffLabel')}
+              removeItemAriaLabel={(s) => t('editForm.removeStaff', { name: s.name })}
+            />
+          )}
+          <p className="text-muted-foreground mt-4 text-sm">
+            {t('editForm.staffAssignedCount', { count: selectedStaffIds.size })}
+          </p>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
@@ -404,7 +494,10 @@ export function AreaEditForm({
                 <Label htmlFor="maxConsecutiveHours">{t('editForm.maxConsecutiveHours')}</Label>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Info className="text-muted-foreground h-3.5 w-3.5 shrink-0 cursor-help" aria-hidden />
+                    <Info
+                      className="text-muted-foreground h-3.5 w-3.5 shrink-0 cursor-help"
+                      aria-hidden
+                    />
                   </TooltipTrigger>
                   <TooltipContent side="top" className="max-w-xs">
                     {t('editForm.maxConsecutiveHoursTooltip')}
@@ -427,7 +520,10 @@ export function AreaEditForm({
                 <Label htmlFor="minRestHours">{t('editForm.minRestHours')}</Label>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Info className="text-muted-foreground h-3.5 w-3.5 shrink-0 cursor-help" aria-hidden />
+                    <Info
+                      className="text-muted-foreground h-3.5 w-3.5 shrink-0 cursor-help"
+                      aria-hidden
+                    />
                   </TooltipTrigger>
                   <TooltipContent side="top" className="max-w-xs">
                     {t('editForm.minRestHoursTooltip')}
@@ -452,16 +548,17 @@ export function AreaEditForm({
               <Label>{t('editForm.dayNightConfig')}</Label>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Info className="text-muted-foreground h-3.5 w-3.5 shrink-0 cursor-help" aria-hidden />
+                  <Info
+                    className="text-muted-foreground h-3.5 w-3.5 shrink-0 cursor-help"
+                    aria-hidden
+                  />
                 </TooltipTrigger>
                 <TooltipContent side="top" className="max-w-xs">
                   {t('editForm.dayNightConfigTooltip')}
                 </TooltipContent>
               </Tooltip>
             </div>
-            <p className="text-muted-foreground text-xs">
-              {t('editForm.dayNightConfigHelper')}
-            </p>
+            <p className="text-muted-foreground text-xs">{t('editForm.dayNightConfigHelper')}</p>
             <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center">
               <div className="grid gap-1.5">
                 <Label htmlFor="dayStartTime" className="text-xs sm:text-sm">

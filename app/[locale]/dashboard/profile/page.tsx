@@ -3,8 +3,8 @@ import { redirect } from 'next/navigation'
 import type { Country } from '@prisma/client'
 
 import { getCurrentUser } from '@/src/shared/lib/auth/session'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
 import { prisma } from '@/src/shared/lib/db'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
 import {
   ChangePasswordForm,
   DocumentSection,
@@ -24,8 +24,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   const user = await getCurrentUser()
   const t = await getTranslations('profile')
 
-  if (!user)
-    redirect(`/${locale}/login`)
+  if (!user) redirect(`/${locale}/login`)
 
   const userData = await prisma.user.findUnique({
     where: { id: user.id },
@@ -42,8 +41,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
     },
   })
 
-  if (!userData)
-    redirect(`/${locale}/login`)
+  if (!userData) redirect(`/${locale}/login`)
 
   return (
     <div className="space-y-6 pb-6">

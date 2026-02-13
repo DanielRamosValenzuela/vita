@@ -3,20 +3,22 @@
 import { revalidatePath } from 'next/cache'
 
 import { requireAuth } from '@/src/shared/lib/auth/session'
-import type { ActionResult } from '@/src/shared/lib/types'
 import { prisma } from '@/src/shared/lib/db'
-import { validateEmail } from '@/src/shared/lib/validation'
+import type { ActionResult } from '@/src/shared/lib/types'
 import { handleActionError } from '@/src/shared/lib/utils'
+import { validateEmail } from '@/src/shared/lib/validation'
 
 export async function getUserEmailsAction(): Promise<
-  ActionResult<Array<{
-    id: string
-    email: string
-    isPrimary: boolean
-    isVerified: boolean
-    provider: string | null
-    createdAt: Date
-  }>>
+  ActionResult<
+    Array<{
+      id: string
+      email: string
+      isPrimary: boolean
+      isVerified: boolean
+      provider: string | null
+      createdAt: Date
+    }>
+  >
 > {
   try {
     const user = await requireAuth()
@@ -39,36 +41,34 @@ export async function addEmailAction(email: string): Promise<ActionResult<{ id: 
   try {
     const user = await requireAuth()
 
-    if (!validateEmail(email)) 
+    if (!validateEmail(email))
       return {
         success: false,
         error: 'Email inválido',
       }
-    
 
     const existingEmail = await prisma.userEmail.findUnique({
       where: { email: email.toLowerCase().trim() },
     })
 
-    if (existingEmail) 
+    if (existingEmail)
       return {
         success: false,
-        error: existingEmail.userId === user.id
-          ? 'Este email ya está en tu cuenta'
-          : 'Este email ya está en uso por otro usuario',
+        error:
+          existingEmail.userId === user.id
+            ? 'Este email ya está en tu cuenta'
+            : 'Este email ya está en uso por otro usuario',
       }
-    
 
     const existingPrimaryUser = await prisma.user.findUnique({
       where: { email: email.toLowerCase().trim() },
     })
 
-    if (existingPrimaryUser && existingPrimaryUser.id !== user.id) 
+    if (existingPrimaryUser && existingPrimaryUser.id !== user.id)
       return {
         success: false,
         error: 'Este email ya está registrado como email principal de otro usuario',
       }
-    
 
     const hasEmails = await prisma.userEmail.count({
       where: { userId: user.id },
@@ -104,26 +104,23 @@ export async function removeEmailAction(emailId: string): Promise<ActionResult<n
       where: { id: emailId },
     })
 
-    if (!email) 
+    if (!email)
       return {
         success: false,
         error: 'Email no encontrado',
       }
-    
 
-    if (email.userId !== user.id) 
+    if (email.userId !== user.id)
       return {
         success: false,
         error: 'No tienes permisos para eliminar este email',
       }
-    
 
-    if (email.isPrimary) 
+    if (email.isPrimary)
       return {
         success: false,
         error: 'No puedes eliminar tu email principal',
       }
-    
 
     await prisma.userEmail.delete({
       where: { id: emailId },
@@ -149,26 +146,23 @@ export async function setPrimaryEmailAction(emailId: string): Promise<ActionResu
       where: { id: emailId },
     })
 
-    if (!email) 
+    if (!email)
       return {
         success: false,
         error: 'Email no encontrado',
       }
-    
 
-    if (email.userId !== user.id) 
+    if (email.userId !== user.id)
       return {
         success: false,
         error: 'No tienes permisos para modificar este email',
       }
-    
 
-    if (email.isPrimary) 
+    if (email.isPrimary)
       return {
         success: false,
         error: 'Este email ya es tu email principal',
       }
-    
 
     await prisma.$transaction([
       prisma.userEmail.updateMany({

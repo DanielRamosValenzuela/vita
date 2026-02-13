@@ -8,8 +8,8 @@ import { ArrowLeft, Loader2 } from 'lucide-react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 
-import { formatTaxId, getTaxIdConfig } from '@/src/shared/lib/utils/tax-id-config'
 import { ROLES } from '@/src/shared/lib/constants'
+import { formatTaxId, getTaxIdConfig } from '@/src/shared/lib/utils/tax-id-config'
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
@@ -239,7 +239,8 @@ export function EditOrganizationForm({ organization }: EditOrganizationFormProps
                 aria-invalid={!!errors.maxAdminHR}
               />
               <p className="text-muted-foreground text-xs">
-                {t('form.maxAdminHR.description')} {t('form.minMaxDescription', { min: currentAdminHR, max: planLimits.maxAdminHR })}
+                {t('form.maxAdminHR.description')}{' '}
+                {t('form.minMaxDescription', { min: currentAdminHR, max: planLimits.maxAdminHR })}
               </p>
               {errors.maxAdminHR && (
                 <p className="text-destructive text-sm">{errors.maxAdminHR.message}</p>
@@ -265,7 +266,8 @@ export function EditOrganizationForm({ organization }: EditOrganizationFormProps
                 aria-invalid={!!errors.maxChiefs}
               />
               <p className="text-muted-foreground text-xs">
-                {t('form.maxChiefs.description')} {t('form.minMaxDescription', { min: currentChiefs, max: planLimits.maxChiefs })}
+                {t('form.maxChiefs.description')}{' '}
+                {t('form.minMaxDescription', { min: currentChiefs, max: planLimits.maxChiefs })}
               </p>
               {errors.maxChiefs && (
                 <p className="text-destructive text-sm">{errors.maxChiefs.message}</p>
@@ -291,7 +293,8 @@ export function EditOrganizationForm({ organization }: EditOrganizationFormProps
                 aria-invalid={!!errors.maxStaff}
               />
               <p className="text-muted-foreground text-xs">
-                {t('form.maxStaff.description')} {t('form.minMaxDescription', { min: currentStaff, max: planLimits.maxStaff })}
+                {t('form.maxStaff.description')}{' '}
+                {t('form.minMaxDescription', { min: currentStaff, max: planLimits.maxStaff })}
               </p>
               {errors.maxStaff && (
                 <p className="text-destructive text-sm">{errors.maxStaff.message}</p>

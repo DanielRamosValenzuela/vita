@@ -1,6 +1,6 @@
+import type { Country, Currency } from '@prisma/client'
 import { format as formatDateFns } from 'date-fns'
 import { enUS, es } from 'date-fns/locale'
-import type { Country, Currency } from '@prisma/client'
 
 const DATE_LOCALES = { es, en: enUS } as const
 
@@ -43,12 +43,7 @@ export function formatCurrencyByCountry(
   country: Country,
   options: FormatCurrencyOptions = {}
 ): string {
-  const {
-    showCurrency = false,
-    showSymbol = true,
-    decimals = 0,
-    compact = false,
-  } = options
+  const { showCurrency = false, showSymbol = true, decimals = 0, compact = false } = options
 
   const currency = COUNTRY_CURRENCIES[country] || 'USD'
   const locale = CURRENCY_LOCALES[currency]
@@ -64,8 +59,7 @@ export function formatCurrencyByCountry(
 
   const formatted = formatter.format(amount)
 
-  if (showCurrency && !showSymbol)
-    return `${formatted} ${currency}`
+  if (showCurrency && !showSymbol) return `${formatted} ${currency}`
 
   return formatted
 }
@@ -75,12 +69,7 @@ export function formatCurrencyByCurrency(
   currency: Currency,
   options: FormatCurrencyOptions = {}
 ): string {
-  const {
-    showCurrency = false,
-    showSymbol = true,
-    decimals = 0,
-    compact = false,
-  } = options
+  const { showCurrency = false, showSymbol = true, decimals = 0, compact = false } = options
 
   const locale = CURRENCY_LOCALES[currency]
 
@@ -95,8 +84,7 @@ export function formatCurrencyByCurrency(
 
   const formatted = formatter.format(amount)
 
-  if (showCurrency && !showSymbol)
-    return `${formatted} ${currency}`
+  if (showCurrency && !showSymbol) return `${formatted} ${currency}`
 
   return formatted
 }

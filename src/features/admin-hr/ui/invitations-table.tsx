@@ -2,10 +2,7 @@
 
 import type { Role } from '@prisma/client'
 
-import {
-  InvitationsTableWithCancel,
-  type InvitationWithUser,
-} from '@/src/shared/ui/molecules'
+import { InvitationsTableWithCancel, type InvitationWithUser } from '@/src/shared/ui/molecules'
 
 import { cancelInvitationAction } from '../api/invitation-actions'
 

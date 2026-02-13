@@ -1,9 +1,9 @@
+import sanityI18n from '@sanity/eslint-plugin-i18n'
 import nextVitals from 'eslint-config-next/core-web-vitals'
 import nextTs from 'eslint-config-next/typescript'
 import prettier from 'eslint-config-prettier'
-import { defineConfig, globalIgnores } from 'eslint/config'
-import sanityI18n from '@sanity/eslint-plugin-i18n'
 import noComments from 'eslint-plugin-no-comments'
+import { defineConfig, globalIgnores } from 'eslint/config'
 
 const eslintConfig = defineConfig([
   ...nextVitals,
@@ -95,10 +95,7 @@ const eslintConfig = defineConfig([
           },
         },
       ],
-      '@sanity/i18n/no-attribute-template-literals': [
-        'error',
-        { mode: 'extend' },
-      ],
+      '@sanity/i18n/no-attribute-template-literals': ['error', { mode: 'extend' }],
     },
   },
 ])

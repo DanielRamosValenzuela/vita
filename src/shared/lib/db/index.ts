@@ -1,5 +1,5 @@
-import { PrismaClient } from '@prisma/client'
 import { PrismaPg } from '@prisma/adapter-pg'
+import { PrismaClient } from '@prisma/client'
 import { Pool } from 'pg'
 
 import { env, isDev } from '@/src/shared/config'
@@ -19,8 +19,6 @@ function createPrismaClient(): PrismaClient {
   })
 }
 
-export const prisma =
-  globalForPrisma.prisma ?? createPrismaClient()
+export const prisma = globalForPrisma.prisma ?? createPrismaClient()
 
-if (env.NODE_ENV !== 'production')
-  globalForPrisma.prisma = prisma
+if (env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma

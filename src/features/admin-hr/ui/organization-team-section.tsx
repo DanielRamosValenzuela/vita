@@ -2,11 +2,11 @@
 
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
+import { useRouter } from 'next/navigation'
 import type { Country, Role } from '@prisma/client'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { UserMinus, UserPlus } from 'lucide-react'
-import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
 import {
@@ -39,8 +39,8 @@ import {
 } from '@/src/shared/ui/table'
 
 import { removeUserFromOrganizationAction } from '../api/invitation-actions'
-import { InviteUserForm } from './invite-user-form'
 import { ChiefAreaSelector } from './chief-area-selector'
+import { InviteUserForm } from './invite-user-form'
 
 interface OrganizationTeamSectionProps {
   organizationId: string
@@ -92,8 +92,7 @@ export function OrganizationTeamSection({
         toast.success(result.message)
         setUnlinkTarget(null)
         router.refresh()
-      } else
-        toast.error(result.error)
+      } else toast.error(result.error)
     } finally {
       setIsUnlinking(false)
     }
@@ -161,11 +160,11 @@ export function OrganizationTeamSection({
                   <TableRow>
                     <TableHead>{t('table.name')}</TableHead>
                     <TableHead>{t('table.email')}</TableHead>
-                    {showAreaColumn && (
-                      <TableHead>{t('table.areaAssigned')}</TableHead>
-                    )}
+                    {showAreaColumn && <TableHead>{t('table.areaAssigned')}</TableHead>}
                     <TableHead>{t('table.createdAt')}</TableHead>
-                    {showUnlinkButton && <TableHead className="w-[100px]">{t('table.actions')}</TableHead>}
+                    {showUnlinkButton && (
+                      <TableHead className="w-[100px]">{t('table.actions')}</TableHead>
+                    )}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -205,29 +204,36 @@ export function OrganizationTeamSection({
               </Table>
             </div>
 
-            <AlertDialog open={!!unlinkTarget} onOpenChange={(open) => !open && setUnlinkTarget(null)}>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>{t('unlinkConfirm.title')}</AlertDialogTitle>
-                <AlertDialogDescription>
-                  {unlinkTarget ? t('unlinkConfirm.description', { name: unlinkTarget.name }) : ''}
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel disabled={isUnlinking}>{t('unlinkConfirm.cancel')}</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={(e) => {
-                    e.preventDefault()
-                    handleUnlink()
-                  }}
-                  disabled={isUnlinking}
-                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                >
-                  {isUnlinking ? t('unlinkConfirm.unlinking') : t('unlinkConfirm.confirm')}
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+            <AlertDialog
+              open={!!unlinkTarget}
+              onOpenChange={(open) => !open && setUnlinkTarget(null)}
+            >
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>{t('unlinkConfirm.title')}</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    {unlinkTarget
+                      ? t('unlinkConfirm.description', { name: unlinkTarget.name })
+                      : ''}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel disabled={isUnlinking}>
+                    {t('unlinkConfirm.cancel')}
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={(e) => {
+                      e.preventDefault()
+                      handleUnlink()
+                    }}
+                    disabled={isUnlinking}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
+                    {isUnlinking ? t('unlinkConfirm.unlinking') : t('unlinkConfirm.confirm')}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </>
         )}
       </CardContent>

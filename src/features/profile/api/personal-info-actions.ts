@@ -16,27 +16,23 @@ const updatePersonalInfoSchema = z.object({
   birthDate: z.date().optional().nullable(),
 })
 
-export async function updatePersonalInfoAction(
-  data: z.infer<typeof updatePersonalInfoSchema>
-) {
+export async function updatePersonalInfoAction(data: z.infer<typeof updatePersonalInfoSchema>) {
   try {
     const user = await getCurrentUser()
 
-    if (!user) 
+    if (!user)
       return {
         success: false,
         error: 'No autenticado',
       }
-    
 
     const validation = updatePersonalInfoSchema.safeParse(data)
 
-    if (!validation.success) 
+    if (!validation.success)
       return {
         success: false,
         error: 'Datos inválidos',
       }
-    
 
     await updatePersonalInfo(user.id, validation.data)
 
@@ -44,6 +40,10 @@ export async function updatePersonalInfoAction(
 
     return { success: true }
   } catch (error) {
-    return handleActionError(error, 'updatePersonalInfo', 'Error al actualizar información personal')
+    return handleActionError(
+      error,
+      'updatePersonalInfo',
+      'Error al actualizar información personal'
+    )
   }
 }

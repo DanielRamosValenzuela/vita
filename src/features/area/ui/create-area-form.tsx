@@ -6,8 +6,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Loader2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 
-import { useRouter } from '@/i18n/navigation'
-
 import { useFormAction } from '@/src/shared/hooks'
 import { AREA_ICONS } from '@/src/shared/lib/constants'
 import { Button } from '@/src/shared/ui/button'
@@ -17,9 +15,11 @@ import { Input } from '@/src/shared/ui/input'
 import { Label } from '@/src/shared/ui/label'
 import { Textarea } from '@/src/shared/ui/textarea'
 
+import { useRouter } from '@/i18n/navigation'
+
 import { createAreaAction } from '../api'
-import type { CreateAreaInput } from '../lib/types'
 import { useCreateAreaSchema } from '../lib/helpers/client'
+import type { CreateAreaInput } from '../lib/types'
 
 export function CreateAreaForm() {
   const t = useTranslations('adminHR.areas')
@@ -116,7 +116,9 @@ export function CreateAreaForm() {
               ariaLabel={t('form.iconAria')}
               searchPlaceholder={t('form.iconSearch')}
               statusLabel={(showing, total, hasSearch) =>
-                hasSearch ? t('form.iconShowing', { showing, total }) : t('form.iconTotal', { total })
+                hasSearch
+                  ? t('form.iconShowing', { showing, total })
+                  : t('form.iconTotal', { total })
               }
             />
           </div>
@@ -140,9 +142,7 @@ export function CreateAreaForm() {
             </div>
           </div>
 
-          <p className="text-muted-foreground text-sm">
-            {t('form.inactiveUntilShiftTypes')}
-          </p>
+          <p className="text-muted-foreground text-sm">{t('form.inactiveUntilShiftTypes')}</p>
 
           <div className="flex gap-4">
             <Button type="submit" disabled={isPending} className="flex-1">

@@ -4,12 +4,8 @@ import { useLocale, useTranslations } from 'next-intl'
 import type { InvitationStatus, Role } from '@prisma/client'
 import { Ban } from 'lucide-react'
 
+import { INVITATION_STATUS, INVITATION_STATUS_BADGE_VARIANTS } from '@/src/shared/lib/constants'
 import { formatDate } from '@/src/shared/lib/utils/format'
-
-import {
-  INVITATION_STATUS,
-  INVITATION_STATUS_BADGE_VARIANTS,
-} from '@/src/shared/lib/constants'
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
@@ -21,11 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/src/shared/ui/table'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/src/shared/ui/tooltip'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/src/shared/ui/tooltip'
 
 export interface InvitationWithUser {
   id: string
@@ -72,7 +64,7 @@ export function InvitationsTableBase({
     </Badge>
   )
 
-  if (invitations.length === 0) 
+  if (invitations.length === 0)
     return (
       <Card>
         <CardHeader>
@@ -84,7 +76,6 @@ export function InvitationsTableBase({
         </CardContent>
       </Card>
     )
-  
 
   return (
     <Card>
@@ -110,9 +101,7 @@ export function InvitationsTableBase({
           <TableBody>
             {invitations.map((invitation) => (
               <TableRow key={invitation.id}>
-                <TableCell className="font-medium">
-                  {invitation.user?.name || '-'}
-                </TableCell>
+                <TableCell className="font-medium">{invitation.user?.name || '-'}</TableCell>
                 <TableCell>{invitation.user?.email || '-'}</TableCell>
                 {showRoleColumn && (
                   <TableCell>
@@ -122,9 +111,7 @@ export function InvitationsTableBase({
                   </TableCell>
                 )}
                 <TableCell>{getStatusBadge(invitation.status)}</TableCell>
-                <TableCell>
-                  {formatDate(new Date(invitation.createdAt), locale)}
-                </TableCell>
+                <TableCell>{formatDate(new Date(invitation.createdAt), locale)}</TableCell>
                 <TableCell>
                   {invitation.acceptedAt
                     ? formatDate(new Date(invitation.acceptedAt), locale)
@@ -137,7 +124,9 @@ export function InvitationsTableBase({
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => onCancel(invitation.id, invitation.user?.name || 'Usuario')}
+                          onClick={() =>
+                            onCancel(invitation.id, invitation.user?.name || 'Usuario')
+                          }
                           disabled={isPending}
                           className="hover:bg-destructive/10 hover:text-destructive dark:hover:bg-destructive/20"
                         >

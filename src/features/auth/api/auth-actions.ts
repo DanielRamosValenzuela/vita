@@ -1,8 +1,9 @@
 'use server'
 
-import { Country, DocType, Prisma } from '@prisma/client'
 import { getTranslations } from 'next-intl/server'
+import { Country, DocType, Prisma } from '@prisma/client'
 
+import type { ActionResult } from '@/src/shared/lib/types'
 import { formatZodErrors } from '@/src/shared/lib/utils'
 
 import {
@@ -11,8 +12,6 @@ import {
   findUserWithCredentials,
   verifyPassword,
 } from '../data/user-repository'
-import type { ActionResult } from '@/src/shared/lib/types'
-
 import { getLoginSchema, getRegisterSchema } from '../lib/schemas'
 import type { RegisterData } from '../lib/types'
 
@@ -35,17 +34,16 @@ export async function registerAction(formData: FormData): Promise<ActionResult<R
 
     const validationResult = registerSchema.safeParse(rawData)
 
-    if (!validationResult.success) 
+    if (!validationResult.success)
       return {
         success: false,
         error: t('validationError'),
         fieldErrors: formatZodErrors(validationResult.error),
       }
-    
 
     const data = validationResult.data
 
-    if (await checkEmailExists(data.email)) 
+    if (await checkEmailExists(data.email))
       return {
         success: false,
         error: t('emailExists'),
@@ -53,7 +51,6 @@ export async function registerAction(formData: FormData): Promise<ActionResult<R
           email: [t('emailExists')],
         },
       }
-    
 
     const userData = await createUserWithAccount(data)
 
@@ -66,11 +63,11 @@ export async function registerAction(formData: FormData): Promise<ActionResult<R
 
     const t = await getTranslations({ locale, namespace: 'auth' })
 
-    if (error instanceof Prisma.PrismaClientKnownRequestError) 
+    if (error instanceof Prisma.PrismaClientKnownRequestError)
       if (error.code === 'P2002') {
         const target = error.meta?.target as string[] | undefined
 
-        if (target?.includes('email')) 
+        if (target?.includes('email'))
           return {
             success: false,
             error: t('emailExists'),
@@ -78,10 +75,7 @@ export async function registerAction(formData: FormData): Promise<ActionResult<R
               email: [t('emailExists')],
             },
           }
-        
-
       }
-    
 
     return {
       success: false,
@@ -102,18 +96,17 @@ export async function loginAction(formData: FormData): Promise<ActionResult<{ em
 
     const validationResult = loginSchema.safeParse(rawData)
 
-    if (!validationResult.success) 
+    if (!validationResult.success)
       return {
         success: false,
         error: 'Error de validación',
         fieldErrors: formatZodErrors(validationResult.error),
       }
-    
 
     const data = validationResult.data
     const user = await findUserWithCredentials(data.email)
 
-    if (!user || !user.accounts || user.accounts.length === 0) 
+    if (!user || !user.accounts || user.accounts.length === 0)
       return {
         success: false,
         error: 'Credenciales inválidas',
@@ -121,10 +114,9 @@ export async function loginAction(formData: FormData): Promise<ActionResult<{ em
           email: ['Email o contraseña incorrectos'],
         },
       }
-    
 
     const hashedPassword = user.accounts[0].access_token
-    if (!hashedPassword) 
+    if (!hashedPassword)
       return {
         success: false,
         error: 'Credenciales inválidas',
@@ -132,11 +124,10 @@ export async function loginAction(formData: FormData): Promise<ActionResult<{ em
           email: ['Email o contraseña incorrectos'],
         },
       }
-    
 
     const isValidPassword = await verifyPassword(data.password, hashedPassword)
 
-    if (!isValidPassword) 
+    if (!isValidPassword)
       return {
         success: false,
         error: 'Credenciales inválidas',
@@ -144,7 +135,6 @@ export async function loginAction(formData: FormData): Promise<ActionResult<{ em
           password: ['Email o contraseña incorrectos'],
         },
       }
-    
 
     return {
       success: true,

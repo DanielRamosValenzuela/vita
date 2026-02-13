@@ -11,43 +11,38 @@ interface ShiftConflict {
 }
 
 export function checkShiftConflictsClient(startTime: Date, endTime: Date): ShiftConflict {
-  if (endTime <= startTime) 
+  if (endTime <= startTime)
     return {
       hasConflict: true,
       conflictType: 'outside_hours',
       message: 'La hora de fin debe ser posterior a la hora de inicio',
     }
-  
 
   const now = new Date()
   const oneHourAgo = new Date(now.getTime() - ONE_HOUR_MS)
-  if (startTime < oneHourAgo) 
+  if (startTime < oneHourAgo)
     return {
       hasConflict: true,
       conflictType: 'future_shift',
       message: 'No se pueden programar turnos en el pasado',
     }
-  
 
   const shiftDuration = endTime.getTime() - startTime.getTime()
   const maxDuration = MAX_SHIFT_DURATION_MS
-  if (shiftDuration > maxDuration) 
+  if (shiftDuration > maxDuration)
     return {
       hasConflict: true,
       conflictType: 'outside_hours',
       message: 'Los turnos no pueden durar más de 12 horas',
     }
-  
 
-  
   const minDuration = MIN_SHIFT_DURATION_MS
-  if (shiftDuration < minDuration) 
+  if (shiftDuration < minDuration)
     return {
       hasConflict: true,
       conflictType: 'outside_hours',
       message: 'Los turnos deben durar al menos 30 minutos',
     }
-  
 
   return {
     hasConflict: false,

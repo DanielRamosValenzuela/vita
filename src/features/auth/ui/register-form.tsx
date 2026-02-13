@@ -40,14 +40,14 @@ export function RegisterForm() {
   const docType = getDocTypeForCountry(country)
 
   useEffect(() => {
-    if (generalError || Object.keys(errors).length > 0 || docNumberError) 
+    if (generalError || Object.keys(errors).length > 0 || docNumberError)
       setTimeout(() => {
-        if (generalError && generalErrorRef.current) 
+        if (generalError && generalErrorRef.current)
           generalErrorRef.current.scrollIntoView({
             behavior: 'smooth',
             block: 'center',
           })
-         else {
+        else {
           const firstErrorField = Object.keys(errors)[0]
           if (firstErrorField) {
             const errorElement = document.getElementById(firstErrorField)
@@ -70,7 +70,6 @@ export function RegisterForm() {
           }
         }
       }, 100)
-    
   }, [generalError, errors, docNumberError])
 
   const handleCountryChange = (value: string) => {
@@ -85,11 +84,9 @@ export function RegisterForm() {
     const formatted = formatTaxId(value, country)
     setDocNumberValue(formatted)
 
-    if (formatted && !validateTaxId(formatted, country)) 
+    if (formatted && !validateTaxId(formatted, country))
       setDocNumberError(t('taxIdInvalid', { label: taxIdConfig.label }))
-     else 
-      setDocNumberError(null)
-    
+    else setDocNumberError(null)
   }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -108,9 +105,8 @@ export function RegisterForm() {
     try {
       const result = await registerAction(formData)
 
-      if (result.success) 
-        router.push('/es/login?registered=true')
-       else {
+      if (result.success) router.push('/es/login?registered=true')
+      else {
         setGeneralError(result.error || t('unknownError'))
         setErrors(result.fieldErrors || {})
       }

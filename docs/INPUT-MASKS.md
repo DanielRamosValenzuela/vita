@@ -57,6 +57,7 @@ import { getCurrencyMask } from '@/src/shared/lib/utils/input-masks'
 ```
 
 **Formatos por moneda:**
+
 - **CLP** (Chile): `$ 1.000.000` (punto para miles, coma para decimales)
 - **USD** (USA): `$ 1,000,000.00` (coma para miles, punto para decimales)
 - **COP** (Colombia): `$ 1.000.000` (punto para miles, coma para decimales)

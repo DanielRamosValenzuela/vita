@@ -7,12 +7,10 @@ import { endOfDay, format, startOfDay } from 'date-fns'
 import { Calendar, Clock, Filter, Search, Users, X } from 'lucide-react'
 
 import { SHIFT_STATUS } from '@/src/shared/lib/constants'
-
-const FILTER_ALL = '__all__'
-const FILTER_CUSTOM = '__custom__'
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 import { Input } from '@/src/shared/ui/input'
+import { Popover, PopoverContent, PopoverTrigger } from '@/src/shared/ui/popover'
 import {
   Select,
   SelectContent,
@@ -21,7 +19,8 @@ import {
   SelectValue,
 } from '@/src/shared/ui/select'
 
-import { Popover, PopoverContent, PopoverTrigger } from '@/src/shared/ui/popover'
+const FILTER_ALL = '__all__'
+const FILTER_CUSTOM = '__custom__'
 
 interface FilterState {
   search: string

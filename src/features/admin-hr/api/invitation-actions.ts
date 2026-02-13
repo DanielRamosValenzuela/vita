@@ -2,20 +2,18 @@
 
 import type { Country } from '@prisma/client'
 
-import { prisma } from '@/src/shared/lib/db'
 import { requireAdminHR, requireAdminHRWithOrg } from '@/src/shared/lib/auth'
-import type { ActionResult } from '@/src/shared/lib/types'
 import { ROLES } from '@/src/shared/lib/constants'
+import { prisma } from '@/src/shared/lib/db'
+import type { ActionResult } from '@/src/shared/lib/types'
 import { handleActionError } from '@/src/shared/lib/utils'
 import { revalidatePaths } from '@/src/shared/lib/utils/revalidate-paths'
 import { checkDocumentExistsInOrganization } from '@/src/shared/lib/validation/document-validation'
 
-import {
-  checkOrganizationLimit,
-  createInvitation,
-} from '../data/invitation-repository'
-import { searchUserByDocumentOrEmail } from '@/src/entities/user'
 import { deleteInvitation } from '@/src/entities/invitation'
+import { searchUserByDocumentOrEmail } from '@/src/entities/user'
+
+import { checkOrganizationLimit, createInvitation } from '../data/invitation-repository'
 
 export const searchUserAction = async (
   search: string,
@@ -24,21 +22,19 @@ export const searchUserAction = async (
   try {
     await requireAdminHR()
 
-    if (!search || search.trim().length === 0) 
+    if (!search || search.trim().length === 0)
       return {
         success: false,
         error: 'Debes ingresar un RUT o email para buscar',
       }
-    
 
     const user = await searchUserByDocumentOrEmail({ search: search.trim(), country })
 
-    if (!user) 
+    if (!user)
       return {
         success: false,
         error: 'Usuario no encontrado. El usuario debe registrarse primero en la plataforma.',
       }
-    
 
     return {
       success: true,
@@ -49,7 +45,10 @@ export const searchUserAction = async (
   }
 }
 
-const INVITATION_PATHS = ['/dashboard/admin-hr/organization', '/dashboard/admin-hr/invitations'] as const
+const INVITATION_PATHS = [
+  '/dashboard/admin-hr/organization',
+  '/dashboard/admin-hr/invitations',
+] as const
 
 export const inviteChiefAction = async (
   organizationId: string,
@@ -58,24 +57,20 @@ export const inviteChiefAction = async (
   try {
     const session = await requireAdminHR()
 
-    if (session.organizationId !== organizationId) 
+    if (session.organizationId !== organizationId)
       return {
         success: false,
         error: 'No tienes permisos para invitar a esta organización',
       }
-    
 
     const limitCheck = await checkOrganizationLimit(organizationId, ROLES.CHIEF_AREA)
-    if (!limitCheck.success) 
-      return limitCheck
-    
+    if (!limitCheck.success) return limitCheck
 
-    if (!limitCheck.canAddMore) 
+    if (!limitCheck.canAddMore)
       return {
         success: false,
         error: `Se ha alcanzado el límite máximo de ${limitCheck.maxLimit} jefes para esta organización`,
       }
-    
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -88,19 +83,17 @@ export const inviteChiefAction = async (
       },
     })
 
-    if (!user) 
+    if (!user)
       return {
         success: false,
         error: 'Usuario no encontrado',
       }
-    
 
-    if (user.role === ROLES.CHIEF_AREA && user.organizationId === organizationId) 
+    if (user.role === ROLES.CHIEF_AREA && user.organizationId === organizationId)
       return {
         success: false,
         error: 'Este usuario ya es jefe de esta organización',
       }
-    
 
     if (user.country && user.docType && user.docNumber) {
       const docExists = await checkDocumentExistsInOrganization(
@@ -111,12 +104,11 @@ export const inviteChiefAction = async (
         userId
       )
 
-      if (docExists) 
+      if (docExists)
         return {
           success: false,
           error: `El documento ${user.docNumber} ya está registrado en esta organización por otro usuario`,
         }
-      
     }
 
     const invitationResult = await createInvitation(
@@ -126,9 +118,7 @@ export const inviteChiefAction = async (
       session.id
     )
 
-    if (!invitationResult.success) 
-      return invitationResult
-    
+    if (!invitationResult.success) return invitationResult
 
     revalidatePaths(...INVITATION_PATHS)
 
@@ -149,24 +139,20 @@ export const inviteStaffAction = async (
   try {
     const session = await requireAdminHRWithOrg()
 
-    if (session.organizationId !== organizationId) 
+    if (session.organizationId !== organizationId)
       return {
         success: false,
         error: 'No tienes permisos para invitar a esta organización',
       }
-    
 
     const limitCheck = await checkOrganizationLimit(organizationId, ROLES.STAFF_HEALTH)
-    if (!limitCheck.success) 
-      return limitCheck
-    
+    if (!limitCheck.success) return limitCheck
 
-    if (!limitCheck.canAddMore) 
+    if (!limitCheck.canAddMore)
       return {
         success: false,
         error: `Se ha alcanzado el límite máximo de ${limitCheck.maxLimit} staff para esta organización`,
       }
-    
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -179,19 +165,17 @@ export const inviteStaffAction = async (
       },
     })
 
-    if (!user) 
+    if (!user)
       return {
         success: false,
         error: 'Usuario no encontrado',
       }
-    
 
-    if (user.role === ROLES.STAFF_HEALTH && user.organizationId === organizationId) 
+    if (user.role === ROLES.STAFF_HEALTH && user.organizationId === organizationId)
       return {
         success: false,
         error: 'Este usuario ya es staff de esta organización',
       }
-    
 
     if (user.country && user.docType && user.docNumber) {
       const docExists = await checkDocumentExistsInOrganization(
@@ -202,12 +186,11 @@ export const inviteStaffAction = async (
         userId
       )
 
-      if (docExists) 
+      if (docExists)
         return {
           success: false,
           error: `El documento ${user.docNumber} ya está registrado en esta organización por otro usuario`,
         }
-      
     }
 
     const invitationResult = await createInvitation(
@@ -217,9 +200,7 @@ export const inviteStaffAction = async (
       session.id
     )
 
-    if (!invitationResult.success) 
-      return invitationResult
-    
+    if (!invitationResult.success) return invitationResult
 
     revalidatePaths(...INVITATION_PATHS)
 
@@ -241,12 +222,11 @@ export const cancelInvitationAction = async (
 
     const result = await deleteInvitation(invitationId)
 
-    if (!result.success) 
+    if (!result.success)
       return {
         success: false,
         error: result.error,
       }
-    
 
     revalidatePaths(...INVITATION_PATHS)
 
@@ -265,16 +245,14 @@ export const removeUserFromOrganizationAction = async (
   try {
     const session = await requireAdminHRWithOrg()
     const orgId = session.organizationId
-    if (!orgId)
-      return { success: false, error: 'No tienes una organización asignada' }
+    if (!orgId) return { success: false, error: 'No tienes una organización asignada' }
 
     const target = await prisma.user.findUnique({
       where: { id: userId },
       select: { organizationId: true, role: true, name: true },
     })
 
-    if (!target)
-      return { success: false, error: 'Usuario no encontrado' }
+    if (!target) return { success: false, error: 'Usuario no encontrado' }
 
     if (target.organizationId !== orgId)
       return { success: false, error: 'El usuario no pertenece a tu organización' }
@@ -297,6 +275,10 @@ export const removeUserFromOrganizationAction = async (
       message: `${target.name} ha sido desvinculado de la organización`,
     }
   } catch (error) {
-    return handleActionError(error, 'removeUserFromOrganizationAction', 'Error al desvincular usuario')
+    return handleActionError(
+      error,
+      'removeUserFromOrganizationAction',
+      'Error al desvincular usuario'
+    )
   }
 }

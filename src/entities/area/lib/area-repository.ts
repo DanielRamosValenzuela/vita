@@ -80,10 +80,7 @@ export async function getAreaById(id: string, organizationId: string) {
   })
 }
 
-export async function createArea(
-  data: CreateAreaInput,
-  organizationId: string
-): Promise<Area> {
+export async function createArea(data: CreateAreaInput, organizationId: string): Promise<Area> {
   const area = await prisma.area.create({
     data: {
       name: data.name,
@@ -135,10 +132,7 @@ export async function updateArea(
   return area
 }
 
-export async function deleteArea(
-  id: string,
-  organizationId: string
-): Promise<void> {
+export async function deleteArea(id: string, organizationId: string): Promise<void> {
   await prisma.area.deleteMany({
     where: { id, organizationId },
   })

@@ -2,8 +2,8 @@ import { getTranslations } from 'next-intl/server'
 import { ShiftStatus } from '@prisma/client'
 import { endOfMonth, format, startOfMonth } from 'date-fns'
 
-import { requireAdminHROrChiefArea } from '@/src/shared/lib/auth/session'
 import { isChiefArea } from '@/src/shared/lib/auth/rbac'
+import { requireAdminHROrChiefArea } from '@/src/shared/lib/auth/session'
 import { prisma } from '@/src/shared/lib/db'
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
@@ -216,11 +216,7 @@ export default async function ShiftsPage({ params }: ShiftsPageProps) {
           <CardTitle>{t('filters.title')}</CardTitle>
         </CardHeader>
         <CardContent>
-          <ShiftFilters
-            users={users}
-            areas={areas}
-            shiftTypes={shiftTypes}
-          />
+          <ShiftFilters users={users} areas={areas} shiftTypes={shiftTypes} />
         </CardContent>
       </Card>
 

@@ -4,9 +4,9 @@ import { revalidatePath } from 'next/cache'
 import type { Prisma } from '@prisma/client'
 import { z } from 'zod'
 
-import { prisma } from '@/src/shared/lib/db'
-import { requireAdminHROrChiefArea } from '@/src/shared/lib/auth/session'
 import { isChiefArea } from '@/src/shared/lib/auth/rbac'
+import { requireAdminHROrChiefArea } from '@/src/shared/lib/auth/session'
+import { prisma } from '@/src/shared/lib/db'
 import type { ActionResult } from '@/src/shared/lib/types'
 
 import { checkShiftConflicts } from '@/src/entities/shift'
@@ -69,7 +69,6 @@ export const createShiftAction = async (
         error: 'El usuario no pertenece a tu organización',
       }
 
-    
     const conflictCheck = await checkShiftConflicts(
       validatedData.userId,
       validatedData.areaId,
@@ -83,7 +82,6 @@ export const createShiftAction = async (
         error: conflictCheck.message,
       }
 
-    
     const area = await prisma.area.findUnique({
       where: {
         id: validatedData.areaId,
@@ -97,7 +95,6 @@ export const createShiftAction = async (
         error: 'El área no pertenece a tu organización',
       }
 
-    
     const shiftType = await prisma.shiftType.findUnique({
       where: {
         id: validatedData.shiftTypeId,
@@ -132,10 +129,7 @@ export const createShiftAction = async (
         userId: validatedData.userId,
         organizationId: session.organizationId!,
         isActive: true,
-        OR: [
-          { areaId: validatedData.areaId },
-          { areaId: null },
-        ],
+        OR: [{ areaId: validatedData.areaId }, { areaId: null }],
       },
       orderBy: [{ areaId: 'desc' }, { startDate: 'desc' }],
     })
@@ -241,20 +235,13 @@ export const updateShiftAction = async (
         }
     }
 
-    
     if (validatedData.startTime || validatedData.endTime) {
       const startTime = validatedData.startTime || existingShift.startTime
       const endTime = validatedData.endTime || existingShift.endTime
       const userId = validatedData.userId || existingShift.userId
       const areaId = validatedData.areaId || existingShift.areaId
 
-      const conflictCheck = await checkShiftConflicts(
-        userId,
-        areaId,
-        startTime,
-        endTime,
-        id 
-      )
+      const conflictCheck = await checkShiftConflicts(userId, areaId, startTime, endTime, id)
 
       if (conflictCheck.hasConflict)
         return {
@@ -369,7 +356,6 @@ export const deleteShiftAction = async (id: string): Promise<ActionResult<null>>
         }
     }
 
-    
     await prisma.shift.update({
       where: { id },
       data: { status: 'CANCELLED' },
@@ -445,13 +431,11 @@ export const getShiftsAction = async (
         },
       }
 
-    if (hasAreaAssignment)
-      where.areaId = { in: chiefAreaIds }
+    if (hasAreaAssignment) where.areaId = { in: chiefAreaIds }
 
     if (status) where.status = status
     if (userId) where.userId = userId
-    if (areaId && (!hasAreaAssignment || chiefAreaIds.includes(areaId)))
-      where.areaId = areaId
+    if (areaId && (!hasAreaAssignment || chiefAreaIds.includes(areaId))) where.areaId = areaId
     if (shiftTypeId) where.shiftTypeId = shiftTypeId
 
     if (search)

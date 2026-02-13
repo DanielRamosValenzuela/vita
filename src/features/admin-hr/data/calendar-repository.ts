@@ -1,5 +1,6 @@
-import { prisma } from '@/src/shared/lib/db'
 import type { DayType } from '@prisma/client'
+
+import { prisma } from '@/src/shared/lib/db'
 
 export async function getDayTypeForDate(
   organizationId: string,
@@ -57,10 +58,7 @@ export async function getYearCalendar(
   return calendarDays
 }
 
-export async function isSpecialDay(
-  organizationId: string,
-  date: Date
-): Promise<boolean> {
+export async function isSpecialDay(organizationId: string, date: Date): Promise<boolean> {
   const count = await prisma.organizationCalendar.count({
     where: {
       organizationId,

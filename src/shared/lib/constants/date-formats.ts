@@ -1,6 +1,6 @@
 import { Country } from '@prisma/client'
-import { es, enUS } from 'date-fns/locale'
 import type { Locale } from 'date-fns'
+import { enUS, es } from 'date-fns/locale'
 
 export const COUNTRY_DATE_FORMATS: Record<Country, string> = {
   CL: 'dd/MM/yyyy',

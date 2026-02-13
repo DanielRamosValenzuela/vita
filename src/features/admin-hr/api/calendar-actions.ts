@@ -3,8 +3,8 @@
 import { revalidatePath } from 'next/cache'
 import type { DayType } from '@prisma/client'
 
-import { prisma } from '@/src/shared/lib/db'
 import { requireAdminHRWithOrg } from '@/src/shared/lib/auth'
+import { prisma } from '@/src/shared/lib/db'
 import type { ActionResult } from '@/src/shared/lib/types'
 import { handleActionError } from '@/src/shared/lib/utils'
 
@@ -53,7 +53,11 @@ export async function getOrganizationCalendarAction(
       data: calendarDays,
     }
   } catch (error) {
-    return handleActionError(error, 'getOrganizationCalendarAction', 'Error al cargar el calendario')
+    return handleActionError(
+      error,
+      'getOrganizationCalendarAction',
+      'Error al cargar el calendario'
+    )
   }
 }
 
@@ -101,9 +105,7 @@ export async function upsertCalendarDayAction(
   }
 }
 
-export async function deleteCalendarDayAction(
-  dayId: string
-): Promise<ActionResult<void>> {
+export async function deleteCalendarDayAction(dayId: string): Promise<ActionResult<void>> {
   try {
     const session = await requireAdminHRWithOrg()
 

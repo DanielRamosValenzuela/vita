@@ -45,7 +45,7 @@ export async function validateDocumentUniqueInOrganization(
     },
   })
 
-  if (existingUser) 
+  if (existingUser)
     return {
       valid: false,
       error: `El documento ${docNumber} ya existe en esta organización (${existingUser.name} - ${existingUser.email})`,
@@ -58,7 +58,6 @@ export async function validateDocumentUniqueInOrganization(
         },
       ],
     }
-  
 
   return { valid: true }
 }
@@ -78,8 +77,7 @@ export async function validateDocumentUniqueInUserOrganizations(
     },
   })
 
-  if (!user || !user.organizationId) 
-    return { valid: true }
+  if (!user || !user.organizationId) return { valid: true }
 
   return validateDocumentUniqueInOrganization(
     userId,

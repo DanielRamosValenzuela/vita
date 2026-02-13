@@ -1,14 +1,13 @@
 'use client'
 
-import { useState, useRef, useTransition } from 'react'
-import { useTranslations } from 'next-intl'
+import { useRef, useState, useTransition } from 'react'
 import { useSession } from 'next-auth/react'
-import { Camera, Trash2, Loader2, AlertCircle } from 'lucide-react'
-import { toast } from 'sonner'
+import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
+import { AlertCircle, Camera, Loader2, Trash2 } from 'lucide-react'
+import { toast } from 'sonner'
 
-import { Button } from '@/src/shared/ui/button'
-import { Avatar, AvatarFallback, AvatarImage } from '@/src/shared/ui/avatar'
+import { getUserInitials } from '@/src/shared/lib/utils/profile-image'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,9 +17,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/src/shared/ui/alert-dialog'
-import { getUserInitials } from '@/src/shared/lib/utils/profile-image'
+import { Avatar, AvatarFallback, AvatarImage } from '@/src/shared/ui/avatar'
+import { Button } from '@/src/shared/ui/button'
 
-import { uploadAvatarAction, deleteAvatarAction } from '../api/profile-image-actions'
+import { deleteAvatarAction, uploadAvatarAction } from '../api/profile-image-actions'
 
 interface AvatarUploadFormProps {
   currentImage?: string | null
@@ -111,9 +111,7 @@ export function AvatarUploadForm({ currentImage, customImage, userName }: Avatar
         setPreviewUrl(null)
         await update({ user: { customImage: undefined } })
         router.refresh()
-      } else 
-        toast.error(result.error || t('deleteError'))
-      
+      } else toast.error(result.error || t('deleteError'))
     })
   }
 
@@ -171,14 +169,19 @@ export function AvatarUploadForm({ currentImage, customImage, userName }: Avatar
         <p className="text-muted-foreground text-center text-xs">{t('help')}</p>
       </div>
 
-      <AlertDialog open={errorDialog.isOpen} onOpenChange={(open) => setErrorDialog({ ...errorDialog, isOpen: open })}>
+      <AlertDialog
+        open={errorDialog.isOpen}
+        onOpenChange={(open) => setErrorDialog({ ...errorDialog, isOpen: open })}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <div className="flex items-center gap-2">
               <AlertCircle className="text-destructive h-5 w-5" />
               <AlertDialogTitle>{errorDialog.title}</AlertDialogTitle>
             </div>
-            <AlertDialogDescription className="text-left">{errorDialog.message}</AlertDialogDescription>
+            <AlertDialogDescription className="text-left">
+              {errorDialog.message}
+            </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogAction onClick={() => setErrorDialog({ ...errorDialog, isOpen: false })}>

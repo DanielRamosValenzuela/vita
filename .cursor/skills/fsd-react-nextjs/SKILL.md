@@ -8,6 +8,7 @@ description: Applies Feature-Sliced Design (FSD) when structuring React and Next
 ## When to use
 
 Apply this skill when:
+
 - Structuring or reorganizing a React/Next.js codebase by business domains
 - Deciding where to place a new component, hook, API call, or page
 - Enforcing or reviewing import direction and public API
@@ -19,14 +20,14 @@ Apply this skill when:
 
 Order of responsibility and dependencies; **a layer may only import from layers below**.
 
-| Layer     | Purpose | Slices |
-|-----------|---------|--------|
-| **app**   | App-wide: providers, global styles, router config, store | Segments only (no slices) |
-| **pages** | Screens; one route (or group) per slice | Yes |
-| **widgets** | Large self-contained UI blocks; reused or page-sized | Yes |
-| **features** | User-facing actions (auth, submit form, search) | Yes |
-| **entities** | Business concepts (user, order, product) | Yes |
-| **shared**  | UI kit, lib, api client, config, i18n | Segments only |
+| Layer        | Purpose                                                  | Slices                    |
+| ------------ | -------------------------------------------------------- | ------------------------- |
+| **app**      | App-wide: providers, global styles, router config, store | Segments only (no slices) |
+| **pages**    | Screens; one route (or group) per slice                  | Yes                       |
+| **widgets**  | Large self-contained UI blocks; reused or page-sized     | Yes                       |
+| **features** | User-facing actions (auth, submit form, search)          | Yes                       |
+| **entities** | Business concepts (user, order, product)                 | Yes                       |
+| **shared**   | UI kit, lib, api client, config, i18n                    | Segments only             |
 
 - **Processes** layer is deprecated; put that logic in `app` or `features`.
 - Not every project needs every layer; typical minimum: `shared`, `pages` (or route composition), `app`.
@@ -40,6 +41,7 @@ Order of responsibility and dependencies; **a layer may only import from layers 
 - **app** and **shared** are exceptions: they have no slices, so their segments can import each other freely.
 
 Examples:
+
 - `features/auth` may import from `entities/user`, `shared`.
 - `features/auth` must **not** import from `features/profile` or `widgets`.
 - `entities/user` must **not** import from `entities/organization` (use cross-slice API with `@x` if needed; see reference).
@@ -53,11 +55,11 @@ Examples:
 
 ```ts
 // ✅ Allowed: import from public API
-import { LoginForm } from '@/src/features/auth';
-import { useUser } from '@/src/entities/user';
-
+import { LoginForm } from '@/src/features/auth'
 // ❌ Avoid: import from segment
-import { LoginForm } from '@/src/features/auth/ui/login-form';
+import { LoginForm } from '@/src/features/auth/ui/login-form'
+
+import { useUser } from '@/src/entities/user'
 ```
 
 - Re-export in the slice's `index` only what other layers need; keep internals private.
@@ -68,14 +70,14 @@ import { LoginForm } from '@/src/features/auth/ui/login-form';
 
 Common segments and what belongs there:
 
-| Segment | Use for |
-|---------|--------|
-| **ui**  | Components and UI of the slice |
-| **api** | Requests, server actions, route handlers logic |
-| **model** | State, stores, types, validation (entities/features) |
-| **lib**  | Helpers, pure logic, constants used only in this slice |
-| **config** | Feature flags, slice-specific config |
-| **types** | Types used in the slice (or re-export from model) |
+| Segment    | Use for                                                |
+| ---------- | ------------------------------------------------------ |
+| **ui**     | Components and UI of the slice                         |
+| **api**    | Requests, server actions, route handlers logic         |
+| **model**  | State, stores, types, validation (entities/features)   |
+| **lib**    | Helpers, pure logic, constants used only in this slice |
+| **config** | Feature flags, slice-specific config                   |
+| **types**  | Types used in the slice (or re-export from model)      |
 
 - Prefer clear segment names (e.g. `api`, `lib`) over generic ones (`utils`, `helpers`).
 - **shared** typically has: `ui`, `lib`, `api`, `config`, `i18n`, `routes`. **app** may have: `routes`, `store`, `styles`, `providers`, `api-routes`.

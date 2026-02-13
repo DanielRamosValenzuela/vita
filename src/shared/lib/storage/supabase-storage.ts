@@ -5,9 +5,8 @@ import { env } from '@/src/shared/config/env.server'
 const supabaseUrl = env.SUPABASE_URL
 const supabaseKey = env.SUPABASE_SERVICE_ROLE_KEY
 
-if (!supabaseUrl || !supabaseKey) 
+if (!supabaseUrl || !supabaseKey)
   throw new Error('Missing Supabase credentials in environment variables')
-
 
 export const supabaseStorage = createClient(supabaseUrl, supabaseKey)
 
@@ -31,12 +30,11 @@ export async function uploadUserAvatar({
   contentType,
 }: UploadAvatarOptions): Promise<UploadAvatarResult> {
   try {
-    if (file.size > 5 * 1024 * 1024) 
+    if (file.size > 5 * 1024 * 1024)
       return {
         success: false,
         error: 'La imagen no debe superar 5MB',
       }
-    
 
     const ext = contentType?.split('/')[1] || 'jpg'
     const filePath = `${userId}/avatar.${ext}`
@@ -73,13 +71,13 @@ export async function uploadUserAvatar({
   }
 }
 
-export async function deleteUserAvatar(userId: string): Promise<{ success: boolean; error?: string }> {
+export async function deleteUserAvatar(
+  userId: string
+): Promise<{ success: boolean; error?: string }> {
   try {
     const { data: files } = await supabaseStorage.storage.from(AVATARS_BUCKET).list(userId)
 
-    if (!files || files.length === 0) 
-      return { success: true }
-    
+    if (!files || files.length === 0) return { success: true }
 
     const filePaths = files.map((file) => `${userId}/${file.name}`)
 

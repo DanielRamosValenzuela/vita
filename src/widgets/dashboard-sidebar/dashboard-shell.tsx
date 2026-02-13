@@ -5,12 +5,7 @@ import { useTranslations } from 'next-intl'
 import { Menu } from 'lucide-react'
 
 import { Button } from '@/src/shared/ui/button'
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetTitle,
-} from '@/src/shared/ui/sheet'
+import { Sheet, SheetContent, SheetDescription, SheetTitle } from '@/src/shared/ui/sheet'
 
 import { usePathname } from '@/i18n/navigation'
 

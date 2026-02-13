@@ -5,8 +5,8 @@ import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import { Role } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
-import { prisma } from '@/src/shared/lib/db'
 import { env, isDev } from '@/src/shared/config'
+import { prisma } from '@/src/shared/lib/db'
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -23,8 +23,7 @@ export const authOptions: NextAuthOptions = {
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password)
-          return null
+        if (!credentials?.email || !credentials?.password) return null
 
         try {
           const user = await prisma.user.findUnique({
@@ -38,34 +37,31 @@ export const authOptions: NextAuthOptions = {
             },
           })
 
-          if (!user)
-            return null
+          if (!user) return null
 
           const credentialsAccount = user.accounts.find((acc) => acc.provider === 'credentials')
 
-          if (!credentialsAccount?.access_token)
-            return null
+          if (!credentialsAccount?.access_token) return null
 
           const isValidPassword = await bcrypt.compare(
             credentials.password,
             credentialsAccount.access_token
           )
 
-          if (!isValidPassword)
-            return null
+          if (!isValidPassword) return null
 
           return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          image: user.image || undefined,
-          customImage: user.customImage || undefined,
-          role: user.role,
-          organizationId: user.organizationId || undefined,
-          country: user.country || undefined,
-          docType: user.docType || undefined,
-          docNumber: user.docNumber || undefined,
-        }
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            image: user.image || undefined,
+            customImage: user.customImage || undefined,
+            role: user.role,
+            organizationId: user.organizationId || undefined,
+            country: user.country || undefined,
+            docType: user.docType || undefined,
+            docNumber: user.docNumber || undefined,
+          }
         } catch (error) {
           console.error('[NextAuth authorize] DB error:', error)
           return null
@@ -80,10 +76,10 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id
         token.role = user.role
         token.organizationId = user.organizationId
-          token.country = user.country
-          token.docType = user.docType
-          token.docNumber = user.docNumber
-          token.customImage = user.customImage
+        token.country = user.country
+        token.docType = user.docType
+        token.docNumber = user.docNumber
+        token.customImage = user.customImage
       } else if (token.id)
         try {
           const currentUser = await prisma.user.findUnique({
@@ -109,7 +105,7 @@ export const authOptions: NextAuthOptions = {
         } catch (error) {
           console.error('[NextAuth jwt] DB error refreshing token:', error)
         }
-      
+
       return token
     },
     async session({ session, token }) {

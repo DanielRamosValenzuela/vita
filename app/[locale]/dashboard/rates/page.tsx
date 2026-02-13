@@ -1,9 +1,9 @@
 import { getTranslations } from 'next-intl/server'
 
-import { getContractsPageDataAction } from '@/src/features/admin-hr/api'
-import { ContractsPage } from '@/src/features/admin-hr/ui'
 import { requireAdminHRWithOrg } from '@/src/shared/lib/auth/session'
 import { prisma } from '@/src/shared/lib/db'
+import { getContractsPageDataAction } from '@/src/features/admin-hr/api'
+import { ContractsPage } from '@/src/features/admin-hr/ui'
 
 interface RatesRouteProps {
   params: Promise<{ locale: string }>

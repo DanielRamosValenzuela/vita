@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { IMaskInput } from 'react-imask'
 import type { FactoryArg } from 'imask'
+import { IMaskInput } from 'react-imask'
 
 import { cn } from '@/src/shared/lib/utils'
 
@@ -50,13 +50,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     }
 
     return (
-      <input
-        type={type}
-        className={baseClassName}
-        ref={ref}
-        onChange={handleChange}
-        {...props}
-      />
+      <input type={type} className={baseClassName} ref={ref} onChange={handleChange} {...props} />
     )
   }
 )

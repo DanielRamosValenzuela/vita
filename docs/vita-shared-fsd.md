@@ -4,12 +4,12 @@ Capa **shared** del proyecto. Solo segmentos (sin slices). Otros layers importan
 
 ## Segmentos
 
-| Segmento | Ruta | Uso |
-|----------|------|-----|
-| **config** | `shared/config/` | Variables de entorno (env, isDev). Una sola fuente de verdad para `process.env`. |
-| **lib** | `shared/lib/` | Lógica pura, helpers, constantes, auth, db, providers, temas, tipos, validación, utils. |
-| **ui** | `shared/ui/` | Componentes reutilizables (atoms, molecules, primitivos). |
-| **hooks** | `shared/hooks/` | Hooks reutilizables (ej. `useFormAction`). |
+| Segmento   | Ruta             | Uso                                                                                     |
+| ---------- | ---------------- | --------------------------------------------------------------------------------------- |
+| **config** | `shared/config/` | Variables de entorno (env, isDev). Una sola fuente de verdad para `process.env`.        |
+| **lib**    | `shared/lib/`    | Lógica pura, helpers, constantes, auth, db, providers, temas, tipos, validación, utils. |
+| **ui**     | `shared/ui/`     | Componentes reutilizables (atoms, molecules, primitivos).                               |
+| **hooks**  | `shared/hooks/`  | Hooks reutilizables (ej. `useFormAction`).                                              |
 
 ## Dentro de lib
 

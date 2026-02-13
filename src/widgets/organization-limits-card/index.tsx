@@ -1,10 +1,10 @@
 import { getTranslations } from 'next-intl/server'
 import { AlertCircle, AlertTriangle, Users } from 'lucide-react'
 
-import { Badge } from '@/src/shared/ui/badge'
 import { getRoleDisplayMeta, getUsageBadgeVariant } from '@/src/shared/lib/utils/role-display'
-
+import { Badge } from '@/src/shared/ui/badge'
 import { Progress } from '@/src/shared/ui/progress'
+
 import { getOrganizationUsageSummary } from '@/src/entities/organization'
 
 interface OrganizationLimitsCardProps {
@@ -19,7 +19,9 @@ export async function OrganizationLimitsCard({ organizationId }: OrganizationLim
     usageSummary = await getOrganizationUsageSummary(organizationId)
   } catch (_error) {
     return (
-      <p className="text-center py-8 text-muted-foreground" role="alert">{t('loadError')}</p>
+      <p className="text-center py-8 text-muted-foreground" role="alert">
+        {t('loadError')}
+      </p>
     )
   }
 
@@ -41,9 +43,7 @@ export async function OrganizationLimitsCard({ organizationId }: OrganizationLim
           role="status"
         >
           <AlertTriangle className="h-4 w-4 text-muted-foreground" aria-hidden />
-          <span className="text-sm text-muted-foreground font-medium">
-            {t('warningsMessage')}
-          </span>
+          <span className="text-sm text-muted-foreground font-medium">{t('warningsMessage')}</span>
         </div>
       )}
 
@@ -65,7 +65,9 @@ export async function OrganizationLimitsCard({ organizationId }: OrganizationLim
 
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
-                  <span className="text-lg" aria-hidden>{meta.icon}</span>
+                  <span className="text-lg" aria-hidden>
+                    {meta.icon}
+                  </span>
                   <div className="flex-1">
                     <h4 className="font-medium text-sm leading-tight">{t(meta.translationKey)}</h4>
                     <p className="text-xs text-muted-foreground">
@@ -106,7 +108,9 @@ export async function OrganizationLimitsCard({ organizationId }: OrganizationLim
       <section className="p-4 rounded-lg bg-muted/50" aria-labelledby="org-limits-total-heading">
         <div className="flex items-center justify-between">
           <div>
-            <h4 id="org-limits-total-heading" className="font-medium text-sm">{t('totalUsage')}</h4>
+            <h4 id="org-limits-total-heading" className="font-medium text-sm">
+              {t('totalUsage')}
+            </h4>
             <p className="text-xs text-muted-foreground">
               {t('accountsUsed', {
                 current: usageSummary.totalUsers,

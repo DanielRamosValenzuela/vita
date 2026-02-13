@@ -201,7 +201,8 @@ export function CreateOrganizationForm() {
                 aria-invalid={!!errors.maxAdminHR}
               />
               <p className="text-muted-foreground text-xs">
-                {t('form.maxAdminHR.description')} {t('form.maxSuffix', { max: planLimits.maxAdminHR })}
+                {t('form.maxAdminHR.description')}{' '}
+                {t('form.maxSuffix', { max: planLimits.maxAdminHR })}
               </p>
               {errors.maxAdminHR && (
                 <p className="text-destructive text-sm">{errors.maxAdminHR.message}</p>
@@ -223,7 +224,8 @@ export function CreateOrganizationForm() {
                 aria-invalid={!!errors.maxChiefs}
               />
               <p className="text-muted-foreground text-xs">
-                {t('form.maxChiefs.description')} {t('form.maxSuffix', { max: planLimits.maxChiefs })}
+                {t('form.maxChiefs.description')}{' '}
+                {t('form.maxSuffix', { max: planLimits.maxChiefs })}
               </p>
               {errors.maxChiefs && (
                 <p className="text-destructive text-sm">{errors.maxChiefs.message}</p>

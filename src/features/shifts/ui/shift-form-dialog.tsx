@@ -2,8 +2,6 @@
 
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
-
-import { useRouter } from '@/i18n/navigation'
 import { CalendarDays } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -15,6 +13,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/src/shared/ui/dialog'
+
+import { useRouter } from '@/i18n/navigation'
 
 import { createShiftAction } from '../api/shift-actions'
 import type { CreateShiftData } from '../types/shift-types'

@@ -1,12 +1,22 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { Trash2, GripVertical, Info } from 'lucide-react'
+import type { Currency } from '@prisma/client'
+import { GripVertical, Info, Trash2 } from 'lucide-react'
 
+import {
+  APPLY_CONDITIONS,
+  COMPONENT_TYPES,
+  COMPONENT_UNITS,
+  type ApplyCondition,
+  type ComponentType,
+  type ComponentUnit,
+} from '@/src/shared/lib/constants'
+import { getCurrencyMask } from '@/src/shared/lib/utils/input-masks'
 import { Button } from '@/src/shared/ui/button'
+import { Checkbox } from '@/src/shared/ui/checkbox'
 import { Input } from '@/src/shared/ui/input'
 import { Label } from '@/src/shared/ui/label'
-import { Checkbox } from '@/src/shared/ui/checkbox'
 import {
   Select,
   SelectContent,
@@ -14,22 +24,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/src/shared/ui/select'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/src/shared/ui/tooltip'
-import type { Currency } from '@prisma/client'
-import {
-  COMPONENT_TYPES,
-  COMPONENT_UNITS,
-  APPLY_CONDITIONS,
-  type ComponentType,
-  type ComponentUnit,
-  type ApplyCondition,
-} from '@/src/shared/lib/constants'
-import { getCurrencyMask } from '@/src/shared/lib/utils/input-masks'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/src/shared/ui/tooltip'
+
 import type { RateComponentData } from '../api/rate-template-actions'
 
 interface ShiftTypeOption {
@@ -166,7 +162,8 @@ export function RateComponentForm({
                 </Tooltip>
               </TooltipProvider>
             </div>
-            {component.unit === COMPONENT_UNITS.MULTIPLIER || component.unit === COMPONENT_UNITS.PERCENTAGE ? (
+            {component.unit === COMPONENT_UNITS.MULTIPLIER ||
+            component.unit === COMPONENT_UNITS.PERCENTAGE ? (
               <Input
                 type="number"
                 step="0.1"
@@ -201,7 +198,9 @@ export function RateComponentForm({
             </div>
             <Select
               value={component.applyCondition}
-              onValueChange={(value) => onUpdate(index, { applyCondition: value as ApplyCondition })}
+              onValueChange={(value) =>
+                onUpdate(index, { applyCondition: value as ApplyCondition })
+              }
             >
               <SelectTrigger>
                 <SelectValue />

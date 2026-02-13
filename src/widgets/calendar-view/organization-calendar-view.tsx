@@ -2,19 +2,21 @@
 
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
-import { Calendar as CalendarIcon } from 'lucide-react'
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isSameMonth } from 'date-fns'
 import type { Country } from '@prisma/client'
+import {
+  eachDayOfInterval,
+  endOfMonth,
+  format,
+  isSameDay,
+  isSameMonth,
+  startOfMonth,
+} from 'date-fns'
+import { Calendar as CalendarIcon } from 'lucide-react'
 
+import { DAY_TYPES, getDayTypeColor, getLocaleByCountry } from '@/src/shared/lib/constants'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/src/shared/ui/card'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/src/shared/ui/tooltip'
-import { getDayTypeColor, DAY_TYPES, getLocaleByCountry } from '@/src/shared/lib/constants'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/src/shared/ui/tooltip'
 
 interface CalendarDay {
   id: string
@@ -63,8 +65,7 @@ export function OrganizationCalendarView({
   }
 
   function handleDayClick(date: Date) {
-    if (canEdit && onDayClick)
-      onDayClick(date)
+    if (canEdit && onDayClick) onDayClick(date)
   }
 
   return (
@@ -135,13 +136,16 @@ export function OrganizationCalendarView({
                   {calendarDay && (
                     <TooltipContent>
                       <div className="space-y-1">
-                        <p className="font-medium">{calendarDay.name || t(`dayTypes.${calendarDay.type}`)}</p>
+                        <p className="font-medium">
+                          {calendarDay.name || t(`dayTypes.${calendarDay.type}`)}
+                        </p>
                         {calendarDay.description && (
                           <p className="text-xs text-muted-foreground">{calendarDay.description}</p>
                         )}
                         {calendarDay.multiplier !== 1.0 && (
                           <p className="text-xs">
-                            {t('multiplier')}: {t('multiplierBadge', { value: calendarDay.multiplier })}
+                            {t('multiplier')}:{' '}
+                            {t('multiplierBadge', { value: calendarDay.multiplier })}
                           </p>
                         )}
                       </div>

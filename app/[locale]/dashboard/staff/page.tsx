@@ -1,9 +1,9 @@
 import { getTranslations } from 'next-intl/server'
 
-import { getStaffPageDataAction } from '@/src/features/admin-hr/api'
-import { StaffViewPage } from '@/src/features/admin-hr/ui'
 import { requireAdminHROrChiefArea } from '@/src/shared/lib/auth'
 import { Alert, AlertDescription, AlertTitle } from '@/src/shared/ui/alert'
+import { getStaffPageDataAction } from '@/src/features/admin-hr/api'
+import { StaffViewPage } from '@/src/features/admin-hr/ui'
 
 interface StaffPageProps {
   params: Promise<{ locale: string }>

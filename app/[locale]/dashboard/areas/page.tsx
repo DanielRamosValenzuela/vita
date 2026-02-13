@@ -1,10 +1,10 @@
 import { getTranslations } from 'next-intl/server'
 
-import { getAreasAction } from '@/src/features/area/api'
-import { AreasTable } from '@/src/features/area/ui'
 import { requireAdminHROrChiefArea } from '@/src/shared/lib/auth'
 import { isChiefArea } from '@/src/shared/lib/auth/rbac'
 import { prisma } from '@/src/shared/lib/db'
+import { getAreasAction } from '@/src/features/area/api'
+import { AreasTable } from '@/src/features/area/ui'
 
 interface AreasPageProps {
   params: Promise<{ locale: string }>
@@ -65,11 +65,7 @@ export default async function AreasPage({ params }: AreasPageProps) {
         <p className="text-muted-foreground mt-2">{t('description')}</p>
       </div>
 
-      <AreasTable
-        areas={areas}
-        canCreate={!isChiefArea(user)}
-        canDelete={!isChiefArea(user)}
-      />
+      <AreasTable areas={areas} canCreate={!isChiefArea(user)} canDelete={!isChiefArea(user)} />
     </div>
   )
 }

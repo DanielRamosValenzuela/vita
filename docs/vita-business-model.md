@@ -80,11 +80,11 @@ Distribución de límites:
 
 ### Tipos de Cuentas
 
-| Tipo        | Rol          | Límite   | Costo |
-| ----------- | ------------ | -------- | ----- |
-| Admin HR    | `ADMIN_HR`   | maxAdminHR (5 gratis) | Gratis |
-| Jefes       | `CHIEF_AREA` | maxChiefs | $$    |
-| Staff       | `STAFF_HEALTH` | maxStaff | $   |
+| Tipo     | Rol            | Límite                | Costo  |
+| -------- | -------------- | --------------------- | ------ |
+| Admin HR | `ADMIN_HR`     | maxAdminHR (5 gratis) | Gratis |
+| Jefes    | `CHIEF_AREA`   | maxChiefs             | $$     |
+| Staff    | `STAFF_HEALTH` | maxStaff              | $      |
 
 ### Campos en Base de Datos
 

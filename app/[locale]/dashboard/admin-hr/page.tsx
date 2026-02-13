@@ -1,9 +1,9 @@
 import { getTranslations } from 'next-intl/server'
 
 import { requireAdminHRWithOrg } from '@/src/shared/lib/auth'
+import { OrganizationLimitsCard } from '@/src/widgets/organization-limits-card'
 import { getDashboardStatsAction } from '@/src/features/admin-hr/api'
 import { DashboardStatsCards } from '@/src/features/admin-hr/ui'
-import { OrganizationLimitsCard } from '@/src/widgets/organization-limits-card'
 
 interface AdminHRDashboardPageProps {
   params: Promise<{ locale: string }>

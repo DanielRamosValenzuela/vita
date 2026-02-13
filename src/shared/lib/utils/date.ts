@@ -1,5 +1,5 @@
-import { format as dateFnsFormat } from 'date-fns'
 import type { Country } from '@prisma/client'
+import { format as dateFnsFormat } from 'date-fns'
 
 import {
   getDateFormatByCountry,
@@ -21,8 +21,7 @@ export function formatDateByCountry(
   const dateObj = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date
   const locale = getLocaleByCountry(country)
 
-  if (customFormat)
-    return dateFnsFormat(dateObj, customFormat, { locale })
+  if (customFormat) return dateFnsFormat(dateObj, customFormat, { locale })
 
   const formatString = includeTime
     ? getDateTimeFormatByCountry(country)

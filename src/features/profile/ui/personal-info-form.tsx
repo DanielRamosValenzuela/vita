@@ -3,22 +3,25 @@
 import { useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Loader2, CalendarIcon } from 'lucide-react'
+import { format } from 'date-fns'
+import { CalendarIcon, Loader2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { format } from 'date-fns'
 
+import { cn } from '@/src/shared/lib/utils'
 import { Button } from '@/src/shared/ui/button'
+import { Calendar } from '@/src/shared/ui/calendar'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
 import { Input } from '@/src/shared/ui/input'
 import { Label } from '@/src/shared/ui/label'
-import { Textarea } from '@/src/shared/ui/textarea'
 import { Popover, PopoverContent, PopoverTrigger } from '@/src/shared/ui/popover'
-import { Calendar } from '@/src/shared/ui/calendar'
-import { cn } from '@/src/shared/lib/utils'
+import { Textarea } from '@/src/shared/ui/textarea'
 
 import { updatePersonalInfoAction } from '../api/personal-info-actions'
-import { updatePersonalInfoSchema, type UpdatePersonalInfoInput } from '../lib/schemas/personal-info-schema'
+import {
+  updatePersonalInfoSchema,
+  type UpdatePersonalInfoInput,
+} from '../lib/schemas/personal-info-schema'
 
 interface PersonalInfoFormProps {
   initialData: {
@@ -62,9 +65,8 @@ export function PersonalInfoForm({ initialData }: PersonalInfoFormProps) {
         birthDate: birthDate || null,
       })
 
-      if (result.success) 
-        toast.success(t('success'))
-       else {
+      if (result.success) toast.success(t('success'))
+      else {
         setError(result.error || t('error'))
         toast.error(result.error || t('error'))
       }
@@ -115,7 +117,11 @@ export function PersonalInfoForm({ initialData }: PersonalInfoFormProps) {
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {birthDate ? format(birthDate, 'PPP') : <span>{t('birthDate.placeholder')}</span>}
+                    {birthDate ? (
+                      format(birthDate, 'PPP')
+                    ) : (
+                      <span>{t('birthDate.placeholder')}</span>
+                    )}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0">
@@ -141,7 +147,9 @@ export function PersonalInfoForm({ initialData }: PersonalInfoFormProps) {
                 {...register('address')}
                 aria-invalid={!!errors.address}
               />
-              {errors.address && <p className="text-destructive text-sm">{errors.address.message}</p>}
+              {errors.address && (
+                <p className="text-destructive text-sm">{errors.address.message}</p>
+              )}
             </div>
 
             <div className="space-y-2 md:col-span-2">

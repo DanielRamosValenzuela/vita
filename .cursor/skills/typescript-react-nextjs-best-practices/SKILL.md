@@ -8,6 +8,7 @@ description: Applies TypeScript, React, and Next.js best practices when writing 
 ## When to use
 
 Apply this skill when:
+
 - Writing or reviewing TypeScript in React/Next.js
 - Implementing server or client components
 - Typing props, hooks, or route params
@@ -29,10 +30,10 @@ Apply this skill when:
 ```tsx
 // Prefer explicit props interface; export if reused
 interface ButtonProps {
-  label: string;
-  variant?: 'primary' | 'secondary';
-  onClick?: () => void;
-  children?: React.ReactNode;
+  label: string
+  variant?: 'primary' | 'secondary'
+  onClick?: () => void
+  children?: React.ReactNode
 }
 
 export function Button({ label, variant = 'primary', onClick, children }: ButtonProps) {
@@ -50,9 +51,9 @@ export function Button({ label, variant = 'primary', onClick, children }: Button
 
 ```tsx
 function useCounter(initial = 0): { count: number; increment: () => void } {
-  const [count, setCount] = useState(initial);
-  const increment = useCallback(() => setCount((c) => c + 1), []);
-  return { count, increment };
+  const [count, setCount] = useState(initial)
+  const increment = useCallback(() => setCount((c) => c + 1), [])
+  return { count, increment }
 }
 ```
 
@@ -97,13 +98,13 @@ function useCounter(initial = 0): { count: number; increment: () => void } {
 ```tsx
 // app/[locale]/dashboard/[id]/page.tsx
 interface PageProps {
-  params: Promise<{ locale: string; id: string }>;
-  searchParams: Promise<{ q?: string }>;
+  params: Promise<{ locale: string; id: string }>
+  searchParams: Promise<{ q?: string }>
 }
 
 export default async function Page({ params, searchParams }: PageProps) {
-  const { locale, id } = await params;
-  const { q } = await searchParams;
+  const { locale, id } = await params
+  const { q } = await searchParams
   // ...
 }
 ```
@@ -121,17 +122,17 @@ export default async function Page({ params, searchParams }: PageProps) {
 - Return a result shape (e.g. `{ success: boolean; error?: string; data?: T }`) for consistent client handling.
 
 ```tsx
-'use server';
+'use server'
 
-import { z } from 'zod';
+import { z } from 'zod'
 
-const schema = z.object({ name: z.string().min(1) });
+const schema = z.object({ name: z.string().min(1) })
 
 export async function submitForm(formData: FormData) {
-  const parsed = schema.safeParse({ name: formData.get('name') });
-  if (!parsed.success) return { success: false, error: parsed.error.message };
+  const parsed = schema.safeParse({ name: formData.get('name') })
+  if (!parsed.success) return { success: false, error: parsed.error.message }
   // ...
-  return { success: true, data: result };
+  return { success: true, data: result }
 }
 ```
 

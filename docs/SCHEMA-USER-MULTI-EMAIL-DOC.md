@@ -44,9 +44,9 @@ model UserEmail {
   provider    EmailProvider?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  
+
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+
   @@index([userId])
   @@index([email])
   @@unique([userId, isPrimary])  // Solo un email primario por usuario
@@ -61,6 +61,7 @@ enum EmailProvider {
 ```
 
 **Reglas**:
+
 - Solo UN email puede tener `isPrimary = true` por usuario
 - `User.email` mantiene compatibilidad con NextAuth (es el primario)
 - Al agregar email de Google, crear también `Account` en NextAuth
@@ -78,17 +79,18 @@ model UserDocumentHistory {
   validUntil   DateTime?
   changeReason String?   // "initial", "correction", "change"
   createdAt    DateTime  @default(now())
-  
+
   user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+
   @@index([userId])
   @@index([docNumber])
 }
 ```
 
 **Reglas**:
+
 - Al crear usuario: crear registro con `validFrom = now()`
-- Al modificar documento: 
+- Al modificar documento:
   - Cerrar registro anterior (`validUntil = now()`)
   - Crear nuevo registro con nuevo documento
 - **NO validar** unicidad por org en historial (solo auditoría)
@@ -98,12 +100,12 @@ model UserDocumentHistory {
 ```prisma
 model User {
   // ... campos existentes ...
-  
+
   // Modificaciones para imágenes
   image            String?           // OAuth image (Google, GitHub, etc.)
   customImage      String?           // Supabase Storage URL
   imageProvider    ImageProvider?    // Último proveedor usado
-  
+
   // Nuevas relaciones
   emails               UserEmail[]
   documentHistory      UserDocumentHistory[]
@@ -117,6 +119,7 @@ enum ImageProvider {
 ```
 
 **Prioridad de imagen**:
+
 1. `customImage` (si existe) ← Supabase Storage
 2. `image` (OAuth) ← Google
 3. Initials fallback (UI)
@@ -124,6 +127,7 @@ enum ImageProvider {
 ### 4. Validación de Documento Único por Org
 
 **Helper Function**:
+
 ```typescript
 async function validateDocumentUniqueness(
   userId: string,
@@ -137,28 +141,28 @@ async function validateDocumentUniqueness(
     include: {
       organization: true,
       // Si puede estar en múltiples orgs, incluir relación
-    }
+    },
   })
-  
+
   // 2. Verificar si el documento ya existe en alguna org del usuario
   const conflicts = await prisma.user.findMany({
     where: {
       AND: [
         { country, docType, docNumber },
         { organizationId: { in: userOrgIds } },
-        { id: { not: userId } } // Excluir el mismo usuario
-      ]
+        { id: { not: userId } }, // Excluir el mismo usuario
+      ],
     },
-    include: { organization: true }
+    include: { organization: true },
   })
-  
+
   if (conflicts.length > 0) {
     return {
       valid: false,
-      error: `El documento ya existe en: ${conflicts.map(c => c.organization.name).join(', ')}`
+      error: `El documento ya existe en: ${conflicts.map((c) => c.organization.name).join(', ')}`,
     }
   }
-  
+
   return { valid: true }
 }
 ```
@@ -174,13 +178,13 @@ async function validateDocumentUniqueness(
 async function inviteUser(organizationId: string, userId: string) {
   // 1. Obtener datos del usuario
   const user = await prisma.user.findUnique({ where: { id: userId } })
-  
+
   // 2. Verificar si tiene documento
   if (!user.docNumber) {
     // Enviar invitación, pero marcar que debe completar perfil
     return { requiresDocumentCompletion: true }
   }
-  
+
   // 3. Verificar si el documento ya existe en esta org
   const existingUser = await prisma.user.findFirst({
     where: {
@@ -188,17 +192,17 @@ async function inviteUser(organizationId: string, userId: string) {
       docType: user.docType,
       docNumber: user.docNumber,
       organizationId: organizationId,
-      id: { not: userId }
-    }
+      id: { not: userId },
+    },
   })
-  
+
   if (existingUser) {
     return {
       success: false,
-      error: `El documento ${user.docNumber} ya existe en esta organización (${existingUser.name})`
+      error: `El documento ${user.docNumber} ya existe en esta organización (${existingUser.name})`,
     }
   }
-  
+
   // 4. Proceder con invitación
   // ...
 }
@@ -214,25 +218,28 @@ async function updateUserDocument(
   newDocNumber: string
 ) {
   // 1. Obtener usuario actual
-  const user = await prisma.user.findUnique({ 
+  const user = await prisma.user.findUnique({
     where: { id: userId },
-    include: { organization: true }
+    include: { organization: true },
   })
-  
+
   // 2. Si tiene organización, validar unicidad
   if (user.organizationId) {
     const validation = await validateDocumentUniqueness(
-      userId, newCountry, newDocType, newDocNumber
+      userId,
+      newCountry,
+      newDocType,
+      newDocNumber
     )
-    
+
     if (!validation.valid) {
       return {
         success: false,
-        error: validation.error
+        error: validation.error,
       }
     }
   }
-  
+
   // 3. Guardar en historial
   if (user.docNumber) {
     await prisma.userDocumentHistory.create({
@@ -243,21 +250,21 @@ async function updateUserDocument(
         docNumber: user.docNumber,
         validFrom: user.createdAt,
         validUntil: new Date(),
-        changeReason: 'change'
-      }
+        changeReason: 'change',
+      },
     })
   }
-  
+
   // 4. Actualizar usuario
   await prisma.user.update({
     where: { id: userId },
     data: {
       country: newCountry,
       docType: newDocType,
-      docNumber: newDocNumber
-    }
+      docNumber: newDocNumber,
+    },
   })
-  
+
   // 5. Crear nuevo registro de historial
   await prisma.userDocumentHistory.create({
     data: {
@@ -265,8 +272,8 @@ async function updateUserDocument(
       country: newCountry,
       docType: newDocType,
       docNumber: newDocNumber,
-      changeReason: 'change'
-    }
+      changeReason: 'change',
+    },
   })
 }
 ```
@@ -282,10 +289,10 @@ async function addGoogleEmail(userId: string) {
       userId,
       email: googleEmail,
       isVerified: true,
-      provider: 'GOOGLE'
-    }
+      provider: 'GOOGLE',
+    },
   })
-  
+
   // 3. Crear Account en NextAuth para OAuth
   await prisma.account.create({
     data: {
@@ -294,7 +301,7 @@ async function addGoogleEmail(userId: string) {
       provider: 'google',
       providerAccountId: googleId,
       // ... otros datos de Google
-    }
+    },
   })
 }
 ```
@@ -314,7 +321,7 @@ values ('avatars', 'avatars', true);
 create policy "Users can upload their own avatar"
 on storage.objects for insert
 with check (
-  bucket_id = 'avatars' 
+  bucket_id = 'avatars'
   and auth.uid()::text = (storage.foldername(name))[1]
 );
 
@@ -327,7 +334,7 @@ using (bucket_id = 'avatars');
 create policy "Users can update their own avatar"
 on storage.objects for update
 using (
-  bucket_id = 'avatars' 
+  bucket_id = 'avatars'
   and auth.uid()::text = (storage.foldername(name))[1]
 );
 
@@ -335,12 +342,13 @@ using (
 create policy "Users can delete their own avatar"
 on storage.objects for delete
 using (
-  bucket_id = 'avatars' 
+  bucket_id = 'avatars'
   and auth.uid()::text = (storage.foldername(name))[1]
 );
 ```
 
 **Estructura de paths**:
+
 ```
 avatars/
   {userId}/
@@ -360,17 +368,17 @@ export function getProfileImage(user: User): string {
   if (user.customImage) {
     return user.customImage
   }
-  
+
   // 2. Imagen OAuth (Google, etc.)
   if (user.image) {
     return user.image
   }
-  
+
   // 3. Gravatar (futuro)
   // if (user.email) {
   //   return getGravatarUrl(user.email)
   // }
-  
+
   // 4. Initials fallback (se maneja en UI)
   return null
 }
@@ -384,35 +392,36 @@ export async function uploadUserAvatar(userId: string, file: File) {
   if (!file.type.startsWith('image/')) {
     throw new Error('El archivo debe ser una imagen')
   }
-  
-  if (file.size > 5 * 1024 * 1024) { // 5MB
+
+  if (file.size > 5 * 1024 * 1024) {
+    // 5MB
     throw new Error('La imagen no debe superar 5MB')
   }
-  
+
   // 2. Subir a Supabase Storage
   const ext = file.name.split('.').pop()
   const path = `${userId}/avatar.${ext}`
-  
+
   const { data, error } = await supabase.storage
     .from('avatars')
     .upload(path, file, { upsert: true })
-  
+
   if (error) throw error
-  
+
   // 3. Obtener URL pública
-  const { data: { publicUrl } } = supabase.storage
-    .from('avatars')
-    .getPublicUrl(path)
-  
+  const {
+    data: { publicUrl },
+  } = supabase.storage.from('avatars').getPublicUrl(path)
+
   // 4. Actualizar usuario
   await prisma.user.update({
     where: { id: userId },
     data: {
       customImage: publicUrl,
-      imageProvider: 'UPLOAD'
-    }
+      imageProvider: 'UPLOAD',
+    },
   })
-  
+
   return publicUrl
 }
 ```

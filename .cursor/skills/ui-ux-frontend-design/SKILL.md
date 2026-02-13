@@ -8,6 +8,7 @@ description: Applies UI/UX design principles, frontend styling best practices (l
 ## When to use
 
 Apply this skill when:
+
 - Designing or redesigning screens or components
 - Reviewing or improving styles (CSS, Tailwind, design systems)
 - Working on HTML semantics or accessibility (a11y)

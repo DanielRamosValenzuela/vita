@@ -109,6 +109,7 @@ Sesiones relacionadas con el sistema de gestión de turnos, tipos de turno, áre
 ### Contexto y Decisión Arquitectónica
 
 **Problema identificado:** El sistema anterior de tarifas era rígido, basado solo en `ratePerMinute` y `baseSalary`, y no contemplaba la complejidad de:
+
 - Diferentes industrias (salud, seguridad, construcción, etc.)
 - Días especiales (feriados, feriados irrenunciables, fin de semana)
 - Componentes variables (bonos nocturnos, multiplicadores, etc.)
@@ -129,6 +130,7 @@ Sesiones relacionadas con el sistema de gestión de turnos, tipos de turno, áre
    - Relación: Pertenece a una `Organization`
 
 **Enums Añadidos**:
+
 - `Currency`: CLP, USD, COP, ARS, MXN, PEN, EUR
 - `ComponentType`: 18 tipos (BASE_SALARY, PER_MINUTE, NIGHT_SHIFT_BONUS, WEEKEND_MULTIPLIER, etc.) + CUSTOM
 - `ComponentUnit`: MONTHLY, BIWEEKLY, WEEKLY, DAILY, PER_SHIFT, PER_MINUTE, PER_HOUR, PERCENTAGE, MULTIPLIER, FIXED_AMOUNT
@@ -136,6 +138,7 @@ Sesiones relacionadas con el sistema de gestión de turnos, tipos de turno, áre
 - `DayType`: NORMAL, WEEKEND, SATURDAY, SUNDAY, HOLIDAY, IRRENUNCIABLE, ORGANIZATION_HOLIDAY, CUSTOM
 
 **Modelos Modificados**:
+
 - `Organization`: Añadido `currency` (Currency) y relación `calendars OrganizationCalendar[]`
 - `RateTemplate`: Eliminados `ratePerMinute`, `baseSalary`. Añadida relación `components RateComponent[]`
 - `Contract`: Simplificado. Campos eliminados: `ratePerMinute`, `adjustmentPerMinute`, `baseSalary`, `baseSalaryUnit`. Campo `rateTemplateId` ahora **obligatorio**. Añadidos: `customMultiplier Float?`, `notes String?`
@@ -145,6 +148,7 @@ Sesiones relacionadas con el sistema de gestión de turnos, tipos de turno, áre
 ### Backend API
 
 **Rate Template Actions** (`features/admin-hr/api/rate-template-actions.ts`):
+
 - ✅ `getRateTemplatesAction`: Lista plantillas con componentes incluidos
 - ✅ `createRateTemplateAction`: Crea plantilla + componentes en transacción
 - ✅ `updateRateTemplateAction`: Actualiza template y reemplaza componentes
@@ -152,6 +156,7 @@ Sesiones relacionadas con el sistema de gestión de turnos, tipos de turno, áre
 - ✅ `duplicateRateTemplateAction`: Duplica plantilla con todos sus componentes
 
 **Contract Actions** (`features/admin-hr/api/contract-actions.ts`):
+
 - Completamente reescrito para nuevo schema
 - `StaffWithContract` y `ContractsPageData` interfaces actualizadas
 - ✅ `getContractsPageDataAction`: incluye `rateTemplates` con `_count` de componentes
@@ -163,6 +168,7 @@ Sesiones relacionadas con el sistema de gestión de turnos, tipos de turno, áre
 ### Componentes Reutilizables
 
 **CurrencyInput** (`shared/ui/atoms/currency-input.tsx`):
+
 - Input especializado para monedas con formateo automático
 - Separadores de miles dinámicos por moneda:
   - CLP (Chile): `$1.000.000` (punto)
@@ -172,6 +178,7 @@ Sesiones relacionadas con el sistema de gestión de turnos, tipos de turno, áre
 - Parsing correcto con `parseCurrencyInput`
 
 **Utilidades de Formateo** (`shared/lib/utils/format.ts`):
+
 - `CURRENCY_LOCALES`: mapeo de Currency a locale (es-CL, en-US, etc.)
 - `COUNTRY_CURRENCIES`: mapeo de Country a Currency
 - `formatCurrencyByCountry(amount, country, options)`
@@ -181,6 +188,7 @@ Sesiones relacionadas con el sistema de gestión de turnos, tipos de turno, áre
 ### UI del Módulo de Tarifas
 
 **RateComponentForm** (`features/admin-hr/ui/rate-component-form.tsx`):
+
 - Formulario para un componente individual
 - Selects para: `type`, `unit`, `applyCondition`
 - Input o CurrencyInput para `value` (según tipo)
@@ -188,6 +196,7 @@ Sesiones relacionadas con el sistema de gestión de turnos, tipos de turno, áre
 - Traducciones completas para todos los enums
 
 **RateTemplateForm** (`features/admin-hr/ui/rate-template-form.tsx`):
+
 - Formulario modal completo para crear/editar plantillas
 - Selección de presets predefinidos
 - Gestión de múltiples componentes (añadir, editar, eliminar, reordenar)
@@ -196,6 +205,7 @@ Sesiones relacionadas con el sistema de gestión de turnos, tipos de turno, áre
 - Estados: nombre, descripción, array de componentes
 
 **ContractsPage** (`features/admin-hr/ui/contracts-page.tsx`):
+
 - Completamente reescrito para el nuevo schema
 - **Tabla de Plantillas de Tarifas**:
   - Columnas: Nombre, Descripción, Componentes (count), Contratos (count), Acciones
@@ -207,12 +217,14 @@ Sesiones relacionadas con el sistema de gestión de turnos, tipos de turno, áre
 - Dialogs de confirmación para eliminar plantilla y finalizar contrato
 
 **Página de Tarifas** (`app/[locale]/dashboard/rates/page.tsx`):
+
 - Server component que obtiene `currency` de la organización
 - Pasa `ContractsPageData` y `currency` a `ContractsPage`
 
 ### UI del Módulo de Personal
 
 **StaffViewPage** (`features/admin-hr/ui/staff-view-page.tsx`):
+
 - Componente simplificado **solo para visualización** (no edita contratos)
 - **Tabla de Personal**:
   - Columnas: Personal, Rol, Área, Tarifa Asignada, Multiplicador, Estado del Contrato
@@ -224,6 +236,7 @@ Sesiones relacionadas con el sistema de gestión de turnos, tipos de turno, áre
   - Personal con contrato / Personal sin contrato (cards con iconos)
 
 **Página de Personal** (`app/[locale]/dashboard/staff/page.tsx`):
+
 - Actualizada para usar `StaffViewPage` en lugar de `ContractsPage`
 - Solo pasa `staff` (no `rateTemplates` ni `areas`)
 - Mensajes de error y estado vacío mejorados
@@ -231,6 +244,7 @@ Sesiones relacionadas con el sistema de gestión de turnos, tipos de turno, áre
 ### Presets de Tarifas
 
 **rate-presets.ts** (`features/admin-hr/lib/rate-presets.ts`):
+
 - 10 presets predefinidos en `RATE_PRESETS`:
   1. Guardia Salud Estándar
   2. Guardia Salud Solo Base
@@ -248,6 +262,7 @@ Sesiones relacionadas con el sistema de gestión de turnos, tipos de turno, áre
 ### Internacionalización
 
 **Traducciones añadidas** (es.json / en.json):
+
 - `adminHR.rates.templateForm.*`: Formulario de plantilla (nombre, descripción, componentes, presets, errores)
 - `adminHR.rates.componentForm.*`: Formulario de componente (tipo, unidad, condición, nombres personalizados)
 - `adminHR.rates.rateTemplates.*`: Tabla de plantillas (headers, acciones, estado)
@@ -273,6 +288,7 @@ Sesiones relacionadas con el sistema de gestión de turnos, tipos de turno, áre
 ### Resultado Final
 
 ✅ **Sistema de Tarifas Flexibles v2.0** completamente funcional:
+
 - Schema modular y escalable
 - Backend API robusto con validaciones
 - UI completa para ADMIN_HR (crear, editar, duplicar, eliminar tarifas)
@@ -286,11 +302,13 @@ Sesiones relacionadas con el sistema de gestión de turnos, tipos de turno, áre
 ### Mejoras de Código y Buenas Prácticas
 
 **Eliminación de Presets**:
+
 - ❌ Eliminado `rate-presets.ts` (10 plantillas hardcodeadas)
 - ✅ ADMIN_HR ahora crea tarifas completamente desde cero
 - ✅ UI mejorada con tooltips explicativos en cada campo
 
 **UX Mejorada con Tooltips**:
+
 - Todos los formularios ahora incluyen iconos de información con tooltips
 - `RateTemplateForm`: Tooltips en nombre, descripción y componentes
 - `RateComponentForm`: Tooltips en tipo, unidad, monto y condición de aplicación
@@ -299,9 +317,10 @@ Sesiones relacionadas con el sistema de gestión de turnos, tipos de turno, áre
 
 **Refactorización según FSD**:
 
-*Problema identificado*: El calendario estaba en `features/admin-hr/ui/organization-calendar.tsx`, violando FSD porque mezclaba widget (visualización reutilizable) con feature (acción específica de ADMIN_HR).
+_Problema identificado_: El calendario estaba en `features/admin-hr/ui/organization-calendar.tsx`, violando FSD porque mezclaba widget (visualización reutilizable) con feature (acción específica de ADMIN_HR).
 
-*Solución aplicada*:
+_Solución aplicada_:
+
 1. **Widget reutilizable** (`widgets/calendar-view/`):
    - `organization-calendar-view.tsx`: Componente visual del calendario
    - Props: `calendarDays`, `onDayClick`, `canEdit`, `locale`
@@ -324,12 +343,14 @@ Sesiones relacionadas con el sistema de gestión de turnos, tipos de turno, áre
    - Separa data fetching de interacción
 
 **Eliminación de Magic Strings**:
+
 - ✅ `RateComponentForm`: Usa `COMPONENT_TYPES`, `COMPONENT_UNITS`, `APPLY_CONDITIONS`
 - ✅ `RateTemplateForm`: Usa constantes para valores por defecto
 - ✅ `CalendarDayForm`: Usa `DAY_TYPES`
 - ✅ Todos los selects iteran sobre `Object.entries()` de constantes
 
 **Principio DRY Aplicado**:
+
 - ✅ `getDayTypeColor()` en shared/constants (reutilizable)
 - ✅ Widget de calendario reutilizable entre roles
 - ✅ Constantes centralizadas en shared
@@ -338,6 +359,7 @@ Sesiones relacionadas con el sistema de gestión de turnos, tipos de turno, áre
 ### Calendario Organizacional
 
 **Funcionalidades Implementadas**:
+
 - ✅ Vista de calendario mensual interactivo
 - ✅ Click en días para editar (solo si `canEdit={true}`)
 - ✅ 8 tipos de día: Normal, Fin de Semana, Sábado, Domingo, Feriado, Feriado Irrenunciable, Feriado Organizacional, Personalizado
@@ -349,6 +371,7 @@ Sesiones relacionadas con el sistema de gestión de turnos, tipos de turno, áre
 - ✅ Navegación mes a mes
 
 **Arquitectura FSD**:
+
 ```
 widgets/calendar-view/              # Widget reutilizable
   ├── organization-calendar-view.tsx  # Visualización del calendario
@@ -369,6 +392,7 @@ app/[locale]/dashboard/calendar/    # Composición de página
 ```
 
 **Ventajas de esta arquitectura**:
+
 - El widget `OrganizationCalendarView` puede usarse en:
   - `/dashboard/calendar` (ADMIN_HR edita días)
   - `/dashboard/shifts` (CHIEF ve días especiales al crear turnos)
@@ -378,6 +402,7 @@ app/[locale]/dashboard/calendar/    # Composición de página
 - Función `getDayTypeColor()` reutilizable para badges, tarjetas, etc.
 
 **Validación**:
+
 - ✅ Build exitoso
 - ✅ Lint sin errores
 - ✅ FSD correctamente aplicado
@@ -411,11 +436,13 @@ app/[locale]/dashboard/calendar/    # Composición de página
    - date-fns locale para nombres de meses y días
 
 **Documentación**:
+
 - ✅ Creado `docs/INTERNACIONALIZACION.md` con guía completa
 - ✅ Ejemplos de uso por país
 - ✅ Buenas prácticas y patrones
 
 **Ventajas**:
+
 - 🌎 Soporte multi-país desde el día 1
 - ✅ Formatos nativos para cada país
 - ✅ Fácil añadir nuevos países (solo actualizar constantes)

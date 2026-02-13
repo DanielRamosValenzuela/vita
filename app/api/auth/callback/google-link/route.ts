@@ -15,9 +15,7 @@ export async function GET(request: NextRequest) {
     )
 
   if (!code || !state)
-    return NextResponse.redirect(
-      new URL(`/es/dashboard/profile?error=missing_params`, request.url)
-    )
+    return NextResponse.redirect(new URL(`/es/dashboard/profile?error=missing_params`, request.url))
 
   try {
     const { emailId, userId } = JSON.parse(Buffer.from(state, 'base64').toString())
@@ -34,8 +32,7 @@ export async function GET(request: NextRequest) {
       }),
     })
 
-    if (!tokenResponse.ok)
-      throw new Error('Token exchange failed')
+    if (!tokenResponse.ok) throw new Error('Token exchange failed')
 
     const tokens = await tokenResponse.json()
 
@@ -43,8 +40,7 @@ export async function GET(request: NextRequest) {
       headers: { Authorization: `Bearer ${tokens.access_token}` },
     })
 
-    if (!profileResponse.ok)
-      throw new Error('Profile fetch failed')
+    if (!profileResponse.ok) throw new Error('Profile fetch failed')
 
     const profile = await profileResponse.json()
 
@@ -114,8 +110,6 @@ export async function GET(request: NextRequest) {
     )
   } catch (error) {
     console.error('[Google Link Callback] Error:', error)
-    return NextResponse.redirect(
-      new URL(`/es/dashboard/profile?error=server_error`, request.url)
-    )
+    return NextResponse.redirect(new URL(`/es/dashboard/profile?error=server_error`, request.url))
   }
 }

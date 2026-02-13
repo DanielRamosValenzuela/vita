@@ -3,8 +3,8 @@
 import { revalidatePath } from 'next/cache'
 
 import { requireSuperAdmin } from '@/src/shared/lib/auth/session'
-import { getLocaleFromHeaders } from '@/src/shared/lib/utils/get-locale'
 import { handleActionError } from '@/src/shared/lib/utils'
+import { getLocaleFromHeaders } from '@/src/shared/lib/utils/get-locale'
 
 import {
   changeOrganizationStatus,
@@ -33,12 +33,11 @@ export const createOrganizationAction = async (data: CreateOrganizationInput) =>
     const validatedData = createOrganizationSchema.parse(data)
 
     const taxIdExists = await checkTaxIdExists(validatedData.taxId)
-    if (taxIdExists) 
+    if (taxIdExists)
       return {
         success: false,
         error: 'Ya existe una organización con este RUT/ID fiscal',
       }
-    
 
     const organization = await createOrganization(validatedData)
 
@@ -76,7 +75,11 @@ export const updateOrganizationAction = async (data: UpdateOrganizationInput) =>
       message: 'Organización actualizada exitosamente',
     }
   } catch (error) {
-    return handleActionError(error, 'updateOrganizationAction', 'Error al actualizar la organización')
+    return handleActionError(
+      error,
+      'updateOrganizationAction',
+      'Error al actualizar la organización'
+    )
   }
 }
 

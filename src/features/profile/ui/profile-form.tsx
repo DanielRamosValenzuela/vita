@@ -43,9 +43,8 @@ export function ProfileForm({ initialData }: ProfileFormProps) {
     startTransition(async () => {
       const result = await updateProfileAction(data)
 
-      if (result.success) 
-        toast.success(t('success'))
-       else {
+      if (result.success) toast.success(t('success'))
+      else {
         setError(result.error || t('error'))
         toast.error(result.error || t('error'))
       }

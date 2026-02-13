@@ -2,8 +2,8 @@
 
 import { env } from '@/src/shared/config'
 import { requireAuth } from '@/src/shared/lib/auth/session'
-import type { ActionResult } from '@/src/shared/lib/types'
 import { prisma } from '@/src/shared/lib/db'
+import type { ActionResult } from '@/src/shared/lib/types'
 import { handleActionError } from '@/src/shared/lib/utils'
 
 export async function initiateGoogleLinkAction(
@@ -59,7 +59,11 @@ export async function initiateGoogleLinkAction(
       },
     }
   } catch (error) {
-    return handleActionError(error, 'initiateGoogleLinkAction', 'Error al iniciar vinculación con Google')
+    return handleActionError(
+      error,
+      'initiateGoogleLinkAction',
+      'Error al iniciar vinculación con Google'
+    )
   }
 }
 
@@ -153,6 +157,10 @@ export async function checkGoogleLinkStatusAction(
       data: { canLink: true },
     }
   } catch (error) {
-    return handleActionError(error, 'checkGoogleLinkStatusAction', 'Error al verificar estado de vinculación')
+    return handleActionError(
+      error,
+      'checkGoogleLinkStatusAction',
+      'Error al verificar estado de vinculación'
+    )
   }
 }

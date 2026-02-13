@@ -29,7 +29,9 @@ export function CalendarView({ user }: CalendarViewProps) {
         <div className="flex min-h-[400px] items-center justify-center rounded-lg border-2 border-dashed">
           <div className="text-center">
             <Calendar className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
-            <p className="text-muted-foreground text-lg font-medium">{t('calendarViewComingSoon')}</p>
+            <p className="text-muted-foreground text-lg font-medium">
+              {t('calendarViewComingSoon')}
+            </p>
             <p className="text-muted-foreground mt-2 text-sm">
               {t('calendarViewComingSoonDescription')}
             </p>

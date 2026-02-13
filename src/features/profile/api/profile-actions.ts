@@ -5,8 +5,8 @@ import type { Country } from '@prisma/client'
 
 import { requireAuth } from '@/src/shared/lib/auth/session'
 import type { ActionResult } from '@/src/shared/lib/types'
-import { getLocaleFromHeaders } from '@/src/shared/lib/utils/get-locale'
 import { handleActionError } from '@/src/shared/lib/utils'
+import { getLocaleFromHeaders } from '@/src/shared/lib/utils/get-locale'
 
 import {
   acceptInvitation,
@@ -41,8 +41,7 @@ export async function updateProfileAction(data: {
 
     const result = await updateUserProfile(user.id, validation.data)
 
-    if (result.success)
-      revalidatePath('/dashboard/profile')
+    if (result.success) revalidatePath('/dashboard/profile')
 
     return result
   } catch (error) {
@@ -99,8 +98,7 @@ export async function updateDocumentAction(data: {
       validation.data.docNumber
     )
 
-    if (result.success)
-      revalidatePath('/dashboard/profile')
+    if (result.success) revalidatePath('/dashboard/profile')
 
     return result
   } catch (error) {
@@ -114,7 +112,11 @@ export async function getPendingInvitationsAction(): Promise<ActionResult<unknow
     const invitations = await getPendingInvitations(user.id)
     return { success: true, data: invitations }
   } catch (error) {
-    return handleActionError(error, 'getPendingInvitationsAction', 'Error al obtener invitaciones pendientes')
+    return handleActionError(
+      error,
+      'getPendingInvitationsAction',
+      'Error al obtener invitaciones pendientes'
+    )
   }
 }
 
@@ -141,9 +143,7 @@ export async function rejectInvitationAction(invitationId: string): Promise<Acti
 
     const result = await rejectInvitation(invitationId, user.id)
 
-    if (result.success) 
-      revalidatePath('/dashboard/profile')
-    
+    if (result.success) revalidatePath('/dashboard/profile')
 
     return result
   } catch (error) {

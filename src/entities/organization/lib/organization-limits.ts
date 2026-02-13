@@ -1,7 +1,7 @@
 import type { Role } from '@prisma/client'
 
-import { prisma } from '@/src/shared/lib/db'
 import { ROLES } from '@/src/shared/lib/constants'
+import { prisma } from '@/src/shared/lib/db'
 
 interface LimitCheckResult {
   success: boolean

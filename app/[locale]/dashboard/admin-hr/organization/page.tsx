@@ -2,13 +2,13 @@ import { getTranslations } from 'next-intl/server'
 
 import { requireAdminHR } from '@/src/shared/lib/auth'
 import { ROLES } from '@/src/shared/lib/constants'
+import { OrganizationLimitsCard } from '@/src/widgets/organization-limits-card'
 import { getAdminHROrganization } from '@/src/features/admin-hr/data'
 import {
   InvitationsTable,
   OrganizationTeamSection,
   OrganizationView,
 } from '@/src/features/admin-hr/ui'
-import { OrganizationLimitsCard } from '@/src/widgets/organization-limits-card'
 
 interface AdminHROrganizationPageProps {
   params: Promise<{ locale: string }>

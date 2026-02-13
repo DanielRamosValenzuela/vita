@@ -1,8 +1,8 @@
 'use server'
 
 import { requireAdminHRWithOrg } from '@/src/shared/lib/auth'
-import { getAdminHRDashboardStats } from '../data'
 
+import { getAdminHRDashboardStats } from '../data'
 import type { AdminHRDashboardStats } from '../lib'
 
 export async function getDashboardStatsAction(): Promise<{
