@@ -91,6 +91,7 @@ export function DashboardSidebar({ user, className }: DashboardSidebarProps) {
                 fill
                 className="rounded-full object-cover"
                 sizes="40px"
+                loading="eager"
                 unoptimized
               />
             </div>

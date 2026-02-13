@@ -69,6 +69,7 @@ export function MainNavbar() {
                         alt={session.user.name || 'Usuario'}
                         fill
                         className="rounded-full object-cover"
+                        loading="eager"
                         sizes="36px"
                         unoptimized
                       />
