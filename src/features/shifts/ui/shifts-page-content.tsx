@@ -1,0 +1,354 @@
+'use client'
+
+import { useMemo, useState, useTransition } from 'react'
+import { useTranslations } from 'next-intl'
+import type { ShiftStatus } from '@prisma/client'
+import { endOfMonth, format, startOfMonth } from 'date-fns'
+
+import { Badge } from '@/src/shared/ui/badge'
+import { Button } from '@/src/shared/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/src/shared/ui/card'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/src/shared/ui/table'
+
+import { getShiftsAction } from '../api/shift-actions'
+import type { ShiftWithRelations } from '../types/shift-types'
+import type { ShiftTypeOption } from './shift-form'
+import { AreaSwitcher } from './area-switcher'
+import { ShiftCalendar } from './shift-calendar'
+import { ShiftFilters } from './shift-filters'
+import { ShiftFormDialog } from './shift-form-dialog'
+
+interface AreaOption {
+  id: string
+  name: string
+  description?: string
+  color?: string
+  icon?: string
+}
+
+interface UserOption {
+  id: string
+  name: string
+  role: string
+  areaIds?: string[]
+}
+
+interface ShiftsPageContentProps {
+  organizationId: string
+  initialShifts: ShiftWithRelations[]
+  users: UserOption[]
+  areas: AreaOption[]
+  shiftTypes: ShiftTypeOption[]
+}
+
+export function ShiftsPageContent({
+  organizationId,
+  initialShifts,
+  users,
+  areas,
+  shiftTypes,
+}: ShiftsPageContentProps) {
+  const t = useTranslations('shifts')
+  const [shifts, setShifts] = useState<ShiftWithRelations[]>(initialShifts)
+  const [selectedAreaId, setSelectedAreaId] = useState<string | null>(null)
+  const [isPending, startTransition] = useTransition()
+
+  const calendarShifts = useMemo(
+    () =>
+      shifts.map((shift) => ({
+        id: shift.id,
+        title: shift.title || t('table.noTitle'),
+        startTime: shift.startTime,
+        endTime: shift.endTime,
+        status: shift.status,
+        userName: shift.user.name,
+        areaName: shift.area.name,
+        color: shift.shiftType.color,
+        icon: shift.shiftType.icon ?? 'Clock',
+      })),
+    [shifts, t]
+  )
+
+  const filteredAreas = useMemo(
+    () =>
+      areas.map((area) => ({
+        id: area.id,
+        name: area.name,
+        color: area.color,
+        icon: area.icon,
+      })),
+    [areas]
+  )
+
+  const formAreas = useMemo(
+    () =>
+      areas.map((area) => ({
+        id: area.id,
+        name: area.name,
+        description: area.description,
+      })),
+    [areas]
+  )
+
+  const formUsers = useMemo(
+    () =>
+      users.map((u) => ({
+        id: u.id,
+        name: u.name,
+        role: u.role,
+        areaIds: u.areaIds,
+      })),
+    [users]
+  )
+
+  const [currentFilters, setCurrentFilters] = useState<{
+    status?: string
+    userId?: string
+    shiftTypeId?: string
+    search?: string
+    startDate?: Date
+    endDate?: Date
+  }>({})
+  const [currentMonth, setCurrentMonth] = useState(new Date())
+
+  const fetchShifts = (params: {
+    areaId?: string | null
+    status?: string
+    userId?: string
+    shiftTypeId?: string
+    search?: string
+    startDate?: Date
+    endDate?: Date
+    monthDate?: Date
+  }) => {
+    const monthDate = params.monthDate ?? currentMonth
+    const start = params.startDate ?? startOfMonth(monthDate)
+    const end = params.endDate ?? endOfMonth(monthDate)
+
+    startTransition(async () => {
+      const result = await getShiftsAction({
+        startDate: start,
+        endDate: end,
+        areaId: (params.areaId !== undefined ? params.areaId : selectedAreaId) || undefined,
+        status: (params.status || undefined) as import('@prisma/client').ShiftStatus | undefined,
+        userId: params.userId || undefined,
+        shiftTypeId: params.shiftTypeId || undefined,
+        search: params.search || undefined,
+        pageSize: 200,
+      })
+      if (result.success && result.data) 
+        setShifts(result.data.shifts)
+      
+    })
+  }
+
+  const handleAreaChange = (areaId: string | null) => {
+    setSelectedAreaId(areaId)
+    fetchShifts({ areaId, ...currentFilters })
+  }
+
+  const handleFiltersChange = (filters: {
+    search: string
+    status: string
+    userId: string
+    areaId: string
+    shiftTypeId: string
+    startDate?: Date
+    endDate?: Date
+  }) => {
+    const newFilters = {
+      status: filters.status || undefined,
+      userId: filters.userId || undefined,
+      shiftTypeId: filters.shiftTypeId || undefined,
+      search: filters.search || undefined,
+      startDate: filters.startDate,
+      endDate: filters.endDate,
+    }
+    setCurrentFilters(newFilters)
+    fetchShifts({ ...newFilters })
+  }
+
+  const handleMonthChange = (month: Date) => {
+    setCurrentMonth(month)
+    fetchShifts({ monthDate: month, ...currentFilters })
+  }
+
+  const getStatusColor = (status: ShiftStatus) => {
+    switch (status) {
+      case 'SCHEDULED':
+        return 'bg-green-100 text-green-800 hover:bg-green-200'
+      case 'IN_PROGRESS':
+        return 'bg-blue-100 text-blue-800 hover:bg-blue-200'
+      case 'COMPLETED':
+        return 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+      case 'CANCELLED':
+        return 'bg-red-100 text-red-800 hover:bg-red-200'
+      case 'NO_SHOW':
+        return 'bg-orange-100 text-orange-800 hover:bg-orange-200'
+      default:
+        return 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+    }
+  }
+
+  const getStatusLabel = (status: ShiftStatus) => {
+    switch (status) {
+      case 'SCHEDULED':
+        return t('status.scheduled')
+      case 'IN_PROGRESS':
+        return t('status.inProgress')
+      case 'COMPLETED':
+        return t('status.completed')
+      case 'CANCELLED':
+        return t('status.cancelled')
+      case 'NO_SHOW':
+        return t('status.noShow')
+      default:
+        return status
+    }
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
+          <p className="text-muted-foreground mt-2">{t('description')}</p>
+        </div>
+
+        <ShiftFormDialog
+          organizationId={organizationId}
+          users={formUsers}
+          areas={formAreas}
+          shiftTypes={shiftTypes}
+        />
+      </div>
+
+      <AreaSwitcher
+        areas={filteredAreas}
+        selectedAreaId={selectedAreaId}
+        onAreaChange={handleAreaChange}
+      />
+
+      {isPending && (
+        <div className="text-sm text-muted-foreground animate-pulse">
+          {t('loading')}
+        </div>
+      )}
+
+      <div className="grid gap-4 md:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">{t('stats.totalShifts')}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{shifts.length}</div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">{t('stats.thisMonth')}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {shifts.filter((s) => s.status === 'SCHEDULED').length}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">{t('stats.inProgress')}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {shifts.filter((s) => s.status === 'IN_PROGRESS').length}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">{t('stats.completed')}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {shifts.filter((s) => s.status === 'COMPLETED').length}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>{t('filters.title')}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ShiftFilters
+            users={formUsers}
+            areas={formAreas}
+            shiftTypes={shiftTypes}
+            onFiltersChange={handleFiltersChange}
+          />
+        </CardContent>
+      </Card>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <ShiftCalendar shifts={calendarShifts} onMonthChange={handleMonthChange} />
+
+        <Card>
+          <CardHeader>
+            <CardTitle>{t('recent.title')}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {shifts.length === 0 ? (
+              <p className="text-muted-foreground text-center py-8">{t('recent.noShifts')}</p>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>{t('table.user')}</TableHead>
+                    <TableHead>{t('table.title')}</TableHead>
+                    <TableHead>{t('table.role')}</TableHead>
+                    <TableHead>{t('table.time')}</TableHead>
+                    <TableHead>{t('table.status')}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {shifts.slice(0, 10).map((shift) => (
+                    <TableRow key={shift.id}>
+                      <TableCell className="font-medium">{shift.user.name}</TableCell>
+                      <TableCell>{shift.title || t('table.noTitle')}</TableCell>
+                      <TableCell>{shift.user.role || t('table.noRole')}</TableCell>
+                      <TableCell>
+                        {format(shift.startTime, 'HH:mm')} - {format(shift.endTime, 'HH:mm')}
+                      </TableCell>
+                      <TableCell>
+                        <Badge className={getStatusColor(shift.status)}>
+                          {getStatusLabel(shift.status)}
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+
+            {shifts.length > 10 && (
+              <div className="mt-4 text-center">
+                <Button variant="outline">{t('recent.viewAll')}</Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  )
+}

@@ -1,22 +1,26 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useEffect, useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import type { Country } from '@prisma/client'
 import { format } from 'date-fns'
-import { Info } from 'lucide-react'
+import { Info, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { DAY_TYPES, getLocaleByCountry, type DayType } from '@/src/shared/lib/constants'
-import { Button } from '@/src/shared/ui/button'
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/src/shared/ui/dialog'
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/src/shared/ui/alert-dialog'
+import { Button } from '@/src/shared/ui/button'
 import { Input } from '@/src/shared/ui/input'
 import { Label } from '@/src/shared/ui/label'
 import {
@@ -26,16 +30,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/src/shared/ui/select'
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from '@/src/shared/ui/sheet'
 import { Textarea } from '@/src/shared/ui/textarea'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/src/shared/ui/tooltip'
 
-import { upsertCalendarDayAction } from '../api/calendar-actions'
+import { deleteCalendarDayAction, upsertCalendarDayAction } from '../api/calendar-actions'
 
 interface CalendarDayFormProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   selectedDate: Date | null
   existingDay?: {
+    id: string
     type: DayType
     name: string | null
     description: string | null
@@ -55,11 +67,19 @@ export function CalendarDayForm({
   const t = useTranslations('adminHR.calendar')
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
+  const [isDeleting, setIsDeleting] = useState(false)
 
   const [dayType, setDayType] = useState<DayType>(existingDay?.type || DAY_TYPES.NORMAL)
   const [dayName, setDayName] = useState(existingDay?.name || '')
   const [dayDescription, setDayDescription] = useState(existingDay?.description || '')
   const [multiplier, setMultiplier] = useState(existingDay?.multiplier.toString() || '1.0')
+
+  useEffect(() => {
+    setDayType(existingDay?.type || DAY_TYPES.NORMAL)
+    setDayName(existingDay?.name || '')
+    setDayDescription(existingDay?.description || '')
+    setMultiplier(existingDay?.multiplier?.toString() || '1.0')
+  }, [existingDay, selectedDate])
 
   const dateLocale = getLocaleByCountry(country)
 
@@ -69,7 +89,7 @@ export function CalendarDayForm({
     if (!selectedDate) return
 
     const multiplierValue = parseFloat(multiplier)
-    if (isNaN(multiplierValue) || multiplierValue < 0) {
+    if (isNaN(multiplierValue) || multiplierValue < 0.1) {
       toast.error(t('errors.invalidMultiplier'))
       return
     }
@@ -92,17 +112,33 @@ export function CalendarDayForm({
     })
   }
 
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle>
-            {selectedDate && format(selectedDate, 'EEEE, d MMMM yyyy', { locale: dateLocale })}
-          </DialogTitle>
-          <DialogDescription>{t('editDescription')}</DialogDescription>
-        </DialogHeader>
+  async function handleDelete() {
+    if (!existingDay?.id) return
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+    setIsDeleting(true)
+    try {
+      const result = await deleteCalendarDayAction(existingDay.id)
+      if (result.success) {
+        toast.success(result.message)
+        onOpenChange(false)
+        router.refresh()
+      } else toast.error(result.error)
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent side="right" className="overflow-y-auto">
+        <SheetHeader>
+          <SheetTitle>
+            {selectedDate && format(selectedDate, 'EEEE, d MMMM yyyy', { locale: dateLocale })}
+          </SheetTitle>
+          <SheetDescription>{t('editDescription')}</SheetDescription>
+        </SheetHeader>
+
+        <form onSubmit={handleSubmit} className="space-y-4 mt-6">
           <div>
             <div className="flex items-center gap-2 mb-2">
               <Label htmlFor="dayType">{t('form.dayType')}</Label>
@@ -149,7 +185,7 @@ export function CalendarDayForm({
               id="multiplier"
               type="number"
               step="0.1"
-              min="0"
+              min="0.1"
               value={multiplier}
               onChange={(e) => setMultiplier(e.target.value)}
               placeholder="1.0"
@@ -194,16 +230,50 @@ export function CalendarDayForm({
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
-              disabled={isPending}
+              disabled={isPending || isDeleting}
             >
               {t('form.cancel')}
             </Button>
-            <Button type="submit" disabled={isPending}>
+            <Button type="submit" disabled={isPending || isDeleting}>
               {isPending ? t('form.saving') : t('form.save')}
             </Button>
           </div>
+
+          {existingDay?.id && existingDay.type !== DAY_TYPES.NORMAL && (
+            <div className="pt-4 border-t">
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    className="w-full"
+                    disabled={isPending || isDeleting}
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    {isDeleting ? t('delete.deleting') : t('delete.title')}
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>{t('delete.title')}</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      {t('delete.description', {
+                        name: existingDay.name || t(`dayTypes.${existingDay.type}`),
+                      })}
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>{t('delete.cancel')}</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleDelete}>
+                      {t('delete.confirm')}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
+          )}
         </form>
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   )
 }

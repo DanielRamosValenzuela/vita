@@ -1,4 +1,4 @@
-# VITA — Guía Rápida para Agentes (Cursor / Claude)
+﻿# VITA — Guía Rápida para Agentes (Cursor / Claude)
 
 Este archivo es el **contexto principal** para cualquier agente que trabaje en VITA: qué es el producto, cómo está armado el proyecto, dónde está la documentación y qué reglas seguir al escribir código.
 

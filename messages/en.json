@@ -242,6 +242,7 @@
     "description": "Manage your staff shifts efficiently",
     "newShift": "New Shift",
     "noOrganization": "You don't have an assigned organization",
+    "loading": "Loading shifts...",
     "loadError": "Error loading shifts",
     "stats": {
       "totalShifts": "Total Shifts",
@@ -280,6 +281,7 @@
       "thisWeek": "This week",
       "thisMonth": "This month",
       "activeFilters": "Active filters",
+      "selectDate": "Select date",
       "clear": "Clear Filters",
       "apply": "Apply Filters"
     },
@@ -296,7 +298,9 @@
       "title": "Title",
       "role": "Role",
       "time": "Schedule",
-      "status": "Status"
+      "status": "Status",
+      "noTitle": "No title",
+      "noRole": "N/A"
     },
     "more": "more",
     "status": {
@@ -308,12 +312,15 @@
     },
     "form": {
       "dialogTitle": "Create New Shift",
-      "title": "Create Shift",
+      "createTitle": "Create Shift",
+      "editTitle": "Edit Shift",
       "basicInfo": "Basic Information",
       "title": {
         "label": "Title",
         "placeholder": "Shift title"
       },
+      "noTitle": "No title",
+      "differentEndDate": "Different end date",
       "user": {
         "label": "User",
         "placeholder": "Select user"
@@ -349,7 +356,23 @@
       },
       "create": "Create Shift",
       "creating": "Creating shift...",
+      "save": "Save",
+      "saving": "Saving...",
+      "checking": "Checking...",
       "cancel": "Cancel"
+    },
+    "validation": {
+      "userRequired": "Select a user",
+      "areaRequired": "Select an area",
+      "shiftTypeRequired": "Select a shift type",
+      "startDateRequired": "Select a start date",
+      "startTimeRequired": "Enter start time",
+      "endTimeRequired": "Enter end time"
+    },
+    "areaSwitcher": {
+      "label": "Area",
+      "allAreas": "All areas",
+      "noAreas": "No assigned areas"
     },
     "shiftTypes": {
       "title": "Shift Types",
@@ -1672,6 +1695,43 @@
         "cancel": "Cancel",
         "confirm": "Delete",
         "deleting": "Deleting..."
+      },
+      "weekdays": {
+        "sun": "Sun",
+        "mon": "Mon",
+        "tue": "Tue",
+        "wed": "Wed",
+        "thu": "Thu",
+        "fri": "Fri",
+        "sat": "Sat"
+      },
+      "import": {
+        "button": "Import Holidays",
+        "title": "Import National Holidays",
+        "description": "Select the national holidays you want to import to your organization's calendar.",
+        "yearLabel": "Year",
+        "selectAll": "Select all",
+        "deselectAll": "Deselect all",
+        "alreadyImported": "Already imported",
+        "importButton": "Import Selected",
+        "importing": "Importing...",
+        "successMessage": "{count} holidays imported",
+        "skippedMessage": "{skipped} already existed",
+        "noHolidays": "No holiday data available for this year",
+        "loadingHolidays": "Loading holidays...",
+        "errorLoading": "Error loading holidays. Please try again.",
+        "retry": "Retry",
+        "holiday": "Holiday",
+        "irrenunciable": "Mandatory",
+        "date": "Date",
+        "name": "Name",
+        "type": "Type",
+        "multiplierCol": "Multiplier"
+      },
+      "summary": {
+        "title": "Month Summary",
+        "total": "{count} special days",
+        "noSpecialDays": "No special days this month"
       }
     }
   },

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import type { Country } from '@prisma/client'
 import {
@@ -14,6 +14,7 @@ import {
 import { Calendar as CalendarIcon } from 'lucide-react'
 
 import { DAY_TYPES, getDayTypeColor, getLocaleByCountry } from '@/src/shared/lib/constants'
+import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/src/shared/ui/card'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/src/shared/ui/tooltip'
@@ -31,16 +32,20 @@ interface OrganizationCalendarViewProps {
   calendarDays: CalendarDay[]
   country: Country
   onDayClick?: (date: Date) => void
+  onMonthChange?: (year: number, month: number) => void
   canEdit?: boolean
   initialDate?: Date
+  isLoading?: boolean
 }
 
 export function OrganizationCalendarView({
   calendarDays,
   country,
   onDayClick,
+  onMonthChange,
   canEdit = false,
   initialDate,
+  isLoading = false,
 }: OrganizationCalendarViewProps) {
   const t = useTranslations('adminHR.calendar')
   const [currentDate, setCurrentDate] = useState(initialDate || new Date())
@@ -56,12 +61,26 @@ export function OrganizationCalendarView({
     calendarMap.set(key, day)
   })
 
+  const summary = useMemo(() => {
+    const counts: Record<string, number> = {}
+    for (const day of calendarDays) 
+      if (day.type !== DAY_TYPES.NORMAL) 
+        counts[day.type] = (counts[day.type] || 0) + 1
+      
+    
+    return counts
+  }, [calendarDays])
+
   function handlePreviousMonth() {
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1))
+    const prev = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1)
+    setCurrentDate(prev)
+    onMonthChange?.(prev.getFullYear(), prev.getMonth() + 1)
   }
 
   function handleNextMonth() {
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1))
+    const next = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1)
+    setCurrentDate(next)
+    onMonthChange?.(next.getFullYear(), next.getMonth() + 1)
   }
 
   function handleDayClick(date: Date) {
@@ -88,9 +107,9 @@ export function OrganizationCalendarView({
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-7 gap-2">
-          {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map((day) => (
+          {(['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'] as const).map((day) => (
             <div key={day} className="text-center text-sm font-medium text-muted-foreground py-2">
-              {day}
+              {t(`weekdays.${day}`)}
             </div>
           ))}
 
@@ -155,6 +174,24 @@ export function OrganizationCalendarView({
               </TooltipProvider>
             )
           })}
+        </div>
+
+        {isLoading && (
+          <div className="flex justify-center py-8">
+            <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          </div>
+        )}
+
+        <div className="mt-4 flex flex-wrap gap-2">
+          {Object.keys(summary).length > 0 ? (
+            Object.entries(summary).map(([type, count]) => (
+              <Badge key={type} variant="secondary">
+                {t('summary.total', { count })} {t(`dayTypes.${type}`)}
+              </Badge>
+            ))
+          ) : (
+            <p className="text-sm text-muted-foreground">{t('summary.noSpecialDays')}</p>
+          )}
         </div>
 
         <div className="mt-6 pt-6 border-t">
