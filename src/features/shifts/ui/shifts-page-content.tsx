@@ -19,10 +19,10 @@ import {
 
 import { getShiftsAction } from '../api/shift-actions'
 import type { ShiftWithRelations } from '../types/shift-types'
-import type { ShiftTypeOption } from './shift-form'
 import { AreaSwitcher } from './area-switcher'
 import { ShiftCalendar } from './shift-calendar'
 import { ShiftFilters } from './shift-filters'
+import type { ShiftTypeOption } from './shift-form'
 import { ShiftFormDialog } from './shift-form-dialog'
 
 interface AreaOption {
@@ -143,9 +143,7 @@ export function ShiftsPageContent({
         search: params.search || undefined,
         pageSize: 200,
       })
-      if (result.success && result.data) 
-        setShifts(result.data.shifts)
-      
+      if (result.success && result.data) setShifts(result.data.shifts)
     })
   }
 
@@ -237,9 +235,7 @@ export function ShiftsPageContent({
       />
 
       {isPending && (
-        <div className="text-sm text-muted-foreground animate-pulse">
-          {t('loading')}
-        </div>
+        <div className="text-sm text-muted-foreground animate-pulse">{t('loading')}</div>
       )}
 
       <div className="grid gap-4 md:grid-cols-4">

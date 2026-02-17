@@ -157,6 +157,7 @@
 ### Parallel Opportunities
 
 **Phase 1** (all parallelizable):
+
 ```
 T001 (Zod schemas)
 T002 (holiday API types)
@@ -166,12 +167,14 @@ T005 (es.json)           T006 (en.json)
 ```
 
 **Phase 2** (T007 parallel with T008):
+
 ```
 T007 (fix i18n weekdays)  ||  T008 (Zod in actions)
 T009 (exports, after T008)
 ```
 
 **User Stories** (can run in parallel after Phase 2):
+
 ```
 US1: T010 → T011 → T012
 US2: T013 → T014 → T015

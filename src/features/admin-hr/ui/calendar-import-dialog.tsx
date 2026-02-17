@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { format, isSameDay } from 'date-fns'
 import { toast } from 'sonner'
 
+import type { MappedHoliday } from '@/src/shared/lib/types/holidays'
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 import { Checkbox } from '@/src/shared/ui/checkbox'
@@ -24,7 +25,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/src/shared/ui/select'
-import type { MappedHoliday } from '@/src/shared/lib/types/holidays'
 
 import { importNationalHolidaysAction } from '../api/calendar-actions'
 import { fetchNationalHolidays } from '../lib/holiday-service'
@@ -71,11 +71,8 @@ export function CalendarImportDialog({
         const data = await fetchNationalHolidays(selectedYear)
         setHolidays(data)
         const initialSelected = new Set<string>()
-        for (const h of data) 
-          if (!isAlreadyImported(h.date)) 
-            initialSelected.add(h.date)
-          
-        
+        for (const h of data) if (!isAlreadyImported(h.date)) initialSelected.add(h.date)
+
         setSelected(initialSelected)
       } catch {
         setLoadError(true)
@@ -87,30 +84,23 @@ export function CalendarImportDialog({
   )
 
   useEffect(() => {
-    if (open) 
-      loadHolidays(year)
-    
+    if (open) loadHolidays(year)
   }, [open, year, loadHolidays])
 
   function handleToggle(date: string) {
     setSelected((prev) => {
       const next = new Set(prev)
-      if (next.has(date)) 
-        next.delete(date)
-       else 
-        next.add(date)
-      
+      if (next.has(date)) next.delete(date)
+      else next.add(date)
+
       return next
     })
   }
 
   function handleSelectAll() {
     const allAvailable = holidays.filter((h) => !isAlreadyImported(h.date)).map((h) => h.date)
-    if (selected.size === allAvailable.length) 
-      setSelected(new Set())
-     else 
-      setSelected(new Set(allAvailable))
-    
+    if (selected.size === allAvailable.length) setSelected(new Set())
+    else setSelected(new Set(allAvailable))
   }
 
   function handleImport() {
@@ -128,19 +118,17 @@ export function CalendarImportDialog({
 
       if (result.success && result.data) {
         const messages: string[] = []
-        if (result.data.imported > 0) 
+        if (result.data.imported > 0)
           messages.push(t('successMessage', { count: result.data.imported }))
-        
-        if (result.data.skipped > 0) 
+
+        if (result.data.skipped > 0)
           messages.push(t('skippedMessage', { skipped: result.data.skipped }))
-        
+
         toast.success(messages.join(' — '))
         onOpenChange(false)
         onImportComplete?.()
         router.refresh()
-      } else 
-        toast.error(result.error)
-      
+      } else toast.error(result.error)
     })
   }
 
@@ -215,9 +203,7 @@ export function CalendarImportDialog({
                       onCheckedChange={() => handleToggle(holiday.date)}
                       disabled={imported}
                     />
-                    <span className="text-sm w-24 shrink-0">
-                      {format(dateObj, 'dd/MM/yyyy')}
-                    </span>
+                    <span className="text-sm w-24 shrink-0">{format(dateObj, 'dd/MM/yyyy')}</span>
                     <span className="text-sm flex-1">{holiday.title}</span>
                     <Badge variant={holiday.inalienable ? 'destructive' : 'secondary'}>
                       {holiday.inalienable ? t('irrenunciable') : t('holiday')}

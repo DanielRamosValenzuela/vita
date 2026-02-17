@@ -2,8 +2,8 @@
 
 import { useTranslations } from 'next-intl'
 
-import { Tabs, TabsList, TabsTrigger } from '@/src/shared/ui/tabs'
 import { renderIcon } from '@/src/shared/ui/icon-picker'
+import { Tabs, TabsList, TabsTrigger } from '@/src/shared/ui/tabs'
 
 interface AreaOption {
   id: string
@@ -23,11 +23,7 @@ const ALL_AREAS_VALUE = '__all__'
 export function AreaSwitcher({ areas, selectedAreaId, onAreaChange }: AreaSwitcherProps) {
   const t = useTranslations('shifts.areaSwitcher')
 
-  if (areas.length === 0) 
-    return (
-      <p className="text-sm text-muted-foreground">{t('noAreas')}</p>
-    )
-  
+  if (areas.length === 0) return <p className="text-sm text-muted-foreground">{t('noAreas')}</p>
 
   return (
     <Tabs

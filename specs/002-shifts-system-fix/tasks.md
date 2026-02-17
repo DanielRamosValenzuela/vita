@@ -178,17 +178,20 @@
 ### Parallel Opportunities
 
 **Phase 1** (all parallelizable):
+
 ```
 T001 (es.json)    T002 (en.json)    T003 (Zod schemas)
 ```
 
 **Phase 2** (T004-T006 parallel, T007 parallel with T005/T006):
+
 ```
 T004 (fix form i18n)  ||  T005 (fix page.tsx)  ||  T006 (fix filters)
 T007 (remove Card wrapper, after T004)
 ```
 
 **User Stories** (partially parallel after Phase 2):
+
 ```
 US1: T008 → T009 → T010
 US3: T014, T016 (parallel) → T015

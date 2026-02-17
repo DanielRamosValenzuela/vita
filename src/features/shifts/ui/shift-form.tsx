@@ -25,8 +25,8 @@ import { Textarea } from '@/src/shared/ui/textarea'
 
 import { checkShiftConflictsClient } from '@/src/entities/shift/lib/shift-validation-client'
 
-import type { CreateShiftData, CreateShiftFormData } from '../types/shift-types'
 import { createShiftSchema, type ShiftFormData } from '../lib/shift-form-schemas'
+import type { CreateShiftData, CreateShiftFormData } from '../types/shift-types'
 
 export type ShiftTypeOption = {
   id: string
@@ -62,8 +62,7 @@ export function ShiftForm({
   const [isCheckingConflicts, setIsCheckingConflicts] = useState(false)
 
   const shiftSchema = useMemo(
-    () =>
-      createShiftSchema((key: string) => tValidation(key)),
+    () => createShiftSchema((key: string) => tValidation(key)),
     [tValidation]
   )
 
@@ -208,10 +207,7 @@ export function ShiftForm({
               {availableShiftTypes.map((type) => (
                 <SelectItem key={type.id} value={type.id}>
                   <div className="flex items-center gap-2">
-                    <div
-                      className="w-3 h-3 rounded-full"
-                      style={{ backgroundColor: type.color }}
-                    />
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: type.color }} />
                     {type.name}
                   </div>
                 </SelectItem>
@@ -238,9 +234,7 @@ export function ShiftForm({
             <PopoverContent className="w-auto p-0" align="start">
               <Calendar
                 mode="single"
-                selected={
-                  form.watch('startDate') ? new Date(form.watch('startDate')) : undefined
-                }
+                selected={form.watch('startDate') ? new Date(form.watch('startDate')) : undefined}
                 onSelect={(date) => date && form.setValue('startDate', date)}
                 initialFocus
               />
@@ -254,10 +248,7 @@ export function ShiftForm({
               id="differentEndDate"
               checked={!!form.watch('endDate')}
               onCheckedChange={(checked: boolean) =>
-                form.setValue(
-                  'endDate',
-                  checked ? form.watch('startDate').toString() : undefined
-                )
+                form.setValue('endDate', checked ? form.watch('startDate').toString() : undefined)
               }
             />
             <Label htmlFor="differentEndDate" className="text-sm font-normal">

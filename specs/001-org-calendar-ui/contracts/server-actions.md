@@ -28,7 +28,7 @@ async function getOrganizationCalendarAction(
 ```typescript
 // Modify to use Zod schema
 async function upsertCalendarDayAction(
-  data: CalendarDayInput  // Zod-validated
+  data: CalendarDayInput // Zod-validated
 ): Promise<ActionResult<OrganizationCalendarDay>>
 
 // Zod schema: calendarDaySchema
@@ -44,9 +44,7 @@ async function upsertCalendarDayAction(
 **Status**: Exists, works correctly. No changes needed.
 
 ```typescript
-async function deleteCalendarDayAction(
-  dayId: string
-): Promise<ActionResult<void>>
+async function deleteCalendarDayAction(dayId: string): Promise<ActionResult<void>>
 ```
 
 ### bulkMarkDaysAction
@@ -117,13 +115,17 @@ export const calendarDaySchema = z.object({
 export const importHolidaysSchema = z.object({
   year: z.number().min(2024).max(2030),
   countryCode: z.enum(['CL', 'CO', 'PE', 'AR', 'MX']),
-  selectedHolidays: z.array(z.object({
-    month: z.number().min(1).max(12),
-    day: z.number().min(1).max(31),
-    name: z.string(),
-    type: z.enum(['HOLIDAY', 'IRRENUNCIABLE']),
-    multiplier: z.number().min(0.1),
-  })).min(1, 'Select at least one holiday'),
+  selectedHolidays: z
+    .array(
+      z.object({
+        month: z.number().min(1).max(12),
+        day: z.number().min(1).max(31),
+        name: z.string(),
+        type: z.enum(['HOLIDAY', 'IRRENUNCIABLE']),
+        multiplier: z.number().min(0.1),
+      })
+    )
+    .min(1, 'Select at least one holiday'),
 })
 
 export type CalendarDayInput = z.infer<typeof calendarDaySchema>

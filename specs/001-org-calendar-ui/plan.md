@@ -21,16 +21,16 @@ Enhance the existing organizational calendar feature to match the full spec: mig
 
 ## Constitution Check
 
-*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
+_GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
-| Principle | Status | Notes |
-|-----------|--------|-------|
-| I. FSD & Code Quality | PASS | Calendar code stays in `features/admin-hr/` (existing location). New holiday datasets go in `shared/lib/constants/`. Zod schemas added for validation. |
-| II. Mandatory i18n | FIX NEEDED | Existing calendar view has hardcoded Spanish day names (`'Dom', 'Lun', ...`). Must be replaced with i18n keys. New import UI must use translation keys. |
-| III. Multi-Tenant Isolation | PASS | All existing actions already use `requireAdminHRWithOrg()` and filter by `organizationId`. New import action will follow same pattern. |
-| IV. Testing Standards | PASS | Feature must pass `build` + `lint`. Manual test flows documented in spec acceptance scenarios. |
-| V. Consistent UX & Accessibility | FIX NEEDED | Form migrating from Dialog to Sheet per clarification. Delete confirmation must use AlertDialog. Calendar grid needs keyboard navigation. |
-| VI. Technology Stack | PASS | No new dependencies. Using existing Shadcn Sheet, AlertDialog, Checkbox components. |
+| Principle                        | Status     | Notes                                                                                                                                                   |
+| -------------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| I. FSD & Code Quality            | PASS       | Calendar code stays in `features/admin-hr/` (existing location). New holiday datasets go in `shared/lib/constants/`. Zod schemas added for validation.  |
+| II. Mandatory i18n               | FIX NEEDED | Existing calendar view has hardcoded Spanish day names (`'Dom', 'Lun', ...`). Must be replaced with i18n keys. New import UI must use translation keys. |
+| III. Multi-Tenant Isolation      | PASS       | All existing actions already use `requireAdminHRWithOrg()` and filter by `organizationId`. New import action will follow same pattern.                  |
+| IV. Testing Standards            | PASS       | Feature must pass `build` + `lint`. Manual test flows documented in spec acceptance scenarios.                                                          |
+| V. Consistent UX & Accessibility | FIX NEEDED | Form migrating from Dialog to Sheet per clarification. Delete confirmation must use AlertDialog. Calendar grid needs keyboard navigation.               |
+| VI. Technology Stack             | PASS       | No new dependencies. Using existing Shadcn Sheet, AlertDialog, Checkbox components.                                                                     |
 
 **Gate result**: PASS with 2 fixes required (i18n day names, Dialog→Sheet migration). No violations to justify.
 

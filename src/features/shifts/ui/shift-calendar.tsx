@@ -9,12 +9,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/src/shared/ui/button'
 import { Calendar } from '@/src/shared/ui/calendar'
 import { Card, CardContent, CardHeader, CardTitle } from '@/src/shared/ui/card'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/src/shared/ui/tooltip'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/src/shared/ui/tooltip'
 
 interface CalendarEvent {
   id: string
@@ -62,11 +57,10 @@ export function ShiftCalendar({
 
   const uniqueShiftTypes = useMemo(() => {
     const seen = new Map<string, { color: string; name: string }>()
-    for (const shift of shifts) 
-      if (!seen.has(shift.color)) 
+    for (const shift of shifts)
+      if (!seen.has(shift.color))
         seen.set(shift.color, { color: shift.color, name: shift.areaName })
-      
-    
+
     return Array.from(seen.values())
   }, [shifts])
 
@@ -191,8 +185,7 @@ export function ShiftCalendar({
               nav_button_next: 'absolute right-1',
               table: 'w-full border-collapse space-y-1',
               head_row: 'flex',
-              head_cell:
-                'text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]',
+              head_cell: 'text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]',
               row: 'flex w-full mt-2',
               cell: 'relative h-28 w-full p-0 text-center text-sm align-top [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l last:[&:has([aria-selected])]:rounded-r focus-within:relative focus-within:z-20',
               day: 'h-9 w-9 p-0 font-normal aria-selected:opacity-100',
@@ -201,8 +194,7 @@ export function ShiftCalendar({
               day_today: 'bg-accent text-accent-foreground',
               day_outside: 'text-muted-foreground opacity-50',
               day_disabled: 'text-muted-foreground opacity-50',
-              day_range_middle:
-                'aria-selected:bg-accent aria-selected:text-accent-foreground',
+              day_range_middle: 'aria-selected:bg-accent aria-selected:text-accent-foreground',
               day_hidden: 'invisible',
             }}
             components={{
@@ -220,10 +212,7 @@ export function ShiftCalendar({
             <div className="mt-4 flex flex-wrap gap-3">
               {uniqueShiftTypes.map((st) => (
                 <div key={st.color} className="flex items-center gap-1.5 text-xs">
-                  <div
-                    className="w-2.5 h-2.5 rounded-full"
-                    style={{ backgroundColor: st.color }}
-                  />
+                  <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: st.color }} />
                   <span className="text-muted-foreground">{st.name}</span>
                 </div>
               ))}

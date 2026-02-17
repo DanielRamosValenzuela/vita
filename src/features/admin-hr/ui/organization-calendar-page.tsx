@@ -29,10 +29,7 @@ export function OrganizationCalendarPage({
   const [importDialogOpen, setImportDialogOpen] = useState(false)
   const [isLoading, startTransition] = useTransition()
 
-  const existingDates = useMemo(
-    () => calendarDays.map((d) => new Date(d.date)),
-    [calendarDays]
-  )
+  const existingDates = useMemo(() => calendarDays.map((d) => new Date(d.date)), [calendarDays])
 
   function handleDayClick(date: Date) {
     setSelectedDate(date)
@@ -42,11 +39,8 @@ export function OrganizationCalendarPage({
   function handleMonthChange(year: number, month: number) {
     startTransition(async () => {
       const result = await getOrganizationCalendarAction(year, month)
-      if (result.success && result.data) 
-        setCalendarDays(result.data)
-       else if (result.error) 
-        toast.error(result.error)
-      
+      if (result.success && result.data) setCalendarDays(result.data)
+      else if (result.error) toast.error(result.error)
     })
   }
 

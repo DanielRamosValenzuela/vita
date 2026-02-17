@@ -8,7 +8,11 @@ import { prisma } from '@/src/shared/lib/db'
 import type { ActionResult } from '@/src/shared/lib/types'
 import { handleActionError } from '@/src/shared/lib/utils'
 
-import { calendarDaySchema, importHolidaysSchema, type ImportHolidaysInput } from '../lib/calendar-schemas'
+import {
+  calendarDaySchema,
+  importHolidaysSchema,
+  type ImportHolidaysInput,
+} from '../lib/calendar-schemas'
 
 export interface OrganizationCalendarDay {
   id: string
@@ -237,10 +241,6 @@ export async function importNationalHolidaysAction(
       data: { imported, skipped },
     }
   } catch (error) {
-    return handleActionError(
-      error,
-      'importNationalHolidaysAction',
-      'Error al importar feriados'
-    )
+    return handleActionError(error, 'importNationalHolidaysAction', 'Error al importar feriados')
   }
 }

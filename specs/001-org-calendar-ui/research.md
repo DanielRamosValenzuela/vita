@@ -10,6 +10,7 @@
 **Rationale**: The feature is ~60% implemented. The Prisma model, route, sidebar, Server Actions (get/upsert/delete/bulkMark), and basic calendar view already exist and follow project patterns correctly.
 
 **What exists**:
+
 - `OrganizationCalendar` model in Prisma with `@@unique([organizationId, date])`
 - `DayType` enum: NORMAL, WEEKEND, SATURDAY, SUNDAY, HOLIDAY, IRRENUNCIABLE, ORGANIZATION_HOLIDAY, CUSTOM
 - Route: `app/[locale]/dashboard/calendar/page.tsx` with `requireAdminHRWithOrg`
@@ -19,6 +20,7 @@
 - Sidebar entry for `/dashboard/calendar` (ADMIN_HR only)
 
 **What's missing (gaps to fill)**:
+
 1. Form uses Dialog, spec requires Sheet (drawer lateral)
 2. No delete button in UI (action exists but CalendarDayForm doesn't expose it)
 3. No month summary/statistics component
@@ -45,13 +47,14 @@
 **Rationale**: ~18-20 holidays per country per year. Static data avoids external API dependency, is versioned with code, and is type-safe. Supporting 5 countries × 3 years = ~300 entries total — trivially small.
 
 **Data structure**:
+
 ```typescript
 interface NationalHoliday {
-  month: number       // 1-12
-  day: number         // 1-31
-  name: string        // i18n key reference
-  nameEs: string      // Spanish name (fallback)
-  nameEn: string      // English name (fallback)
+  month: number // 1-12
+  day: number // 1-31
+  name: string // i18n key reference
+  nameEs: string // Spanish name (fallback)
+  nameEn: string // English name (fallback)
   type: 'HOLIDAY' | 'IRRENUNCIABLE'
   defaultMultiplier: number
 }
@@ -70,6 +73,7 @@ Using month/day (not full dates) allows reuse across years. The import action co
 **Rationale**: Import is a one-time setup action per year, not a frequent interaction. A Dialog (not Sheet) is appropriate here since it's a modal workflow separate from the calendar view. Checkboxes allow selective import. Already-existing holidays are shown as disabled/checked.
 
 **Flow**:
+
 1. User clicks "Import Holidays" button in calendar page header
 2. Dialog opens with year selector (default: current year) and country auto-detected from organization
 3. Holiday list loads with checkboxes. Already-existing dates shown as "Already imported" (disabled)
@@ -85,6 +89,7 @@ Using month/day (not full dates) allows reuse across years. The import action co
 **Rationale**: Consistent with project convention (useFormAction + Zod). Currently `CalendarDayForm` uses manual `parseFloat` validation. Zod centralizes validation rules and enables server-side + client-side reuse.
 
 **Schemas**:
+
 - `calendarDaySchema`: date (Date), type (DayType enum), name (optional string), description (optional string), multiplier (number, min 0.1)
 - `importHolidaysSchema`: year (number, min 2024, max 2030), countryCode (enum of supported countries), holidayIndices (array of numbers)
 

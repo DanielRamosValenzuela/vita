@@ -13,7 +13,7 @@
 - Q: ¿Qué patrón de interacción usa el formulario de crear/editar día especial? → A: Sheet (drawer lateral), manteniendo el calendario visible parcialmente al fondo para contexto.
 - Q: ¿Qué países soporta la importación masiva de feriados nacionales? → A: Chile + datos básicos de otros países Latam (Colombia, Perú, Argentina, México).
 
-## User Scenarios & Testing *(mandatory)*
+## User Scenarios & Testing _(mandatory)_
 
 ### User Story 1 - Visualizar y gestionar días especiales en calendario (Priority: P1)
 
@@ -75,7 +75,7 @@ ADMIN_HR necesita cargar rápidamente los feriados nacionales de Chile (o del pa
 - **Año sin feriados cargados**: Al intentar importar feriados para un año no soportado, el sistema informa que no hay datos disponibles para ese año.
 - **País no soportado**: Organizaciones de países sin datos de feriados embebidos ven el botón de importación deshabilitado con un mensaje informando que la funcionalidad estará disponible próximamente. El CRUD manual (P1) sigue funcionando normalmente.
 
-## Requirements *(mandatory)*
+## Requirements _(mandatory)_
 
 ### Functional Requirements
 
@@ -108,7 +108,7 @@ ADMIN_HR necesita cargar rápidamente los feriados nacionales de Chile (o del pa
 - El calendario NO reemplaza la detección automática de fin de semana. Sábados y domingos se detectan por fecha en el motor de cálculo; solo necesitan entrada de calendario si tienen un multiplicador especial adicional.
 - Los datos de feriados incluirán al menos los años 2025, 2026 y 2027 para cubrir necesidades inmediatas.
 
-## Success Criteria *(mandatory)*
+## Success Criteria _(mandatory)_
 
 ### Measurable Outcomes
 

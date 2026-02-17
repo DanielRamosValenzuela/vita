@@ -81,13 +81,21 @@ export default async function ShiftsPage({ params }: ShiftsPageProps) {
   const shiftTypes = shiftTypesResult.data || []
   const users = usersResult.data || []
   const areasRaw = Array.isArray(areasResult.data) ? areasResult.data : []
-  const areas = areasRaw.map((area: { id: string; name: string; description?: string | null; color?: string | null; icon?: string | null }) => ({
-    id: area.id,
-    name: area.name,
-    description: area.description || undefined,
-    color: area.color || undefined,
-    icon: area.icon || undefined,
-  }))
+  const areas = areasRaw.map(
+    (area: {
+      id: string
+      name: string
+      description?: string | null
+      color?: string | null
+      icon?: string | null
+    }) => ({
+      id: area.id,
+      name: area.name,
+      description: area.description || undefined,
+      color: area.color || undefined,
+      icon: area.icon || undefined,
+    })
+  )
 
   const shifts = shiftsResult.data?.shifts || []
 

@@ -12,3 +12,10 @@ yarn.lock
 app/generated
 prisma/migrations
 
+# Carpetas de IA / herramientas
+.cursor
+.claude
+specs
+.specify
+docs
+

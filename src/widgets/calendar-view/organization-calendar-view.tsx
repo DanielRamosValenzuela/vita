@@ -63,11 +63,9 @@ export function OrganizationCalendarView({
 
   const summary = useMemo(() => {
     const counts: Record<string, number> = {}
-    for (const day of calendarDays) 
-      if (day.type !== DAY_TYPES.NORMAL) 
-        counts[day.type] = (counts[day.type] || 0) + 1
-      
-    
+    for (const day of calendarDays)
+      if (day.type !== DAY_TYPES.NORMAL) counts[day.type] = (counts[day.type] || 0) + 1
+
     return counts
   }, [calendarDays])
 
