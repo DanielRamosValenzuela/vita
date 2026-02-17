@@ -33,8 +33,9 @@ model Organization {
   shiftTypes    ShiftType[]
   shifts        Shift[]
   rateTemplates RateTemplate[]
-  contracts     Contract[]
-  calendars     OrganizationCalendar[]
+  contracts      Contract[]
+  calendars      OrganizationCalendar[]
+  notifications  Notification[]
 
   @@index([taxId])
   @@index([country])
@@ -69,8 +70,10 @@ model User {
   shifts          Shift[]
   contracts       Contract[]
   userAreas       UserArea[]
-  emails          UserEmail[]
-  documentHistory UserDocumentHistory[]
+  emails                UserEmail[]
+  documentHistory       UserDocumentHistory[]
+  notificationsReceived Notification[]         @relation("NotificationRecipient")
+  notificationsActed    Notification[]         @relation("NotificationActor")
 
   @@index([email])
   @@index([docNumber])
@@ -565,4 +568,34 @@ enum EmailProvider {
   GITHUB
   FACEBOOK
   APPLE
+}
+
+enum NotificationType {
+  INVITATION_PENDING
+  AREA_ASSIGNED
+  SHIFT_CREATED
+  SHIFT_UPDATED
+  SHIFT_CANCELLED
+  GENERAL
+}
+
+model Notification {
+  id             String           @id @default(cuid())
+  userId         String
+  actorId        String?
+  organizationId String?
+  type           NotificationType
+  title          String
+  description    String?
+  actionUrl      String
+  isRead         Boolean          @default(false)
+  createdAt      DateTime         @default(now())
+
+  user         User          @relation("NotificationRecipient", fields: [userId], references: [id], onDelete: Cascade)
+  actor        User?         @relation("NotificationActor", fields: [actorId], references: [id], onDelete: SetNull)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+
+  @@index([userId, isRead, createdAt(sort: Desc)])
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([userId, type])
 }

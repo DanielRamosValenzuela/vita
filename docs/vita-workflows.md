@@ -393,6 +393,27 @@ El sistema de tarifas flexibles permite a ADMIN_HR crear tarifas completamente p
 
 **Pendiente:** reglas avanzadas de validación legal (descansos, máximos semanales) en la UI.
 
+### Sistema de Notificaciones (Bandeja de Entrada)
+
+Implementado para ADMIN_HR, CHIEF_AREA y STAFF_HEALTH. SUPER_ADMIN no recibe notificaciones en esta iteración.
+
+**Funcionalidades implementadas:**
+- Bandeja de Entrada (`/dashboard/inbox`) accesible desde el sidebar con badge de no leídas.
+- Notificaciones generadas automáticamente por: invitaciones (INVITATION_PENDING), asignación a áreas (AREA_ASSIGNED), creación de turnos (SHIFT_CREATED), actualización de turnos (SHIFT_UPDATED), cancelación de turnos (SHIFT_CANCELLED).
+- Cada notificación muestra: icono por tipo, título pre-renderizado con nombre del actor, descripción opcional, nombre de la organización, avatar del actor, fecha relativa con tooltip de fecha absoluta.
+- Click en notificación: marca como leída y navega al recurso (perfil para invitaciones, turnos, áreas).
+- "Marcar todas como leídas" en la bandeja.
+- Filtros por estado (todas/no leídas/leídas) y por tipo (invitaciones/turnos/áreas/general).
+- Eliminar notificación individual con confirmación AlertDialog.
+- Toasts diferenciados por tipo al cargar el dashboard (info, success, warning según tipo de notificación).
+- Paginación cursor-based (20 por página, "Cargar más").
+
+**Pendiente:**
+- Notificaciones para SUPER_ADMIN.
+- Actualizaciones en tiempo real (WebSocket/SSE).
+- Notificaciones por email.
+- Notificaciones para solicitudes de cambio de turno entre staff.
+
 ---
 
 ## Próximos Workflows a Diseñar
@@ -401,11 +422,8 @@ El sistema de tarifas flexibles permite a ADMIN_HR crear tarifas completamente p
    - Panel SUPER_ADMIN con organizaciones, montos, estados de pago.
    - Automatizar cálculo de facturación según uso de cuentas (Admin HR / Jefes / Staff).
 
-2. **Sistema de Notificaciones**
-   - Envío de emails o in-app para cambios de turno, nuevas invitaciones, recordatorios.
-
-3. **App móvil / PWA para Staff**
+2. **App móvil / PWA para Staff**
    - Calendario móvil, notificaciones push, flujo de postulación/intercambio sencillo.
 
-4. **Reportes de Cumplimiento Legal**
+3. **Reportes de Cumplimiento Legal**
    - Reportes de horas trabajadas vs límites legales por país.

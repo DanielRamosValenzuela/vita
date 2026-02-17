@@ -3,6 +3,7 @@ import { DashboardShell } from '@/src/widgets/dashboard-sidebar/dashboard-shell'
 import { PendingNotificationsToaster } from '@/src/features/notifications/ui/pending-notifications-toaster'
 
 import { getUserPendingNotifications } from '@/src/entities/notification/lib/pending-notifications'
+import { getUnreadCount } from '@/src/entities/notification/lib/notification-repository'
 
 interface DashboardLayoutProps {
   children: React.ReactNode
@@ -19,12 +20,13 @@ export default async function DashboardLayout({ children, params }: DashboardLay
       </div>
     )
 
-  const pendingNotifications = await getUserPendingNotifications({
-    userId: user.id,
-  })
+  const [pendingNotifications, unreadNotificationCount] = await Promise.all([
+    getUserPendingNotifications({ userId: user.id }),
+    getUnreadCount(user.id),
+  ])
 
   return (
-    <DashboardShell user={user}>
+    <DashboardShell user={user} unreadNotificationCount={unreadNotificationCount}>
       <PendingNotificationsToaster notifications={pendingNotifications} />
       {children}
     </DashboardShell>

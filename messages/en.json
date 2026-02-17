@@ -218,6 +218,7 @@
     "rates": "Rates",
     "staff": "Staff",
     "shifts": "Shifts",
+    "inbox": "Inbox",
     "profile": "Profile",
     "settings": "Settings",
     "calendarTitle": "Calendar",
@@ -1937,6 +1938,37 @@
     "invitationPending": "You have a pending invitation from {organization}",
     "actions": {
       "view": "View"
+    },
+    "inbox": {
+      "title": "Inbox",
+      "empty": "No notifications",
+      "emptyDescription": "When you receive notifications, they will appear here",
+      "markAllRead": "Mark all as read",
+      "markAllReadSuccess": "{count} notifications marked as read",
+      "deleteConfirm": "Delete this notification?",
+      "deleteConfirmDescription": "This action cannot be undone.",
+      "deleteSuccess": "Notification deleted",
+      "loadMore": "Load more",
+      "filters": {
+        "all": "All",
+        "unread": "Unread",
+        "read": "Read"
+      },
+      "typeFilters": {
+        "all": "All types",
+        "INVITATION_PENDING": "Invitations",
+        "SHIFTS": "Shifts",
+        "AREA_ASSIGNED": "Areas",
+        "GENERAL": "General"
+      }
+    },
+    "types": {
+      "INVITATION_PENDING": "{actor} invited you to {organization}",
+      "AREA_ASSIGNED": "{actor} assigned you to area {area}",
+      "SHIFT_CREATED": "{actor} assigned you a shift on {date}",
+      "SHIFT_UPDATED": "{actor} modified your shift on {date}",
+      "SHIFT_CANCELLED": "{actor} cancelled your shift on {date}",
+      "GENERAL": "Notification"
     }
   }
 }

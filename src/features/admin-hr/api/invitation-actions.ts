@@ -2,6 +2,8 @@
 
 import type { Country } from '@prisma/client'
 
+import { getTranslations } from 'next-intl/server'
+
 import { requireAdminHR, requireAdminHRWithOrg } from '@/src/shared/lib/auth'
 import { ROLES } from '@/src/shared/lib/constants'
 import { prisma } from '@/src/shared/lib/db'
@@ -12,6 +14,8 @@ import { checkDocumentExistsInOrganization } from '@/src/shared/lib/validation/d
 
 import { deleteInvitation } from '@/src/entities/invitation'
 import { searchUserByDocumentOrEmail } from '@/src/entities/user'
+
+import { createNotification } from '@/src/features/notifications/lib/notification-service'
 
 import { checkOrganizationLimit, createInvitation } from '../data/invitation-repository'
 
@@ -120,6 +124,20 @@ export const inviteChiefAction = async (
 
     if (!invitationResult.success) return invitationResult
 
+    const org = await prisma.organization.findUnique({
+      where: { id: organizationId },
+      select: { name: true },
+    })
+    const tNotif = await getTranslations('notifications')
+    await createNotification({
+      userId,
+      actorId: session.id,
+      organizationId,
+      type: 'INVITATION_PENDING',
+      title: tNotif('types.INVITATION_PENDING', { actor: session.name, organization: org?.name ?? '' }),
+      actionUrl: '/dashboard/profile?section=invitations',
+    })
+
     revalidatePaths(...INVITATION_PATHS)
 
     return {
@@ -201,6 +219,20 @@ export const inviteStaffAction = async (
     )
 
     if (!invitationResult.success) return invitationResult
+
+    const org = await prisma.organization.findUnique({
+      where: { id: organizationId },
+      select: { name: true },
+    })
+    const tNotif = await getTranslations('notifications')
+    await createNotification({
+      userId,
+      actorId: session.id,
+      organizationId,
+      type: 'INVITATION_PENDING',
+      title: tNotif('types.INVITATION_PENDING', { actor: session.name, organization: org?.name ?? '' }),
+      actionUrl: '/dashboard/profile?section=invitations',
+    })
 
     revalidatePaths(...INVITATION_PATHS)
 

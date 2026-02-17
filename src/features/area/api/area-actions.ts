@@ -1,5 +1,7 @@
 'use server'
 
+import { getTranslations } from 'next-intl/server'
+
 import { requireAdminHROrChiefArea, requireAdminHRWithOrg } from '@/src/shared/lib/auth'
 import { isChiefArea } from '@/src/shared/lib/auth/rbac'
 import { ROLES } from '@/src/shared/lib/constants'
@@ -9,6 +11,8 @@ import { getLocaleFromHeaders } from '@/src/shared/lib/utils/get-locale'
 import { revalidatePaths } from '@/src/shared/lib/utils/revalidate-paths'
 
 import { createArea, deleteArea, getAreas, updateArea } from '@/src/entities/area'
+
+import { createNotification } from '@/src/features/notifications/lib/notification-service'
 
 import { getCreateAreaSchema, getUpdateAreaSchema } from '../lib/helpers/server'
 import type { CreateAreaInput, UpdateAreaInput } from '../lib/types'
@@ -217,12 +221,37 @@ export async function assignChiefsToAreaAction(areaId: string, chiefUserIds: str
       select: { id: true },
     })
     const validIds = validChiefs.map((u) => u.id)
+
+    const previousAssignments = await prisma.userArea.findMany({
+      where: { areaId, user: { role: ROLES.CHIEF_AREA } },
+      select: { userId: true },
+    })
+    const previousIds = new Set(previousAssignments.map((ua) => ua.userId))
+
     await prisma.$transaction([
       prisma.userArea.deleteMany({
         where: { areaId, user: { role: ROLES.CHIEF_AREA } },
       }),
       ...validIds.map((userId) => prisma.userArea.create({ data: { areaId, userId } })),
     ])
+
+    const newlyAssigned = validIds.filter((id) => !previousIds.has(id))
+    if (newlyAssigned.length > 0) {
+      const tNotif = await getTranslations('notifications')
+      await Promise.all(
+        newlyAssigned.map((chiefId) =>
+          createNotification({
+            userId: chiefId,
+            actorId: user.id,
+            organizationId: user.organizationId,
+            type: 'AREA_ASSIGNED',
+            title: tNotif('types.AREA_ASSIGNED', { actor: user.name, area: area.name }),
+            actionUrl: '/dashboard/areas',
+          })
+        )
+      )
+    }
+
     revalidatePaths(...AREA_PATHS)
     return { success: true, message: 'Jefes de área actualizados' }
   } catch (error) {
@@ -388,12 +417,35 @@ export async function assignStaffToAreaAction(areaId: string, staffUserIds: stri
     })
     const validIds = validStaff.map((u) => u.id)
 
+    const previousAssignments = await prisma.userArea.findMany({
+      where: { areaId, user: { role: ROLES.STAFF_HEALTH } },
+      select: { userId: true },
+    })
+    const previousIds = new Set(previousAssignments.map((ua) => ua.userId))
+
     await prisma.$transaction([
       prisma.userArea.deleteMany({
         where: { areaId, user: { role: ROLES.STAFF_HEALTH } },
       }),
       ...validIds.map((userId) => prisma.userArea.create({ data: { areaId, userId } })),
     ])
+
+    const newlyAssigned = validIds.filter((id) => !previousIds.has(id))
+    if (newlyAssigned.length > 0) {
+      const tNotif = await getTranslations('notifications')
+      await Promise.all(
+        newlyAssigned.map((staffId) =>
+          createNotification({
+            userId: staffId,
+            actorId: user.id,
+            organizationId: orgId,
+            type: 'AREA_ASSIGNED',
+            title: tNotif('types.AREA_ASSIGNED', { actor: user.name, area: area.name }),
+            actionUrl: '/dashboard/areas',
+          })
+        )
+      )
+    }
 
     revalidatePaths(...AREA_PATHS)
     return { success: true, message: 'Personal del área actualizado' }

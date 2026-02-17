@@ -9,6 +9,7 @@ import { cn } from '@/src/shared/lib/utils/cn'
 import { LanguageSelector } from '@/src/shared/ui/atoms/language-selector'
 import { ThemeSelector } from '@/src/shared/ui/atoms/theme-selector'
 import { ThemeToggle } from '@/src/shared/ui/atoms/theme-toggle'
+import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 
 import { Link, usePathname } from '@/i18n/navigation'
@@ -16,7 +17,7 @@ import { Link, usePathname } from '@/i18n/navigation'
 import { getNavItems } from './constants'
 import type { DashboardSidebarProps } from './types'
 
-export function DashboardSidebar({ user, className }: DashboardSidebarProps) {
+export function DashboardSidebar({ user, className, unreadNotificationCount }: DashboardSidebarProps) {
   const t = useTranslations('dashboard')
   const tCommon = useTranslations('common')
   const pathname = usePathname()
@@ -29,9 +30,13 @@ export function DashboardSidebar({ user, className }: DashboardSidebarProps) {
 
   const navItems = getNavItems(t, user.role)
   const userRoleStr = String(user.role)
-  const filteredNavItems = navItems.filter((item) =>
-    item.roles.some((role) => String(role) === userRoleStr)
-  )
+  const filteredNavItems = navItems
+    .filter((item) => item.roles.some((role) => String(role) === userRoleStr))
+    .map((item) =>
+      item.href === '/dashboard/inbox' && unreadNotificationCount
+        ? { ...item, badge: unreadNotificationCount }
+        : item
+    )
 
   return (
     <aside
@@ -67,7 +72,12 @@ export function DashboardSidebar({ user, className }: DashboardSidebarProps) {
               )}
             >
               <Icon className="h-5 w-5" />
-              {item.label}
+              <span className="flex-1">{item.label}</span>
+              {item.badge != null && item.badge > 0 && (
+                <Badge variant="destructive" className="ml-auto h-5 min-w-[20px] px-1.5 text-xs">
+                  {item.badge > 99 ? '99+' : item.badge}
+                </Badge>
+              )}
             </Link>
           )
         })}

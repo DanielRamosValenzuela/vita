@@ -1,17 +1,27 @@
 'use client'
 
 import { useEffect } from 'react'
+import type { NotificationType } from '@prisma/client'
 import { useLocale, useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 
 import { NOTIFICATIONS_LIMITS } from '@/src/shared/lib/constants'
 
-import { NOTIFICATION_TYPES, type PendingNotification } from '@/src/entities/notification/lib/types'
+import type { NotificationWithActor } from '@/src/entities/notification/lib/types'
 
 const STORAGE_KEY = 'vita:pending-notifications:shown-ids'
 
+const TOAST_METHOD: Record<NotificationType, 'info' | 'success' | 'warning'> = {
+  INVITATION_PENDING: 'info',
+  AREA_ASSIGNED: 'info',
+  SHIFT_CREATED: 'success',
+  SHIFT_UPDATED: 'info',
+  SHIFT_CANCELLED: 'warning',
+  GENERAL: 'info',
+}
+
 interface PendingNotificationsToasterProps {
-  notifications: PendingNotification[]
+  notifications: NotificationWithActor[]
 }
 
 export function PendingNotificationsToaster({ notifications }: PendingNotificationsToasterProps) {
@@ -39,33 +49,17 @@ export function PendingNotificationsToaster({ notifications }: PendingNotificati
     if (!unseen.length) return
 
     unseen.forEach((notification) => {
-      let message: string | null = null
-      let href: string | undefined
+      const href = `/${locale}${notification.actionUrl}`
+      const method = TOAST_METHOD[notification.type] ?? 'info'
 
-      switch (notification.type) {
-        case NOTIFICATION_TYPES.INVITATION_PENDING: {
-          const organizationName = notification.meta?.organizationName as string | undefined
-          href = `/${locale}/dashboard/profile?section=invitations`
-          message = t('invitationPending', {
-            organization: organizationName ?? '',
-          })
-          break
-        }
-        default:
-          break
-      }
-
-      if (!message) return
-
-      toast.info(message, {
-        action: href
-          ? {
-              label: t('actions.view'),
-              onClick: () => {
-                window.location.href = href as string
-              },
-            }
-          : undefined,
+      toast[method](notification.title, {
+        description: notification.description ?? undefined,
+        action: {
+          label: t('actions.view'),
+          onClick: () => {
+            window.location.href = href
+          },
+        },
       })
     })
 

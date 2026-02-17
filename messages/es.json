@@ -219,6 +219,7 @@
     "staff": "Personal",
     "shifts": "Turnos",
     "profile": "Perfil",
+    "inbox": "Bandeja de entrada",
     "settings": "Configuración",
     "calendarTitle": "Calendario",
     "calendarDescription": "Visualiza el calendario de turnos. Inicia sesión para gestionar tus turnos.",
@@ -1910,6 +1911,37 @@
     "invitationPending": "Tienes una invitación pendiente de {organization}",
     "actions": {
       "view": "Ver"
+    },
+    "inbox": {
+      "title": "Bandeja de Entrada",
+      "empty": "No tienes notificaciones",
+      "emptyDescription": "Cuando recibas notificaciones, aparecerán aquí",
+      "markAllRead": "Marcar todas como leídas",
+      "markAllReadSuccess": "{count} notificaciones marcadas como leídas",
+      "deleteConfirm": "¿Eliminar esta notificación?",
+      "deleteConfirmDescription": "Esta acción no se puede deshacer.",
+      "deleteSuccess": "Notificación eliminada",
+      "loadMore": "Cargar más",
+      "filters": {
+        "all": "Todas",
+        "unread": "No leídas",
+        "read": "Leídas"
+      },
+      "typeFilters": {
+        "all": "Todos los tipos",
+        "INVITATION_PENDING": "Invitaciones",
+        "SHIFTS": "Turnos",
+        "AREA_ASSIGNED": "Áreas",
+        "GENERAL": "General"
+      }
+    },
+    "types": {
+      "INVITATION_PENDING": "{actor} te invitó a {organization}",
+      "AREA_ASSIGNED": "{actor} te asignó al área {area}",
+      "SHIFT_CREATED": "{actor} te asignó un turno el {date}",
+      "SHIFT_UPDATED": "{actor} modificó tu turno del {date}",
+      "SHIFT_CANCELLED": "{actor} canceló tu turno del {date}",
+      "GENERAL": "Notificación"
     }
   }
 }
