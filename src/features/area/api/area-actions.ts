@@ -162,19 +162,20 @@ export async function getChiefsForAreaAction(areaId: string) {
       if (!chiefArea) return { success: false, error: 'No tienes permiso para ver esta área' }
     }
     const assignedUserAreas = await prisma.userArea.findMany({
-      where: { areaId },
+      where: { areaId, user: { role: ROLES.CHIEF_AREA } },
       select: { userId: true },
     })
-    const assignedChiefIds = assignedUserAreas.map((ua) => ua.userId)
+    const rawAssignedChiefIds = assignedUserAreas.map((ua) => ua.userId)
     if (isChiefArea(user)) {
       const chiefs = await prisma.user.findMany({
         where: {
-          id: { in: assignedChiefIds },
+          id: { in: rawAssignedChiefIds },
           role: ROLES.CHIEF_AREA,
         },
         select: { id: true, name: true, email: true, docNumber: true },
         orderBy: { name: 'asc' },
       })
+      const assignedChiefIds = chiefs.map((c) => c.id)
       return {
         success: true,
         data: { chiefs, assignedChiefIds },
@@ -188,6 +189,9 @@ export async function getChiefsForAreaAction(areaId: string) {
       select: { id: true, name: true, email: true, docNumber: true },
       orderBy: { name: 'asc' },
     })
+    const assignedChiefIds = rawAssignedChiefIds.filter((id) =>
+      orgChiefs.some((chief) => chief.id === id)
+    )
     return {
       success: true,
       data: { chiefs: orgChiefs, assignedChiefIds },

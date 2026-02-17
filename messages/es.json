@@ -242,6 +242,7 @@
     "description": "Administra los turnos de tu personal de forma eficiente",
     "newShift": "Nuevo Turno",
     "noOrganization": "No tienes una organización asignada",
+    "loading": "Cargando turnos...",
     "loadError": "Error al cargar los turnos",
     "stats": {
       "totalShifts": "Total de Turnos",
@@ -281,7 +282,8 @@
       "thisMonth": "Este mes",
       "activeFilters": "Filtros activos",
       "clear": "Limpiar Filtros",
-      "apply": "Aplicar Filtros"
+      "apply": "Aplicar Filtros",
+      "selectDate": "Seleccionar fecha"
     },
     "calendar": {
       "title": "Calendario de Turnos"
@@ -296,7 +298,9 @@
       "title": "Título",
       "role": "Rol",
       "time": "Horario",
-      "status": "Estado"
+      "status": "Estado",
+      "noTitle": "Sin título",
+      "noRole": "N/A"
     },
     "more": "más",
     "status": {
@@ -308,12 +312,15 @@
     },
     "form": {
       "dialogTitle": "Crear Nuevo Turno",
-      "title": "Crear Turno",
+      "createTitle": "Crear Turno",
+      "editTitle": "Editar Turno",
       "basicInfo": "Información Básica",
       "title": {
         "label": "Título",
         "placeholder": "Título del turno"
       },
+      "noTitle": "Sin título",
+      "differentEndDate": "Fecha de fin diferente",
       "user": {
         "label": "Usuario",
         "placeholder": "Seleccionar usuario"
@@ -349,7 +356,22 @@
       },
       "create": "Crear Turno",
       "creating": "Creando turno...",
+      "save": "Guardar",
+      "saving": "Guardando...",
       "cancel": "Cancelar"
+    },
+    "validation": {
+      "userRequired": "Selecciona un usuario",
+      "areaRequired": "Selecciona un área",
+      "shiftTypeRequired": "Selecciona un tipo de turno",
+      "startDateRequired": "Selecciona una fecha de inicio",
+      "startTimeRequired": "Ingresa la hora de inicio",
+      "endTimeRequired": "Ingresa la hora de fin"
+    },
+    "areaSwitcher": {
+      "label": "Área",
+      "allAreas": "Todas las áreas",
+      "noAreas": "Sin áreas asignadas"
     },
     "shiftTypes": {
       "title": "Tipos de Turno",
@@ -1645,6 +1667,43 @@
         "cancel": "Cancelar",
         "confirm": "Eliminar",
         "deleting": "Eliminando..."
+      },
+      "weekdays": {
+        "sun": "Dom",
+        "mon": "Lun",
+        "tue": "Mar",
+        "wed": "Mié",
+        "thu": "Jue",
+        "fri": "Vie",
+        "sat": "Sáb"
+      },
+      "import": {
+        "button": "Importar Feriados",
+        "title": "Importar Feriados Nacionales",
+        "description": "Selecciona los feriados nacionales que deseas importar al calendario de tu organización.",
+        "yearLabel": "Año",
+        "selectAll": "Seleccionar todos",
+        "deselectAll": "Deseleccionar todos",
+        "alreadyImported": "Ya importado",
+        "importButton": "Importar Seleccionados",
+        "importing": "Importando...",
+        "successMessage": "{count} feriados importados",
+        "skippedMessage": "{skipped} ya existían",
+        "noHolidays": "No hay datos de feriados disponibles para este año",
+        "loadingHolidays": "Cargando feriados...",
+        "errorLoading": "Error al cargar feriados. Intenta nuevamente.",
+        "retry": "Reintentar",
+        "holiday": "Feriado",
+        "irrenunciable": "Irrenunciable",
+        "date": "Fecha",
+        "name": "Nombre",
+        "type": "Tipo",
+        "multiplierCol": "Multiplicador"
+      },
+      "summary": {
+        "title": "Resumen del Mes",
+        "total": "{count} días especiales",
+        "noSpecialDays": "Sin días especiales este mes"
       }
     }
   },

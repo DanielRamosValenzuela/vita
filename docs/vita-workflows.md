@@ -270,10 +270,14 @@ El sistema de tarifas flexibles permite a ADMIN_HR crear tarifas completamente p
   - Generar preview de costo antes de crear turno
 
 - **Gestión del Calendario Organizacional** ✅
-  - ✅ UI para marcar días especiales (feriados, feriados irrenunciables)
+  - ✅ UI para marcar días especiales (Sheet lateral con formulario)
+  - ✅ CRUD completo con eliminación via AlertDialog
   - ✅ Multiplicadores por tipo de día
+  - ✅ Navegación entre meses con carga dinámica de datos
+  - ✅ Resumen mensual con badges por tipo de día
+  - ✅ Importación masiva de feriados nacionales (via BFF/Boostr API)
   - ⏳ Días recurrentes (ej: todos los domingos) - pendiente
-  - ⏳ Importar feriados nacionales automáticamente - pendiente
+  - ⏳ Auto-importación de feriados al crear organización - pendiente
 
 - **Reportes y Analytics**
   - Vista de costos por personal

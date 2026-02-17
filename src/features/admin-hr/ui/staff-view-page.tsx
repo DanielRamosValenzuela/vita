@@ -69,6 +69,7 @@ export function StaffViewPage({ staff }: StaffViewPageProps) {
                 <TableBody>
                   {staff.map((person) => {
                     const currentContract = person.contracts[0] ?? null
+                    const areaName = currentContract?.areaName || person.primaryAreaName
 
                     return (
                       <TableRow key={person.id}>
@@ -84,7 +85,9 @@ export function StaffViewPage({ staff }: StaffViewPageProps) {
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          {currentContract?.areaName || (
+                          {areaName ? (
+                            <span>{areaName}</span>
+                          ) : (
                             <span className="text-muted-foreground">-</span>
                           )}
                         </TableCell>

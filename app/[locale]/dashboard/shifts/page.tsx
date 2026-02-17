@@ -1,29 +1,16 @@
 import { getTranslations } from 'next-intl/server'
-import { ShiftStatus } from '@prisma/client'
-import { endOfMonth, format, startOfMonth } from 'date-fns'
+import { endOfMonth, startOfMonth } from 'date-fns'
 
 import { isChiefArea } from '@/src/shared/lib/auth/rbac'
 import { requireAdminHROrChiefArea } from '@/src/shared/lib/auth/session'
 import { prisma } from '@/src/shared/lib/db'
-import { Badge } from '@/src/shared/ui/badge'
-import { Button } from '@/src/shared/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/src/shared/ui/card'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/src/shared/ui/table'
 import { getAreasAction } from '@/src/features/area/api'
 import {
   getShiftsAction,
   getShiftTypesAction,
   getUsersForShiftsAction,
-  type ShiftWithRelations,
 } from '@/src/features/shifts/api'
-import { ShiftCalendar, ShiftFilters, ShiftFormDialog } from '@/src/features/shifts/ui'
+import { ShiftsPageContent } from '@/src/features/shifts/ui'
 
 interface ShiftsPageProps {
   params: Promise<{ locale: string }>
@@ -70,11 +57,10 @@ export default async function ShiftsPage({ params }: ShiftsPageProps) {
   ])
 
   const now = new Date()
-  const monthStart = startOfMonth(now)
-  const monthEnd = endOfMonth(now)
   const shiftsResult = await getShiftsAction({
-    startDate: monthStart,
-    endDate: monthEnd,
+    startDate: startOfMonth(now),
+    endDate: endOfMonth(now),
+    pageSize: 200,
   })
 
   if (
@@ -95,189 +81,23 @@ export default async function ShiftsPage({ params }: ShiftsPageProps) {
   const shiftTypes = shiftTypesResult.data || []
   const users = usersResult.data || []
   const areasRaw = Array.isArray(areasResult.data) ? areasResult.data : []
-  const areas = areasRaw.map((area: { id: string; name: string; description?: string | null }) => ({
+  const areas = areasRaw.map((area: { id: string; name: string; description?: string | null; color?: string | null; icon?: string | null }) => ({
     id: area.id,
     name: area.name,
     description: area.description || undefined,
+    color: area.color || undefined,
+    icon: area.icon || undefined,
   }))
 
   const shifts = shiftsResult.data?.shifts || []
 
-  const calendarShifts = (shifts || []).map((shift: ShiftWithRelations) => ({
-    id: shift.id,
-    title: shift.title || 'Sin título',
-    startTime: shift.startTime,
-    endTime: shift.endTime,
-    status: shift.status,
-    userName: shift.user.name,
-    areaName: shift.area.name,
-    color: shift.shiftType.color,
-    icon: shift.shiftType.icon ?? 'Clock',
-  }))
-
-  const getStatusColor = (status: ShiftStatus) => {
-    switch (status) {
-      case 'SCHEDULED':
-        return 'bg-green-100 text-green-800 hover:bg-green-200'
-      case 'IN_PROGRESS':
-        return 'bg-blue-100 text-blue-800 hover:bg-blue-200'
-      case 'COMPLETED':
-        return 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-      case 'CANCELLED':
-        return 'bg-red-100 text-red-800 hover:bg-red-200'
-      case 'NO_SHOW':
-        return 'bg-orange-100 text-orange-800 hover:bg-orange-200'
-      default:
-        return 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-    }
-  }
-
-  const getStatusLabel = (status: ShiftStatus) => {
-    switch (status) {
-      case 'SCHEDULED':
-        return t('status.scheduled')
-      case 'IN_PROGRESS':
-        return t('status.inProgress')
-      case 'COMPLETED':
-        return t('status.completed')
-      case 'CANCELLED':
-        return t('status.cancelled')
-      case 'NO_SHOW':
-        return t('status.noShow')
-      default:
-        return status
-    }
-  }
-
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
-          <p className="text-muted-foreground mt-2">{t('description')}</p>
-        </div>
-
-        <ShiftFormDialog
-          organizationId={organizationId}
-          users={users}
-          areas={areas}
-          shiftTypes={shiftTypes}
-        />
-      </div>
-
-      {}
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('stats.totalShifts')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{shifts.length}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('stats.thisMonth')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {shifts.filter((s: ShiftWithRelations) => s.status === 'SCHEDULED').length}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('stats.inProgress')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {shifts.filter((s: ShiftWithRelations) => s.status === 'IN_PROGRESS').length}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('stats.completed')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {shifts.filter((s: ShiftWithRelations) => s.status === 'COMPLETED').length}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {}
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('filters.title')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ShiftFilters users={users} areas={areas} shiftTypes={shiftTypes} />
-        </CardContent>
-      </Card>
-
-      <div className="grid gap-6 lg:grid-cols-2">
-        {}
-        <Card>
-          <CardHeader>
-            <CardTitle>{t('calendar.title')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ShiftCalendar shifts={calendarShifts} />
-          </CardContent>
-        </Card>
-
-        {}
-        <Card>
-          <CardHeader>
-            <CardTitle>{t('recent.title')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {shifts.length === 0 ? (
-              <p className="text-muted-foreground text-center py-8">{t('recent.noShifts')}</p>
-            ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>{t('table.user')}</TableHead>
-                    <TableHead>{t('table.title')}</TableHead>
-                    <TableHead>{t('table.role')}</TableHead>
-                    <TableHead>{t('table.time')}</TableHead>
-                    <TableHead>{t('table.status')}</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {(shifts || []).slice(0, 10).map((shift: ShiftWithRelations) => (
-                    <TableRow key={shift.id}>
-                      <TableCell className="font-medium">{shift.user.name}</TableCell>
-                      <TableCell>{shift.title || 'Sin título'}</TableCell>
-                      <TableCell>{shift.user.role || 'N/A'}</TableCell>
-                      <TableCell>
-                        {format(shift.startTime, 'HH:mm')} - {format(shift.endTime, 'HH:mm')}
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={getStatusColor(shift.status)}>
-                          {getStatusLabel(shift.status)}
-                        </Badge>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            )}
-
-            {shifts.length > 10 && (
-              <div className="mt-4 text-center">
-                <Button variant="outline">{t('recent.viewAll')}</Button>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-    </div>
+    <ShiftsPageContent
+      organizationId={organizationId}
+      initialShifts={shifts}
+      users={users}
+      areas={areas}
+      shiftTypes={shiftTypes}
+    />
   )
 }

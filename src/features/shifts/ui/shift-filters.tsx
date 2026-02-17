@@ -4,11 +4,12 @@ import { useMemo, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import type { ShiftStatus } from '@prisma/client'
 import { endOfDay, format, startOfDay } from 'date-fns'
-import { Calendar, Clock, Filter, Search, Users, X } from 'lucide-react'
+import { Calendar as CalendarIcon, Clock, Filter, Search, Users, X } from 'lucide-react'
 
 import { SHIFT_STATUS } from '@/src/shared/lib/constants'
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
+import { Calendar as DatePicker } from '@/src/shared/ui/calendar'
 import { Input } from '@/src/shared/ui/input'
 import { Popover, PopoverContent, PopoverTrigger } from '@/src/shared/ui/popover'
 import {
@@ -254,14 +255,17 @@ export function ShiftFilters({
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" className="w-full justify-start text-left font-normal">
-              <Calendar className="mr-2 h-4 w-4" />
+              <CalendarIcon className="mr-2 h-4 w-4" />
               {filters.startDate ? format(filters.startDate, 'PPP') : t('startDatePlaceholder')}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
-            <div className="p-2">
-              {filters.startDate ? format(filters.startDate, 'dd/MM/yyyy') : 'Select date'}
-            </div>
+            <DatePicker
+              mode="single"
+              selected={filters.startDate}
+              onSelect={(date) => date && updateFilters({ startDate: date })}
+              initialFocus
+            />
           </PopoverContent>
         </Popover>
 
@@ -269,14 +273,17 @@ export function ShiftFilters({
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" className="w-full justify-start text-left font-normal">
-              <Calendar className="mr-2 h-4 w-4" />
+              <CalendarIcon className="mr-2 h-4 w-4" />
               {filters.endDate ? format(filters.endDate, 'PPP') : t('endDatePlaceholder')}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
-            <div className="p-2">
-              {filters.endDate ? format(filters.endDate, 'dd/MM/yyyy') : 'Select date'}
-            </div>
+            <DatePicker
+              mode="single"
+              selected={filters.endDate}
+              onSelect={(date) => date && updateFilters({ endDate: date })}
+              initialFocus
+            />
           </PopoverContent>
         </Popover>
 
@@ -337,13 +344,13 @@ export function ShiftFilters({
             </SelectItem>
             <SelectItem value="week">
               <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4" />
+                <CalendarIcon className="h-4 w-4" />
                 {t('thisWeek')}
               </div>
             </SelectItem>
             <SelectItem value="month">
               <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4" />
+                <CalendarIcon className="h-4 w-4" />
                 {t('thisMonth')}
               </div>
             </SelectItem>
@@ -397,7 +404,7 @@ export function ShiftFilters({
 
           {(filters.startDate || filters.endDate) && (
             <Badge variant="secondary" className="gap-1">
-              <Calendar className="h-3 w-3" />
+              <CalendarIcon className="h-3 w-3" />
               {filters.startDate && format(filters.startDate, 'dd/MM/yyyy')}
               {filters.startDate && filters.endDate && ' - '}
               {filters.endDate && format(filters.endDate, 'dd/MM/yyyy')}

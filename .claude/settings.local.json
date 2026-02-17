@@ -10,7 +10,12 @@
       "Bash(npm run build:*)",
       "Bash(git fetch:*)",
       "Bash(powershell -ExecutionPolicy Bypass -File .specify/scripts/powershell/create-new-feature.ps1:*)",
-      "Bash(powershell:*)"
+      "Bash(powershell:*)",
+      "Bash(find:*)",
+      "Bash(npx shadcn@latest add:*)",
+      "Bash(npx eslint:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx next build:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

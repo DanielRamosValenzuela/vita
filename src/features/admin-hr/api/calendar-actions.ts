@@ -8,6 +8,8 @@ import { prisma } from '@/src/shared/lib/db'
 import type { ActionResult } from '@/src/shared/lib/types'
 import { handleActionError } from '@/src/shared/lib/utils'
 
+import { calendarDaySchema, importHolidaysSchema, type ImportHolidaysInput } from '../lib/calendar-schemas'
+
 export interface OrganizationCalendarDay {
   id: string
   date: Date
@@ -67,28 +69,37 @@ export async function upsertCalendarDayAction(
   try {
     const session = await requireAdminHRWithOrg()
 
+    const validated = calendarDaySchema.parse({
+      date: data.date,
+      type: data.type,
+      name: data.name,
+      description: data.description,
+      multiplier: data.multiplier ?? 1.0,
+      isRecurring: data.isRecurring,
+    })
+
     const calendarDay = await prisma.organizationCalendar.upsert({
       where: {
         organizationId_date: {
           organizationId: session.organizationId,
-          date: data.date,
+          date: validated.date,
         },
       },
       create: {
         organizationId: session.organizationId,
-        date: data.date,
-        type: data.type,
-        name: data.name,
-        description: data.description,
-        multiplier: data.multiplier || 1.0,
-        isRecurring: data.isRecurring || false,
+        date: validated.date,
+        type: validated.type,
+        name: validated.name,
+        description: validated.description,
+        multiplier: validated.multiplier,
+        isRecurring: validated.isRecurring || false,
       },
       update: {
-        type: data.type,
-        name: data.name,
-        description: data.description,
-        multiplier: data.multiplier || 1.0,
-        isRecurring: data.isRecurring || false,
+        type: validated.type,
+        name: validated.name,
+        description: validated.description,
+        multiplier: validated.multiplier,
+        isRecurring: validated.isRecurring || false,
       },
     })
 
@@ -172,5 +183,64 @@ export async function bulkMarkDaysAction(
     }
   } catch (error) {
     return handleActionError(error, 'bulkMarkDaysAction', 'Error al marcar los días')
+  }
+}
+
+export async function importNationalHolidaysAction(
+  data: ImportHolidaysInput
+): Promise<ActionResult<{ imported: number; skipped: number }>> {
+  try {
+    const session = await requireAdminHRWithOrg()
+    const validated = importHolidaysSchema.parse(data)
+
+    let imported = 0
+    let skipped = 0
+
+    for (const holiday of validated.selectedHolidays) {
+      const [yearStr, monthStr, dayStr] = holiday.date.split('-')
+      const date = new Date(parseInt(yearStr), parseInt(monthStr) - 1, parseInt(dayStr))
+      const dayType: DayType = holiday.inalienable ? 'IRRENUNCIABLE' : 'HOLIDAY'
+      const multiplier = holiday.inalienable ? 2.5 : 1.5
+
+      const existing = await prisma.organizationCalendar.findUnique({
+        where: {
+          organizationId_date: {
+            organizationId: session.organizationId,
+            date,
+          },
+        },
+      })
+
+      if (existing) {
+        skipped++
+        continue
+      }
+
+      await prisma.organizationCalendar.create({
+        data: {
+          organizationId: session.organizationId,
+          date,
+          type: dayType,
+          name: holiday.title,
+          multiplier,
+          isRecurring: false,
+        },
+      })
+      imported++
+    }
+
+    revalidatePath('/dashboard/calendar')
+    revalidatePath('/dashboard/shifts')
+
+    return {
+      success: true,
+      data: { imported, skipped },
+    }
+  } catch (error) {
+    return handleActionError(
+      error,
+      'importNationalHolidaysAction',
+      'Error al importar feriados'
+    )
   }
 }

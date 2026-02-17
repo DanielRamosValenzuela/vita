@@ -231,27 +231,36 @@ export const getStaffPageDataAction = async (): Promise<ActionResult<ContractsPa
         },
       }
 
-    const [contracts, rateTemplates, areas] = await Promise.all([
-      prisma.contract.findMany({
-        where: {
-          organizationId: session.organizationId!,
-          areaId: { in: areaIds },
-          isActive: true,
-          endDate: null,
+    const users = await prisma.user.findMany({
+      where: {
+        organizationId: session.organizationId!,
+        role: { in: [ROLES.STAFF_HEALTH, ROLES.CHIEF_AREA] },
+        userAreas: {
+          some: {
+            areaId: { in: areaIds },
+          },
         },
-        include: {
-          user: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              role: true,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        userAreas: {
+          select: {
+            area: {
+              select: {
+                id: true,
+                name: true,
+              },
             },
           },
-          area: { select: { id: true, name: true } },
-          rateTemplate: { select: { id: true, name: true } },
         },
-      }),
+      },
+      orderBy: { name: 'asc' },
+    })
+
+    const [rateTemplates, areas, contracts] = await Promise.all([
       prisma.rateTemplate.findMany({
         where: {
           organizationId: session.organizationId!,
@@ -281,6 +290,28 @@ export const getStaffPageDataAction = async (): Promise<ActionResult<ContractsPa
         select: { id: true, name: true },
         orderBy: { name: 'asc' },
       }),
+      prisma.contract.findMany({
+        where: {
+          organizationId: session.organizationId!,
+          userId: {
+            in: users.map((u) => u.id),
+          },
+          isActive: true,
+          endDate: null,
+        },
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              role: true,
+            },
+          },
+          area: { select: { id: true, name: true } },
+          rateTemplate: { select: { id: true, name: true } },
+        },
+      }),
     ])
 
     const contractsByUserId = new Map<string, typeof contracts>()
@@ -298,32 +329,31 @@ export const getStaffPageDataAction = async (): Promise<ActionResult<ContractsPa
       contractsCountByRateTemplateId.set(contract.rateTemplateId, current + 1)
     })
 
-    const staff: StaffWithContract[] = Array.from(contractsByUserId.values()).map(
-      (userContracts) => {
-        const first = userContracts[0]
+    const staff: StaffWithContract[] = users.map((user) => {
+      const userContracts = contractsByUserId.get(user.id) || []
+      const primaryArea = user.userAreas[0]?.area
 
-        return {
-          id: first.user.id,
-          name: first.user.name,
-          email: first.user.email,
-          role: first.user.role,
-          primaryAreaId: first.area?.id ?? null,
-          primaryAreaName: first.area?.name ?? null,
-          contracts: userContracts.map((contract) => ({
-            id: contract.id,
-            areaId: contract.areaId,
-            areaName: contract.area?.name || null,
-            rateTemplateId: contract.rateTemplateId,
-            rateTemplateName: contract.rateTemplate.name,
-            customMultiplier: contract.customMultiplier,
-            startDate: contract.startDate,
-            endDate: contract.endDate,
-            isActive: contract.isActive,
-            notes: contract.notes,
-          })),
-        }
+      return {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        primaryAreaId: primaryArea?.id ?? null,
+        primaryAreaName: primaryArea?.name ?? null,
+        contracts: userContracts.map((contract) => ({
+          id: contract.id,
+          areaId: contract.areaId,
+          areaName: contract.area?.name || null,
+          rateTemplateId: contract.rateTemplateId,
+          rateTemplateName: contract.rateTemplate.name,
+          customMultiplier: contract.customMultiplier,
+          startDate: contract.startDate,
+          endDate: contract.endDate,
+          isActive: contract.isActive,
+          notes: contract.notes,
+        })),
       }
-    )
+    })
 
     return {
       success: true,
