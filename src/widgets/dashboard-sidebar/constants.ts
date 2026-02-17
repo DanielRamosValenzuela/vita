@@ -7,6 +7,7 @@ import {
   Clock,
   CreditCard,
   DollarSign,
+  Inbox,
   LayoutGrid,
   User,
   Users,
@@ -41,6 +42,12 @@ export function getNavItems(t: (key: string) => string, userRole: Role): NavItem
       label: t('analytics'),
       icon: BarChart3,
       roles: [Role.SUPER_ADMIN],
+    },
+    {
+      href: '/dashboard/inbox',
+      label: t('inbox'),
+      icon: Inbox,
+      roles: [Role.ADMIN_HR, Role.CHIEF_AREA, Role.STAFF_HEALTH],
     },
     {
       href: '/dashboard/areas',

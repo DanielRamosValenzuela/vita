@@ -6,6 +6,7 @@ import type { CurrentUser } from '@/types'
 export interface DashboardSidebarProps {
   user: CurrentUser
   className?: string
+  unreadNotificationCount?: number
 }
 
 export interface NavItem {
@@ -13,4 +14,5 @@ export interface NavItem {
   label: string
   icon: LucideIcon
   roles: Role[]
+  badge?: number
 }

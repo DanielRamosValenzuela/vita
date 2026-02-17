@@ -17,7 +17,7 @@
 | 10   | Seguridad y Upload                | Completado |
 | 11   | Calendario Visual                 | Completado |
 | 12   | Perfiles de Usuario Avanzados     | Completado |
-| 13   | Sistema de Notificaciones         | Pendiente  |
+| 13   | Sistema de Notificaciones         | Parcial    |
 | 14   | Testing y Pulido                  | Pendiente  |
 
 ## Próximos Pasos Inmediatos (Feb 2026)
@@ -68,7 +68,7 @@
 
 - Layout y Sidebar ✅
 - Historial de pagos
-- Sistema de notificaciones
+- Sistema de notificaciones ✅ (Bandeja de entrada para ADMIN_HR, CHIEF_AREA, STAFF_HEALTH; pendiente SUPER_ADMIN, tiempo real, email)
 - Export a Excel/PDF
 
 ## Prioridad 3: Auth y Testing

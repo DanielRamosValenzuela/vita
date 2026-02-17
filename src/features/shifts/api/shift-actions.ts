@@ -2,6 +2,8 @@
 
 import { revalidatePath } from 'next/cache'
 import type { Prisma } from '@prisma/client'
+import { format } from 'date-fns'
+import { getTranslations } from 'next-intl/server'
 import { z } from 'zod'
 
 import { isChiefArea } from '@/src/shared/lib/auth/rbac'
@@ -10,6 +12,8 @@ import { prisma } from '@/src/shared/lib/db'
 import type { ActionResult } from '@/src/shared/lib/types'
 
 import { checkShiftConflicts } from '@/src/entities/shift'
+
+import { createNotification } from '@/src/features/notifications/lib/notification-service'
 
 import type { GetShiftsParams, GetShiftsResult, ShiftWithRelations } from '../types/shift-types'
 
@@ -168,6 +172,19 @@ export const createShiftAction = async (
       },
     })
 
+    if (shift.userId !== session.id) {
+      const tNotif = await getTranslations('notifications')
+      await createNotification({
+        userId: shift.userId,
+        actorId: session.id,
+        organizationId: session.organizationId!,
+        type: 'SHIFT_CREATED',
+        title: tNotif('types.SHIFT_CREATED', { actor: session.name, date: format(shift.startTime, 'dd/MM/yyyy') }),
+        description: `${shift.area.name} — ${shift.shiftType.name}`,
+        actionUrl: '/dashboard/shifts',
+      })
+    }
+
     revalidatePath('/dashboard/shifts')
     revalidatePath('/dashboard/shifts/calendar')
 
@@ -301,6 +318,18 @@ export const updateShiftAction = async (
       },
     })
 
+    if (updatedShift.userId !== session.id) {
+      const tNotif = await getTranslations('notifications')
+      await createNotification({
+        userId: updatedShift.userId,
+        actorId: session.id,
+        organizationId: session.organizationId!,
+        type: 'SHIFT_UPDATED',
+        title: tNotif('types.SHIFT_UPDATED', { actor: session.name, date: format(updatedShift.startTime, 'dd/MM/yyyy') }),
+        actionUrl: '/dashboard/shifts',
+      })
+    }
+
     revalidatePath('/dashboard/shifts')
     revalidatePath('/dashboard/shifts/calendar')
     revalidatePath(`/dashboard/shifts/${id}`)
@@ -330,7 +359,7 @@ export const deleteShiftAction = async (id: string): Promise<ActionResult<null>>
 
     const shift = await prisma.shift.findUnique({
       where: { id },
-      select: { id: true, organizationId: true, areaId: true },
+      select: { id: true, organizationId: true, areaId: true, userId: true, startTime: true },
     })
 
     if (!shift)
@@ -360,6 +389,18 @@ export const deleteShiftAction = async (id: string): Promise<ActionResult<null>>
       where: { id },
       data: { status: 'CANCELLED' },
     })
+
+    if (shift.userId !== session.id) {
+      const tNotif = await getTranslations('notifications')
+      await createNotification({
+        userId: shift.userId,
+        actorId: session.id,
+        organizationId: session.organizationId!,
+        type: 'SHIFT_CANCELLED',
+        title: tNotif('types.SHIFT_CANCELLED', { actor: session.name, date: format(shift.startTime, 'dd/MM/yyyy') }),
+        actionUrl: '/dashboard/shifts',
+      })
+    }
 
     revalidatePath('/dashboard/shifts')
     revalidatePath('/dashboard/shifts/calendar')
