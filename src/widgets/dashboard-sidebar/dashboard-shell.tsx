@@ -51,7 +51,11 @@ export function DashboardShell({ user, children, unreadNotificationCount }: Dash
           <SheetDescription id="dashboard-menu-description" className="sr-only">
             {tDashboard('sidebarLabel')}
           </SheetDescription>
-          <DashboardSidebar user={user} className="h-full w-full border-0" unreadNotificationCount={unreadNotificationCount} />
+          <DashboardSidebar
+            user={user}
+            className="h-full w-full border-0"
+            unreadNotificationCount={unreadNotificationCount}
+          />
         </SheetContent>
       </Sheet>
 

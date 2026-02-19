@@ -1,6 +1,6 @@
 'use client'
 
-import { type Dispatch, type ReactNode, useMemo, useReducer, useTransition } from 'react'
+import { useMemo, useReducer, useTransition, type Dispatch, type ReactNode } from 'react'
 import { useTranslations } from 'next-intl'
 import { Check, Edit, Info, Loader2, Palette, Plus, Trash2, X } from 'lucide-react'
 import { toast } from 'sonner'
@@ -164,7 +164,12 @@ const INITIAL_STATE: ShiftTypesState = {
 const shiftTypesReducer = (state: ShiftTypesState, action: ShiftTypesAction): ShiftTypesState => {
   switch (action.type) {
     case 'OPEN_CREATE':
-      return { ...state, isCreateDialogOpen: true, editingShiftType: null, formData: DEFAULT_FORM_DATA }
+      return {
+        ...state,
+        isCreateDialogOpen: true,
+        editingShiftType: null,
+        formData: DEFAULT_FORM_DATA,
+      }
     case 'OPEN_EDIT': {
       const h = Math.floor(action.shiftType.durationMinutes / 60)
       const m = action.shiftType.durationMinutes % 60
@@ -298,9 +303,7 @@ function ShiftTypesTable({
               <span className="text-sm">
                 {shiftType.isGlobal
                   ? '-'
-                  : (shiftType._count?.areaShiftTypes ??
-                    shiftType.areaShiftTypes?.length ??
-                    0)}
+                  : (shiftType._count?.areaShiftTypes ?? shiftType.areaShiftTypes?.length ?? 0)}
               </span>
             </TableCell>
             <TableCell>
@@ -368,7 +371,9 @@ function ShiftTypeFormDialog({
             <Input
               id="name"
               value={formData.name}
-              onChange={(e) => dispatch({ type: 'UPDATE_FORM', field: 'name', value: e.target.value })}
+              onChange={(e) =>
+                dispatch({ type: 'UPDATE_FORM', field: 'name', value: e.target.value })
+              }
               placeholder={t('form.namePlaceholder')}
             />
           </div>
@@ -381,7 +386,9 @@ function ShiftTypeFormDialog({
                 min={0}
                 max={24}
                 value={formData.durationHours}
-                onChange={(e) => dispatch({ type: 'UPDATE_FORM', field: 'durationHours', value: e.target.value })}
+                onChange={(e) =>
+                  dispatch({ type: 'UPDATE_FORM', field: 'durationHours', value: e.target.value })
+                }
                 placeholder={t('form.durationPlaceholder')}
               />
             </div>
@@ -393,7 +400,9 @@ function ShiftTypeFormDialog({
                 min={0}
                 max={59}
                 value={formData.durationMinutes}
-                onChange={(e) => dispatch({ type: 'UPDATE_FORM', field: 'durationMinutes', value: e.target.value })}
+                onChange={(e) =>
+                  dispatch({ type: 'UPDATE_FORM', field: 'durationMinutes', value: e.target.value })
+                }
                 placeholder="0"
               />
             </div>
@@ -442,7 +451,9 @@ function ShiftTypeFormDialog({
                 id="color"
                 type="color"
                 value={formData.color}
-                onChange={(e) => dispatch({ type: 'UPDATE_FORM', field: 'color', value: e.target.value })}
+                onChange={(e) =>
+                  dispatch({ type: 'UPDATE_FORM', field: 'color', value: e.target.value })
+                }
                 className="h-10 w-20"
               />
               <div className="flex gap-1">
@@ -463,7 +474,9 @@ function ShiftTypeFormDialog({
             <Input
               id="description"
               value={formData.description}
-              onChange={(e) => dispatch({ type: 'UPDATE_FORM', field: 'description', value: e.target.value })}
+              onChange={(e) =>
+                dispatch({ type: 'UPDATE_FORM', field: 'description', value: e.target.value })
+              }
               placeholder={t('form.descriptionPlaceholder')}
             />
           </div>
@@ -488,7 +501,13 @@ function ShiftTypeFormDialog({
                 type="number"
                 min={1}
                 value={formData.minStaffRequired}
-                onChange={(e) => dispatch({ type: 'UPDATE_FORM', field: 'minStaffRequired', value: e.target.value })}
+                onChange={(e) =>
+                  dispatch({
+                    type: 'UPDATE_FORM',
+                    field: 'minStaffRequired',
+                    value: e.target.value,
+                  })
+                }
               />
             </div>
             <div className="grid gap-2">
@@ -511,7 +530,9 @@ function ShiftTypeFormDialog({
                 type="number"
                 min={1}
                 value={formData.idealStaffCount}
-                onChange={(e) => dispatch({ type: 'UPDATE_FORM', field: 'idealStaffCount', value: e.target.value })}
+                onChange={(e) =>
+                  dispatch({ type: 'UPDATE_FORM', field: 'idealStaffCount', value: e.target.value })
+                }
               />
             </div>
           </div>
@@ -536,7 +557,9 @@ function ShiftTypeFormDialog({
                 type="number"
                 min={1}
                 value={formData.maxStaffAllowed}
-                onChange={(e) => dispatch({ type: 'UPDATE_FORM', field: 'maxStaffAllowed', value: e.target.value })}
+                onChange={(e) =>
+                  dispatch({ type: 'UPDATE_FORM', field: 'maxStaffAllowed', value: e.target.value })
+                }
               />
             </div>
           </div>
@@ -545,7 +568,9 @@ function ShiftTypeFormDialog({
               type="checkbox"
               id="isGlobal"
               checked={formData.isGlobal}
-              onChange={(e) => dispatch({ type: 'UPDATE_FORM', field: 'isGlobal', value: e.target.checked })}
+              onChange={(e) =>
+                dispatch({ type: 'UPDATE_FORM', field: 'isGlobal', value: e.target.checked })
+              }
               className="rounded border-gray-300"
             />
             <div className="flex items-center gap-1.5">
@@ -603,17 +628,16 @@ function ShiftTypeFormDialog({
               type="checkbox"
               id="isActive"
               checked={formData.isActive || false}
-              onChange={(e) => dispatch({ type: 'UPDATE_FORM', field: 'isActive', value: e.target.checked })}
+              onChange={(e) =>
+                dispatch({ type: 'UPDATE_FORM', field: 'isActive', value: e.target.checked })
+              }
               className="rounded border-gray-300"
             />
             <Label htmlFor="isActive">{t('form.active')}</Label>
           </div>
         </div>
         <DialogFooter>
-          <Button
-            variant="outline"
-            onClick={() => dispatch({ type: 'CLOSE_DIALOG' })}
-          >
+          <Button variant="outline" onClick={() => dispatch({ type: 'CLOSE_DIALOG' })}>
             {t('form.cancel')}
           </Button>
           <Button onClick={onSave} disabled={!hasChanges || isPending}>
@@ -686,18 +710,13 @@ function DeleteShiftTypeDialog({
           </div>
         )}
         <DialogFooter>
-          <Button
-            variant="outline"
-            onClick={() => dispatch({ type: 'CLOSE_DELETE' })}
-          >
+          <Button variant="outline" onClick={() => dispatch({ type: 'CLOSE_DELETE' })}>
             {t('delete.cancel')}
           </Button>
           <Button
             variant="destructive"
             onClick={onConfirm}
-            disabled={
-              isPending || Boolean(deleteTarget && (deleteTarget._count?.shifts ?? 0) > 0)
-            }
+            disabled={isPending || Boolean(deleteTarget && (deleteTarget._count?.shifts ?? 0) > 0)}
           >
             {isPending ? t('delete.deleting') : t('delete.confirm')}
           </Button>
@@ -712,7 +731,14 @@ export function ShiftTypesPage({ shiftTypes, areas }: ShiftTypesPageProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [state, dispatch] = useReducer(shiftTypesReducer, INITIAL_STATE)
-  const { formData, editingShiftType, isCreateDialogOpen, showSaveConfirm, deleteDialogOpen, deleteTarget } = state
+  const {
+    formData,
+    editingShiftType,
+    isCreateDialogOpen,
+    showSaveConfirm,
+    deleteDialogOpen,
+    deleteTarget,
+  } = state
 
   const hasChanges = useMemo(() => {
     if (editingShiftType) {

@@ -17,7 +17,11 @@ import { Link, usePathname } from '@/i18n/navigation'
 import { getNavItems } from './constants'
 import type { DashboardSidebarProps } from './types'
 
-export function DashboardSidebar({ user, className, unreadNotificationCount }: DashboardSidebarProps) {
+export function DashboardSidebar({
+  user,
+  className,
+  unreadNotificationCount,
+}: DashboardSidebarProps) {
   const t = useTranslations('dashboard')
   const tCommon = useTranslations('common')
   const pathname = usePathname()

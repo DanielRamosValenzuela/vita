@@ -1,14 +1,14 @@
 'use client'
 
 import { useTransition } from 'react'
-import type { NotificationType } from '@prisma/client'
 import { useTranslations } from 'next-intl'
+import type { NotificationType } from '@prisma/client'
 import { Inbox } from 'lucide-react'
 
 import { Button } from '@/src/shared/ui/button'
+import { getNotificationsAction } from '@/src/features/notifications/api'
 
 import type { NotificationWithActor } from '@/src/entities/notification/lib/types'
-import { getNotificationsAction } from '@/src/features/notifications/api'
 
 import { NotificationItem } from './notification-item'
 
@@ -58,11 +58,7 @@ export function NotificationList({
   return (
     <div className="space-y-2">
       {notifications.map((notification) => (
-        <NotificationItem
-          key={notification.id}
-          notification={notification}
-          onDelete={onDelete}
-        />
+        <NotificationItem key={notification.id} notification={notification} onDelete={onDelete} />
       ))}
       {nextCursor && (
         <div className="flex justify-center pt-4">

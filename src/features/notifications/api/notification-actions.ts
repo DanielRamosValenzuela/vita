@@ -30,8 +30,7 @@ export async function getNotificationsAction(
     const user = await requireAuth()
 
     const limit = Math.min(params.limit ?? 20, 50)
-    const isRead =
-      params.filter === 'unread' ? false : params.filter === 'read' ? true : undefined
+    const isRead = params.filter === 'unread' ? false : params.filter === 'read' ? true : undefined
 
     const result = await getNotificationsByUser(user.id, {
       cursor: params.cursor,
@@ -74,9 +73,7 @@ export async function markNotificationReadAction(
   }
 }
 
-export async function markAllNotificationsReadAction(): Promise<
-  ActionResult<{ count: number }>
-> {
+export async function markAllNotificationsReadAction(): Promise<ActionResult<{ count: number }>> {
   try {
     const user = await requireAuth()
     const count = await markAllAsRead(user.id)
@@ -102,10 +99,6 @@ export async function deleteNotificationAction(
     revalidatePath('/dashboard')
     return { success: true, data: null }
   } catch (error) {
-    return handleActionError(
-      error,
-      'deleteNotificationAction',
-      'Error al eliminar notificación'
-    )
+    return handleActionError(error, 'deleteNotificationAction', 'Error al eliminar notificación')
   }
 }

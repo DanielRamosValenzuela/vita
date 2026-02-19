@@ -106,7 +106,8 @@ export function InviteUserForm({
     startTransition(async () => {
       const result = await searchUserAction(searchTerm, organizationCountry)
 
-      if (result.success && result.data) dispatch({ type: 'SEARCH_SUCCESS', payload: result.data as FoundUser })
+      if (result.success && result.data)
+        dispatch({ type: 'SEARCH_SUCCESS', payload: result.data as FoundUser })
       else dispatch({ type: 'SEARCH_FAIL', payload: result.error || t('searchError') })
     })
   }
@@ -121,7 +122,8 @@ export function InviteUserForm({
 
     startTransition(async () => {
       let result
-      if (role === ROLES.CHIEF_AREA) result = await inviteChiefAction(organizationId, state.foundUser!.id)
+      if (role === ROLES.CHIEF_AREA)
+        result = await inviteChiefAction(organizationId, state.foundUser!.id)
       else if (role === ROLES.STAFF_HEALTH)
         result = await inviteStaffAction(organizationId, state.foundUser!.id)
       else {

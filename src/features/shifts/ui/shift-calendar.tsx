@@ -85,9 +85,7 @@ function ShiftCalendarDayCell({
                       onShiftClick?.(shift)
                     }}
                   >
-                    <span className="font-medium shrink-0">
-                      {format(shift.startTime, 'HH:mm')}
-                    </span>
+                    <span className="font-medium shrink-0">{format(shift.startTime, 'HH:mm')}</span>
                     <span className="truncate">{shift.userName.split(' ')[0]}</span>
                   </button>
                 </TooltipTrigger>

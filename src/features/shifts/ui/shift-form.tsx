@@ -85,9 +85,7 @@ export function ShiftForm({
   const availableShiftTypes = useMemo(() => {
     if (!areaId) return shiftTypes
     return shiftTypes.filter(
-      (st) =>
-        !!st.isGlobal ||
-        (st.areaShiftTypes?.some((ast) => ast.areaId === areaId) ?? false)
+      (st) => !!st.isGlobal || (st.areaShiftTypes?.some((ast) => ast.areaId === areaId) ?? false)
     )
   }, [shiftTypes, areaId])
 

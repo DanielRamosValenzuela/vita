@@ -157,7 +157,12 @@ export function CalendarDayForm({
                 </Tooltip>
               </TooltipProvider>
             </div>
-            <Select value={formState.dayType} onValueChange={(value) => setFormState(prev => ({ ...prev, dayType: value as DayType }))}>
+            <Select
+              value={formState.dayType}
+              onValueChange={(value) =>
+                setFormState((prev) => ({ ...prev, dayType: value as DayType }))
+              }
+            >
               <SelectTrigger id="dayType">
                 <SelectValue />
               </SelectTrigger>
@@ -191,7 +196,7 @@ export function CalendarDayForm({
               step="0.1"
               min="0.1"
               value={formState.multiplier}
-              onChange={(e) => setFormState(prev => ({ ...prev, multiplier: e.target.value }))}
+              onChange={(e) => setFormState((prev) => ({ ...prev, multiplier: e.target.value }))}
               placeholder="1.0"
             />
           </div>
@@ -213,7 +218,7 @@ export function CalendarDayForm({
             <Input
               id="dayName"
               value={formState.dayName}
-              onChange={(e) => setFormState(prev => ({ ...prev, dayName: e.target.value }))}
+              onChange={(e) => setFormState((prev) => ({ ...prev, dayName: e.target.value }))}
               placeholder={t('form.namePlaceholder')}
             />
           </div>
@@ -223,7 +228,9 @@ export function CalendarDayForm({
             <Textarea
               id="dayDescription"
               value={formState.dayDescription}
-              onChange={(e) => setFormState(prev => ({ ...prev, dayDescription: e.target.value }))}
+              onChange={(e) =>
+                setFormState((prev) => ({ ...prev, dayDescription: e.target.value }))
+              }
               placeholder={t('form.descriptionPlaceholder')}
               rows={2}
             />

@@ -1,8 +1,7 @@
 'use server'
 
-import type { Country } from '@prisma/client'
-
 import { getTranslations } from 'next-intl/server'
+import type { Country } from '@prisma/client'
 
 import { requireAdminHR, requireAdminHRWithOrg } from '@/src/shared/lib/auth'
 import { ROLES } from '@/src/shared/lib/constants'
@@ -11,11 +10,10 @@ import type { ActionResult } from '@/src/shared/lib/types'
 import { handleActionError } from '@/src/shared/lib/utils'
 import { revalidatePaths } from '@/src/shared/lib/utils/revalidate-paths'
 import { checkDocumentExistsInOrganization } from '@/src/shared/lib/validation/document-validation'
+import { createNotification } from '@/src/features/notifications/lib/notification-service'
 
 import { deleteInvitation } from '@/src/entities/invitation'
 import { searchUserByDocumentOrEmail } from '@/src/entities/user'
-
-import { createNotification } from '@/src/features/notifications/lib/notification-service'
 
 import { checkOrganizationLimit, createInvitation } from '../data/invitation-repository'
 
@@ -134,7 +132,10 @@ export const inviteChiefAction = async (
       actorId: session.id,
       organizationId,
       type: 'INVITATION_PENDING',
-      title: tNotif('types.INVITATION_PENDING', { actor: session.name, organization: org?.name ?? '' }),
+      title: tNotif('types.INVITATION_PENDING', {
+        actor: session.name,
+        organization: org?.name ?? '',
+      }),
       actionUrl: '/dashboard/profile?section=invitations',
     })
 
@@ -230,7 +231,10 @@ export const inviteStaffAction = async (
       actorId: session.id,
       organizationId,
       type: 'INVITATION_PENDING',
-      title: tNotif('types.INVITATION_PENDING', { actor: session.name, organization: org?.name ?? '' }),
+      title: tNotif('types.INVITATION_PENDING', {
+        actor: session.name,
+        organization: org?.name ?? '',
+      }),
       actionUrl: '/dashboard/profile?section=invitations',
     })
 

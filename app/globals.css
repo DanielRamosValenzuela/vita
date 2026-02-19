@@ -204,11 +204,21 @@
 }
 
 @keyframes nav-progress {
-  0% { width: 0%; }
-  15% { width: 30%; }
-  40% { width: 60%; }
-  70% { width: 90%; }
-  100% { width: 100%; }
+  0% {
+    width: 0%;
+  }
+  15% {
+    width: 30%;
+  }
+  40% {
+    width: 60%;
+  }
+  70% {
+    width: 90%;
+  }
+  100% {
+    width: 100%;
+  }
 }
 
 .animate-nav-progress {

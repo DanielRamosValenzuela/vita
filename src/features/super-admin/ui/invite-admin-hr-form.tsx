@@ -100,7 +100,8 @@ export function InviteAdminHRForm({
     startTransition(async () => {
       const result = await searchUserAction(searchTerm, organizationCountry)
 
-      if (result.success && result.data) dispatch({ type: 'SEARCH_SUCCESS', payload: result.data as FoundUser })
+      if (result.success && result.data)
+        dispatch({ type: 'SEARCH_SUCCESS', payload: result.data as FoundUser })
       else dispatch({ type: 'SEARCH_FAIL', payload: result.error || t('searchError') })
     })
   }

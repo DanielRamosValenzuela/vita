@@ -2,27 +2,11 @@
 
 import { useState, useTransition } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
-import { formatDistanceToNow } from 'date-fns'
-import { es, enUS } from 'date-fns/locale'
-import {
-  Bell,
-  Calendar,
-  LayoutGrid,
-  Mail,
-  RefreshCw,
-  Trash2,
-  XCircle,
-} from 'lucide-react'
 import Image from 'next/image'
+import { formatDistanceToNow } from 'date-fns'
+import { enUS, es } from 'date-fns/locale'
+import { Bell, Calendar, LayoutGrid, Mail, RefreshCw, Trash2, XCircle } from 'lucide-react'
 import { toast } from 'sonner'
-
-import { useRouter } from '@/i18n/navigation'
-
-import type { NotificationWithActor } from '@/src/entities/notification/lib/types'
-import {
-  deleteNotificationAction,
-  markNotificationReadAction,
-} from '@/src/features/notifications/api'
 
 import {
   AlertDialog,
@@ -35,12 +19,14 @@ import {
   AlertDialogTitle,
 } from '@/src/shared/ui/alert-dialog'
 import { Button } from '@/src/shared/ui/button'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/src/shared/ui/tooltip'
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/src/shared/ui/tooltip'
+  deleteNotificationAction,
+  markNotificationReadAction,
+} from '@/src/features/notifications/api'
+
+import { useRouter } from '@/i18n/navigation'
+import type { NotificationWithActor } from '@/src/entities/notification/lib/types'
 
 const ICON_MAP = {
   Mail,
@@ -97,8 +83,7 @@ export function NotificationItem({ notification, onDelete }: NotificationItemPro
 
   const handleClick = () => {
     startTransition(async () => {
-      if (!notification.isRead)
-        await markNotificationReadAction(notification.id)
+      if (!notification.isRead) await markNotificationReadAction(notification.id)
       router.push(notification.actionUrl as '/')
     })
   }
@@ -118,9 +103,7 @@ export function NotificationItem({ notification, onDelete }: NotificationItemPro
     <>
       <div
         className={`group relative flex items-start gap-3 rounded-lg border p-4 transition-colors ${
-          notification.isRead
-            ? 'bg-card hover:bg-accent/50'
-            : 'bg-accent/30 hover:bg-accent/50'
+          notification.isRead ? 'bg-card hover:bg-accent/50' : 'bg-accent/30 hover:bg-accent/50'
         }`}
       >
         <button
@@ -143,9 +126,7 @@ export function NotificationItem({ notification, onDelete }: NotificationItemPro
                   {notification.title}
                 </p>
                 {notification.description && (
-                  <p className="text-muted-foreground mt-0.5 text-xs">
-                    {notification.description}
-                  </p>
+                  <p className="text-muted-foreground mt-0.5 text-xs">{notification.description}</p>
                 )}
                 {notification.organization && (
                   <p className="text-muted-foreground mt-0.5 text-xs">

@@ -9,10 +9,9 @@ import { prisma } from '@/src/shared/lib/db'
 import { handleActionError } from '@/src/shared/lib/utils'
 import { getLocaleFromHeaders } from '@/src/shared/lib/utils/get-locale'
 import { revalidatePaths } from '@/src/shared/lib/utils/revalidate-paths'
+import { createNotification } from '@/src/features/notifications/lib/notification-service'
 
 import { createArea, deleteArea, getAreas, updateArea } from '@/src/entities/area'
-
-import { createNotification } from '@/src/features/notifications/lib/notification-service'
 
 import { getCreateAreaSchema, getUpdateAreaSchema } from '../lib/helpers/server'
 import type { CreateAreaInput, UpdateAreaInput } from '../lib/types'

@@ -68,9 +68,7 @@ interface StatusSelectItemProps {
 function StatusSelectItem({ status, label }: StatusSelectItemProps) {
   return (
     <SelectItem value={status}>
-      <Badge className={`mr-2 ${getStatusColor(status)}`}>
-        {label}
-      </Badge>
+      <Badge className={`mr-2 ${getStatusColor(status)}`}>{label}</Badge>
     </SelectItem>
   )
 }

@@ -53,7 +53,10 @@ const createInitialState = (currentYear: number): ImportDialogState => ({
   loadError: false,
 })
 
-const importDialogReducer = (state: ImportDialogState, action: ImportDialogAction): ImportDialogState => {
+const importDialogReducer = (
+  state: ImportDialogState,
+  action: ImportDialogAction
+): ImportDialogState => {
   switch (action.type) {
     case 'SET_YEAR':
       return { ...state, year: action.payload }
@@ -142,7 +145,8 @@ export function CalendarImportDialog({
 
   function handleSelectAll() {
     const allAvailable = state.holidays.filter((h) => !isAlreadyImported(h.date)).map((h) => h.date)
-    if (state.selected.size === allAvailable.length) dispatch({ type: 'SELECT_ALL', payload: new Set() })
+    if (state.selected.size === allAvailable.length)
+      dispatch({ type: 'SELECT_ALL', payload: new Set() })
     else dispatch({ type: 'SELECT_ALL', payload: new Set(allAvailable) })
   }
 
@@ -179,7 +183,10 @@ export function CalendarImportDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto" onOpenAutoFocus={handleDialogAutoFocus}>
+      <DialogContent
+        className="max-w-2xl max-h-[80vh] overflow-y-auto"
+        onOpenAutoFocus={handleDialogAutoFocus}
+      >
         <DialogHeader>
           <DialogTitle>{t('title')}</DialogTitle>
           <DialogDescription>{t('description')}</DialogDescription>

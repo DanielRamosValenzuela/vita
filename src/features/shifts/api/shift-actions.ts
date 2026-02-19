@@ -1,19 +1,18 @@
 'use server'
 
+import { getTranslations } from 'next-intl/server'
 import { revalidatePath } from 'next/cache'
 import type { Prisma } from '@prisma/client'
 import { format } from 'date-fns'
-import { getTranslations } from 'next-intl/server'
 import { z } from 'zod'
 
 import { isChiefArea } from '@/src/shared/lib/auth/rbac'
 import { requireAdminHROrChiefArea } from '@/src/shared/lib/auth/session'
 import { prisma } from '@/src/shared/lib/db'
 import type { ActionResult } from '@/src/shared/lib/types'
+import { createNotification } from '@/src/features/notifications/lib/notification-service'
 
 import { checkShiftConflicts } from '@/src/entities/shift'
-
-import { createNotification } from '@/src/features/notifications/lib/notification-service'
 
 import type { GetShiftsParams, GetShiftsResult, ShiftWithRelations } from '../types/shift-types'
 
@@ -189,7 +188,10 @@ export const createShiftAction = async (
         actorId: session.id,
         organizationId,
         type: 'SHIFT_CREATED',
-        title: tNotif('types.SHIFT_CREATED', { actor: session.name, date: format(shift.startTime, 'dd/MM/yyyy') }),
+        title: tNotif('types.SHIFT_CREATED', {
+          actor: session.name,
+          date: format(shift.startTime, 'dd/MM/yyyy'),
+        }),
         description: `${shift.area.name} — ${shift.shiftType.name}`,
         actionUrl: '/dashboard/shifts',
       })
@@ -345,7 +347,10 @@ export const updateShiftAction = async (
         actorId: session.id,
         organizationId,
         type: 'SHIFT_UPDATED',
-        title: tNotif('types.SHIFT_UPDATED', { actor: session.name, date: format(updatedShift.startTime, 'dd/MM/yyyy') }),
+        title: tNotif('types.SHIFT_UPDATED', {
+          actor: session.name,
+          date: format(updatedShift.startTime, 'dd/MM/yyyy'),
+        }),
         actionUrl: '/dashboard/shifts',
       })
     }
@@ -427,7 +432,10 @@ export const deleteShiftAction = async (id: string): Promise<ActionResult<null>>
         actorId: session.id,
         organizationId,
         type: 'SHIFT_CANCELLED',
-        title: tNotif('types.SHIFT_CANCELLED', { actor: session.name, date: format(shift.startTime, 'dd/MM/yyyy') }),
+        title: tNotif('types.SHIFT_CANCELLED', {
+          actor: session.name,
+          date: format(shift.startTime, 'dd/MM/yyyy'),
+        }),
         actionUrl: '/dashboard/shifts',
       })
     }

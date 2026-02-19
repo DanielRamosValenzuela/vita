@@ -1,8 +1,8 @@
 'use client'
 
 import { useEffect } from 'react'
-import type { NotificationType } from '@prisma/client'
 import { useLocale, useTranslations } from 'next-intl'
+import type { NotificationType } from '@prisma/client'
 import { toast } from 'sonner'
 
 import { NOTIFICATIONS_LIMITS } from '@/src/shared/lib/constants'

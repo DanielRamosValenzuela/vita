@@ -136,7 +136,7 @@ const EMPTY_STAFF: StaffOption[] = []
 const createInitialState = (
   area: AreaEditFormProps['area'],
   initialAssignedChiefIds: Set<string>,
-  initialAssignedStaffIds: Set<string>,
+  initialAssignedStaffIds: Set<string>
 ): AreaFormState => ({
   name: area.name,
   description: area.description || '',
@@ -478,7 +478,7 @@ const hasAreaFormChanged = (
   initialSelectedIds: Set<string>,
   canAssignChiefs: boolean,
   initialAssignedChiefIds: Set<string>,
-  initialAssignedStaffIds: Set<string>,
+  initialAssignedStaffIds: Set<string>
 ): boolean => {
   if (state.name.trim() !== area.name) return true
   if ((state.description || '') !== (area.description || '')) return true
@@ -540,7 +540,14 @@ export function AreaEditForm({
         initialAssignedChiefIds,
         initialAssignedStaffIds
       ),
-    [state, area, initialSelectedIds, canAssignChiefs, initialAssignedChiefIds, initialAssignedStaffIds]
+    [
+      state,
+      area,
+      initialSelectedIds,
+      canAssignChiefs,
+      initialAssignedChiefIds,
+      initialAssignedStaffIds,
+    ]
   )
 
   const performSave = () => {
@@ -572,10 +579,7 @@ export function AreaEditForm({
         }
       }
 
-      const staffResult = await assignStaffToAreaAction(
-        area.id,
-        Array.from(state.selectedStaffIds)
-      )
+      const staffResult = await assignStaffToAreaAction(area.id, Array.from(state.selectedStaffIds))
       if (!staffResult.success) {
         toast.error(staffResult.error)
         return

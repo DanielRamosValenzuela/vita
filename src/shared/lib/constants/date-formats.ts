@@ -40,4 +40,3 @@ export function getDateTimeFormatByCountry(country: Country): string {
 export function getLocaleByCountry(country: Country): Locale {
   return COUNTRY_LOCALES[country] || es
 }
-

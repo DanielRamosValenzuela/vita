@@ -1,7 +1,7 @@
 'use client'
 
-import type { NotificationType } from '@prisma/client'
 import { useTranslations } from 'next-intl'
+import type { NotificationType } from '@prisma/client'
 
 import { Button } from '@/src/shared/ui/button'
 
@@ -37,10 +37,8 @@ export function InboxFilters({
   const t = useTranslations('notifications')
 
   const handleTypeToggle = (key: string) => {
-    if (selectedTypeKeys.includes(key))
-      onTypeKeysChange(selectedTypeKeys.filter((k) => k !== key))
-    else
-      onTypeKeysChange([...selectedTypeKeys, key])
+    if (selectedTypeKeys.includes(key)) onTypeKeysChange(selectedTypeKeys.filter((k) => k !== key))
+    else onTypeKeysChange([...selectedTypeKeys, key])
   }
 
   const allSelected = selectedTypeKeys.length === 0

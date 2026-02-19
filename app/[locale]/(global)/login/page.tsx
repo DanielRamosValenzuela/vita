@@ -13,10 +13,7 @@ export default async function LoginPage({
   params: Promise<{ locale: string }>
   searchParams: Promise<{ callbackUrl?: string; registered?: string }>
 }) {
-  const [{ locale }, session] = await Promise.all([
-    params,
-    getServerSession(authOptions),
-  ])
+  const [{ locale }, session] = await Promise.all([params, getServerSession(authOptions)])
   const t = await getTranslations({ locale, namespace: 'auth' })
 
   if (session) redirect(`/${locale}`)

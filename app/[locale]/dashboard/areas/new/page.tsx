@@ -19,10 +19,7 @@ export async function generateMetadata({ params }: NewAreaPageProps) {
 
 export default async function NewAreaPage({ params }: NewAreaPageProps) {
   const { locale } = await params
-  const [_, t] = await Promise.all([
-    requireAdminHR(locale),
-    getTranslations('adminHR.areas'),
-  ])
+  const [_, t] = await Promise.all([requireAdminHR(locale), getTranslations('adminHR.areas')])
 
   return (
     <div className="space-y-6">

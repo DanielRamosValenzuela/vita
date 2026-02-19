@@ -4,7 +4,4 @@ export {
   getChangePasswordSchema,
   getUpdateDocumentSchema,
 } from '../helpers/server'
-export {
-  useChangePasswordSchema,
-  useUpdateDocumentSchema,
-} from '../helpers/client'
+export { useChangePasswordSchema, useUpdateDocumentSchema } from '../helpers/client'

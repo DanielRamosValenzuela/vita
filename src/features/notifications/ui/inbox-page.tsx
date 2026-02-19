@@ -1,19 +1,19 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import type { NotificationType } from '@prisma/client'
 import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
+import type { NotificationType } from '@prisma/client'
 import { CheckCheck } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Button } from '@/src/shared/ui/button'
-
-import type { NotificationWithActor } from '@/src/entities/notification/lib/types'
 import {
   getNotificationsAction,
   markAllNotificationsReadAction,
 } from '@/src/features/notifications/api'
+
+import type { NotificationWithActor } from '@/src/entities/notification/lib/types'
 
 import { InboxFilters, TYPE_GROUPS } from './inbox-filters'
 import { NotificationList } from './notification-list'
@@ -88,12 +88,7 @@ export function InboxPage({ initialNotifications, nextCursor, unreadCount }: Inb
           <h1 className="text-2xl font-bold tracking-tight">{t('inbox.title')}</h1>
         </div>
         {unreadCount > 0 && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleMarkAllRead}
-            disabled={isPending}
-          >
+          <Button variant="outline" size="sm" onClick={handleMarkAllRead} disabled={isPending}>
             <CheckCheck className="mr-2 h-4 w-4" />
             {t('inbox.markAllRead')}
           </Button>

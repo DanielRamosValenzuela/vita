@@ -60,7 +60,7 @@ export async function getNotificationsByUser(
   const hasMore = notifications.length > limit
   if (hasMore) notifications.pop()
 
-  const nextCursor = hasMore ? notifications[notifications.length - 1]?.id ?? null : null
+  const nextCursor = hasMore ? (notifications[notifications.length - 1]?.id ?? null) : null
 
   return { notifications, nextCursor }
 }
