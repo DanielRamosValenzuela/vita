@@ -18,7 +18,9 @@
       "Bash(npx next build:*)",
       "Bash(npx prisma db push)",
       "Bash(npx prisma generate:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(npx next lint:*)",
+      "mcp__ide__getDiagnostics"
     ]
   },
   "enableAllProjectMcpServers": true,

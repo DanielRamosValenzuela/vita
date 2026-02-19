@@ -86,8 +86,8 @@ export function ShiftForm({
     if (!areaId) return shiftTypes
     return shiftTypes.filter(
       (st) =>
-        st.isGlobal === true ||
-        (st.areaShiftTypes?.some((ast) => ast.areaId === areaId && ast.isActive) ?? false)
+        !!st.isGlobal ||
+        (st.areaShiftTypes?.some((ast) => ast.areaId === areaId) ?? false)
     )
   }, [shiftTypes, areaId])
 

@@ -21,9 +21,10 @@ import type { StaffWithContract } from '../api/contract-actions'
 
 interface StaffViewPageProps {
   staff: StaffWithContract[]
+  canManageRates?: boolean
 }
 
-export function StaffViewPage({ staff }: StaffViewPageProps) {
+export function StaffViewPage({ staff, canManageRates = false }: StaffViewPageProps) {
   const t = useTranslations('staff')
 
   const staffWithContract = staff.filter((s) => s.contracts.length > 0)
@@ -42,12 +43,14 @@ export function StaffViewPage({ staff }: StaffViewPageProps) {
               <div className="text-sm text-muted-foreground">
                 {staff.length} {t('table.totalStaff')}
               </div>
-              <Link href="/dashboard/rates">
-                <Button variant="outline" size="sm">
-                  <ExternalLink className="mr-2 h-4 w-4" />
-                  {t('goToRates')}
-                </Button>
-              </Link>
+              {canManageRates && (
+                <Link href="/dashboard/rates">
+                  <Button variant="outline" size="sm">
+                    <ExternalLink className="mr-2 h-4 w-4" />
+                    {t('goToRates')}
+                  </Button>
+                </Link>
+              )}
             </div>
           </div>
         </CardHeader>
@@ -130,7 +133,7 @@ export function StaffViewPage({ staff }: StaffViewPageProps) {
         </CardContent>
       </Card>
 
-      {staffWithoutContract.length > 0 && (
+      {canManageRates && staffWithoutContract.length > 0 && (
         <Card className="border-yellow-200 bg-yellow-50/50 dark:border-yellow-800 dark:bg-yellow-900/10">
           <CardHeader>
             <CardTitle className="text-yellow-800 dark:text-yellow-200">

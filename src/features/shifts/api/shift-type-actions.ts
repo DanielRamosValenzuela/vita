@@ -61,7 +61,7 @@ export const getShiftTypesAction = async (): Promise<ActionResult<ShiftType[]>> 
       organizationId: string
       OR?: Array<
         | { isGlobal: boolean }
-        | { areaShiftTypes: { some: { areaId: { in: string[] }; isActive: boolean } } }
+        | { areaShiftTypes: { some: { areaId: { in: string[] } } } }
       >
     } = {
       organizationId: effectiveOrgId,
@@ -80,15 +80,6 @@ export const getShiftTypesAction = async (): Promise<ActionResult<ShiftType[]>> 
           areaShiftTypes: {
             some: {
               areaId: { in: chiefAreaIds },
-              isActive: true,
-            },
-          },
-        },
-        {
-          areaShiftTypes: {
-            some: {
-              areaId: { in: chiefAreaIds },
-              isActive: false,
             },
           },
         },

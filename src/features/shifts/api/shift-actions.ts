@@ -43,11 +43,21 @@ export const createShiftAction = async (
 ): Promise<ActionResult<ShiftWithRelations>> => {
   try {
     const session = await requireAdminHROrChiefArea()
-    if (!session.organizationId)
+
+    let derivedOrgId: string | null = session.organizationId ?? null
+    if (isChiefArea(session) && !derivedOrgId) {
+      const firstArea = await prisma.userArea.findFirst({
+        where: { userId: session.id },
+        select: { area: { select: { organizationId: true } } },
+      })
+      derivedOrgId = firstArea?.area?.organizationId ?? null
+    }
+    if (!derivedOrgId)
       return {
         success: false,
         error: 'No tienes una organización asignada',
       }
+    const organizationId = derivedOrgId
 
     const validatedData = createShiftSchema.parse(data)
 
@@ -67,7 +77,7 @@ export const createShiftAction = async (
       select: { organizationId: true },
     })
 
-    if (!user || user.organizationId !== session.organizationId!)
+    if (!user || user.organizationId !== organizationId)
       return {
         success: false,
         error: 'El usuario no pertenece a tu organización',
@@ -89,7 +99,7 @@ export const createShiftAction = async (
     const area = await prisma.area.findUnique({
       where: {
         id: validatedData.areaId,
-        organizationId: session.organizationId!,
+        organizationId,
       },
     })
 
@@ -102,7 +112,7 @@ export const createShiftAction = async (
     const shiftType = await prisma.shiftType.findUnique({
       where: {
         id: validatedData.shiftTypeId,
-        organizationId: session.organizationId!,
+        organizationId,
       },
     })
 
@@ -131,7 +141,7 @@ export const createShiftAction = async (
     const activeContract = await prisma.contract.findFirst({
       where: {
         userId: validatedData.userId,
-        organizationId: session.organizationId!,
+        organizationId,
         isActive: true,
         OR: [{ areaId: validatedData.areaId }, { areaId: null }],
       },
@@ -141,7 +151,7 @@ export const createShiftAction = async (
     const shift = await prisma.shift.create({
       data: {
         ...validatedData,
-        organizationId: session.organizationId!,
+        organizationId,
         status: 'SCHEDULED',
         contractId: activeContract?.id ?? undefined,
       },
@@ -177,7 +187,7 @@ export const createShiftAction = async (
       await createNotification({
         userId: shift.userId,
         actorId: session.id,
-        organizationId: session.organizationId!,
+        organizationId,
         type: 'SHIFT_CREATED',
         title: tNotif('types.SHIFT_CREATED', { actor: session.name, date: format(shift.startTime, 'dd/MM/yyyy') }),
         description: `${shift.area.name} — ${shift.shiftType.name}`,
@@ -208,11 +218,21 @@ export const updateShiftAction = async (
 ): Promise<ActionResult<ShiftWithRelations>> => {
   try {
     const session = await requireAdminHROrChiefArea()
-    if (!session.organizationId)
+
+    let derivedOrgId: string | null = session.organizationId ?? null
+    if (isChiefArea(session) && !derivedOrgId) {
+      const firstArea = await prisma.userArea.findFirst({
+        where: { userId: session.id },
+        select: { area: { select: { organizationId: true } } },
+      })
+      derivedOrgId = firstArea?.area?.organizationId ?? null
+    }
+    if (!derivedOrgId)
       return {
         success: false,
         error: 'No tienes una organización asignada',
       }
+    const organizationId = derivedOrgId
 
     const validatedData = updateShiftSchema.parse(data)
 
@@ -235,7 +255,7 @@ export const updateShiftAction = async (
         error: 'Turno no encontrado',
       }
 
-    if (existingShift.organizationId !== session.organizationId)
+    if (existingShift.organizationId !== organizationId)
       return {
         success: false,
         error: 'El turno no pertenece a tu organización',
@@ -272,7 +292,7 @@ export const updateShiftAction = async (
 
     if (areaId && shiftTypeId) {
       const shiftType = await prisma.shiftType.findFirst({
-        where: { id: shiftTypeId, organizationId: session.organizationId! },
+        where: { id: shiftTypeId, organizationId },
       })
       if (shiftType && !shiftType.isGlobal) {
         const areaShiftType = await prisma.areaShiftType.findUnique({
@@ -323,7 +343,7 @@ export const updateShiftAction = async (
       await createNotification({
         userId: updatedShift.userId,
         actorId: session.id,
-        organizationId: session.organizationId!,
+        organizationId,
         type: 'SHIFT_UPDATED',
         title: tNotif('types.SHIFT_UPDATED', { actor: session.name, date: format(updatedShift.startTime, 'dd/MM/yyyy') }),
         actionUrl: '/dashboard/shifts',
@@ -351,11 +371,21 @@ export const updateShiftAction = async (
 export const deleteShiftAction = async (id: string): Promise<ActionResult<null>> => {
   try {
     const session = await requireAdminHROrChiefArea()
-    if (!session.organizationId)
+
+    let derivedOrgId: string | null = session.organizationId ?? null
+    if (isChiefArea(session) && !derivedOrgId) {
+      const firstArea = await prisma.userArea.findFirst({
+        where: { userId: session.id },
+        select: { area: { select: { organizationId: true } } },
+      })
+      derivedOrgId = firstArea?.area?.organizationId ?? null
+    }
+    if (!derivedOrgId)
       return {
         success: false,
         error: 'No tienes una organización asignada',
       }
+    const organizationId = derivedOrgId
 
     const shift = await prisma.shift.findUnique({
       where: { id },
@@ -368,7 +398,7 @@ export const deleteShiftAction = async (id: string): Promise<ActionResult<null>>
         error: 'Turno no encontrado',
       }
 
-    if (shift.organizationId !== session.organizationId)
+    if (shift.organizationId !== organizationId)
       return {
         success: false,
         error: 'El turno no pertenece a tu organización',
@@ -395,7 +425,7 @@ export const deleteShiftAction = async (id: string): Promise<ActionResult<null>>
       await createNotification({
         userId: shift.userId,
         actorId: session.id,
-        organizationId: session.organizationId!,
+        organizationId,
         type: 'SHIFT_CANCELLED',
         title: tNotif('types.SHIFT_CANCELLED', { actor: session.name, date: format(shift.startTime, 'dd/MM/yyyy') }),
         actionUrl: '/dashboard/shifts',
