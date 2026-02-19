@@ -2,7 +2,6 @@
 
 import { useEffect, useReducer, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
-import { useSearchParams } from 'next/navigation'
 import { Loader2, Mail, Plus } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -60,9 +59,14 @@ function emailsReducer(state: EmailsState, action: EmailsAction): EmailsState {
   return state
 }
 
-export function EmailsManagementSection() {
+export function EmailsManagementSection({
+  success,
+  error,
+}: {
+  success?: string
+  error?: string
+}) {
   const t = useTranslations('profile.emails')
-  const searchParams = useSearchParams()
   const [state, dispatch] = useReducer(emailsReducer, initialState)
   const [isPending, startTransition] = useTransition()
 
@@ -82,9 +86,6 @@ export function EmailsManagementSection() {
       loadEmails()
     })
 
-    const success = searchParams.get('success')
-    const error = searchParams.get('error')
-
     if (success === 'google_linked') {
       toast.success(t('googleLinkSuccess'))
       window.history.replaceState({}, '', window.location.pathname)
@@ -101,7 +102,7 @@ export function EmailsManagementSection() {
       toast.error(errorMessages[error] ?? t('googleLinkError'))
       window.history.replaceState({}, '', window.location.pathname)
     }
-  }, [searchParams, t])
+  }, [success, error, t])
 
   function handleAddEmail() {
     if (!newEmail.trim()) {

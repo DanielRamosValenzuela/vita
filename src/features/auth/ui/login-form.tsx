@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { signIn } from 'next-auth/react'
 import { useTranslations } from 'next-intl'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 
 import { Button } from '@/src/shared/ui/button'
 import { GoogleIcon } from '@/src/shared/ui/icons'
@@ -14,11 +14,9 @@ import { Link } from '@/i18n/navigation'
 
 import { loginAction } from '../api'
 
-export function LoginForm() {
+export function LoginForm({ callbackUrl = '/es' }: { callbackUrl?: string }) {
   const t = useTranslations('auth')
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const callbackUrl = searchParams.get('callbackUrl') || '/es'
 
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState<Record<string, string[]>>({})

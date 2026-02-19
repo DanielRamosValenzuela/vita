@@ -1,4 +1,3 @@
-import { Suspense } from 'react'
 import { getTranslations } from 'next-intl/server'
 import { redirect } from 'next/navigation'
 import type { Country } from '@prisma/client'
@@ -18,13 +17,15 @@ import { PersonalInfoForm } from '@/src/features/profile/ui/personal-info-form'
 
 interface ProfilePageProps {
   params: Promise<{ locale: string }>
+  searchParams: Promise<{ success?: string; error?: string }>
 }
 
-export default async function ProfilePage({ params }: ProfilePageProps) {
-  const [{ locale }, user, t] = await Promise.all([
+export default async function ProfilePage({ params, searchParams }: ProfilePageProps) {
+  const [{ locale }, user, t, resolvedSearchParams] = await Promise.all([
     params,
     getCurrentUser(),
     getTranslations('profile'),
+    searchParams,
   ])
 
   if (!user) redirect(`/${locale}/login`)
@@ -79,9 +80,10 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
 
       <ChangePasswordForm />
 
-      <Suspense>
-        <EmailsManagementSection />
-      </Suspense>
+      <EmailsManagementSection
+        success={resolvedSearchParams.success}
+        error={resolvedSearchParams.error}
+      />
 
       <InvitationsSection />
 

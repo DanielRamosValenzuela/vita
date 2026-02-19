@@ -1,4 +1,3 @@
-import { Suspense } from 'react'
 import { getServerSession } from 'next-auth/next'
 import { getTranslations } from 'next-intl/server'
 import { redirect } from 'next/navigation'
@@ -18,7 +17,7 @@ export default async function LoginPage({
 
   if (session) redirect(`/${locale}`)
 
-  const { registered } = await searchParams
+  const { registered, callbackUrl } = await searchParams
 
   return (
     <main className="bg-background fixed inset-0 overflow-y-auto font-sans">
@@ -39,9 +38,7 @@ export default async function LoginPage({
             )}
           </header>
           <section className="bg-card rounded-lg px-8 py-8 shadow">
-            <Suspense>
-              <LoginForm />
-            </Suspense>
+            <LoginForm callbackUrl={callbackUrl} />
           </section>
         </article>
       </section>

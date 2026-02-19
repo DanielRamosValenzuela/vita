@@ -23,7 +23,8 @@
       "mcp__ide__getDiagnostics",
       "Bash(npx:*)",
       "Bash(cmd.exe /c \"dir C:\\\\Users\\\\danie\\\\AppData\\\\Local\\\\Temp\\\\react-doctor-e6aef0b2-f54b-45ce-83db-dd9d400ca825\")",
-      "Bash(echo:*)"
+      "Bash(echo:*)",
+      "Bash(npm run i18n:check:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
