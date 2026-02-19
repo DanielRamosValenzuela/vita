@@ -26,8 +26,10 @@ export async function generateMetadata({ params }: AreaEditPageProps) {
 
 export default async function AreaEditPage({ params }: AreaEditPageProps) {
   const { locale, id } = await params
-  const user = await requireAdminHROrChiefArea(locale)
-  const t = await getTranslations('adminHR.areas')
+  const [user, t] = await Promise.all([
+    requireAdminHROrChiefArea(locale),
+    getTranslations('adminHR.areas'),
+  ])
 
   let organizationId: string | null = user.organizationId ?? null
   if (isChiefArea(user) && !organizationId) {

@@ -28,8 +28,10 @@ export async function generateMetadata({ params }: ShiftsPageProps) {
 
 export default async function ShiftsPage({ params }: ShiftsPageProps) {
   const { locale } = await params
-  const session = await requireAdminHROrChiefArea(locale)
-  const t = await getTranslations('shifts')
+  const [session, t] = await Promise.all([
+    requireAdminHROrChiefArea(locale),
+    getTranslations('shifts'),
+  ])
 
   let organizationId: string | null = session.organizationId ?? null
   if (isChiefArea(session) && !organizationId) {
@@ -50,18 +52,17 @@ export default async function ShiftsPage({ params }: ShiftsPageProps) {
       </div>
     )
 
-  const [shiftTypesResult, usersResult, areasResult] = await Promise.all([
+  const now = new Date()
+  const [shiftTypesResult, usersResult, areasResult, shiftsResult] = await Promise.all([
     getShiftTypesAction(),
     getUsersForShiftsAction(),
     getAreasAction(),
+    getShiftsAction({
+      startDate: startOfMonth(now),
+      endDate: endOfMonth(now),
+      pageSize: 200,
+    }),
   ])
-
-  const now = new Date()
-  const shiftsResult = await getShiftsAction({
-    startDate: startOfMonth(now),
-    endDate: endOfMonth(now),
-    pageSize: 200,
-  })
 
   if (
     !shiftTypesResult.success ||

@@ -21,10 +21,11 @@ export async function generateMetadata({ params }: AdminHRDashboardPageProps) {
 
 export default async function AdminHRDashboardPage({ params }: AdminHRDashboardPageProps) {
   const { locale } = await params
-  const session = await requireAdminHRWithOrg(locale)
-  const t = await getTranslations('adminHR.dashboard')
-
-  const statsResult = await getDashboardStatsAction()
+  const [session, t, statsResult] = await Promise.all([
+    requireAdminHRWithOrg(locale),
+    getTranslations('adminHR.dashboard'),
+    getDashboardStatsAction(),
+  ])
 
   if (!statsResult.success || !statsResult.data)
     return (

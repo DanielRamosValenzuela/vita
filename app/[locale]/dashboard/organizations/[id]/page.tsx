@@ -38,8 +38,10 @@ const OrganizationDetailsPage = async ({ params }: PageProps) => {
 
   if (!organization) notFound()
 
-  const t = await getTranslations('superAdmin.organizationDetails')
-  const tOrg = await getTranslations('superAdmin.organizations')
+  const [t, tOrg] = await Promise.all([
+    getTranslations('superAdmin.organizationDetails'),
+    getTranslations('superAdmin.organizations'),
+  ])
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {

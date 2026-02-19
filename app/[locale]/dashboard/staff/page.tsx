@@ -21,10 +21,11 @@ export async function generateMetadata({ params }: StaffPageProps) {
 
 export default async function StaffPage({ params }: StaffPageProps) {
   const { locale } = await params
-  const session = await requireAdminHROrChiefArea(locale)
-  const t = await getTranslations('dashboard')
-
-  const result = await getStaffPageDataAction()
+  const [session, t, result] = await Promise.all([
+    requireAdminHROrChiefArea(locale),
+    getTranslations('dashboard'),
+    getStaffPageDataAction(),
+  ])
 
   if (!result.success || !result.data)
     return (

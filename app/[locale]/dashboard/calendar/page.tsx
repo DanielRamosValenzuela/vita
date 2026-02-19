@@ -21,8 +21,10 @@ export async function generateMetadata({ params }: CalendarPageProps) {
 
 export default async function CalendarPage({ params }: CalendarPageProps) {
   const { locale } = await params
-  const session = await requireAdminHRWithOrg(locale)
-  const t = await getTranslations('adminHR.calendar')
+  const [session, t] = await Promise.all([
+    requireAdminHRWithOrg(locale),
+    getTranslations('adminHR.calendar'),
+  ])
 
   const now = new Date()
   const currentYear = now.getFullYear()
