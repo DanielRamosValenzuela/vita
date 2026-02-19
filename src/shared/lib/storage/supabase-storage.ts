@@ -8,17 +8,17 @@ const supabaseKey = env.SUPABASE_SERVICE_ROLE_KEY
 if (!supabaseUrl || !supabaseKey)
   throw new Error('Missing Supabase credentials in environment variables')
 
-export const supabaseStorage = createClient(supabaseUrl, supabaseKey)
+const supabaseStorage = createClient(supabaseUrl, supabaseKey)
 
-export const AVATARS_BUCKET = 'avatars'
+const AVATARS_BUCKET = 'avatars'
 
-export interface UploadAvatarOptions {
+interface UploadAvatarOptions {
   userId: string
   file: File | Blob
   contentType?: string
 }
 
-export interface UploadAvatarResult {
+interface UploadAvatarResult {
   success: boolean
   publicUrl?: string
   error?: string

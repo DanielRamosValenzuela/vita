@@ -7,7 +7,16 @@ import { cn } from '@/src/shared/lib/utils'
 
 import { Input } from '../input'
 
-export interface SearchableAddableListProps<T> {
+interface ItemContentProps<T> {
+  item: T
+  render: (item: T) => React.ReactNode
+}
+
+function ItemContent<T>({ item, render }: ItemContentProps<T>) {
+  return <>{render(item)}</>
+}
+
+interface SearchableAddableListProps<T> {
   items: T[]
   selectedIds: Set<string>
   onSelectionChange: (ids: Set<string>) => void
@@ -108,7 +117,7 @@ export function SearchableAddableList<T>({
                       onClick={() => handleAdd(id)}
                       className="flex w-full items-center justify-between gap-2 rounded-md px-3 py-2 text-left text-sm transition-colors hover:bg-accent"
                     >
-                      {renderItem(item)}
+                      <ItemContent item={item} render={renderItem} />
                       <Plus className="text-muted-foreground h-4 w-4 shrink-0" aria-hidden />
                     </button>
                   </li>
@@ -136,7 +145,7 @@ export function SearchableAddableList<T>({
                       'flex items-center gap-2 rounded-lg border bg-background px-3 py-2 text-sm'
                     )}
                   >
-                    {renderItem(item)}
+                    <ItemContent item={item} render={renderItem} />
                     <button
                       type="button"
                       onClick={() => handleRemove(id)}

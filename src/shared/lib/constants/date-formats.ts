@@ -2,7 +2,7 @@ import { Country } from '@prisma/client'
 import type { Locale } from 'date-fns'
 import { enUS, es } from 'date-fns/locale'
 
-export const COUNTRY_DATE_FORMATS: Record<Country, string> = {
+const COUNTRY_DATE_FORMATS: Record<Country, string> = {
   CL: 'dd/MM/yyyy',
   PE: 'dd/MM/yyyy',
   CO: 'dd/MM/yyyy',
@@ -11,7 +11,7 @@ export const COUNTRY_DATE_FORMATS: Record<Country, string> = {
   US: 'MM/dd/yyyy',
 }
 
-export const COUNTRY_DATE_TIME_FORMATS: Record<Country, string> = {
+const COUNTRY_DATE_TIME_FORMATS: Record<Country, string> = {
   CL: 'dd/MM/yyyy HH:mm',
   PE: 'dd/MM/yyyy HH:mm',
   CO: 'dd/MM/yyyy HH:mm',
@@ -20,7 +20,7 @@ export const COUNTRY_DATE_TIME_FORMATS: Record<Country, string> = {
   US: 'MM/dd/yyyy hh:mm a',
 }
 
-export const COUNTRY_LOCALES: Record<Country, Locale> = {
+const COUNTRY_LOCALES: Record<Country, Locale> = {
   CL: es,
   PE: es,
   CO: es,
@@ -41,4 +41,3 @@ export function getLocaleByCountry(country: Country): Locale {
   return COUNTRY_LOCALES[country] || es
 }
 
-export { Country }

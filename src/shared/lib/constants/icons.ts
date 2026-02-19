@@ -68,7 +68,7 @@ export const ICON_SEARCH_ALIASES: Record<string, string[]> = {
   Zap: ['rayo', 'electricidad', 'energía', 'energia'],
 }
 
-export const ALL_ICONS = [
+const ALL_ICONS = [
   'Activity',
   'AlarmClock',
   'Ambulance',

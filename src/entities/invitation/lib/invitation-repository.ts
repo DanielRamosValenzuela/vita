@@ -288,4 +288,3 @@ export async function rejectInvitation(
   }
 }
 
-export type { InvitationWithUser }

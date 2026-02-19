@@ -9,7 +9,7 @@ import { InviteUserFormBase, type FoundUser } from '@/src/shared/ui/molecules'
 
 import { inviteAdminHRAction, searchUserAction } from '../api/admin-hr-invitation-actions'
 
-export interface InviteAdminHRFormProps {
+interface InviteAdminHRFormProps {
   organizationId: string
   organizationCountry: import('@prisma/client').Country
   translationNamespace: string

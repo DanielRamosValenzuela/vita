@@ -1,1 +1,1 @@
-export { useCreateAreaSchema, useUpdateAreaSchema } from './area-schemas'
+export { useCreateAreaSchema } from './area-schemas'

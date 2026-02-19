@@ -1,6 +1,6 @@
 import { ROLES } from '@/src/shared/lib/constants'
 
-export interface UserCountsByRole {
+interface UserCountsByRole {
   ADMIN_HR: number
   CHIEF_AREA: number
   STAFF_HEALTH: number

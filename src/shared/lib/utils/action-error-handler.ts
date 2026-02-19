@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import type { ActionResult } from '@/src/shared/lib/types'
 
-export function isZodError(error: unknown): error is z.ZodError {
+function isZodError(error: unknown): error is z.ZodError {
   return error instanceof z.ZodError
 }
 

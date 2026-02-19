@@ -87,9 +87,8 @@ export function RateTemplateForm({
   const { name, description, components } = formState
 
   useEffect(() => {
-    if (mode === 'edit' && existingTemplate) {
+    if (mode === 'edit' && existingTemplate)
       setFormState(mapTemplateToState(existingTemplate))
-    }
   }, [mode, existingTemplate, open])
 
   const loadShiftTypes = async () => {
@@ -210,7 +209,7 @@ export function RateTemplateForm({
               <Input
                 id="name"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => setFormState(prev => ({ ...prev, name: e.target.value }))}
                 placeholder={t('namePlaceholder')}
                 required
               />
@@ -233,7 +232,7 @@ export function RateTemplateForm({
               <Textarea
                 id="description"
                 value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                onChange={(e) => setFormState(prev => ({ ...prev, description: e.target.value }))}
                 placeholder={t('descriptionPlaceholder')}
                 rows={2}
               />

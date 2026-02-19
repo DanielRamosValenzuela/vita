@@ -7,7 +7,7 @@ import { toastActionResult } from '@/src/shared/lib/utils/toast-action-result'
 
 import { useRouter } from '@/i18n/navigation'
 
-export interface UseFormActionOptions<TData, TInput> {
+interface UseFormActionOptions<TData, TInput> {
   action: (input: TInput) => Promise<ActionResult<TData>>
   successMessage?: string
   errorMessage?: string

@@ -4,7 +4,7 @@ import { IMaskInput } from 'react-imask'
 
 import { cn } from '@/src/shared/lib/utils'
 
-export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   maxDigits?: number
   mask?: FactoryArg
   onMaskAccept?: (value: string, unmaskedValue: string) => void

@@ -2,7 +2,7 @@ import type { Role } from '@prisma/client'
 
 import { ROLES } from '@/src/shared/lib/constants'
 
-export interface RoleDisplayMeta {
+interface RoleDisplayMeta {
   icon: string
   color: string
   translationKey: string
@@ -21,7 +21,7 @@ export function getRoleDisplayMeta(role: Role): RoleDisplayMeta {
   }
 }
 
-export interface UsageBadgeInput {
+interface UsageBadgeInput {
   isOverLimit: boolean
   isAtLimit: boolean
   isNearLimit: boolean

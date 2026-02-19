@@ -62,6 +62,8 @@ interface OrganizationTeamSectionProps {
   availableAreas?: Array<{ id: string; name: string }>
 }
 
+const EMPTY_AVAILABLE_AREAS: Array<{ id: string; name: string }> = []
+
 export function OrganizationTeamSection({
   organizationId,
   organizationCountry,
@@ -73,7 +75,7 @@ export function OrganizationTeamSection({
   defaultRole,
   showAreaColumn = false,
   showUnlinkButton = false,
-  availableAreas = [],
+  availableAreas = EMPTY_AVAILABLE_AREAS,
 }: OrganizationTeamSectionProps) {
   const t = useTranslations(translationNamespace)
   const router = useRouter()

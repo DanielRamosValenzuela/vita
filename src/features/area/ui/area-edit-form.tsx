@@ -20,7 +20,7 @@ import {
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
-import { IconPicker, renderIcon } from '@/src/shared/ui/icon-picker'
+import { IconDisplay, IconPicker } from '@/src/shared/ui/icon-picker'
 import { Input } from '@/src/shared/ui/input'
 import { Label } from '@/src/shared/ui/label'
 import { SearchableAddableList } from '@/src/shared/ui/molecules'
@@ -85,13 +85,16 @@ function formatDuration(mins: number) {
   return m > 0 ? `${h}h ${m}min` : `${h}h`
 }
 
+const EMPTY_CHIEFS: ChiefOption[] = []
+const EMPTY_STAFF: StaffOption[] = []
+
 export function AreaEditForm({
   area,
   shiftTypes,
   canAssignChiefs = false,
-  chiefs = [],
+  chiefs = EMPTY_CHIEFS,
   initialAssignedChiefIds = new Set(),
-  staff = [],
+  staff = EMPTY_STAFF,
   initialAssignedStaffIds = new Set(),
 }: AreaEditFormProps) {
   const t = useTranslations('adminHR.areas')
@@ -350,7 +353,7 @@ export function AreaEditForm({
                     aria-hidden
                   />
                   {st.icon && (
-                    <span style={{ color: st.color }}>{renderIcon(st.icon, '', 16)}</span>
+                    <span style={{ color: st.color }}><IconDisplay iconName={st.icon} size={16} /></span>
                   )}
                   <span className="font-medium">{st.name}</span>
                   <span className="text-muted-foreground text-sm">

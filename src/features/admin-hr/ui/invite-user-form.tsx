@@ -11,7 +11,7 @@ import { InviteUserFormBase, type FoundUser } from '@/src/shared/ui/molecules'
 
 import { inviteChiefAction, inviteStaffAction, searchUserAction } from '../api/invitation-actions'
 
-export interface InviteUserFormProps {
+interface InviteUserFormProps {
   organizationId: string
   organizationCountry: import('@prisma/client').Country
   translationNamespace: string

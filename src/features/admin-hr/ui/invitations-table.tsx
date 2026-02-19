@@ -6,7 +6,7 @@ import { InvitationsTableWithCancel, type InvitationWithUser } from '@/src/share
 
 import { cancelInvitationAction } from '../api/invitation-actions'
 
-export interface InvitationsTableProps {
+interface InvitationsTableProps {
   invitations: InvitationWithUser[]
   translationNamespace: string
   showRoleColumn?: boolean

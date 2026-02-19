@@ -34,7 +34,6 @@ export function OrganizationsSection() {
 
   useEffect(() => {
     const loadOrganizations = async () => {
-      setLoading(true)
       const result = (await getUserOrganizationsAction()) as ActionResult<UserOrganizationsData>
       if (result.success && result.data) {
         const orgs: Organization[] = []

@@ -7,7 +7,7 @@ import { Button } from '@/src/shared/ui/button'
 
 type StatusFilter = 'all' | 'unread' | 'read'
 
-export interface TypeGroup {
+interface TypeGroup {
   key: string
   types: NotificationType[]
 }

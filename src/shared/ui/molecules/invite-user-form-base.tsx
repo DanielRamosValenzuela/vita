@@ -36,7 +36,7 @@ export interface FoundUser {
   } | null
 }
 
-export interface InviteUserFormBaseProps {
+interface InviteUserFormBaseProps {
   organizationCountry: import('@prisma/client').Country
   translationNamespace: string
   allowedRoles?: Array<{ value: Role; label: string }>

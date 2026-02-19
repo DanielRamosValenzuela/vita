@@ -7,11 +7,11 @@ import { getTaxIdConfig, validateTaxId } from '@/src/shared/lib/utils/tax-id-con
 
 export type ValidationMessages = AuthValidationMessages
 
-export function createEmailSchema(messages: ValidationMessages['email']) {
+function createEmailSchema(messages: ValidationMessages['email']) {
   return z.string().min(1, messages.required).email(messages.invalid).toLowerCase().trim()
 }
 
-export function createPasswordSchema(messages: ValidationMessages['password']) {
+function createPasswordSchema(messages: ValidationMessages['password']) {
   return z
     .string()
     .min(8, messages.minLength)
@@ -21,11 +21,11 @@ export function createPasswordSchema(messages: ValidationMessages['password']) {
     .regex(/[0-9]/, messages.number)
 }
 
-export function createNameSchema(messages: ValidationMessages['name']) {
+function createNameSchema(messages: ValidationMessages['name']) {
   return z.string().min(2, messages.minLength).max(100, messages.maxLength).trim()
 }
 
-export function createDocNumberSchema(country: Country, messages: ValidationMessages['docNumber']) {
+function createDocNumberSchema(country: Country, messages: ValidationMessages['docNumber']) {
   const config = getTaxIdConfig(country)
   return z
     .string()

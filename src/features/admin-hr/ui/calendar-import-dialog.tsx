@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState, useTransition } from 'react'
+import { useCallback, useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { format, isSameDay } from 'date-fns'
@@ -83,9 +83,15 @@ export function CalendarImportDialog({
     [isAlreadyImported]
   )
 
-  useEffect(() => {
-    if (open) loadHolidays(year)
-  }, [open, year, loadHolidays])
+  function handleYearChange(value: string) {
+    const newYear = Number(value)
+    setYear(newYear)
+    loadHolidays(newYear)
+  }
+
+  function handleDialogAutoFocus() {
+    loadHolidays(year)
+  }
 
   function handleToggle(date: string) {
     setSelected((prev) => {
@@ -136,7 +142,7 @@ export function CalendarImportDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto" onOpenAutoFocus={handleDialogAutoFocus}>
         <DialogHeader>
           <DialogTitle>{t('title')}</DialogTitle>
           <DialogDescription>{t('description')}</DialogDescription>
@@ -144,7 +150,7 @@ export function CalendarImportDialog({
 
         <div className="flex items-center gap-4 mb-4">
           <span className="text-sm font-medium">{t('yearLabel')}</span>
-          <Select value={String(year)} onValueChange={(v) => setYear(Number(v))}>
+          <Select value={String(year)} onValueChange={handleYearChange}>
             <SelectTrigger className="w-28">
               <SelectValue />
             </SelectTrigger>

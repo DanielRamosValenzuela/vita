@@ -1,7 +1,5 @@
 import type { NotificationType } from '@prisma/client'
 
-export type { NotificationType } from '@prisma/client'
-
 export interface NotificationWithActor {
   id: string
   userId: string

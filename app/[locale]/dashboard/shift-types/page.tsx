@@ -23,8 +23,10 @@ export async function generateMetadata({ params }: ShiftTypesProps) {
 
 export default async function ShiftTypes({ params }: ShiftTypesProps) {
   const { locale } = await params
-  const session = await requireAdminHR(locale)
-  const t = await getTranslations('shifts.shiftTypes')
+  const [session, t] = await Promise.all([
+    requireAdminHR(locale),
+    getTranslations('shifts.shiftTypes'),
+  ])
 
   if (!session.organizationId)
     return (

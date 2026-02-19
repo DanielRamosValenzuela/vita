@@ -41,12 +41,14 @@ interface ShiftFiltersProps {
   initialFilters?: Partial<FilterState>
 }
 
+const EMPTY_INITIAL_FILTERS: Partial<FilterState> = {}
+
 export function ShiftFilters({
   users,
   areas,
   shiftTypes,
   onFiltersChange,
-  initialFilters = {},
+  initialFilters = EMPTY_INITIAL_FILTERS,
 }: ShiftFiltersProps) {
   const t = useTranslations('shifts.filters')
   const [filters, setFilters] = useState<FilterState>({

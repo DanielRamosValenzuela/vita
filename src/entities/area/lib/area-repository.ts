@@ -2,7 +2,7 @@ import type { Area, Prisma } from '@prisma/client'
 
 import { prisma } from '@/src/shared/lib/db'
 
-export type AreaWithShiftTypes = Prisma.AreaGetPayload<{
+type AreaWithShiftTypes = Prisma.AreaGetPayload<{
   include: {
     shiftTypes: {
       select: {

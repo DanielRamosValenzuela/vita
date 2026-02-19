@@ -1,6 +1,2 @@
-export { AreaSwitcher } from './area-switcher'
-export { ShiftCalendar } from './shift-calendar'
-export { ShiftFilters } from './shift-filters'
-export { ShiftFormDialog } from './shift-form-dialog'
 export { ShiftsPageContent } from './shifts-page-content'
 export { ShiftTypesPage } from './shift-types-page'

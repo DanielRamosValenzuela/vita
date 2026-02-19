@@ -1,6 +1,6 @@
 import { Country } from '@prisma/client'
 
-export interface TaxIdConfig {
+interface TaxIdConfig {
   label: string
   placeholder: string
   description: string
@@ -11,7 +11,7 @@ export interface TaxIdConfig {
   validateFunction?: (value: string) => boolean
 }
 
-export const TAX_ID_CONFIG: Record<Country, TaxIdConfig> = {
+const TAX_ID_CONFIG: Record<Country, TaxIdConfig> = {
   CL: {
     label: 'RUT',
     placeholder: '77.888.999-7',

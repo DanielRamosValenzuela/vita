@@ -122,8 +122,8 @@ function SheetDescription({
 
 export {
   Sheet,
-  SheetTrigger,
   SheetClose,
+  SheetTrigger,
   SheetContent,
   SheetHeader,
   SheetFooter,

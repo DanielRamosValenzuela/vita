@@ -1,4 +1,3 @@
-export { ButtonSkeleton } from './button-skeleton'
 export { Logo } from './logo'
 export { ThemeToggle } from './theme-toggle'
 export { ThemeSelector } from './theme-selector'

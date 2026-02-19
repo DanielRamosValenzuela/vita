@@ -24,7 +24,7 @@ export interface OrganizationCalendarDay {
   isRecurring: boolean
 }
 
-export interface CalendarDayData {
+interface CalendarDayData {
   date: Date
   type: DayType
   name?: string

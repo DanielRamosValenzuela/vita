@@ -69,16 +69,20 @@ export function CalendarDayForm({
   const [isPending, startTransition] = useTransition()
   const [isDeleting, setIsDeleting] = useState(false)
 
-  const [dayType, setDayType] = useState<DayType>(existingDay?.type || DAY_TYPES.NORMAL)
-  const [dayName, setDayName] = useState(existingDay?.name || '')
-  const [dayDescription, setDayDescription] = useState(existingDay?.description || '')
-  const [multiplier, setMultiplier] = useState(existingDay?.multiplier.toString() || '1.0')
+  const [formState, setFormState] = useState({
+    dayType: (existingDay?.type || DAY_TYPES.NORMAL) as DayType,
+    dayName: existingDay?.name || '',
+    dayDescription: existingDay?.description || '',
+    multiplier: existingDay?.multiplier?.toString() || '1.0',
+  })
 
   useEffect(() => {
-    setDayType(existingDay?.type || DAY_TYPES.NORMAL)
-    setDayName(existingDay?.name || '')
-    setDayDescription(existingDay?.description || '')
-    setMultiplier(existingDay?.multiplier?.toString() || '1.0')
+    setFormState({
+      dayType: (existingDay?.type || DAY_TYPES.NORMAL) as DayType,
+      dayName: existingDay?.name || '',
+      dayDescription: existingDay?.description || '',
+      multiplier: existingDay?.multiplier?.toString() || '1.0',
+    })
   }, [existingDay, selectedDate])
 
   const dateLocale = getLocaleByCountry(country)
@@ -88,7 +92,7 @@ export function CalendarDayForm({
 
     if (!selectedDate) return
 
-    const multiplierValue = parseFloat(multiplier)
+    const multiplierValue = parseFloat(formState.multiplier)
     if (isNaN(multiplierValue) || multiplierValue < 0.1) {
       toast.error(t('errors.invalidMultiplier'))
       return
@@ -97,9 +101,9 @@ export function CalendarDayForm({
     startTransition(async () => {
       const result = await upsertCalendarDayAction({
         date: selectedDate,
-        type: dayType,
-        name: dayName.trim() || undefined,
-        description: dayDescription.trim() || undefined,
+        type: formState.dayType,
+        name: formState.dayName.trim() || undefined,
+        description: formState.dayDescription.trim() || undefined,
         multiplier: multiplierValue,
         isRecurring: false,
       })
@@ -153,7 +157,7 @@ export function CalendarDayForm({
                 </Tooltip>
               </TooltipProvider>
             </div>
-            <Select value={dayType} onValueChange={(value) => setDayType(value as DayType)}>
+            <Select value={formState.dayType} onValueChange={(value) => setFormState(prev => ({ ...prev, dayType: value as DayType }))}>
               <SelectTrigger id="dayType">
                 <SelectValue />
               </SelectTrigger>
@@ -186,8 +190,8 @@ export function CalendarDayForm({
               type="number"
               step="0.1"
               min="0.1"
-              value={multiplier}
-              onChange={(e) => setMultiplier(e.target.value)}
+              value={formState.multiplier}
+              onChange={(e) => setFormState(prev => ({ ...prev, multiplier: e.target.value }))}
               placeholder="1.0"
             />
           </div>
@@ -208,8 +212,8 @@ export function CalendarDayForm({
             </div>
             <Input
               id="dayName"
-              value={dayName}
-              onChange={(e) => setDayName(e.target.value)}
+              value={formState.dayName}
+              onChange={(e) => setFormState(prev => ({ ...prev, dayName: e.target.value }))}
               placeholder={t('form.namePlaceholder')}
             />
           </div>
@@ -218,8 +222,8 @@ export function CalendarDayForm({
             <Label htmlFor="dayDescription">{t('form.description')}</Label>
             <Textarea
               id="dayDescription"
-              value={dayDescription}
-              onChange={(e) => setDayDescription(e.target.value)}
+              value={formState.dayDescription}
+              onChange={(e) => setFormState(prev => ({ ...prev, dayDescription: e.target.value }))}
               placeholder={t('form.descriptionPlaceholder')}
               rows={2}
             />

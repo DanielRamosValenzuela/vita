@@ -9,7 +9,7 @@ import { revalidatePaths } from '@/src/shared/lib/utils/revalidate-paths'
 
 const CONTRACTS_PATHS = ['/dashboard/rates', '/dashboard/staff'] as const
 
-export interface StaffContractSummary {
+interface StaffContractSummary {
   id: string
   areaId: string | null
   areaName: string | null

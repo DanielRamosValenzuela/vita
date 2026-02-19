@@ -3,7 +3,7 @@ import type { Country, OrganizationPlan, OrganizationStatus, Prisma } from '@pri
 import { ROLES } from '@/src/shared/lib/constants'
 import { prisma } from '@/src/shared/lib/db'
 
-export type OrganizationWithDetails = Prisma.OrganizationGetPayload<{
+type OrganizationWithDetails = Prisma.OrganizationGetPayload<{
   include: {
     users: { select: { id: true; name: true; email: true; role: true; createdAt: true } }
     invitations: {

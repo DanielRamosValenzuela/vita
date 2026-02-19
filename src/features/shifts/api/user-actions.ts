@@ -5,7 +5,7 @@ import { requireAdminHROrChiefArea } from '@/src/shared/lib/auth/session'
 import { prisma } from '@/src/shared/lib/db'
 import type { ActionResult } from '@/src/shared/lib/types'
 
-export interface ShiftUser {
+interface ShiftUser {
   id: string
   name: string
   email: string

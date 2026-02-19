@@ -1,13 +1,13 @@
 import type { ImageProvider } from '@prisma/client'
 
-export interface UserImageData {
+interface UserImageData {
   image?: string | null
   customImage?: string | null
   imageProvider?: ImageProvider | null
   name: string
 }
 
-export function getProfileImageUrl(user: UserImageData): string | null {
+function getProfileImageUrl(user: UserImageData): string | null {
   if (user.customImage) return user.customImage
 
   if (user.image) return user.image
@@ -15,7 +15,7 @@ export function getProfileImageUrl(user: UserImageData): string | null {
   return null
 }
 
-export function getProfileImageSource(user: UserImageData): ImageProvider | 'INITIALS' {
+function getProfileImageSource(user: UserImageData): ImageProvider | 'INITIALS' {
   if (user.customImage) return 'UPLOAD'
 
   if (user.image) return user.imageProvider || 'OAUTH'

@@ -2,7 +2,7 @@ import type { Country, DocType } from '@prisma/client'
 
 import { prisma } from '@/src/shared/lib/db'
 
-export interface DocumentValidationResult {
+interface DocumentValidationResult {
   valid: boolean
   error?: string
   conflicts?: Array<{
@@ -13,7 +13,7 @@ export interface DocumentValidationResult {
   }>
 }
 
-export async function validateDocumentUniqueInOrganization(
+async function validateDocumentUniqueInOrganization(
   userId: string,
   country: Country,
   docType: DocType,

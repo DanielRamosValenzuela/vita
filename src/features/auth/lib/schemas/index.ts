@@ -1,2 +1,2 @@
-export type { RegisterInput, LoginInput } from '../types'
+export type { RegisterInput } from '../types'
 export { getRegisterSchema, getLoginSchema } from '../helpers/server'

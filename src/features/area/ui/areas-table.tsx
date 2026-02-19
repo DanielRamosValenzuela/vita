@@ -19,11 +19,13 @@ import {
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
-import { renderIcon } from '@/src/shared/ui/icon-picker'
+import { IconDisplay } from '@/src/shared/ui/icon-picker'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/src/shared/ui/tooltip'
 import { deleteAreaAction } from '@/src/features/area/api'
 
 import { useRouter } from '@/i18n/navigation'
+
+const DEFAULT_AREA_ICON = 'Building2'
 
 interface AreasTableProps {
   areas: Array<{
@@ -123,7 +125,7 @@ export function AreasTable({ areas, canCreate = true, canDelete = true }: AreasT
                     <td className="py-4">
                       <span className="flex items-center gap-2">
                         <span style={{ color: area.color }}>
-                          {renderIcon(area.icon ?? 'Building2', '', 18)}
+                          <IconDisplay iconName={area.icon ?? DEFAULT_AREA_ICON} size={18} />
                         </span>
                         <span className="font-medium">{area.name}</span>
                       </span>

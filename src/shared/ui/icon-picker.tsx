@@ -91,6 +91,17 @@ export function renderIcon(iconName: string, className?: string, size = 16) {
   return <Icon className={cn('shrink-0', className)} size={size} />
 }
 
+interface IconDisplayProps {
+  iconName: string
+  className?: string
+  size?: number
+}
+
+export function IconDisplay({ iconName, className, size = 16 }: IconDisplayProps) {
+  const Icon = iconMap[iconName] ?? FALLBACK_ICON
+  return <Icon className={cn('shrink-0', className)} size={size} />
+}
+
 interface IconPickerProps {
   value: string
   onChange: (value: string) => void

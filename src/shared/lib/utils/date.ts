@@ -7,12 +7,12 @@ import {
   getLocaleByCountry,
 } from '../constants/date-formats'
 
-export interface FormatDateOptions {
+interface FormatDateOptions {
   includeTime?: boolean
   customFormat?: string
 }
 
-export function formatDateByCountry(
+function formatDateByCountry(
   date: Date | string | number,
   country: Country,
   options: FormatDateOptions = {}

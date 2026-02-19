@@ -19,10 +19,11 @@ export async function generateMetadata() {
 }
 
 export default async function EditAdminHRUserPage({ params }: EditAdminHRUserPageProps) {
-  await requireSuperAdmin()
-  const t = await getTranslations('superAdmin.editAdminHRUser')
-
-  const { id } = await params
+  const [, t, { id }] = await Promise.all([
+    requireSuperAdmin(),
+    getTranslations('superAdmin.editAdminHRUser'),
+    params,
+  ])
   const user = await getAdminHRUserById(id)
 
   if (!user) notFound()

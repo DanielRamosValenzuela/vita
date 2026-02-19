@@ -31,9 +31,7 @@ interface PageProps {
 }
 
 const OrganizationDetailsPage = async ({ params }: PageProps) => {
-  await requireSuperAdmin()
-
-  const { id } = await params
+  const [, { id }] = await Promise.all([requireSuperAdmin(), params])
   const organization = await getOrganizationById(id)
 
   if (!organization) notFound()

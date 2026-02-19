@@ -23,7 +23,7 @@ import {
 
 import { useRouter } from '@/i18n/navigation'
 
-export interface InvitationsTableWithCancelProps {
+interface InvitationsTableWithCancelProps {
   invitations: InvitationWithUser[]
   translationNamespace: string
   onCancelInvitation: (id: string) => Promise<ActionResult<unknown>>

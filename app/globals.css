@@ -203,6 +203,18 @@
   }
 }
 
+@keyframes nav-progress {
+  0% { width: 0%; }
+  15% { width: 30%; }
+  40% { width: 60%; }
+  70% { width: 90%; }
+  100% { width: 100%; }
+}
+
+.animate-nav-progress {
+  animation: nav-progress 0.7s ease-out forwards;
+}
+
 @keyframes shimmer {
   0% {
     background-position: -200% 0;

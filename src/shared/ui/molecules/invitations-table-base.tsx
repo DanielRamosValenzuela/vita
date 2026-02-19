@@ -32,7 +32,7 @@ export interface InvitationWithUser {
   } | null
 }
 
-export interface InvitationsTableBaseProps {
+interface InvitationsTableBaseProps {
   invitations: InvitationWithUser[]
   translationNamespace: string
   showRoleColumn?: boolean

@@ -31,7 +31,7 @@ const COUNTRY_CURRENCIES: Record<Country, Currency> = {
   PE: 'PEN',
 }
 
-export interface FormatCurrencyOptions {
+interface FormatCurrencyOptions {
   showCurrency?: boolean
   showSymbol?: boolean
   decimals?: number

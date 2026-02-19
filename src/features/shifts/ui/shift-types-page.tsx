@@ -27,7 +27,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/src/shared/ui/dialog'
-import { IconPicker, renderIcon } from '@/src/shared/ui/icon-picker'
+import { IconDisplay, IconPicker } from '@/src/shared/ui/icon-picker'
 import { Input } from '@/src/shared/ui/input'
 import { Label } from '@/src/shared/ui/label'
 import { SearchableAddableList } from '@/src/shared/ui/molecules'
@@ -55,6 +55,8 @@ import {
   deleteShiftTypeAction,
   updateShiftTypeAction,
 } from '../api/shift-type-actions'
+
+const DEFAULT_SHIFT_TYPE_ICON = 'Clock'
 
 type ShiftClassification = 'DAY' | 'NIGHT' | 'MIXED'
 
@@ -387,7 +389,7 @@ export function ShiftTypesPage({ shiftTypes, areas }: ShiftTypesPageProps) {
                     <TableCell className="font-medium">{shiftType.name}</TableCell>
                     <TableCell>
                       <span style={{ color: shiftType.color }}>
-                        {renderIcon(shiftType.icon ?? 'Clock', '', 18)}
+                        <IconDisplay iconName={shiftType.icon ?? DEFAULT_SHIFT_TYPE_ICON} size={18} />
                       </span>
                     </TableCell>
                     <TableCell>{formatDuration(shiftType.durationMinutes)}</TableCell>
