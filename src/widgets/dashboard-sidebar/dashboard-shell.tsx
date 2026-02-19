@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Menu } from 'lucide-react'
 
@@ -9,7 +9,7 @@ import { Sheet, SheetContent, SheetDescription, SheetTitle } from '@/src/shared/
 
 import { usePathname } from '@/i18n/navigation'
 
-import { DashboardSidebar } from './index'
+import { DashboardSidebar } from './'
 import type { DashboardSidebarProps } from './types'
 
 interface DashboardShellProps extends DashboardSidebarProps {
@@ -20,12 +20,8 @@ export function DashboardShell({ user, children, unreadNotificationCount }: Dash
   const t = useTranslations('common')
   const tNav = useTranslations('nav')
   const tDashboard = useTranslations('dashboard')
-  const [sheetOpen, setSheetOpen] = useState(false)
   const pathname = usePathname()
-
-  useEffect(() => {
-    setSheetOpen(false)
-  }, [pathname])
+  const [sheetOpen, setSheetOpen] = useState(false)
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -45,7 +41,7 @@ export function DashboardShell({ user, children, unreadNotificationCount }: Dash
         <span className="text-primary font-semibold">{t('appName')}</span>
       </header>
 
-      <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+      <Sheet key={pathname} open={sheetOpen} onOpenChange={setSheetOpen}>
         <SheetContent
           side="left"
           className="w-72 border-r p-0"

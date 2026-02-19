@@ -54,10 +54,10 @@ export function AlertsPanel({ data }: AlertsPanelProps) {
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
-          {visibleAlerts.map((alert, index) => {
+          {visibleAlerts.map((alert) => {
             const Icon = alert.icon
             return (
-              <div key={index} className="flex items-center gap-3 rounded-lg border p-3">
+              <div key={alert.text} className="flex items-center gap-3 rounded-lg border p-3">
                 <div className={`rounded-lg p-2 ${alert.bg}`}>
                   <Icon className={`h-5 w-5 ${alert.color}`} />
                 </div>

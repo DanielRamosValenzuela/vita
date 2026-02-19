@@ -45,6 +45,29 @@ interface RateTemplateFormProps {
   mode: 'create' | 'edit'
 }
 
+interface RateTemplateFormState {
+  name: string
+  description: string
+  components: RateComponentData[]
+}
+
+const mapTemplateToState = (
+  template?: RateTemplateWithComponents
+): RateTemplateFormState => ({
+  name: template?.name || '',
+  description: template?.description || '',
+  components:
+    template?.components?.map((comp) => ({
+      ...comp,
+      applicableShiftTypeIds:
+        'applicableShiftTypes' in comp
+          ? (comp.applicableShiftTypes as Array<{ shiftTypeId: string }>)?.map(
+              (ast) => ast.shiftTypeId
+            ) || []
+          : [],
+    })) || [],
+})
+
 export function RateTemplateForm({
   open,
   onOpenChange,
@@ -57,80 +80,68 @@ export function RateTemplateForm({
   const [isPending, startTransition] = useTransition()
   const [shiftTypes, setShiftTypes] = useState<ShiftTypeOption[]>([])
   const [isLoadingShiftTypes, setIsLoadingShiftTypes] = useState(false)
-
-  const [name, setName] = useState(existingTemplate?.name || '')
-  const [description, setDescription] = useState(existingTemplate?.description || '')
-  const [components, setComponents] = useState<RateComponentData[]>(
-    existingTemplate?.components?.map((comp) => ({
-      ...comp,
-      applicableShiftTypeIds:
-        'applicableShiftTypes' in comp
-          ? (comp.applicableShiftTypes as Array<{ shiftTypeId: string }>)?.map(
-              (ast) => ast.shiftTypeId
-            ) || []
-          : [],
-    })) || []
+  const [formState, setFormState] = useState<RateTemplateFormState>(() =>
+    mapTemplateToState(existingTemplate)
   )
+
+  const { name, description, components } = formState
 
   useEffect(() => {
     if (mode === 'edit' && existingTemplate) {
-      setName(existingTemplate.name || '')
-      setDescription(existingTemplate.description || '')
-      setComponents(
-        existingTemplate.components?.map((comp) => ({
-          ...comp,
-          applicableShiftTypeIds:
-            'applicableShiftTypes' in comp
-              ? (comp.applicableShiftTypes as Array<{ shiftTypeId: string }>)?.map(
-                  (ast) => ast.shiftTypeId
-                ) || []
-              : [],
-        })) || []
-      )
+      setFormState(mapTemplateToState(existingTemplate))
     }
   }, [mode, existingTemplate, open])
 
-  useEffect(() => {
-    if (open) {
-      setIsLoadingShiftTypes(true)
-      getShiftTypesAction()
-        .then((result) => {
-          if (result.success && result.data)
-            setShiftTypes(
-              result.data.map((st) => ({
-                id: st.id,
-                name: st.name,
-                color: st.color,
-                icon: st.icon,
-              }))
-            )
-          else toast.error(result.error || 'Error al cargar tipos de turno')
-        })
-        .finally(() => setIsLoadingShiftTypes(false))
-    }
-  }, [open])
-
-  function handleAddComponent() {
-    setComponents([
-      ...components,
-      {
-        type: COMPONENT_TYPES.BASE_SALARY,
-        value: 0,
-        unit: COMPONENT_UNITS.MONTHLY,
-        applyCondition: APPLY_CONDITIONS.ALWAYS,
-        order: components.length,
-      },
-    ])
+  const loadShiftTypes = async () => {
+    setIsLoadingShiftTypes(true)
+    const result = await getShiftTypesAction()
+    if (result.success && result.data)
+      setShiftTypes(
+        result.data.map((st) => ({
+          id: st.id,
+          name: st.name,
+          color: st.color,
+          icon: st.icon,
+        }))
+      )
+    else toast.error(result.error || 'Error al cargar tipos de turno')
+    setIsLoadingShiftTypes(false)
   }
 
-  function handleUpdateComponent(index: number, data: Partial<RateComponentData>) {
-    const newComponents = [...components]
-    newComponents[index] = { ...newComponents[index], ...data }
-    setComponents(newComponents)
+  const handleDialogOpenChange = (nextOpen: boolean) => {
+    if (nextOpen && shiftTypes.length === 0 && !isLoadingShiftTypes) void loadShiftTypes()
+    onOpenChange(nextOpen)
   }
 
-  function handleRemoveComponent(index: number) {
-    setComponents(components.filter((_, i) => i !== index))
+  const handleAddComponent = () => {
+    setFormState((prev) => ({
+      ...prev,
+      components: [
+        ...prev.components,
+        {
+          type: COMPONENT_TYPES.BASE_SALARY,
+          value: 0,
+          unit: COMPONENT_UNITS.MONTHLY,
+          applyCondition: APPLY_CONDITIONS.ALWAYS,
+          order: prev.components.length,
+        },
+      ],
+    }))
+  }
+
+  const handleUpdateComponent = (index: number, data: Partial<RateComponentData>) => {
+    setFormState((prev) => {
+      const newComponents = [...prev.components]
+      newComponents[index] = { ...newComponents[index], ...data }
+      return { ...prev, components: newComponents }
+    })
+  }
+
+  const handleRemoveComponent = (index: number) => {
+    setFormState((prev) => ({
+      ...prev,
+      components: prev.components.filter((_, i) => i !== index),
+    }))
   }
 
   function handleSubmit(e: React.FormEvent) {
@@ -169,7 +180,7 @@ export function RateTemplateForm({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleDialogOpenChange}>
       <DialogContent className="max-w-[95vw] sm:max-w-2xl lg:max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-lg sm:text-xl">
@@ -277,7 +288,7 @@ export function RateTemplateForm({
               <div className="space-y-3">
                 {components.map((component, index) => (
                   <RateComponentForm
-                    key={index}
+                    key={component.id ?? `new-${index}`}
                     component={component}
                     index={index}
                     currency={currency}

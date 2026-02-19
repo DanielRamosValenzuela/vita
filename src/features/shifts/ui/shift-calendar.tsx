@@ -31,6 +31,89 @@ interface ShiftCalendarProps {
   selectedDate?: Date
 }
 
+interface ShiftCalendarDayCellProps {
+  date: Date
+  shifts: CalendarEvent[]
+  onShiftClick?: (shift: CalendarEvent) => void
+  moreLabel: string
+}
+
+function ShiftCalendarDayCell({
+  date,
+  shifts,
+  onShiftClick,
+  moreLabel,
+}: ShiftCalendarDayCellProps) {
+  const dayShifts = shifts
+  const formattedDay = format(date, 'd')
+
+  if (dayShifts.length === 0)
+    return (
+      <div className="relative h-full w-full">
+        <div className="text-sm p-1 h-full">
+          <div className="font-medium">{formattedDay}</div>
+        </div>
+      </div>
+    )
+
+  const now = new Date()
+
+  return (
+    <div className="relative h-full w-full">
+      <div className="text-sm p-1 h-full">
+        <div className="font-medium">{formattedDay}</div>
+
+        <div className="space-y-0.5 mt-0.5">
+          {dayShifts.slice(0, 3).map((shift) => {
+            const isPast = new Date(shift.endTime) < now
+            const opacity = isPast ? 0.45 : 1
+
+            return (
+              <Tooltip key={shift.id}>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    className="text-[10px] leading-tight px-1 py-0.5 rounded cursor-pointer hover:opacity-80 truncate flex items-center gap-0.5 w-full text-left"
+                    style={{
+                      backgroundColor: shift.color + (isPast ? '30' : '20'),
+                      borderLeft: `3px solid ${shift.color}`,
+                      color: shift.color,
+                      opacity,
+                    }}
+                    onClick={(event) => {
+                      event.stopPropagation()
+                      onShiftClick?.(shift)
+                    }}
+                  >
+                    <span className="font-medium shrink-0">
+                      {format(shift.startTime, 'HH:mm')}
+                    </span>
+                    <span className="truncate">{shift.userName.split(' ')[0]}</span>
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="top" className="text-xs">
+                  <p className="font-semibold">{shift.userName}</p>
+                  <p>
+                    {format(shift.startTime, 'HH:mm')} - {format(shift.endTime, 'HH:mm')}
+                  </p>
+                  <p className="text-muted-foreground">{shift.areaName}</p>
+                  {shift.title && <p className="text-muted-foreground">{shift.title}</p>}
+                </TooltipContent>
+              </Tooltip>
+            )
+          })}
+
+          {dayShifts.length > 3 && (
+            <div className="text-[10px] text-muted-foreground text-center">
+              +{dayShifts.length - 3} {moreLabel}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export function ShiftCalendar({
   shifts,
   onDateSelect,
@@ -83,66 +166,6 @@ export function ShiftCalendar({
   const formatMonthTitle = (date: Date) => {
     const monthStr = format(date, 'MMMM yyyy', { locale: dateLocale })
     return monthStr.charAt(0).toUpperCase() + monthStr.slice(1)
-  }
-
-  const renderDay = (day: Date) => {
-    const dayShifts = getEventsForDay(day)
-
-    return (
-      <div className="relative h-full w-full">
-        <div className="text-sm p-1 h-full">
-          <div className="font-medium">{format(day, 'd')}</div>
-
-          {dayShifts.length > 0 && (
-            <div className="space-y-0.5 mt-0.5">
-              {dayShifts.slice(0, 3).map((shift) => {
-                const now = new Date()
-                const isPast = new Date(shift.endTime) < now
-                const opacity = isPast ? 0.45 : 1
-                return (
-                  <Tooltip key={shift.id}>
-                    <TooltipTrigger asChild>
-                      <div
-                        className="text-[10px] leading-tight px-1 py-0.5 rounded cursor-pointer hover:opacity-80 truncate flex items-center gap-0.5"
-                        style={{
-                          backgroundColor: shift.color + (isPast ? '30' : '20'),
-                          borderLeft: `3px solid ${shift.color}`,
-                          color: shift.color,
-                          opacity,
-                        }}
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          onShiftClick?.(shift)
-                        }}
-                      >
-                        <span className="font-medium shrink-0">
-                          {format(shift.startTime, 'HH:mm')}
-                        </span>
-                        <span className="truncate">{shift.userName.split(' ')[0]}</span>
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent side="top" className="text-xs">
-                      <p className="font-semibold">{shift.userName}</p>
-                      <p>
-                        {format(shift.startTime, 'HH:mm')} - {format(shift.endTime, 'HH:mm')}
-                      </p>
-                      <p className="text-muted-foreground">{shift.areaName}</p>
-                      {shift.title && <p className="text-muted-foreground">{shift.title}</p>}
-                    </TooltipContent>
-                  </Tooltip>
-                )
-              })}
-
-              {dayShifts.length > 3 && (
-                <div className="text-[10px] text-muted-foreground text-center">
-                  +{dayShifts.length - 3} {t('more')}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-    )
   }
 
   return (
@@ -198,13 +221,18 @@ export function ShiftCalendar({
               day_hidden: 'invisible',
             }}
             components={{
-              Day: ({ day, ...props }) => {
-                return (
-                  <td {...props}>
-                    <div className="h-28 w-full p-0">{renderDay(day.date)}</div>
-                  </td>
-                )
-              },
+              Day: ({ day, ...props }) => (
+                <td {...props}>
+                  <div className="h-28 w-full p-0">
+                    <ShiftCalendarDayCell
+                      date={day.date}
+                      shifts={getEventsForDay(day.date)}
+                      onShiftClick={onShiftClick}
+                      moreLabel={t('more')}
+                    />
+                  </div>
+                </td>
+              ),
             }}
           />
 

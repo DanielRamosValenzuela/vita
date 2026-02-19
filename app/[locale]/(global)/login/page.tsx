@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { getServerSession } from 'next-auth/next'
 import { getTranslations } from 'next-intl/server'
 import { redirect } from 'next/navigation'
@@ -12,8 +13,10 @@ export default async function LoginPage({
   params: Promise<{ locale: string }>
   searchParams: Promise<{ callbackUrl?: string; registered?: string }>
 }) {
-  const { locale } = await params
-  const session = await getServerSession(authOptions)
+  const [{ locale }, session] = await Promise.all([
+    params,
+    getServerSession(authOptions),
+  ])
   const t = await getTranslations({ locale, namespace: 'auth' })
 
   if (session) redirect(`/${locale}`)
@@ -39,7 +42,9 @@ export default async function LoginPage({
             )}
           </header>
           <section className="bg-card rounded-lg px-8 py-8 shadow">
-            <LoginForm />
+            <Suspense>
+              <LoginForm />
+            </Suspense>
           </section>
         </article>
       </section>

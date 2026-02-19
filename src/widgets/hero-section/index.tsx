@@ -87,11 +87,11 @@ export function HeroSection({ locale }: HeroSectionProps) {
           )}
 
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {features.map((feature, index) => {
+            {features.map((feature) => {
               const Icon = feature.icon
               return (
                 <article
-                  key={index}
+                  key={feature.title}
                   className="group bg-card hover:border-primary/50 rounded-lg border p-6 text-left transition-all hover:shadow-md"
                 >
                   <div className="bg-primary/10 text-primary mb-4 flex h-12 w-12 items-center justify-center rounded-lg">

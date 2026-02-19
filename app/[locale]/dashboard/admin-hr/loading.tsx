@@ -20,10 +20,10 @@ export default function AdminHRDashboardLoading() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
-        {cards.map((card, i) => {
+        {cards.map((card) => {
           const Icon = card.icon
           return (
-            <Card key={i}>
+            <Card key={card.title}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <Skeleton className="h-4 w-20" />
                 <Icon className="text-muted-foreground h-4 w-4" />

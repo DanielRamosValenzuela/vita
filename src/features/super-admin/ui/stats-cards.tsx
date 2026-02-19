@@ -76,10 +76,10 @@ export function StatsCards({ data }: StatsCardsProps) {
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {stats.map((stat, index) => {
+      {stats.map((stat) => {
         const Icon = stat.icon
         return (
-          <Card key={index}>
+          <Card key={stat.title}>
             <CardContent className="p-6">
               <div className="flex items-start justify-between">
                 <div className="flex-1">

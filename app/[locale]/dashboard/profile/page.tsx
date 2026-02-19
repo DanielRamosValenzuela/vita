@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { getTranslations } from 'next-intl/server'
 import { redirect } from 'next/navigation'
 import type { Country } from '@prisma/client'
@@ -20,9 +21,11 @@ interface ProfilePageProps {
 }
 
 export default async function ProfilePage({ params }: ProfilePageProps) {
-  const { locale } = await params
-  const user = await getCurrentUser()
-  const t = await getTranslations('profile')
+  const [{ locale }, user, t] = await Promise.all([
+    params,
+    getCurrentUser(),
+    getTranslations('profile'),
+  ])
 
   if (!user) redirect(`/${locale}/login`)
 
@@ -76,7 +79,9 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
 
       <ChangePasswordForm />
 
-      <EmailsManagementSection />
+      <Suspense>
+        <EmailsManagementSection />
+      </Suspense>
 
       <InvitationsSection />
 

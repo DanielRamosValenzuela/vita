@@ -20,7 +20,10 @@
       "Bash(npx prisma generate:*)",
       "Bash(ls:*)",
       "Bash(npx next lint:*)",
-      "mcp__ide__getDiagnostics"
+      "mcp__ide__getDiagnostics",
+      "Bash(npx:*)",
+      "Bash(cmd.exe /c \"dir C:\\\\Users\\\\danie\\\\AppData\\\\Local\\\\Temp\\\\react-doctor-e6aef0b2-f54b-45ce-83db-dd9d400ca825\")",
+      "Bash(echo:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
