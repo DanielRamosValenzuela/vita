@@ -11,7 +11,7 @@ import { Textarea } from '@/src/shared/ui/textarea'
 
 import type { AreaFormAction } from './area-edit-utils'
 
-export interface AreaBasicInfoCardProps {
+interface AreaBasicInfoCardProps {
   name: string
   description: string
   icon: string

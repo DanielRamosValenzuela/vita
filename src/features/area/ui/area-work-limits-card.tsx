@@ -10,7 +10,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/src/shared/ui/tooltip
 
 import type { AreaFormAction } from './area-edit-utils'
 
-export interface AreaWorkLimitsCardProps {
+interface AreaWorkLimitsCardProps {
   maxConsecutiveHours: string
   minRestHours: string
   dayStartTime: string

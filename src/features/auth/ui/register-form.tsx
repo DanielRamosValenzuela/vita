@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useReducer, useRef } from 'react'
 import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { Country } from '@prisma/client'
@@ -24,17 +24,68 @@ import { Link } from '@/i18n/navigation'
 
 import { registerAction } from '../api'
 
+interface RegisterFormState {
+  loading: boolean
+  errors: Record<string, string[]>
+  generalError: string | null
+  country: Country
+  docNumberValue: string
+  docNumberError: string | null
+}
+
+type RegisterFormAction =
+  | { type: 'SET_LOADING'; value: boolean }
+  | { type: 'SET_ERRORS'; errors: Record<string, string[]> }
+  | { type: 'SET_GENERAL_ERROR'; error: string | null }
+  | { type: 'SET_COUNTRY'; country: Country }
+  | { type: 'SET_DOC_NUMBER'; value: string }
+  | { type: 'SET_DOC_NUMBER_ERROR'; error: string | null }
+  | { type: 'RESET_FOR_SUBMIT' }
+  | { type: 'CHANGE_COUNTRY'; country: Country }
+
+const initialState: RegisterFormState = {
+  loading: false,
+  errors: {},
+  generalError: null,
+  country: Country.CL,
+  docNumberValue: '',
+  docNumberError: null,
+}
+
+function registerFormReducer(
+  state: RegisterFormState,
+  action: RegisterFormAction,
+): RegisterFormState {
+  switch (action.type) {
+    case 'SET_LOADING':
+      return { ...state, loading: action.value }
+    case 'SET_ERRORS':
+      return { ...state, errors: action.errors }
+    case 'SET_GENERAL_ERROR':
+      return { ...state, generalError: action.error }
+    case 'SET_COUNTRY':
+      return { ...state, country: action.country }
+    case 'SET_DOC_NUMBER':
+      return { ...state, docNumberValue: action.value }
+    case 'SET_DOC_NUMBER_ERROR':
+      return { ...state, docNumberError: action.error }
+    case 'RESET_FOR_SUBMIT':
+      return { ...state, loading: true, errors: {}, generalError: null }
+    case 'CHANGE_COUNTRY':
+      return { ...state, country: action.country, docNumberValue: '', docNumberError: null }
+    default:
+      return state
+  }
+}
+
 export function RegisterForm() {
   const t = useTranslations('auth')
   const router = useRouter()
-  const [loading, setLoading] = useState(false)
-  const [errors, setErrors] = useState<Record<string, string[]>>({})
-  const [generalError, setGeneralError] = useState<string | null>(null)
-  const [country, setCountry] = useState<Country>(Country.CL)
-  const [docNumberValue, setDocNumberValue] = useState('')
-  const [docNumberError, setDocNumberError] = useState<string | null>(null)
+  const [state, dispatch] = useReducer(registerFormReducer, initialState)
   const generalErrorRef = useRef<HTMLElement>(null)
   const formRef = useRef<HTMLFormElement>(null)
+
+  const { loading, errors, generalError, country, docNumberValue, docNumberError } = state
 
   const taxIdConfig = getTaxIdConfig(country)
   const docType = getDocTypeForCountry(country)
@@ -73,27 +124,22 @@ export function RegisterForm() {
   }, [generalError, errors, docNumberError])
 
   const handleCountryChange = (value: string) => {
-    const newCountry = value as Country
-    setCountry(newCountry)
-    setDocNumberValue('')
-    setDocNumberError(null)
+    dispatch({ type: 'CHANGE_COUNTRY', country: value as Country })
   }
 
   const handleDocNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
     const formatted = formatTaxId(value, country)
-    setDocNumberValue(formatted)
+    dispatch({ type: 'SET_DOC_NUMBER', value: formatted })
 
     if (formatted && !validateTaxId(formatted, country))
-      setDocNumberError(t('taxIdInvalid', { label: taxIdConfig.label }))
-    else setDocNumberError(null)
+      dispatch({ type: 'SET_DOC_NUMBER_ERROR', error: t('taxIdInvalid', { label: taxIdConfig.label }) })
+    else dispatch({ type: 'SET_DOC_NUMBER_ERROR', error: null })
   }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    setLoading(true)
-    setErrors({})
-    setGeneralError(null)
+    dispatch({ type: 'RESET_FOR_SUBMIT' })
 
     const formData = new FormData(e.currentTarget)
     formData.set('docType', docType)
@@ -107,13 +153,16 @@ export function RegisterForm() {
 
       if (result.success) router.push('/es/login?registered=true')
       else {
-        setGeneralError(result.error || t('unknownError'))
-        setErrors(result.fieldErrors || {})
+        dispatch({ type: 'SET_GENERAL_ERROR', error: result.error || t('unknownError') })
+        dispatch({ type: 'SET_ERRORS', errors: result.fieldErrors || {} })
       }
     } catch (error) {
-      setGeneralError(error instanceof Error ? error.message : t('unexpectedError'))
+      dispatch({
+        type: 'SET_GENERAL_ERROR',
+        error: error instanceof Error ? error.message : t('unexpectedError'),
+      })
     } finally {
-      setLoading(false)
+      dispatch({ type: 'SET_LOADING', value: false })
     }
   }
 
@@ -216,10 +265,10 @@ export function RegisterForm() {
             </TooltipTrigger>
             <TooltipContent side="right" className="max-w-xs">
               <ul className="space-y-1 text-xs">
-                <li>• {t('passwordMinLength')}</li>
-                <li>• {t('passwordUppercase')}</li>
-                <li>• {t('passwordLowercase')}</li>
-                <li>• {t('passwordNumber')}</li>
+                <li>{'• '}{t('passwordMinLength')}</li>
+                <li>{'• '}{t('passwordUppercase')}</li>
+                <li>{'• '}{t('passwordLowercase')}</li>
+                <li>{'• '}{t('passwordNumber')}</li>
               </ul>
             </TooltipContent>
           </Tooltip>

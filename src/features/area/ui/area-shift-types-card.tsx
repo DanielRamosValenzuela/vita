@@ -23,7 +23,7 @@ function formatDuration(mins: number) {
   return m > 0 ? `${h}h ${m}min` : `${h}h`
 }
 
-export interface AreaShiftTypesCardProps {
+interface AreaShiftTypesCardProps {
   shiftTypes: ShiftTypeOption[]
   selectedShiftTypeIds: Set<string>
   dispatch: (action: AreaFormAction) => void

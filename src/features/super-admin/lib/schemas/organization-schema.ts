@@ -256,13 +256,3 @@ export function createDeleteOrganizationSchema(messages: OrganizationValidationM
   })
 }
 
-export function createOrganizationFiltersSchema() {
-  return z.object({
-    search: z.string().optional(),
-    status: OrganizationStatusEnum.optional(),
-    plan: OrganizationPlanEnum.optional(),
-    country: CountryEnum.optional(),
-    page: z.number().min(1).default(1),
-    pageSize: z.number().min(10).max(100).default(20),
-  })
-}

@@ -16,7 +16,7 @@ import {
 
 import { type ShiftType, type ShiftTypesAction } from './shift-types-utils'
 
-export interface DeleteShiftTypeDialogProps {
+interface DeleteShiftTypeDialogProps {
   deleteDialogOpen: boolean
   deleteTarget: ShiftType | null
   dispatch: Dispatch<ShiftTypesAction>

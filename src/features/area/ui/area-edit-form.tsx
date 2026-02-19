@@ -32,7 +32,7 @@ import {
   hasAreaFormChanged,
 } from './area-edit-utils'
 
-export interface AreaEditFormProps {
+interface AreaEditFormProps {
   area: {
     id: string
     name: string

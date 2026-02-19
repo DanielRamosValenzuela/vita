@@ -8,7 +8,7 @@ import { SearchableAddableList } from '@/src/shared/ui/molecules'
 import type { ChiefOption } from '../api/area-actions'
 import type { AreaFormAction } from './area-edit-utils'
 
-export interface AreaChiefsCardProps {
+interface AreaChiefsCardProps {
   canAssignChiefs: boolean
   chiefs: ChiefOption[]
   selectedChiefIds: Set<string>

@@ -1,5 +1,3 @@
-import type { Dispatch } from 'react'
-
 export const DEFAULT_SHIFT_TYPE_ICON = 'Clock'
 
 export type ShiftClassification = 'DAY' | 'NIGHT' | 'MIXED'
@@ -51,7 +49,7 @@ export interface ShiftTypeFormData {
   areaConfigs: Array<{ areaId: string; isActive: boolean }>
 }
 
-export interface ShiftTypesState {
+interface ShiftTypesState {
   isCreateDialogOpen: boolean
   editingShiftType: ShiftType | null
   deleteDialogOpen: boolean
@@ -75,9 +73,7 @@ export type ShiftTypesAction =
   | { type: 'TOGGLE_SAVE_CONFIRM'; open: boolean }
   | { type: 'RESET_FORM' }
 
-export type ShiftTypesDispatch = Dispatch<ShiftTypesAction>
-
-export const DEFAULT_FORM_DATA: ShiftTypeFormData = {
+const DEFAULT_FORM_DATA: ShiftTypeFormData = {
   name: '',
   description: '',
   icon: 'Clock',

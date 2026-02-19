@@ -9,7 +9,7 @@ import type { StaffOption } from '../api/area-actions'
 
 import type { AreaFormAction } from './area-edit-utils'
 
-export interface AreaStaffCardProps {
+interface AreaStaffCardProps {
   staff: StaffOption[]
   selectedStaffIds: Set<string>
   dispatch: (action: AreaFormAction) => void

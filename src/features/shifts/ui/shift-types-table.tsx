@@ -17,7 +17,7 @@ import {
 
 import { DEFAULT_SHIFT_TYPE_ICON, type ShiftType } from './shift-types-utils'
 
-export interface ShiftTypesTableProps {
+interface ShiftTypesTableProps {
   shiftTypes: ShiftType[]
   formatDuration: (mins: number) => string
   getStatusBadge: (isActive: boolean) => ReactNode

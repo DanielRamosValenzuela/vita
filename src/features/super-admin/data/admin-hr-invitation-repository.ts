@@ -3,18 +3,8 @@ import { Role } from '@prisma/client'
 import {
   createInvitation as createInvitationEntity,
   deleteInvitation,
-  getAllInvitationsForOrganization as getAllInvitationsForOrganizationEntity,
-  getPendingInvitationsForOrganization as getPendingInvitationsForOrganizationEntity,
 } from '@/src/entities/invitation'
 import { checkOrganizationRoleLimit } from '@/src/entities/organization'
-
-export async function getPendingInvitationsForOrganization(organizationId: string) {
-  return await getPendingInvitationsForOrganizationEntity(organizationId, Role.ADMIN_HR)
-}
-
-export async function getAllInvitationsForOrganization(organizationId: string) {
-  return await getAllInvitationsForOrganizationEntity(organizationId, Role.ADMIN_HR)
-}
 
 export async function createAdminHRInvitation(
   organizationId: string,

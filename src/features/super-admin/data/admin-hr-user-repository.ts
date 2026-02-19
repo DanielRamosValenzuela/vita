@@ -6,57 +6,6 @@ import { prisma } from '@/src/shared/lib/db'
 
 import type { CreateAdminHRUserInput, UpdateAdminHRUserInput } from '../lib/schemas'
 
-interface GetAdminHRUsersParams {
-  search?: string
-  organizationId?: string
-  page?: number
-  pageSize?: number
-}
-
-export async function getAdminHRUsers(params: GetAdminHRUsersParams = {}) {
-  const { search = '', organizationId, page = 1, pageSize = 20 } = params
-
-  const skip = (page - 1) * pageSize
-
-  const where: Prisma.UserWhereInput = {
-    role: ROLES.ADMIN_HR,
-  }
-
-  if (search)
-    where.OR = [
-      { name: { contains: search, mode: 'insensitive' } },
-      { email: { contains: search, mode: 'insensitive' } },
-    ]
-
-  if (organizationId) where.organizationId = organizationId
-
-  const [users, total] = await Promise.all([
-    prisma.user.findMany({
-      where,
-      skip,
-      take: pageSize,
-      orderBy: { createdAt: 'desc' },
-      include: {
-        organization: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-      },
-    }),
-    prisma.user.count({ where }),
-  ])
-
-  return {
-    users,
-    total,
-    page,
-    pageSize,
-    totalPages: Math.ceil(total / pageSize),
-  }
-}
-
 export async function getAdminHRUserById(id: string) {
   return await prisma.user.findUnique({
     where: { id, role: ROLES.ADMIN_HR },

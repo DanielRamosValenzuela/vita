@@ -20,7 +20,7 @@ import type { CreateOrganizationInput } from '../lib/schemas'
 
 const DEFAULT_COUNTRY_CODES = ['CL', 'AR', 'PE', 'CO', 'MX'] as const
 
-export interface OrgBasicInfoCardProps {
+interface OrgBasicInfoCardProps {
   register: UseFormRegister<CreateOrganizationInput>
   errors: FieldErrors<CreateOrganizationInput>
   setValue: UseFormSetValue<CreateOrganizationInput>
@@ -109,7 +109,7 @@ export function OrgBasicInfoCard({
   )
 }
 
-export interface OrgContactCardProps {
+interface OrgContactCardProps {
   register: UseFormRegister<CreateOrganizationInput>
   errors: FieldErrors<CreateOrganizationInput>
   tNamespace: 'superAdmin.createOrganization' | 'superAdmin.editOrganization'

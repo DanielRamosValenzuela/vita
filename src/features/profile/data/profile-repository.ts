@@ -11,40 +11,6 @@ import {
   rejectInvitation as rejectInvitationEntity,
 } from '@/src/entities/invitation'
 
-export async function updateUserProfile(
-  userId: string,
-  data: { name: string; email: string }
-): Promise<ActionResult<unknown>> {
-  try {
-    const existingUser = await prisma.user.findUnique({
-      where: { id: userId },
-    })
-
-    if (!existingUser) return { success: false, error: 'Usuario no encontrado' }
-
-    if (data.email !== existingUser.email) {
-      const emailExists = await prisma.user.findUnique({
-        where: { email: data.email },
-      })
-
-      if (emailExists) return { success: false, error: 'Este email ya está en uso' }
-    }
-
-    await prisma.user.update({
-      where: { id: userId },
-      data: {
-        name: data.name,
-        email: data.email,
-      },
-    })
-
-    return { success: true }
-  } catch (error) {
-    console.error('[updateUserProfile] Error:', error)
-    return { success: false, error: 'Error al actualizar el perfil' }
-  }
-}
-
 export async function changeUserPassword(
   userId: string,
   currentPassword: string,

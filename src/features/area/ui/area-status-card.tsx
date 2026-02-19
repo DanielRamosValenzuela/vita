@@ -21,7 +21,7 @@ import { Switch } from '@/src/shared/ui/switch'
 
 import type { AreaFormAction } from './area-edit-utils'
 
-export interface AreaStatusCardProps {
+interface AreaStatusCardProps {
   isActive: boolean
   canActivate: boolean
   hasChanges: boolean

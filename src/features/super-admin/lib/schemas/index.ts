@@ -12,12 +12,10 @@ export {
   getUpdateOrganizationSchema,
   getChangeOrganizationStatusSchema,
   getDeleteOrganizationSchema,
-  getCreateAdminHRUserSchema,
   getUpdateAdminHRUserSchema,
 } from '../helpers/server'
 export {
   useCreateOrganizationSchema,
   useUpdateOrganizationSchema,
-  useCreateAdminHRUserSchema,
   useUpdateAdminHRUserSchema,
 } from '../helpers/client'

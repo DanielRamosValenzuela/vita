@@ -1,4 +1,4 @@
-export interface AreaShapeForState {
+interface AreaShapeForState {
   name: string
   description: string | null
   icon: string | null

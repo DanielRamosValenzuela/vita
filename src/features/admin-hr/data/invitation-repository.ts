@@ -1,11 +1,6 @@
-import type { Role } from '@prisma/client'
-
 import { ROLES } from '@/src/shared/lib/constants'
 
-import {
-  createInvitation as createInvitationEntity,
-  getAllInvitationsForOrganization as getAllInvitationsForOrganizationEntity,
-} from '@/src/entities/invitation'
+import { createInvitation as createInvitationEntity } from '@/src/entities/invitation'
 import { checkOrganizationRoleLimit } from '@/src/entities/organization'
 
 export async function checkOrganizationLimit(
@@ -24,6 +19,3 @@ export async function createInvitation(
   return await createInvitationEntity(organizationId, userId, role, invitedBy)
 }
 
-export async function getAllInvitationsForOrganization(organizationId: string, role?: Role) {
-  return await getAllInvitationsForOrganizationEntity(organizationId, role)
-}

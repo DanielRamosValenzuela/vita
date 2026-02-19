@@ -5,14 +5,14 @@ import type { Country, OrganizationPlan, OrganizationStatus } from '@prisma/clie
 
 import { usePathname, useRouter } from '@/i18n/navigation'
 
-export interface OrganizationFiltersState {
+interface OrganizationFiltersState {
   search: string
   status: OrganizationStatus | 'ALL'
   plan: OrganizationPlan | 'ALL'
   country: Country | 'ALL'
 }
 
-export interface UseOrganizationFiltersReturn {
+interface UseOrganizationFiltersReturn {
   search: string
   status: OrganizationStatus | 'ALL'
   plan: OrganizationPlan | 'ALL'

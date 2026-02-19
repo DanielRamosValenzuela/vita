@@ -7,57 +7,13 @@ import { getLocaleFromHeaders } from '@/src/shared/lib/utils/get-locale'
 
 import {
   checkEmailExists,
-  createAdminHRUser,
   deleteAdminHRUser,
   updateAdminHRUser,
 } from '../data/admin-hr-user-repository'
 import {
-  getCreateAdminHRUserSchema,
   getUpdateAdminHRUserSchema,
-  type CreateAdminHRUserInput,
   type UpdateAdminHRUserInput,
 } from '../lib/schemas'
-
-export async function createAdminHRUserAction(data: CreateAdminHRUserInput) {
-  try {
-    await requireSuperAdmin()
-
-    const locale = await getLocaleFromHeaders()
-    const createAdminHRUserSchema = await getCreateAdminHRUserSchema(locale)
-    const validatedData = createAdminHRUserSchema.parse(data)
-
-    const emailExists = await checkEmailExists(validatedData.email)
-    if (emailExists)
-      return {
-        success: false,
-        error: 'Ya existe un usuario con este email',
-      }
-
-    const user = await createAdminHRUser(validatedData)
-
-    revalidatePath('/dashboard/admin-hr-users')
-    revalidatePath('/dashboard')
-
-    return {
-      success: true,
-      data: user,
-      message: 'Usuario ADMIN_HR creado exitosamente',
-    }
-  } catch (error) {
-    console.error('[createAdminHRUserAction] Error:', error)
-
-    if (error instanceof Error && 'name' in error && error.name === 'ZodError')
-      return {
-        success: false,
-        error: 'Datos inválidos',
-      }
-
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Error al crear el usuario ADMIN_HR',
-    }
-  }
-}
 
 export async function updateAdminHRUserAction(id: string, data: UpdateAdminHRUserInput) {
   try {
