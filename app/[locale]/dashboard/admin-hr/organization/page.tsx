@@ -26,9 +26,11 @@ export async function generateMetadata({ params }: AdminHROrganizationPageProps)
 
 export default async function AdminHROrganizationPage({ params }: AdminHROrganizationPageProps) {
   const { locale } = await params
-  const user = await requireAdminHR(locale)
-  const t = await getTranslations('adminHR.organization')
-  const tInvitations = await getTranslations('adminHR.invitations')
+  const [user, t, tInvitations] = await Promise.all([
+    requireAdminHR(locale),
+    getTranslations('adminHR.organization'),
+    getTranslations('adminHR.invitations'),
+  ])
 
   if (!user.organizationId)
     return (

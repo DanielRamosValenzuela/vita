@@ -7,8 +7,10 @@ import { RegisterForm } from '@/src/features/auth/ui'
 
 export default async function RegisterPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params
-  const session = await getServerSession(authOptions)
-  const t = await getTranslations({ locale, namespace: 'auth' })
+  const [session, t] = await Promise.all([
+    getServerSession(authOptions),
+    getTranslations({ locale, namespace: 'auth' }),
+  ])
 
   if (session) redirect(`/${locale}`)
 

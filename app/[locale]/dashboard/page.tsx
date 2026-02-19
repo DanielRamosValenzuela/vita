@@ -18,11 +18,13 @@ interface DashboardPageProps {
 
 export default async function DashboardPage({ params }: DashboardPageProps) {
   const { locale } = await params
-  const user = await getCurrentUser()
-  const t = await getTranslations({ locale, namespace: 'dashboard' })
-  const tSuperAdmin = await getTranslations({ locale, namespace: 'superAdmin.dashboard' })
-  const tAlerts = await getTranslations({ locale, namespace: 'superAdmin.alerts' })
-  const tStats = await getTranslations({ locale, namespace: 'superAdmin.stats' })
+  const [user, t, tSuperAdmin, tAlerts, tStats] = await Promise.all([
+    getCurrentUser(),
+    getTranslations({ locale, namespace: 'dashboard' }),
+    getTranslations({ locale, namespace: 'superAdmin.dashboard' }),
+    getTranslations({ locale, namespace: 'superAdmin.alerts' }),
+    getTranslations({ locale, namespace: 'superAdmin.stats' }),
+  ])
 
   if (!user)
     return (
