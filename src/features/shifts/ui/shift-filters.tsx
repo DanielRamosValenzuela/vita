@@ -43,6 +43,112 @@ interface ShiftFiltersProps {
 
 const EMPTY_INITIAL_FILTERS: Partial<FilterState> = {}
 
+const getStatusColor = (status: ShiftStatus) => {
+  switch (status) {
+    case SHIFT_STATUS.SCHEDULED:
+      return 'bg-green-100 text-green-800 hover:bg-green-200'
+    case SHIFT_STATUS.IN_PROGRESS:
+      return 'bg-blue-100 text-blue-800 hover:bg-blue-200'
+    case SHIFT_STATUS.COMPLETED:
+      return 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+    case SHIFT_STATUS.CANCELLED:
+      return 'bg-red-100 text-red-800 hover:bg-red-200'
+    case SHIFT_STATUS.NO_SHOW:
+      return 'bg-orange-100 text-orange-800 hover:bg-orange-200'
+    default:
+      return 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+  }
+}
+
+interface StatusSelectItemProps {
+  status: ShiftStatus
+  label: string
+}
+
+function StatusSelectItem({ status, label }: StatusSelectItemProps) {
+  return (
+    <SelectItem value={status}>
+      <Badge className={`mr-2 ${getStatusColor(status)}`}>
+        {label}
+      </Badge>
+    </SelectItem>
+  )
+}
+
+interface ActiveFiltersBadgesProps {
+  filters: FilterState
+  users: Array<{ id: string; name: string; role: string }>
+  areas: Array<{ id: string; name: string }>
+  shiftTypes: Array<{ id: string; name: string; color: string }>
+  getStatusColor: (status: ShiftStatus) => string
+  getStatusLabel: (status: ShiftStatus) => string
+}
+
+function ActiveFiltersBadges({
+  filters,
+  users,
+  areas,
+  shiftTypes,
+  getStatusColor,
+  getStatusLabel,
+}: ActiveFiltersBadgesProps) {
+  const t = useTranslations('shifts.filters')
+
+  return (
+    <div className="flex flex-wrap gap-2 p-3 bg-muted/50 rounded-lg">
+      <span className="text-sm text-muted-foreground">{t('activeFilters')}:</span>
+
+      {filters.search && (
+        <Badge variant="secondary" className="gap-1">
+          <Search className="h-3 w-3" />
+          {filters.search}
+        </Badge>
+      )}
+
+      {filters.status && (
+        <Badge className={`gap-1 ${getStatusColor(filters.status as ShiftStatus)}`}>
+          {getStatusLabel(filters.status as ShiftStatus)}
+        </Badge>
+      )}
+
+      {filters.userId && (
+        <Badge variant="secondary" className="gap-1">
+          <Users className="h-3 w-3" />
+          {users.find((u) => u.id === filters.userId)?.name}
+        </Badge>
+      )}
+
+      {filters.areaId && (
+        <Badge variant="secondary" className="gap-1">
+          <Filter className="h-3 w-3" />
+          {areas.find((a) => a.id === filters.areaId)?.name}
+        </Badge>
+      )}
+
+      {filters.shiftTypeId && (
+        <Badge variant="secondary" className="gap-1">
+          <div
+            className="w-3 h-3 rounded-full"
+            style={{
+              backgroundColor: shiftTypes.find((st) => st.id === filters.shiftTypeId)?.color,
+            }}
+          />
+          {shiftTypes.find((st) => st.id === filters.shiftTypeId)?.name}
+        </Badge>
+      )}
+
+      {(filters.startDate || filters.endDate) && (
+        <Badge variant="secondary" className="gap-1">
+          <CalendarIcon className="h-3 w-3" />
+          {filters.startDate && format(filters.startDate, 'dd/MM/yyyy')}
+          {filters.startDate && filters.endDate && ' - '}
+          {filters.endDate && format(filters.endDate, 'dd/MM/yyyy')}
+        </Badge>
+      )}
+    </div>
+  )
+}
+
 export function ShiftFilters({
   users,
   areas,
@@ -91,23 +197,6 @@ export function ShiftFilters({
     onFiltersChange?.(clearedFilters)
   }
 
-  const getStatusColor = (status: ShiftStatus) => {
-    switch (status) {
-      case SHIFT_STATUS.SCHEDULED:
-        return 'bg-green-100 text-green-800 hover:bg-green-200'
-      case SHIFT_STATUS.IN_PROGRESS:
-        return 'bg-blue-100 text-blue-800 hover:bg-blue-200'
-      case SHIFT_STATUS.COMPLETED:
-        return 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-      case SHIFT_STATUS.CANCELLED:
-        return 'bg-red-100 text-red-800 hover:bg-red-200'
-      case SHIFT_STATUS.NO_SHOW:
-        return 'bg-orange-100 text-orange-800 hover:bg-orange-200'
-      default:
-        return 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-    }
-  }
-
   const getStatusLabel = (status: ShiftStatus) => {
     switch (status) {
       case SHIFT_STATUS.SCHEDULED:
@@ -138,7 +227,6 @@ export function ShiftFilters({
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {}
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
@@ -149,7 +237,6 @@ export function ShiftFilters({
           />
         </div>
 
-        {}
         <Select
           value={filters.status || FILTER_ALL}
           onValueChange={(value) =>
@@ -161,35 +248,14 @@ export function ShiftFilters({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value={FILTER_ALL}>{t('allStatuses')}</SelectItem>
-            <SelectItem value={SHIFT_STATUS.SCHEDULED}>
-              <Badge className={`mr-2 ${getStatusColor(SHIFT_STATUS.SCHEDULED)}`}>
-                {t('status.scheduled')}
-              </Badge>
-            </SelectItem>
-            <SelectItem value={SHIFT_STATUS.IN_PROGRESS}>
-              <Badge className={`mr-2 ${getStatusColor(SHIFT_STATUS.IN_PROGRESS)}`}>
-                {t('status.inProgress')}
-              </Badge>
-            </SelectItem>
-            <SelectItem value={SHIFT_STATUS.COMPLETED}>
-              <Badge className={`mr-2 ${getStatusColor(SHIFT_STATUS.COMPLETED)}`}>
-                {t('status.completed')}
-              </Badge>
-            </SelectItem>
-            <SelectItem value={SHIFT_STATUS.CANCELLED}>
-              <Badge className={`mr-2 ${getStatusColor(SHIFT_STATUS.CANCELLED)}`}>
-                {t('status.cancelled')}
-              </Badge>
-            </SelectItem>
-            <SelectItem value={SHIFT_STATUS.NO_SHOW}>
-              <Badge className={`mr-2 ${getStatusColor(SHIFT_STATUS.NO_SHOW)}`}>
-                {t('status.noShow')}
-              </Badge>
-            </SelectItem>
+            <StatusSelectItem status={SHIFT_STATUS.SCHEDULED} label={t('status.scheduled')} />
+            <StatusSelectItem status={SHIFT_STATUS.IN_PROGRESS} label={t('status.inProgress')} />
+            <StatusSelectItem status={SHIFT_STATUS.COMPLETED} label={t('status.completed')} />
+            <StatusSelectItem status={SHIFT_STATUS.CANCELLED} label={t('status.cancelled')} />
+            <StatusSelectItem status={SHIFT_STATUS.NO_SHOW} label={t('status.noShow')} />
           </SelectContent>
         </Select>
 
-        {}
         <Select
           value={filters.userId || FILTER_ALL}
           onValueChange={(value) => updateFilters({ userId: value === FILTER_ALL ? '' : value })}
@@ -210,7 +276,6 @@ export function ShiftFilters({
           </SelectContent>
         </Select>
 
-        {}
         <Select
           value={filters.areaId || FILTER_ALL}
           onValueChange={(value) => updateFilters({ areaId: value === FILTER_ALL ? '' : value })}
@@ -230,7 +295,6 @@ export function ShiftFilters({
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {}
         <Select
           value={filters.shiftTypeId || FILTER_ALL}
           onValueChange={(value) =>
@@ -253,7 +317,6 @@ export function ShiftFilters({
           </SelectContent>
         </Select>
 
-        {}
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" className="w-full justify-start text-left font-normal">
@@ -271,7 +334,6 @@ export function ShiftFilters({
           </PopoverContent>
         </Popover>
 
-        {}
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" className="w-full justify-start text-left font-normal">
@@ -289,7 +351,6 @@ export function ShiftFilters({
           </PopoverContent>
         </Popover>
 
-        {}
         <Select
           value={quickRange || FILTER_CUSTOM}
           onValueChange={(value) => {
@@ -360,59 +421,15 @@ export function ShiftFilters({
         </Select>
       </div>
 
-      {}
       {hasActiveFilters && (
-        <div className="flex flex-wrap gap-2 p-3 bg-muted/50 rounded-lg">
-          <span className="text-sm text-muted-foreground">{t('activeFilters')}:</span>
-
-          {filters.search && (
-            <Badge variant="secondary" className="gap-1">
-              <Search className="h-3 w-3" />
-              {filters.search}
-            </Badge>
-          )}
-
-          {filters.status && (
-            <Badge className={`gap-1 ${getStatusColor(filters.status as ShiftStatus)}`}>
-              {getStatusLabel(filters.status as ShiftStatus)}
-            </Badge>
-          )}
-
-          {filters.userId && (
-            <Badge variant="secondary" className="gap-1">
-              <Users className="h-3 w-3" />
-              {users.find((u) => u.id === filters.userId)?.name}
-            </Badge>
-          )}
-
-          {filters.areaId && (
-            <Badge variant="secondary" className="gap-1">
-              <Filter className="h-3 w-3" />
-              {areas.find((a) => a.id === filters.areaId)?.name}
-            </Badge>
-          )}
-
-          {filters.shiftTypeId && (
-            <Badge variant="secondary" className="gap-1">
-              <div
-                className="w-3 h-3 rounded-full"
-                style={{
-                  backgroundColor: shiftTypes.find((t) => t.id === filters.shiftTypeId)?.color,
-                }}
-              />
-              {shiftTypes.find((t) => t.id === filters.shiftTypeId)?.name}
-            </Badge>
-          )}
-
-          {(filters.startDate || filters.endDate) && (
-            <Badge variant="secondary" className="gap-1">
-              <CalendarIcon className="h-3 w-3" />
-              {filters.startDate && format(filters.startDate, 'dd/MM/yyyy')}
-              {filters.startDate && filters.endDate && ' - '}
-              {filters.endDate && format(filters.endDate, 'dd/MM/yyyy')}
-            </Badge>
-          )}
-        </div>
+        <ActiveFiltersBadges
+          filters={filters}
+          users={users}
+          areas={areas}
+          shiftTypes={shiftTypes}
+          getStatusColor={getStatusColor}
+          getStatusLabel={getStatusLabel}
+        />
       )}
     </div>
   )

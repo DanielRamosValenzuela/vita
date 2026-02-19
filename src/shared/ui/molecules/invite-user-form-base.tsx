@@ -68,7 +68,7 @@ export function InviteUserFormBase({
   onCancel,
 }: InviteUserFormBaseProps) {
   const t = useTranslations(translationNamespace)
-  const [selectedRole, setSelectedRole] = useState<Role | undefined>(defaultRole)
+  const [selectedRole, setSelectedRole] = useState<Role | undefined>(() => defaultRole)
   const [emailValue, setEmailValue] = useState('')
   const [docValue, setDocValue] = useState('')
 

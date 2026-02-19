@@ -1,16 +1,16 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useReducer } from 'react'
 
 import { usePathname } from '@/i18n/navigation'
 
 export function NavigationProgress() {
   const pathname = usePathname()
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, dispatch] = useReducer((_: boolean, action: boolean) => action, false)
 
   useEffect(() => {
-    setIsLoading(true)
-    const timer = setTimeout(() => setIsLoading(false), 900)
+    dispatch(true)
+    const timer = setTimeout(() => dispatch(false), 900)
     return () => clearTimeout(timer)
   }, [pathname])
 

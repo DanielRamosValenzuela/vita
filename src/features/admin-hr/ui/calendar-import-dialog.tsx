@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useState, useTransition } from 'react'
+import { useCallback, useReducer, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { format, isSameDay } from 'date-fns'
@@ -29,6 +29,58 @@ import {
 import { importNationalHolidaysAction } from '../api/calendar-actions'
 import { fetchNationalHolidays } from '../lib/holiday-service'
 
+interface ImportDialogState {
+  year: number
+  holidays: MappedHoliday[]
+  selected: Set<string>
+  loadingHolidays: boolean
+  loadError: boolean
+}
+
+type ImportDialogAction =
+  | { type: 'SET_YEAR'; payload: number }
+  | { type: 'LOAD_START' }
+  | { type: 'LOAD_SUCCESS'; payload: { holidays: MappedHoliday[]; selected: Set<string> } }
+  | { type: 'LOAD_FAIL' }
+  | { type: 'TOGGLE_HOLIDAY'; payload: string }
+  | { type: 'SELECT_ALL'; payload: Set<string> }
+
+const createInitialState = (currentYear: number): ImportDialogState => ({
+  year: currentYear,
+  holidays: [],
+  selected: new Set(),
+  loadingHolidays: false,
+  loadError: false,
+})
+
+const importDialogReducer = (state: ImportDialogState, action: ImportDialogAction): ImportDialogState => {
+  switch (action.type) {
+    case 'SET_YEAR':
+      return { ...state, year: action.payload }
+    case 'LOAD_START':
+      return { ...state, loadingHolidays: true, loadError: false }
+    case 'LOAD_SUCCESS':
+      return {
+        ...state,
+        loadingHolidays: false,
+        holidays: action.payload.holidays,
+        selected: action.payload.selected,
+      }
+    case 'LOAD_FAIL':
+      return { ...state, loadingHolidays: false, loadError: true }
+    case 'TOGGLE_HOLIDAY': {
+      const next = new Set(state.selected)
+      if (next.has(action.payload)) next.delete(action.payload)
+      else next.add(action.payload)
+      return { ...state, selected: next }
+    }
+    case 'SELECT_ALL':
+      return { ...state, selected: action.payload }
+    default:
+      return state
+  }
+}
+
 interface CalendarImportDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -47,11 +99,7 @@ export function CalendarImportDialog({
   const router = useRouter()
   const currentYear = new Date().getFullYear()
 
-  const [year, setYear] = useState(currentYear)
-  const [holidays, setHolidays] = useState<MappedHoliday[]>([])
-  const [selected, setSelected] = useState<Set<string>>(new Set())
-  const [loadingHolidays, setLoadingHolidays] = useState(false)
-  const [loadError, setLoadError] = useState(false)
+  const [state, dispatch] = useReducer(importDialogReducer, currentYear, createInitialState)
   const [isPending, startTransition] = useTransition()
 
   const isAlreadyImported = useCallback(
@@ -65,19 +113,14 @@ export function CalendarImportDialog({
 
   const loadHolidays = useCallback(
     async (selectedYear: number) => {
-      setLoadingHolidays(true)
-      setLoadError(false)
+      dispatch({ type: 'LOAD_START' })
       try {
         const data = await fetchNationalHolidays(selectedYear)
-        setHolidays(data)
         const initialSelected = new Set<string>()
         for (const h of data) if (!isAlreadyImported(h.date)) initialSelected.add(h.date)
-
-        setSelected(initialSelected)
+        dispatch({ type: 'LOAD_SUCCESS', payload: { holidays: data, selected: initialSelected } })
       } catch {
-        setLoadError(true)
-      } finally {
-        setLoadingHolidays(false)
+        dispatch({ type: 'LOAD_FAIL' })
       }
     },
     [isAlreadyImported]
@@ -85,40 +128,34 @@ export function CalendarImportDialog({
 
   function handleYearChange(value: string) {
     const newYear = Number(value)
-    setYear(newYear)
+    dispatch({ type: 'SET_YEAR', payload: newYear })
     loadHolidays(newYear)
   }
 
   function handleDialogAutoFocus() {
-    loadHolidays(year)
+    loadHolidays(state.year)
   }
 
   function handleToggle(date: string) {
-    setSelected((prev) => {
-      const next = new Set(prev)
-      if (next.has(date)) next.delete(date)
-      else next.add(date)
-
-      return next
-    })
+    dispatch({ type: 'TOGGLE_HOLIDAY', payload: date })
   }
 
   function handleSelectAll() {
-    const allAvailable = holidays.filter((h) => !isAlreadyImported(h.date)).map((h) => h.date)
-    if (selected.size === allAvailable.length) setSelected(new Set())
-    else setSelected(new Set(allAvailable))
+    const allAvailable = state.holidays.filter((h) => !isAlreadyImported(h.date)).map((h) => h.date)
+    if (state.selected.size === allAvailable.length) dispatch({ type: 'SELECT_ALL', payload: new Set() })
+    else dispatch({ type: 'SELECT_ALL', payload: new Set(allAvailable) })
   }
 
   function handleImport() {
-    const selectedHolidays = holidays
-      .filter((h) => selected.has(h.date))
+    const selectedHolidays = state.holidays
+      .filter((h) => state.selected.has(h.date))
       .map((h) => ({ date: h.date, title: h.title, inalienable: h.inalienable }))
 
     if (selectedHolidays.length === 0) return
 
     startTransition(async () => {
       const result = await importNationalHolidaysAction({
-        year,
+        year: state.year,
         selectedHolidays,
       })
 
@@ -138,7 +175,7 @@ export function CalendarImportDialog({
     })
   }
 
-  const availableCount = holidays.filter((h) => !isAlreadyImported(h.date)).length
+  const availableCount = state.holidays.filter((h) => !isAlreadyImported(h.date)).length
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -150,7 +187,7 @@ export function CalendarImportDialog({
 
         <div className="flex items-center gap-4 mb-4">
           <span className="text-sm font-medium">{t('yearLabel')}</span>
-          <Select value={String(year)} onValueChange={handleYearChange}>
+          <Select value={String(state.year)} onValueChange={handleYearChange}>
             <SelectTrigger className="w-28">
               <SelectValue />
             </SelectTrigger>
@@ -164,38 +201,38 @@ export function CalendarImportDialog({
           </Select>
         </div>
 
-        {loadingHolidays && (
+        {state.loadingHolidays && (
           <div className="flex items-center justify-center py-8">
             <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
             <span className="ml-2 text-sm text-muted-foreground">{t('loadingHolidays')}</span>
           </div>
         )}
 
-        {loadError && (
+        {state.loadError && (
           <div className="text-center py-8 space-y-3">
             <p className="text-sm text-destructive">{t('errorLoading')}</p>
-            <Button variant="outline" size="sm" onClick={() => loadHolidays(year)}>
+            <Button variant="outline" size="sm" onClick={() => loadHolidays(state.year)}>
               {t('retry')}
             </Button>
           </div>
         )}
 
-        {!loadingHolidays && !loadError && holidays.length === 0 && (
+        {!state.loadingHolidays && !state.loadError && state.holidays.length === 0 && (
           <p className="text-sm text-muted-foreground text-center py-8">{t('noHolidays')}</p>
         )}
 
-        {!loadingHolidays && !loadError && holidays.length > 0 && (
+        {!state.loadingHolidays && !state.loadError && state.holidays.length > 0 && (
           <>
             <div className="flex justify-between items-center mb-2">
               <Button variant="ghost" size="sm" onClick={handleSelectAll}>
-                {selected.size === availableCount ? t('deselectAll') : t('selectAll')}
+                {state.selected.size === availableCount ? t('deselectAll') : t('selectAll')}
               </Button>
             </div>
 
             <div className="border rounded-lg divide-y">
-              {holidays.map((holiday) => {
+              {state.holidays.map((holiday) => {
                 const imported = isAlreadyImported(holiday.date)
-                const checked = selected.has(holiday.date)
+                const checked = state.selected.has(holiday.date)
                 const [y, m, d] = holiday.date.split('-').map(Number)
                 const dateObj = new Date(y, m - 1, d)
 
@@ -231,7 +268,7 @@ export function CalendarImportDialog({
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isPending}>
             {tCalendar('form.cancel')}
           </Button>
-          <Button onClick={handleImport} disabled={isPending || selected.size === 0}>
+          <Button onClick={handleImport} disabled={isPending || state.selected.size === 0}>
             {isPending ? t('importing') : t('importButton')}
           </Button>
         </DialogFooter>
