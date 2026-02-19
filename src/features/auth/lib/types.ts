@@ -3,15 +3,6 @@ export interface RegisterData {
   name: string
 }
 
-export interface LoginData {
-  user: {
-    id: string
-    email: string
-    name: string
-    role: string
-  }
-}
-
 export type RegisterInput = {
   name: string
   email: string
@@ -20,9 +11,4 @@ export type RegisterInput = {
   confirmPassword: string
   country: string
   docType: string
-}
-
-export type LoginInput = {
-  email: string
-  password: string
 }

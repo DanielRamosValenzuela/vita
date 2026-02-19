@@ -140,6 +140,3 @@ const ALL_ICONS = [
 export const AREA_ICONS = ALL_ICONS
 
 export const SHIFT_TYPE_ICONS = ALL_ICONS
-
-export type AreaIcon = (typeof AREA_ICONS)[number]
-export type ShiftTypeIcon = (typeof SHIFT_TYPE_ICONS)[number]

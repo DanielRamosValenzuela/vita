@@ -37,12 +37,6 @@ export interface OrganizationSummary {
   maxUsers: number
 }
 
-export interface OrganizationActionResult {
-  success: boolean
-  error?: string
-  data?: Organization
-}
-
 export type CreateOrganizationInput = {
   name: string
   taxId: string
@@ -84,15 +78,6 @@ export type ChangeOrganizationStatusInput = {
 export type DeleteOrganizationInput = {
   id: string
   reason: string
-}
-
-export type OrganizationFilters = {
-  search?: string
-  status?: OrganizationStatus | 'ALL'
-  plan?: OrganizationPlan | 'ALL'
-  country?: Country | 'ALL'
-  page?: number
-  pageSize?: number
 }
 
 export type CreateAdminHRUserInput = {

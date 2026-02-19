@@ -2,38 +2,15 @@
 
 import { useState, useTransition } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
-import type { Country, OrganizationPlan, OrganizationStatus } from '@prisma/client'
-import { Ban, CheckCircle, Edit, Eye, MoreHorizontal, Trash2 } from 'lucide-react'
+import type { OrganizationPlan, OrganizationStatus } from '@prisma/client'
 import { toast } from 'sonner'
 
 import {
   ORGANIZATION_PLAN_BADGE_VARIANTS,
   ORGANIZATION_STATUS_BADGE_VARIANTS,
 } from '@/src/shared/lib/constants'
-import { countUsersByRole } from '@/src/shared/lib/utils/count-users-by-role'
-import { formatCurrency, formatDate } from '@/src/shared/lib/utils/format'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/src/shared/ui/alert-dialog'
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/src/shared/ui/dropdown-menu'
-import { Input } from '@/src/shared/ui/input'
-import { Label } from '@/src/shared/ui/label'
 import {
   Table,
   TableBody,
@@ -42,18 +19,24 @@ import {
   TableHeader,
   TableRow,
 } from '@/src/shared/ui/table'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/src/shared/ui/tooltip'
 
-import { usePathname, useRouter } from '@/i18n/navigation'
+import { useRouter } from '@/i18n/navigation'
 
 import {
   changeOrganizationStatusAction,
   deleteOrganizationAction,
 } from '../api/organization-actions'
 import type { OrganizationsTableProps } from '../lib/types'
+import { OrganizationDialogs } from './organization-dialogs'
+import { OrganizationTableRow } from './organization-table-row'
 import { OrganizationsFilters } from './organizations-filters'
+import { useOrganizationFilters } from './use-organization-filters'
 
 type OrganizationsTableClientProps = OrganizationsTableProps
+
+type DialogState = { open: boolean; id: string; name: string }
+
+const EMPTY_DIALOG: DialogState = { open: false, id: '', name: '' }
 
 export function OrganizationsTableClient({
   initialOrganizations,
@@ -65,66 +48,25 @@ export function OrganizationsTableClient({
   const t = useTranslations('superAdmin.organizations')
   const locale = useLocale() as 'es' | 'en'
   const router = useRouter()
-  const pathname = usePathname()
   const [isPending, startTransition] = useTransition()
 
-  const [search, setSearch] = useState(initialFilters.search)
-  const [status, setStatus] = useState<OrganizationStatus | 'ALL'>(initialFilters.status)
-  const [plan, setPlan] = useState<OrganizationPlan | 'ALL'>(initialFilters.plan)
-  const [country, setCountry] = useState<Country | 'ALL'>(initialFilters.country)
+  const {
+    search,
+    status,
+    plan,
+    country,
+    pathname,
+    setSearch,
+    setStatus,
+    setPlan,
+    setCountry,
+    handleFilterChange,
+    handleReset,
+  } = useOrganizationFilters(initialFilters)
 
-  const [suspendDialog, setSuspendDialog] = useState<{ open: boolean; id: string; name: string }>({
-    open: false,
-    id: '',
-    name: '',
-  })
-  const [reactivateDialog, setReactivateDialog] = useState<{
-    open: boolean
-    id: string
-    name: string
-  }>({
-    open: false,
-    id: '',
-    name: '',
-  })
-  const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; id: string; name: string }>({
-    open: false,
-    id: '',
-    name: '',
-  })
-  const [deleteReason, setDeleteReason] = useState('')
-
-  const handleFilterChange = (newFilters: {
-    search?: string
-    status?: OrganizationStatus | 'ALL'
-    plan?: OrganizationPlan | 'ALL'
-    country?: Country | 'ALL'
-  }) => {
-    const params = new URLSearchParams()
-
-    if (newFilters.search) params.set('search', newFilters.search)
-    if (newFilters.status && newFilters.status !== 'ALL') params.set('status', newFilters.status)
-    if (newFilters.plan && newFilters.plan !== 'ALL') params.set('plan', newFilters.plan)
-    if (newFilters.country && newFilters.country !== 'ALL')
-      params.set('country', newFilters.country)
-
-    params.set('page', '1')
-
-    startTransition(() => {
-      router.push(`${pathname}?${params.toString()}`)
-    })
-  }
-
-  const handleReset = () => {
-    setSearch('')
-    setStatus('ALL')
-    setPlan('ALL')
-    setCountry('ALL')
-
-    startTransition(() => {
-      router.push(pathname)
-    })
-  }
+  const [suspendDialog, setSuspendDialog] = useState<DialogState>(EMPTY_DIALOG)
+  const [reactivateDialog, setReactivateDialog] = useState<DialogState>(EMPTY_DIALOG)
+  const [deleteDialog, setDeleteDialog] = useState<DialogState>(EMPTY_DIALOG)
 
   const handleSuspend = (id: string, name: string) => {
     setSuspendDialog({ open: true, id, name })
@@ -136,10 +78,9 @@ export function OrganizationsTableClient({
 
   const handleDelete = (id: string, name: string) => {
     setDeleteDialog({ open: true, id, name })
-    setDeleteReason('')
   }
 
-  const confirmSuspend = async () => {
+  const confirmSuspend = () => {
     startTransition(async () => {
       const result = await changeOrganizationStatusAction({
         id: suspendDialog.id,
@@ -151,11 +92,11 @@ export function OrganizationsTableClient({
         router.refresh()
       } else toast.error(result.error || t('suspendError'))
 
-      setSuspendDialog({ open: false, id: '', name: '' })
+      setSuspendDialog(EMPTY_DIALOG)
     })
   }
 
-  const confirmReactivate = async () => {
+  const confirmReactivate = () => {
     startTransition(async () => {
       const result = await changeOrganizationStatusAction({
         id: reactivateDialog.id,
@@ -167,12 +108,12 @@ export function OrganizationsTableClient({
         router.refresh()
       } else toast.error(result.error || t('reactivateError'))
 
-      setReactivateDialog({ open: false, id: '', name: '' })
+      setReactivateDialog(EMPTY_DIALOG)
     })
   }
 
-  const confirmDelete = async () => {
-    if (deleteReason.trim().length < 10) {
+  const confirmDelete = (reason: string) => {
+    if (reason.trim().length < 10) {
       toast.error(t('deleteReasonMinLength'))
       return
     }
@@ -180,7 +121,7 @@ export function OrganizationsTableClient({
     startTransition(async () => {
       const result = await deleteOrganizationAction({
         id: deleteDialog.id,
-        reason: deleteReason.trim(),
+        reason: reason.trim(),
       })
 
       if (result.success) {
@@ -188,20 +129,19 @@ export function OrganizationsTableClient({
         router.refresh()
       } else toast.error(result.error || t('deleteError'))
 
-      setDeleteDialog({ open: false, id: '', name: '' })
-      setDeleteReason('')
+      setDeleteDialog(EMPTY_DIALOG)
     })
   }
 
-  const getStatusBadge = (status: OrganizationStatus) => (
-    <Badge variant={ORGANIZATION_STATUS_BADGE_VARIANTS[status] ?? 'outline'}>
-      {t(`statuses.${status}`)}
+  const getStatusBadge = (orgStatus: OrganizationStatus) => (
+    <Badge variant={ORGANIZATION_STATUS_BADGE_VARIANTS[orgStatus] ?? 'outline'}>
+      {t(`statuses.${orgStatus}`)}
     </Badge>
   )
 
-  const getPlanBadge = (plan: OrganizationPlan) => (
-    <Badge variant={ORGANIZATION_PLAN_BADGE_VARIANTS[plan] ?? 'outline'}>
-      {t(`plans.${plan}`)}
+  const getPlanBadge = (orgPlan: OrganizationPlan) => (
+    <Badge variant={ORGANIZATION_PLAN_BADGE_VARIANTS[orgPlan] ?? 'outline'}>
+      {t(`plans.${orgPlan}`)}
     </Badge>
   )
 
@@ -259,202 +199,20 @@ export function OrganizationsTableClient({
                 </TableCell>
               </TableRow>
             ) : (
-              initialOrganizations.map((org) => {
-                const userCounts = countUsersByRole(org.users)
-                return (
-                  <TableRow key={org.id} className="hover:bg-muted/50 cursor-pointer">
-                    <TableCell className="font-medium">
-                      <div>
-                        <div>{org.name}</div>
-                        <div className="text-muted-foreground text-sm">{org.contactName}</div>
-                      </div>
-                    </TableCell>
-                    <TableCell>{org.taxId}</TableCell>
-                    <TableCell>{getPlanBadge(org.plan)}</TableCell>
-                    <TableCell>{getStatusBadge(org.status)}</TableCell>
-                    <TableCell className="text-center">
-                      <div className="space-y-1 text-xs">
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="text-muted-foreground">{t('accountsAdminHR')}</span>
-                          <span className="font-medium">
-                            {userCounts.ADMIN_HR}/{org.maxAdminHR}
-                          </span>
-                        </div>
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="text-muted-foreground">{t('accountsChiefs')}</span>
-                          <span className="font-medium">
-                            {userCounts.CHIEF_AREA}/{org.maxChiefs}
-                          </span>
-                        </div>
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="text-muted-foreground">{t('accountsStaff')}</span>
-                          <span className="font-medium">
-                            {userCounts.STAFF_HEALTH}/{org.maxStaff}
-                          </span>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right">{formatCurrency(org.monthlyFee)}</TableCell>
-                    <TableCell>
-                      {org.nextPayment ? formatDate(new Date(org.nextPayment), locale) : '-'}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="hidden md:flex items-center justify-end gap-2">
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 p-0 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-950 dark:hover:text-blue-400"
-                              onClick={() => router.push(`/dashboard/organizations/${org.id}`)}
-                            >
-                              <span className="sr-only">{t('actions.view')}</span>
-                              <Eye className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>{t('actions.view')}</p>
-                          </TooltipContent>
-                        </Tooltip>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 p-0 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-950 dark:hover:text-blue-400"
-                              onClick={() => router.push(`/dashboard/organizations/${org.id}/edit`)}
-                            >
-                              <span className="sr-only">{t('actions.edit')}</span>
-                              <Edit className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>{t('actions.edit')}</p>
-                          </TooltipContent>
-                        </Tooltip>
-                        {org.status === 'ACTIVE' && (
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-8 w-8 p-0 hover:bg-muted hover:text-muted-foreground"
-                                onClick={() => handleSuspend(org.id, org.name)}
-                              >
-                                <span className="sr-only">{t('actions.suspend')}</span>
-                                <Ban className="h-4 w-4 text-muted-foreground" />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>{t('actions.suspend')}</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        )}
-                        {(org.status === 'SUSPENDED' ||
-                          org.status === 'PENDING_PAYMENT' ||
-                          org.status === 'INACTIVE') && (
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-8 w-8 p-0 hover:bg-primary/10 hover:text-primary"
-                                onClick={() => handleReactivate(org.id, org.name)}
-                              >
-                                <span className="sr-only">{t('actions.reactivate')}</span>
-                                <CheckCircle className="h-4 w-4 text-primary" />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>{t('actions.reactivate')}</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        )}
-                        {org.status !== 'INACTIVE' && (
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive dark:hover:bg-destructive/20"
-                                onClick={() => handleDelete(org.id, org.name)}
-                              >
-                                <span className="sr-only">{t('actions.delete')}</span>
-                                <Trash2 className="h-4 w-4 text-destructive" />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>{t('actions.delete')}</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        )}
-                      </div>
-
-                      <div className="flex md:hidden items-center justify-end">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                              <span className="sr-only">{t('openMenu')}</span>
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>{t('table.actions')}</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                              onClick={() => router.push(`/dashboard/organizations/${org.id}`)}
-                              className="cursor-pointer"
-                            >
-                              <Eye className="mr-2 h-4 w-4" />
-                              {t('actions.view')}
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => router.push(`/dashboard/organizations/${org.id}/edit`)}
-                              className="cursor-pointer"
-                            >
-                              <Edit className="mr-2 h-4 w-4" />
-                              {t('actions.edit')}
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            {org.status === 'ACTIVE' && (
-                              <DropdownMenuItem
-                                className="cursor-pointer text-muted-foreground"
-                                onClick={() => handleSuspend(org.id, org.name)}
-                              >
-                                <Ban className="mr-2 h-4 w-4" />
-                                {t('actions.suspend')}
-                              </DropdownMenuItem>
-                            )}
-                            {(org.status === 'SUSPENDED' ||
-                              org.status === 'PENDING_PAYMENT' ||
-                              org.status === 'INACTIVE') && (
-                              <DropdownMenuItem
-                                className="cursor-pointer text-primary"
-                                onClick={() => handleReactivate(org.id, org.name)}
-                              >
-                                <CheckCircle className="mr-2 h-4 w-4" />
-                                {t('actions.reactivate')}
-                              </DropdownMenuItem>
-                            )}
-                            {org.status !== 'INACTIVE' && (
-                              <>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem
-                                  className="text-destructive cursor-pointer"
-                                  onClick={() => handleDelete(org.id, org.name)}
-                                >
-                                  <Trash2 className="mr-2 h-4 w-4" />
-                                  {t('actions.delete')}
-                                </DropdownMenuItem>
-                              </>
-                            )}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                )
-              })
+              initialOrganizations.map((org) => (
+                <OrganizationTableRow
+                  key={org.id}
+                  org={org}
+                  locale={locale}
+                  onView={(id) => router.push(`/dashboard/organizations/${id}`)}
+                  onEdit={(id) => router.push(`/dashboard/organizations/${id}/edit`)}
+                  onSuspend={handleSuspend}
+                  onReactivate={handleReactivate}
+                  onDelete={handleDelete}
+                  getStatusBadge={getStatusBadge}
+                  getPlanBadge={getPlanBadge}
+                />
+              ))
             )}
           </TableBody>
         </Table>
@@ -505,94 +263,18 @@ export function OrganizationsTableClient({
         </div>
       )}
 
-      <AlertDialog
-        open={suspendDialog.open}
-        onOpenChange={(open) => setSuspendDialog({ ...suspendDialog, open })}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{t('actions.suspend')}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t('confirmSuspend', { name: suspendDialog.name })}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={confirmSuspend}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              {t('actions.suspend')}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      <AlertDialog
-        open={reactivateDialog.open}
-        onOpenChange={(open) => setReactivateDialog({ ...reactivateDialog, open })}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{t('actions.reactivate')}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t('confirmReactivate', { name: reactivateDialog.name })}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={confirmReactivate}
-              className="bg-primary text-primary-foreground hover:bg-primary/90"
-            >
-              {t('actions.reactivate')}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      <AlertDialog
-        open={deleteDialog.open}
-        onOpenChange={(open) => setDeleteDialog({ ...deleteDialog, open })}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{t('actions.delete')}</AlertDialogTitle>
-            <AlertDialogDescription className="space-y-4">
-              <p>{t('confirmDelete', { name: deleteDialog.name })}</p>
-              <p className="text-muted-foreground text-sm">{t('confirmDeleteWarning')}</p>
-              <div className="space-y-2">
-                <Label htmlFor="delete-reason">{t('deleteReasonPrompt')}</Label>
-                <Input
-                  id="delete-reason"
-                  value={deleteReason}
-                  onChange={(e) => setDeleteReason(e.target.value)}
-                  placeholder={t('deleteReasonPlaceholder')}
-                />
-                {deleteReason.length > 0 && deleteReason.length < 10 && (
-                  <p className="text-destructive text-xs">{t('deleteReasonMinLength')}</p>
-                )}
-              </div>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel
-              onClick={() => {
-                setDeleteReason('')
-              }}
-            >
-              {t('cancel')}
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={confirmDelete}
-              disabled={deleteReason.trim().length < 10}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              {t('actions.delete')}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <OrganizationDialogs
+        suspendDialog={suspendDialog}
+        setSuspendDialog={setSuspendDialog}
+        reactivateDialog={reactivateDialog}
+        setReactivateDialog={setReactivateDialog}
+        deleteDialog={deleteDialog}
+        setDeleteDialog={setDeleteDialog}
+        onConfirmSuspend={confirmSuspend}
+        onConfirmReactivate={confirmReactivate}
+        onConfirmDelete={confirmDelete}
+        isPending={isPending}
+      />
     </section>
   )
 }

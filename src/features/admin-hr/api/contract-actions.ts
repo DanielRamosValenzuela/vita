@@ -540,37 +540,3 @@ export const endContractAction = async (contractId: string): Promise<ActionResul
   }
 }
 
-export const deleteContractAction = async (contractId: string): Promise<ActionResult<null>> => {
-  try {
-    const session = await requireAdminHRWithOrg()
-
-    const contract = await prisma.contract.findUnique({
-      where: { id: contractId },
-    })
-
-    if (!contract)
-      return {
-        success: false,
-        error: 'Contrato no encontrado',
-      }
-
-    if (contract.organizationId !== session.organizationId)
-      return {
-        success: false,
-        error: 'El contrato no pertenece a tu organización',
-      }
-
-    await prisma.contract.delete({
-      where: { id: contractId },
-    })
-
-    revalidatePaths(...CONTRACTS_PATHS)
-
-    return {
-      success: true,
-      message: 'Contrato eliminado exitosamente',
-    }
-  } catch (error) {
-    return handleActionError(error, 'deleteContractAction', 'Error al eliminar contrato')
-  }
-}

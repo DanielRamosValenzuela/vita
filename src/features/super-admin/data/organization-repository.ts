@@ -3,16 +3,6 @@ import type { Country, OrganizationPlan, OrganizationStatus, Prisma } from '@pri
 import { ROLES } from '@/src/shared/lib/constants'
 import { prisma } from '@/src/shared/lib/db'
 
-type OrganizationWithDetails = Prisma.OrganizationGetPayload<{
-  include: {
-    users: { select: { id: true; name: true; email: true; role: true; createdAt: true } }
-    invitations: {
-      include: { user: { select: { id: true; name: true; email: true } } }
-    }
-    _count: { select: { users: true } }
-  }
-}>
-
 interface GetOrganizationsParams {
   search?: string
   status?: OrganizationStatus
@@ -73,10 +63,13 @@ export const getOrganizations = async (params: GetOrganizationsParams = {}) => {
   }
 }
 
-export const getOrganizationById = async (id: string): Promise<OrganizationWithDetails | null> => {
-  const organization = await prisma.organization.findUnique({
+export const getOrganizationById = async (id: string) => {
+  return await prisma.organization.findUnique({
     where: { id },
     include: {
+      _count: {
+        select: { users: true },
+      },
       users: {
         select: {
           id: true,
@@ -89,25 +82,12 @@ export const getOrganizationById = async (id: string): Promise<OrganizationWithD
       },
       invitations: {
         include: {
-          user: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-            },
-          },
+          user: true,
         },
         orderBy: { createdAt: 'desc' },
       },
-      _count: {
-        select: {
-          users: true,
-        },
-      },
     },
   })
-
-  return organization
 }
 
 export const checkTaxIdExists = async (taxId: string, excludeId?: string) => {
@@ -233,27 +213,6 @@ export const deleteOrganization = async (id: string) => {
   })
 
   return organization
-}
-
-export const getOrganizationStats = async () => {
-  const [total, activeCount, suspendedCount, pendingPaymentCount] = await Promise.all([
-    prisma.organization.count(),
-    prisma.organization.count({ where: { status: 'ACTIVE' } }),
-    prisma.organization.count({ where: { status: 'SUSPENDED' } }),
-    prisma.organization.count({ where: { status: 'PENDING_PAYMENT' } }),
-  ])
-
-  const activePercentage = total > 0 ? (activeCount / total) * 100 : 0
-  const suspendedPercentage = total > 0 ? (suspendedCount / total) * 100 : 0
-
-  return {
-    total,
-    activeCount,
-    activePercentage,
-    suspendedCount,
-    suspendedPercentage,
-    pendingPaymentCount,
-  }
 }
 
 export const getDashboardStats = async () => {

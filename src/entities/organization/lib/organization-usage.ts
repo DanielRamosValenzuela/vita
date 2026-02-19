@@ -106,14 +106,3 @@ export async function getOrganizationUsageSummary(
   }
 }
 
-export async function getRoleUsageForOrganization(
-  organizationId: string,
-  role: Role
-): Promise<RoleUsage> {
-  const summary = await getOrganizationUsageSummary(organizationId)
-  const roleUsage = summary.roleUsage.find((usage) => usage.role === role)
-
-  if (!roleUsage) throw new Error(`Role ${role} not found in organization`)
-
-  return roleUsage
-}

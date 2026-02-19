@@ -23,12 +23,12 @@ type AreaWithShiftTypes = Prisma.AreaGetPayload<{
 
 export type AreaShiftTypeItem = AreaWithShiftTypes['shiftTypes'][number]
 
-export type CreateAreaInput = Pick<
+type CreateAreaInput = Pick<
   Prisma.AreaUncheckedCreateInput,
   'name' | 'description' | 'icon' | 'color'
 >
 
-export type UpdateAreaInput = Partial<
+type UpdateAreaInput = Partial<
   Pick<
     Prisma.AreaUncheckedUpdateInput,
     | 'name'

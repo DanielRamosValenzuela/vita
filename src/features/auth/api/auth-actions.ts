@@ -151,16 +151,3 @@ export async function loginAction(formData: FormData): Promise<ActionResult<{ em
   }
 }
 
-export async function logoutAction(): Promise<ActionResult> {
-  try {
-    return {
-      success: true,
-    }
-  } catch (error) {
-    console.error('Error en logoutAction:', error)
-    return {
-      success: false,
-      error: 'Error al cerrar sesión. Por favor, intenta nuevamente.',
-    }
-  }
-}

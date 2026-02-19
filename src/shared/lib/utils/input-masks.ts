@@ -30,35 +30,3 @@ export function getCurrencyMask(currency: Currency, _showSymbol = false): Factor
 
   return mask
 }
-
-export const phoneMask: FactoryArg = {
-  mask: '+56 0 0000 0000',
-  lazy: false,
-}
-
-export const rutMask: FactoryArg = {
-  mask: '00.000.000-0',
-  lazy: false,
-}
-
-export const percentageMask: FactoryArg = {
-  mask: Number,
-  scale: 2,
-  min: 0,
-  max: 100,
-  radix: '.',
-  mapToRadix: ['.', ','],
-  thousandsSeparator: ',',
-}
-
-export const timeMask: FactoryArg = {
-  mask: 'HH:MM',
-  blocks: {
-    HH: {
-      mask: '00',
-    },
-    MM: {
-      mask: '00',
-    },
-  },
-}

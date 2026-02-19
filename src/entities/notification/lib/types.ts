@@ -22,39 +22,3 @@ export interface NotificationWithActor {
     name: string
   } | null
 }
-
-export const NOTIFICATION_TYPE_CONFIG: Record<
-  NotificationType,
-  { icon: string; colorClass: string; defaultActionUrl: string }
-> = {
-  INVITATION_PENDING: {
-    icon: 'Mail',
-    colorClass: 'text-blue-500',
-    defaultActionUrl: '/dashboard/profile?section=invitations',
-  },
-  AREA_ASSIGNED: {
-    icon: 'LayoutGrid',
-    colorClass: 'text-green-500',
-    defaultActionUrl: '/dashboard/areas',
-  },
-  SHIFT_CREATED: {
-    icon: 'Calendar',
-    colorClass: 'text-purple-500',
-    defaultActionUrl: '/dashboard/shifts',
-  },
-  SHIFT_UPDATED: {
-    icon: 'RefreshCw',
-    colorClass: 'text-orange-500',
-    defaultActionUrl: '/dashboard/shifts',
-  },
-  SHIFT_CANCELLED: {
-    icon: 'XCircle',
-    colorClass: 'text-red-500',
-    defaultActionUrl: '/dashboard/shifts',
-  },
-  GENERAL: {
-    icon: 'Bell',
-    colorClass: 'text-muted-foreground',
-    defaultActionUrl: '/dashboard/inbox',
-  },
-}

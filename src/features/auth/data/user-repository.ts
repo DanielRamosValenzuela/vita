@@ -13,21 +13,6 @@ export async function checkEmailExists(email: string): Promise<boolean> {
   return !!user
 }
 
-export async function checkDocExists(
-  country: Country,
-  docType: DocType,
-  docNumber: string
-): Promise<boolean> {
-  const user = await prisma.user.findFirst({
-    where: {
-      country,
-      docType,
-      docNumber,
-    },
-  })
-  return !!user
-}
-
 export async function createUserWithAccount(data: RegisterInput) {
   const hashedPassword = await bcrypt.hash(data.password, 12)
   const cleanDocNumber = data.docNumber.replace(/[^a-zA-Z0-9]/g, '')

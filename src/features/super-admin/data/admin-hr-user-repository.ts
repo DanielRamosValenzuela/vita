@@ -58,7 +58,7 @@ export async function getAdminHRUsers(params: GetAdminHRUsersParams = {}) {
 }
 
 export async function getAdminHRUserById(id: string) {
-  return await prisma.user.findFirst({
+  return await prisma.user.findUnique({
     where: { id, role: ROLES.ADMIN_HR },
     include: {
       organization: true,

@@ -145,11 +145,6 @@ export interface ChiefOption {
   docNumber: string | null
 }
 
-export interface GetChiefsForAreaResult {
-  chiefs: ChiefOption[]
-  assignedChiefIds: string[]
-}
-
 export async function getChiefsForAreaAction(areaId: string) {
   try {
     const user = await requireAdminHROrChiefArea()
@@ -323,11 +318,6 @@ export interface StaffOption {
   name: string
   email: string
   docNumber: string | null
-}
-
-export interface GetStaffForAreaResult {
-  staff: StaffOption[]
-  assignedStaffIds: string[]
 }
 
 export async function getStaffForAreaAction(areaId: string) {

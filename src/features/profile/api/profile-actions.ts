@@ -15,39 +15,11 @@ import {
   getUserOrganizations,
   rejectInvitation,
   updateUserDocument,
-  updateUserProfile,
 } from '../data/profile-repository'
 import {
   getChangePasswordSchema,
   getUpdateDocumentSchema,
-  getUpdateProfileSchema,
 } from '../lib/schemas'
-
-export async function updateProfileAction(data: {
-  name: string
-  email: string
-}): Promise<ActionResult<unknown>> {
-  try {
-    const user = await requireAuth()
-    const locale = await getLocaleFromHeaders()
-    const updateProfileSchema = await getUpdateProfileSchema(locale)
-
-    const validation = updateProfileSchema.safeParse(data)
-    if (!validation.success)
-      return {
-        success: false,
-        error: validation.error.issues[0].message,
-      }
-
-    const result = await updateUserProfile(user.id, validation.data)
-
-    if (result.success) revalidatePath('/dashboard/profile')
-
-    return result
-  } catch (error) {
-    return handleActionError(error, 'updateProfileAction', 'Error al actualizar el perfil')
-  }
-}
 
 export async function changePasswordAction(data: {
   currentPassword: string

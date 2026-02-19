@@ -42,17 +42,6 @@ export interface CreateShiftData {
   notes?: string
 }
 
-export interface UpdateShiftData {
-  title?: string
-  status?: ShiftStatus
-  userId?: string
-  areaId?: string
-  shiftTypeId?: string
-  startTime?: Date
-  endTime?: Date
-  notes?: string
-}
-
 export interface GetShiftsParams {
   page?: number
   pageSize?: number

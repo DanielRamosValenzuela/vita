@@ -18,8 +18,6 @@ export const calendarDaySchema = z.object({
   isRecurring: z.boolean().optional(),
 })
 
-export type CalendarDayInput = z.infer<typeof calendarDaySchema>
-
 export const importHolidaysSchema = z.object({
   year: z.number().min(2024).max(2030),
   selectedHolidays: z

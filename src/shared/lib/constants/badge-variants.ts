@@ -17,5 +17,3 @@ export const INVITATION_STATUS_BADGE_VARIANTS = {
   REJECTED: 'destructive',
   EXPIRED: 'outline',
 } as const
-
-export type BadgeVariant = 'default' | 'secondary' | 'destructive' | 'outline'

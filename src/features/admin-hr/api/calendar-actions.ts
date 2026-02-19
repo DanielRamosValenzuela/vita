@@ -143,53 +143,6 @@ export async function deleteCalendarDayAction(dayId: string): Promise<ActionResu
   }
 }
 
-export async function bulkMarkDaysAction(
-  dates: Date[],
-  type: DayType,
-  multiplier?: number,
-  name?: string
-): Promise<ActionResult<number>> {
-  try {
-    const session = await requireAdminHRWithOrg()
-
-    const results = await Promise.all(
-      dates.map((date) =>
-        prisma.organizationCalendar.upsert({
-          where: {
-            organizationId_date: {
-              organizationId: session.organizationId,
-              date,
-            },
-          },
-          create: {
-            organizationId: session.organizationId,
-            date,
-            type,
-            multiplier: multiplier || 1.0,
-            name,
-          },
-          update: {
-            type,
-            multiplier: multiplier || 1.0,
-            name,
-          },
-        })
-      )
-    )
-
-    revalidatePath('/dashboard/calendar')
-    revalidatePath('/dashboard/shifts')
-
-    return {
-      success: true,
-      data: results.length,
-      message: `${results.length} días marcados exitosamente`,
-    }
-  } catch (error) {
-    return handleActionError(error, 'bulkMarkDaysAction', 'Error al marcar los días')
-  }
-}
-
 export async function importNationalHolidaysAction(
   data: ImportHolidaysInput
 ): Promise<ActionResult<{ imported: number; skipped: number }>> {

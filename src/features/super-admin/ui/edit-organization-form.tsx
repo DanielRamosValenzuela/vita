@@ -3,13 +3,13 @@
 import { useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 import { zodResolver } from '@hookform/resolvers/zod'
-import type { Country, Organization } from '@prisma/client'
+import type { Organization } from '@prisma/client'
 import { ArrowLeft, Loader2 } from 'lucide-react'
 import { useForm, useWatch } from 'react-hook-form'
+import type { FieldErrors, UseFormRegister, UseFormSetValue } from 'react-hook-form'
 import { toast } from 'sonner'
 
 import { ROLES } from '@/src/shared/lib/constants'
-import { formatTaxId, getTaxIdConfig } from '@/src/shared/lib/utils/tax-id-config'
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
@@ -29,8 +29,12 @@ import { updateOrganizationAction } from '../api/organization-actions'
 import {
   PLAN_LIMITS,
   useUpdateOrganizationSchema,
+  type CreateOrganizationInput,
   type UpdateOrganizationInput,
 } from '../lib/schemas'
+import { OrgBasicInfoCard, OrgContactCard } from './organization-form-cards'
+
+const ALL_COUNTRY_CODES = ['CL', 'AR', 'PE', 'CO', 'MX', 'US'] as const
 
 interface EditOrganizationFormProps {
   organization: Organization & {
@@ -40,7 +44,6 @@ interface EditOrganizationFormProps {
 
 export function EditOrganizationForm({ organization }: EditOrganizationFormProps) {
   const t = useTranslations('superAdmin.editOrganization')
-  const tCommon = useTranslations('superAdmin.createOrganization')
   const tOrgs = useTranslations('superAdmin.organizations')
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
@@ -81,7 +84,6 @@ export function EditOrganizationForm({ organization }: EditOrganizationFormProps
   const selectedCountry = useWatch({ control, name: 'country' }) ?? organization.country
   const selectedPlan = useWatch({ control, name: 'plan' }) ?? organization.plan
   const planLimits = PLAN_LIMITS[selectedPlan as 'BASIC' | 'PRO' | 'ENTERPRISE']
-  const taxIdConfig = getTaxIdConfig(selectedCountry as Country)
 
   const onSubmit = async (data: UpdateOrganizationInput) => {
     setError(null)
@@ -112,62 +114,14 @@ export function EditOrganizationForm({ organization }: EditOrganizationFormProps
         {t('back')}
       </Button>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('form.basicInfo')}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">{t('form.name.label')}</Label>
-            <Input
-              id="name"
-              placeholder={t('form.name.placeholder')}
-              {...register('name')}
-              aria-invalid={!!errors.name}
-            />
-            {errors.name && <p className="text-destructive text-sm">{errors.name.message}</p>}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="taxId">{taxIdConfig.label}</Label>
-            <Input
-              id="taxId"
-              placeholder={taxIdConfig.placeholder}
-              maxLength={taxIdConfig.maxLength}
-              {...register('taxId', {
-                onChange: (e) => {
-                  const formatted = formatTaxId(e.target.value, selectedCountry as Country)
-                  e.target.value = formatted
-                  setValue('taxId', formatted)
-                },
-              })}
-              aria-invalid={!!errors.taxId}
-            />
-            {errors.taxId && <p className="text-destructive text-sm">{errors.taxId.message}</p>}
-            <p className="text-muted-foreground text-sm">{taxIdConfig.description}</p>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="country">{tCommon('form.country.label')}</Label>
-            <Select
-              onValueChange={(value: Country) => setValue('country', value)}
-              defaultValue={selectedCountry}
-            >
-              <SelectTrigger id="country" aria-invalid={!!errors.country}>
-                <SelectValue placeholder={tCommon('form.country.placeholder')} />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.entries(tOrgs.raw('countries')).map(([code, name]) => (
-                  <SelectItem key={code} value={code}>
-                    {String(name)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.country && <p className="text-destructive text-sm">{errors.country.message}</p>}
-          </div>
-        </CardContent>
-      </Card>
+      <OrgBasicInfoCard
+        register={register as unknown as UseFormRegister<CreateOrganizationInput>}
+        errors={errors as unknown as FieldErrors<CreateOrganizationInput>}
+        setValue={setValue as unknown as UseFormSetValue<CreateOrganizationInput>}
+        selectedCountry={selectedCountry as string}
+        countryCodes={ALL_COUNTRY_CODES}
+        countrySelectMode="default"
+      />
 
       <Card>
         <CardHeader>
@@ -215,7 +169,7 @@ export function EditOrganizationForm({ organization }: EditOrganizationFormProps
         <CardHeader>
           <CardTitle>{t('form.accountLimits')}</CardTitle>
           <CardDescription className="text-amber-600 dark:text-amber-500">
-            ⚠️ {t('form.limitsWarning')}
+            {'⚠️'} {t('form.limitsWarning')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -304,66 +258,13 @@ export function EditOrganizationForm({ organization }: EditOrganizationFormProps
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('form.contact')}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <div className="space-y-2">
-              <Label htmlFor="contactName">{t('form.contactName.label')}</Label>
-              <Input
-                id="contactName"
-                placeholder={t('form.contactName.placeholder')}
-                {...register('contactName')}
-                aria-invalid={!!errors.contactName}
-              />
-              {errors.contactName && (
-                <p className="text-destructive text-sm">{errors.contactName.message}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="contactEmail">{t('form.contactEmail.label')}</Label>
-              <Input
-                id="contactEmail"
-                type="email"
-                placeholder={t('form.contactEmail.placeholder')}
-                {...register('contactEmail')}
-                aria-invalid={!!errors.contactEmail}
-              />
-              {errors.contactEmail && (
-                <p className="text-destructive text-sm">{errors.contactEmail.message}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="contactPhone">{t('form.contactPhone.label')}</Label>
-              <Input
-                id="contactPhone"
-                type="tel"
-                placeholder={t('form.contactPhone.placeholder')}
-                {...register('contactPhone')}
-                aria-invalid={!!errors.contactPhone}
-              />
-              {errors.contactPhone && (
-                <p className="text-destructive text-sm">{errors.contactPhone.message}</p>
-              )}
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="address">{t('form.address.label')}</Label>
-            <Input
-              id="address"
-              placeholder={t('form.address.placeholder')}
-              {...register('address')}
-              aria-invalid={!!errors.address}
-            />
-            {errors.address && <p className="text-destructive text-sm">{errors.address.message}</p>}
-          </div>
-        </CardContent>
-      </Card>
+      <OrgContactCard
+        register={register as unknown as UseFormRegister<CreateOrganizationInput>}
+        errors={errors as unknown as FieldErrors<CreateOrganizationInput>}
+        tNamespace="superAdmin.editOrganization"
+        titleKey="contact"
+        gridLayout
+      />
 
       {error && (
         <div className="bg-destructive/10 border-destructive/20 rounded-md border p-4">

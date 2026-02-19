@@ -1,10 +1,5 @@
 import type { Country } from '@prisma/client'
 
-export type UpdateProfileInput = {
-  name: string
-  email: string
-}
-
 export type ChangePasswordInput = {
   currentPassword: string
   newPassword: string

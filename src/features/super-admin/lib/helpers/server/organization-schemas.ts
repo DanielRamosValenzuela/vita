@@ -1,7 +1,6 @@
 import {
   createChangeOrganizationStatusSchema,
   createDeleteOrganizationSchema,
-  createOrganizationFiltersSchema,
   createOrganizationSchema,
   createUpdateOrganizationSchema,
 } from '../../schemas/organization-schema'
@@ -25,8 +24,4 @@ export async function getChangeOrganizationStatusSchema(locale: string) {
 export async function getDeleteOrganizationSchema(locale: string) {
   const messages = await getOrganizationValidationMessages(locale)
   return createDeleteOrganizationSchema(messages)
-}
-
-export function getOrganizationFiltersSchema() {
-  return createOrganizationFiltersSchema()
 }

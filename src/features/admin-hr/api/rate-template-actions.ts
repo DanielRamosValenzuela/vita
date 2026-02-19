@@ -35,50 +35,6 @@ export interface RateTemplateWithComponents {
   _count?: { contracts: number }
 }
 
-export const getRateTemplatesAction = async (): Promise<
-  ActionResult<RateTemplateWithComponents[]>
-> => {
-  try {
-    const session = await requireAdminHRWithOrg()
-
-    const templates = await prisma.rateTemplate.findMany({
-      where: { organizationId: session.organizationId },
-      orderBy: { createdAt: 'desc' },
-      include: {
-        components: {
-          orderBy: { order: 'asc' },
-          include: {
-            applicableShiftTypes: {
-              include: {
-                shiftType: {
-                  select: {
-                    id: true,
-                    name: true,
-                    color: true,
-                    icon: true,
-                  },
-                },
-              },
-            },
-          },
-        },
-        _count: { select: { contracts: true } },
-      },
-    })
-
-    return {
-      success: true,
-      data: templates,
-    }
-  } catch (error) {
-    return handleActionError(
-      error,
-      'getRateTemplatesAction',
-      'Error al obtener plantillas de tarifa'
-    )
-  }
-}
-
 export const createRateTemplateAction = async (data: {
   name: string
   description?: string
@@ -278,6 +234,85 @@ export const updateRateTemplateAction = async (
   }
 }
 
+export const duplicateRateTemplateAction = async (
+  id: string,
+  newName: string
+): Promise<ActionResult<RateTemplateWithComponents>> => {
+  try {
+    const session = await requireAdminHRWithOrg()
+
+    const original = await prisma.rateTemplate.findUnique({
+      where: { id },
+      include: {
+        components: {
+          orderBy: { order: 'asc' },
+          include: {
+            applicableShiftTypes: true,
+          },
+        },
+      },
+    })
+
+    if (!original)
+      return { success: false, error: 'Tarifa no encontrada' }
+
+    if (original.organizationId !== session.organizationId)
+      return { success: false, error: 'La tarifa no pertenece a tu organización' }
+
+    const duplicate = await prisma.rateTemplate.create({
+      data: {
+        name: newName,
+        description: original.description,
+        organizationId: session.organizationId,
+        components: {
+          create: original.components.map((comp, index) => ({
+            type: comp.type,
+            customName: comp.customName,
+            value: comp.value,
+            unit: comp.unit,
+            applyCondition: comp.applyCondition,
+            conditionValue: comp.conditionValue,
+            description: comp.description,
+            order: comp.order ?? index,
+            applicableShiftTypes: comp.applicableShiftTypes.length > 0
+              ? {
+                  create: comp.applicableShiftTypes.map((st) => ({
+                    shiftTypeId: st.shiftTypeId,
+                  })),
+                }
+              : undefined,
+          })),
+        },
+      },
+      include: {
+        components: {
+          orderBy: { order: 'asc' },
+          include: {
+            applicableShiftTypes: {
+              include: {
+                shiftType: {
+                  select: { id: true, name: true, color: true, icon: true },
+                },
+              },
+            },
+          },
+        },
+        _count: { select: { contracts: true } },
+      },
+    })
+
+    revalidatePaths(...RATES_PATHS)
+
+    return {
+      success: true,
+      data: duplicate,
+      message: 'Tarifa duplicada exitosamente',
+    }
+  } catch (error) {
+    return handleActionError(error, 'duplicateRateTemplateAction', 'Error al duplicar tarifa')
+  }
+}
+
 export const deleteRateTemplateAction = async (id: string): Promise<ActionResult<null>> => {
   try {
     const session = await requireAdminHRWithOrg()
@@ -322,116 +357,3 @@ export const deleteRateTemplateAction = async (id: string): Promise<ActionResult
   }
 }
 
-export const duplicateRateTemplateAction = async (
-  id: string,
-  newName: string
-): Promise<ActionResult<RateTemplateWithComponents>> => {
-  try {
-    const session = await requireAdminHRWithOrg()
-
-    const existing = await prisma.rateTemplate.findUnique({
-      where: { id },
-      include: { components: true },
-    })
-
-    if (!existing)
-      return {
-        success: false,
-        error: 'Tarifa no encontrada',
-      }
-
-    if (existing.organizationId !== session.organizationId)
-      return {
-        success: false,
-        error: 'La tarifa no pertenece a tu organización',
-      }
-
-    const duplicate = await prisma.rateTemplate.findFirst({
-      where: {
-        name: newName,
-        organizationId: session.organizationId,
-      },
-    })
-
-    if (duplicate)
-      return {
-        success: false,
-        error: 'Ya existe una tarifa con ese nombre',
-      }
-
-    const existingWithRelations = await prisma.rateTemplate.findUnique({
-      where: { id },
-      include: {
-        components: {
-          include: {
-            applicableShiftTypes: true,
-          },
-        },
-      },
-    })
-
-    if (!existingWithRelations)
-      return {
-        success: false,
-        error: 'Tarifa no encontrada',
-      }
-
-    const newTemplate = await prisma.rateTemplate.create({
-      data: {
-        name: newName,
-        description: existingWithRelations.description,
-        organizationId: session.organizationId,
-        components: {
-          create: existingWithRelations.components.map((comp) => ({
-            type: comp.type,
-            customName: comp.customName,
-            value: comp.value,
-            unit: comp.unit,
-            applyCondition: comp.applyCondition,
-            conditionValue: comp.conditionValue,
-            description: comp.description,
-            order: comp.order,
-            applicableShiftTypes:
-              comp.applicableShiftTypes.length > 0
-                ? {
-                    create: comp.applicableShiftTypes.map((ast) => ({
-                      shiftTypeId: ast.shiftTypeId,
-                    })),
-                  }
-                : undefined,
-          })),
-        },
-      },
-      include: {
-        components: {
-          orderBy: { order: 'asc' },
-          include: {
-            applicableShiftTypes: {
-              include: {
-                shiftType: {
-                  select: {
-                    id: true,
-                    name: true,
-                    color: true,
-                    icon: true,
-                  },
-                },
-              },
-            },
-          },
-        },
-        _count: { select: { contracts: true } },
-      },
-    })
-
-    revalidatePaths(...RATES_PATHS)
-
-    return {
-      success: true,
-      data: newTemplate,
-      message: 'Tarifa duplicada exitosamente',
-    }
-  } catch (error) {
-    return handleActionError(error, 'duplicateRateTemplateAction', 'Error al duplicar tarifa')
-  }
-}
