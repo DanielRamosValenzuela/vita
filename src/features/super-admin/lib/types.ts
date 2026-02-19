@@ -1,6 +1,5 @@
 import {
   Country,
-  DocType,
   type Organization,
   type OrganizationPlan,
   type OrganizationStatus,
@@ -78,16 +77,6 @@ export type ChangeOrganizationStatusInput = {
 export type DeleteOrganizationInput = {
   id: string
   reason: string
-}
-
-export type CreateAdminHRUserInput = {
-  name: string
-  email: string
-  password: string
-  country?: Country
-  docType?: DocType
-  docNumber?: string
-  organizationId: string
 }
 
 export type UpdateAdminHRUserInput = {
