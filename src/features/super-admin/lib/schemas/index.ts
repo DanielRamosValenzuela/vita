@@ -3,7 +3,6 @@ export type {
   UpdateOrganizationInput,
   ChangeOrganizationStatusInput,
   DeleteOrganizationInput,
-  CreateAdminHRUserInput,
   UpdateAdminHRUserInput,
 } from '../types'
 export { PLAN_LIMITS } from '../constants'

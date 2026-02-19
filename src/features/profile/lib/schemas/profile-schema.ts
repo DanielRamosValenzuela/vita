@@ -21,18 +21,6 @@ export interface ProfileValidationMessages {
   }
 }
 
-export function createUpdateProfileSchema(messages: ProfileValidationMessages) {
-  return z.object({
-    name: z.string().min(2, messages.name.minLength).max(100, messages.name.maxLength).trim(),
-    email: z
-      .string()
-      .min(1, messages.email.required)
-      .email(messages.email.invalid)
-      .toLowerCase()
-      .trim(),
-  })
-}
-
 export function createChangePasswordSchema(messages: ProfileValidationMessages) {
   return z
     .object({

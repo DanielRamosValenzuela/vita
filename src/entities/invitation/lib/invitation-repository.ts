@@ -17,35 +17,6 @@ interface InvitationWithUser extends OrganizationInvitation {
   }
 }
 
-export async function getAllInvitationsForOrganization(
-  organizationId: string,
-  role?: Role
-): Promise<InvitationWithUser[]> {
-  return await prisma.organizationInvitation.findMany({
-    where: {
-      organizationId,
-      role: role || undefined,
-    },
-    include: {
-      user: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          docNumber: true,
-        },
-      },
-      organization: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
-    },
-    orderBy: { createdAt: 'desc' },
-  })
-}
-
 export async function getPendingInvitationsForOrganization(
   organizationId: string,
   role?: Role

@@ -14,7 +14,7 @@ interface AreaShapeForState {
   }>
 }
 
-export interface AreaFormState {
+interface AreaFormState {
   name: string
   description: string
   icon: string
