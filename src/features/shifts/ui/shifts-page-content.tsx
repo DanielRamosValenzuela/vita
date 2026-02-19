@@ -56,7 +56,7 @@ export function ShiftsPageContent({
   shiftTypes,
 }: ShiftsPageContentProps) {
   const t = useTranslations('shifts')
-  const [shifts, setShifts] = useState<ShiftWithRelations[]>(initialShifts)
+  const [shifts, setShifts] = useState<ShiftWithRelations[]>(() => initialShifts)
   const [selectedAreaId, setSelectedAreaId] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 

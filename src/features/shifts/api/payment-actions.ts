@@ -133,7 +133,7 @@ function mapComponents(
   }))
 }
 
-export async function calculateShiftPaymentAction(
+async function calculateShiftPaymentAction(
   shiftId: string
 ): Promise<ActionResult<ShiftPaymentResult>> {
   try {
