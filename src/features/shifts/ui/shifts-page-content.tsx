@@ -4,7 +4,19 @@ import { useMemo, useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 import type { ShiftStatus } from '@prisma/client'
 import { endOfMonth, format, startOfMonth } from 'date-fns'
+import { CalendarDays } from 'lucide-react'
+import { toast } from 'sonner'
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/src/shared/ui/alert-dialog'
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/src/shared/ui/card'
@@ -17,7 +29,9 @@ import {
   TableRow,
 } from '@/src/shared/ui/table'
 
-import { getShiftsAction } from '../api/shift-actions'
+import { useRouter } from '@/i18n/navigation'
+
+import { deleteShiftAction, getShiftsAction } from '../api/shift-actions'
 import type { ShiftWithRelations } from '../types/shift-types'
 import { AreaSwitcher } from './area-switcher'
 import { ShiftCalendar } from './shift-calendar'
@@ -56,9 +70,15 @@ export function ShiftsPageContent({
   shiftTypes,
 }: ShiftsPageContentProps) {
   const t = useTranslations('shifts')
+  const tToast = useTranslations()
+  const router = useRouter()
   const [shifts, setShifts] = useState<ShiftWithRelations[]>(() => initialShifts)
   const [selectedAreaId, setSelectedAreaId] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [editingShift, setEditingShift] = useState<ShiftWithRelations | null>(null)
+  const [shiftToDelete, setShiftToDelete] = useState<ShiftWithRelations | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   const calendarShifts = useMemo(
     () =>
@@ -178,6 +198,39 @@ export function ShiftsPageContent({
     fetchShifts({ monthDate: month, ...currentFilters })
   }
 
+  const handleShiftClick = (calendarEvent: { id: string }) => {
+    const fullShift = shifts.find((s) => s.id === calendarEvent.id)
+    if (fullShift) {
+      setEditingShift(fullShift)
+      setDialogOpen(true)
+    }
+  }
+
+  const handleShiftDeleteClick = (calendarEvent: { id: string }) => {
+    const fullShift = shifts.find((s) => s.id === calendarEvent.id)
+    if (fullShift) setShiftToDelete(fullShift)
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (!shiftToDelete) return
+    setIsDeleting(true)
+    try {
+      const result = await deleteShiftAction(shiftToDelete.id)
+      if (result.success) {
+        toast.success(tToast('toast.shifts.deleted'))
+        setShiftToDelete(null)
+        router.refresh()
+        fetchShifts({ ...currentFilters })
+      } else {
+        toast.error(result.error || tToast('toast.shifts.errorDeleting'))
+      }
+    } catch {
+      toast.error(tToast('toast.shifts.errorDeleting'))
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
   const getStatusColor = (status: ShiftStatus) => {
     switch (status) {
       case 'SCHEDULED':
@@ -220,13 +273,55 @@ export function ShiftsPageContent({
           <p className="text-muted-foreground mt-2">{t('description')}</p>
         </div>
 
+        <Button
+          type="button"
+          onClick={() => {
+            setEditingShift(null)
+            setDialogOpen(true)
+          }}
+        >
+          <CalendarDays className="mr-2 h-4 w-4" />
+          {t('newShift')}
+        </Button>
         <ShiftFormDialog
           organizationId={organizationId}
           users={formUsers}
           areas={formAreas}
           shiftTypes={shiftTypes}
           initialAreaId={selectedAreaId}
+          open={dialogOpen}
+          onOpenChange={(open) => {
+            setDialogOpen(open)
+            if (!open) setEditingShift(null)
+          }}
+          editingShift={editingShift}
+          onSuccess={() => fetchShifts({ ...currentFilters })}
         />
+        <AlertDialog
+          open={!!shiftToDelete}
+          onOpenChange={(open) => !open && setShiftToDelete(null)}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>{t('deleteConfirm.title')}</AlertDialogTitle>
+              <AlertDialogDescription>
+                {t('deleteConfirm.description')}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={isDeleting}>
+                {t('form.cancel')}
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleDeleteConfirm}
+                disabled={isDeleting}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                {isDeleting ? t('form.saving') : t('deleteConfirm.action')}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
 
       <AreaSwitcher
@@ -292,7 +387,12 @@ export function ShiftsPageContent({
       </Card>
 
       <div className="space-y-6">
-        <ShiftCalendar shifts={calendarShifts} onMonthChange={handleMonthChange} />
+        <ShiftCalendar
+          shifts={calendarShifts}
+          onMonthChange={handleMonthChange}
+          onShiftClick={handleShiftClick}
+          onShiftDelete={handleShiftDeleteClick}
+        />
 
         <Card>
           <CardHeader>

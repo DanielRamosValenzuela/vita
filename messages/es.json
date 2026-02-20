@@ -394,6 +394,11 @@
       "allAreas": "Todas las áreas",
       "noAreas": "Sin áreas asignadas"
     },
+    "deleteConfirm": {
+      "title": "¿Eliminar turno?",
+      "description": "Se eliminará este turno. Esta acción no se puede deshacer.",
+      "action": "Eliminar"
+    },
     "shiftTypes": {
       "title": "Tipos de Turno",
       "description": "Gestiona los tipos de turnos disponibles en tu organización",

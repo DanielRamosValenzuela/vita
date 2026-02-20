@@ -127,7 +127,8 @@ export function ShiftForm({
 
     try {
       const [startHour, startMinute] = startTime.split(':').map(Number)
-      const startDateTime = new Date(startDate)
+      const startDateObj = startDate instanceof Date ? startDate : new Date(startDate)
+      const startDateTime = new Date(startDateObj)
       startDateTime.setHours(startHour, startMinute, 0, 0)
 
       const endDateTime = addMinutes(startDateTime, selectedShiftType.durationMinutes)
@@ -346,11 +347,14 @@ export function ShiftForm({
             value={
               (() => {
                 const endDate = form.watch('endDate')
-                return endDate
-                  ? formatDateLong(new Date(endDate), locale)
-                  : selectedShiftType
+                if (!endDate) {
+                  return selectedShiftType
                     ? t('endDate.calculated')
                     : t('endDate.selectShiftType')
+                }
+                const [year, month, day] = endDate.split('-').map(Number)
+                const endDateObj = new Date(year, month - 1, day)
+                return formatDateLong(endDateObj, locale)
               })()
             }
             disabled

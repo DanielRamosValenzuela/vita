@@ -13,7 +13,7 @@ import {
   subMonths,
 } from 'date-fns'
 import { enUS, es } from 'date-fns/locale'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Minus } from 'lucide-react'
 
 import holidaysClSample from '@/src/shared/lib/constants/holidays-cl-sample.json'
 import type { BoostrHolidaysResponse } from '@/src/shared/lib/types/holidays'
@@ -40,6 +40,7 @@ interface ShiftCalendarProps {
   shifts: CalendarEvent[]
   onDateSelect?: (date: Date) => void
   onShiftClick?: (shift: CalendarEvent) => void
+  onShiftDelete?: (shift: CalendarEvent) => void
   onMonthChange?: (month: Date) => void
   selectedDate?: Date
 }
@@ -48,23 +49,24 @@ interface ShiftCalendarDayCellProps {
   date: Date
   shifts: CalendarEvent[]
   onShiftClick?: (shift: CalendarEvent) => void
-  moreLabel: string
+  onShiftDelete?: (shift: CalendarEvent) => void
 }
 
 function ShiftCalendarDayCell({
   date,
   shifts,
   onShiftClick,
-  moreLabel,
+  onShiftDelete,
 }: ShiftCalendarDayCellProps) {
+  const t = useTranslations('shifts')
   const dayShifts = shifts
   const formattedDay = format(date, 'd')
 
   if (dayShifts.length === 0)
     return (
-      <div className="relative h-full w-full">
-        <div className="text-sm p-1 h-full">
-          <div className="font-medium">{formattedDay}</div>
+      <div className="relative flex h-full w-full flex-col">
+        <div className="shrink-0 p-0.5">
+          <div className="text-sm font-medium">{formattedDay}</div>
         </div>
       </div>
     )
@@ -72,27 +74,45 @@ function ShiftCalendarDayCell({
   const now = new Date()
 
   return (
-    <div className="relative h-full w-full">
-      <div className="text-sm p-1 h-full">
-        <div className="font-medium">{formattedDay}</div>
+    <div className="relative flex h-full w-full flex-col">
+      <div className="shrink-0 p-0.5">
+        <div className="text-sm font-medium">{formattedDay}</div>
+      </div>
 
-        <div className="space-y-0.5 mt-0.5">
-          {dayShifts.slice(0, 3).map((shift) => {
-            const isPast = new Date(shift.endTime) < now
-            const opacity = isPast ? 0.45 : 1
+      <div className="flex min-h-0 flex-1 flex-col gap-0.5 p-0.5 pt-0">
+        {dayShifts.map((shift) => {
+          const isPast = new Date(shift.endTime) < now
+          const opacity = isPast ? 0.45 : 1
 
-            return (
-              <Tooltip key={shift.id}>
+          return (
+            <div
+              key={shift.id}
+              className="flex min-h-0 flex-1 items-stretch gap-0.5 overflow-hidden rounded"
+              style={{
+                backgroundColor: shift.color + (isPast ? '30' : '20'),
+                borderLeft: `3px solid ${shift.color}`,
+                opacity,
+              }}
+            >
+              {onShiftDelete && (
+                <button
+                  type="button"
+                  className="flex shrink-0 items-center justify-center rounded-l p-0.5 text-muted-foreground/70 hover:bg-black/10 hover:text-foreground focus:outline-none focus:ring-1 focus:ring-inset focus:ring-muted-foreground"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onShiftDelete(shift)
+                  }}
+                  aria-label={t('deleteConfirm.action')}
+                >
+                  <Minus className="h-3 w-3" />
+                </button>
+              )}
+              <Tooltip>
                 <TooltipTrigger asChild>
                   <button
                     type="button"
-                    className="text-[10px] leading-tight px-1 py-0.5 rounded cursor-pointer hover:opacity-80 truncate flex items-center gap-0.5 w-full text-left"
-                    style={{
-                      backgroundColor: shift.color + (isPast ? '30' : '20'),
-                      borderLeft: `3px solid ${shift.color}`,
-                      color: shift.color,
-                      opacity,
-                    }}
+                    className="flex min-w-0 flex-1 flex-col items-stretch justify-center gap-0 px-1 py-1 text-left text-[10px] leading-tight cursor-pointer hover:opacity-80 overflow-hidden"
+                    style={{ color: shift.color }}
                     onClick={(event) => {
                       event.stopPropagation()
                       onShiftClick?.(shift)
@@ -111,15 +131,9 @@ function ShiftCalendarDayCell({
                   {shift.title && <p className="text-muted-foreground">{shift.title}</p>}
                 </TooltipContent>
               </Tooltip>
-            )
-          })}
-
-          {dayShifts.length > 3 && (
-            <div className="text-[10px] text-muted-foreground text-center">
-              +{dayShifts.length - 3} {moreLabel}
             </div>
-          )}
-        </div>
+          )
+        })}
       </div>
     </div>
   )
@@ -129,6 +143,7 @@ export function ShiftCalendar({
   shifts,
   onDateSelect,
   onShiftClick,
+  onShiftDelete,
   onMonthChange,
   selectedDate,
 }: ShiftCalendarProps) {
@@ -273,7 +288,7 @@ export function ShiftCalendar({
                               date={date}
                               shifts={getEventsForDay(date)}
                               onShiftClick={onShiftClick}
-                              moreLabel={t('more')}
+                              onShiftDelete={onShiftDelete}
                             />
                           </div>
                         </td>

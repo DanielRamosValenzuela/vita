@@ -203,6 +203,216 @@ export const createShiftAction = async (
   }
 }
 
+const updateShiftSchema = createShiftSchema
+
+export const updateShiftAction = async (
+  shiftId: string,
+  data: z.infer<typeof updateShiftSchema>
+): Promise<ActionResult<ShiftWithRelations>> => {
+  try {
+    const session = await requireAdminHROrChiefArea()
+
+    let derivedOrgId: string | null = session.organizationId ?? null
+    if (isChiefArea(session) && !derivedOrgId) {
+      const firstArea = await prisma.userArea.findFirst({
+        where: { userId: session.id },
+        select: { area: { select: { organizationId: true } } },
+      })
+      derivedOrgId = firstArea?.area?.organizationId ?? null
+    }
+    if (!derivedOrgId)
+      return { success: false, error: 'No tienes una organización asignada' }
+    const organizationId = derivedOrgId
+
+    const existing = await prisma.shift.findFirst({
+      where: { id: shiftId, organizationId },
+      include: { user: true, area: true, shiftType: true },
+    })
+    if (!existing)
+      return { success: false, error: 'Turno no encontrado' }
+
+    if (isChiefArea(session)) {
+      const chiefArea = await prisma.userArea.findFirst({
+        where: { userId: session.id, areaId: existing.areaId },
+      })
+      if (!chiefArea)
+        return {
+          success: false,
+          error: 'Solo puedes editar turnos de las áreas que tienes asignadas',
+        }
+    }
+
+    const validatedData = updateShiftSchema.parse(data)
+
+    if (isChiefArea(session)) {
+      const chiefArea = await prisma.userArea.findFirst({
+        where: { userId: session.id, areaId: validatedData.areaId },
+      })
+      if (!chiefArea)
+        return {
+          success: false,
+          error: 'Solo puedes asignar turnos en las áreas que tienes asignadas',
+        }
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: validatedData.userId },
+      select: { organizationId: true },
+    })
+    if (!user || user.organizationId !== organizationId)
+      return { success: false, error: 'El usuario no pertenece a tu organización' }
+
+    const conflictCheck = await checkShiftConflicts(
+      validatedData.userId,
+      validatedData.areaId,
+      validatedData.startTime,
+      validatedData.endTime,
+      shiftId
+    )
+    if (conflictCheck.hasConflict)
+      return { success: false, error: conflictCheck.message }
+
+    const area = await prisma.area.findUnique({
+      where: { id: validatedData.areaId, organizationId },
+    })
+    if (!area)
+      return { success: false, error: 'El área no pertenece a tu organización' }
+
+    const shiftType = await prisma.shiftType.findUnique({
+      where: { id: validatedData.shiftTypeId, organizationId },
+    })
+    if (!shiftType)
+      return { success: false, error: 'El tipo de turno no pertenece a tu organización' }
+
+    if (!shiftType.isGlobal) {
+      const areaShiftType = await prisma.areaShiftType.findUnique({
+        where: {
+          areaId_shiftTypeId: {
+            areaId: validatedData.areaId,
+            shiftTypeId: validatedData.shiftTypeId,
+          },
+        },
+      })
+      if (!areaShiftType)
+        return {
+          success: false,
+          error: 'El tipo de turno no está asignado a esta área',
+        }
+    }
+
+    const activeContract = await prisma.contract.findFirst({
+      where: {
+        userId: validatedData.userId,
+        organizationId,
+        isActive: true,
+        OR: [{ areaId: validatedData.areaId }, { areaId: null }],
+      },
+      orderBy: [{ areaId: 'desc' }, { startDate: 'desc' }],
+    })
+
+    const shift = await prisma.shift.update({
+      where: { id: shiftId },
+      data: {
+        title: validatedData.title ?? null,
+        userId: validatedData.userId,
+        areaId: validatedData.areaId,
+        shiftTypeId: validatedData.shiftTypeId,
+        startTime: validatedData.startTime,
+        endTime: validatedData.endTime,
+        notes: validatedData.notes ?? null,
+        contractId: activeContract?.id ?? undefined,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+          },
+        },
+        area: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+          },
+        },
+        shiftType: {
+          select: {
+            id: true,
+            name: true,
+            color: true,
+            icon: true,
+          },
+        },
+      },
+    })
+
+    revalidatePath('/dashboard/shifts')
+    revalidatePath('/dashboard/shifts/calendar')
+    return {
+      success: true,
+      data: shift,
+      message: 'Turno actualizado',
+    }
+  } catch (error) {
+    console.error('[updateShiftAction] Error:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Error al actualizar turno',
+    }
+  }
+}
+
+export const deleteShiftAction = async (
+  shiftId: string
+): Promise<ActionResult<null>> => {
+  try {
+    const session = await requireAdminHROrChiefArea()
+
+    let derivedOrgId: string | null = session.organizationId ?? null
+    if (isChiefArea(session) && !derivedOrgId) {
+      const firstArea = await prisma.userArea.findFirst({
+        where: { userId: session.id },
+        select: { area: { select: { organizationId: true } } },
+      })
+      derivedOrgId = firstArea?.area?.organizationId ?? null
+    }
+    if (!derivedOrgId)
+      return { success: false, error: 'No tienes una organización asignada' }
+
+    const existing = await prisma.shift.findFirst({
+      where: { id: shiftId, organizationId: derivedOrgId },
+    })
+    if (!existing)
+      return { success: false, error: 'Turno no encontrado' }
+
+    if (isChiefArea(session)) {
+      const chiefArea = await prisma.userArea.findFirst({
+        where: { userId: session.id, areaId: existing.areaId },
+      })
+      if (!chiefArea)
+        return {
+          success: false,
+          error: 'Solo puedes eliminar turnos de las áreas que tienes asignadas',
+        }
+    }
+
+    await prisma.shift.delete({ where: { id: shiftId } })
+
+    revalidatePath('/dashboard/shifts')
+    revalidatePath('/dashboard/shifts/calendar')
+    return { success: true, data: null, message: 'Turno eliminado' }
+  } catch (error) {
+    console.error('[deleteShiftAction] Error:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Error al eliminar turno',
+    }
+  }
+}
+
 export const getShiftsAction = async (
   params: GetShiftsParams
 ): Promise<ActionResult<GetShiftsResult>> => {

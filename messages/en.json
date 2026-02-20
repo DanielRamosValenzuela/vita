@@ -394,6 +394,11 @@
       "allAreas": "All areas",
       "noAreas": "No assigned areas"
     },
+    "deleteConfirm": {
+      "title": "Delete shift?",
+      "description": "This shift will be removed. This action cannot be undone.",
+      "action": "Delete"
+    },
     "shiftTypes": {
       "title": "Shift Types",
       "description": "Manage shift types available in your organization",
