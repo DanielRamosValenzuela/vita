@@ -3,9 +3,9 @@
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Loader2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 
+import { Spinner } from '@/src/shared/ui/atoms'
 import { useFormAction } from '@/src/shared/hooks'
 import { AREA_ICONS } from '@/src/shared/lib/constants'
 import { Button } from '@/src/shared/ui/button'
@@ -146,7 +146,7 @@ export function CreateAreaForm() {
 
           <div className="flex gap-4">
             <Button type="submit" disabled={isPending} className="flex-1">
-              {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isPending && <Spinner size="sm" className="mr-2" />}
               {t('create')}
             </Button>
             <Button type="button" variant="outline" onClick={() => router.push('/dashboard/areas')}>

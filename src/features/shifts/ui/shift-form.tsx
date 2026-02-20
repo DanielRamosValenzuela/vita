@@ -1,16 +1,15 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { format } from 'date-fns'
-import { CalendarIcon, Clock } from 'lucide-react'
+import { addMinutes, format } from 'date-fns'
+import { CalendarIcon, Clock, Search } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
 import { Button } from '@/src/shared/ui/button'
 import { Calendar } from '@/src/shared/ui/calendar'
-import { Checkbox } from '@/src/shared/ui/checkbox'
 import { Input } from '@/src/shared/ui/input'
 import { Label } from '@/src/shared/ui/label'
 import { Popover, PopoverContent, PopoverTrigger } from '@/src/shared/ui/popover'
@@ -24,6 +23,7 @@ import {
 import { Textarea } from '@/src/shared/ui/textarea'
 
 import { checkShiftConflictsClient } from '@/src/entities/shift/lib/shift-validation-client'
+import { formatDateLong } from '@/src/shared/lib/utils/format'
 
 import { createShiftSchema, type ShiftFormData } from '../lib/shift-form-schemas'
 import type { CreateShiftData, CreateShiftFormData } from '../types/shift-types'
@@ -32,6 +32,7 @@ export type ShiftTypeOption = {
   id: string
   name: string
   color: string
+  durationMinutes: number
   isGlobal?: boolean
   areaShiftTypes?: Array<{ areaId: string; isActive: boolean }>
 }
@@ -59,6 +60,7 @@ export function ShiftForm({
 }: ShiftFormProps) {
   const t = useTranslations('shifts.form')
   const tValidation = useTranslations('shifts.validation')
+  const locale = useLocale() as 'es' | 'en'
   const [isCheckingConflicts, setIsCheckingConflicts] = useState(false)
 
   const shiftSchema = useMemo(
@@ -69,7 +71,11 @@ export function ShiftForm({
   const form = useForm<ShiftFormData>({
     resolver: zodResolver(shiftSchema),
     defaultValues: {
-      title: initialData?.title || '',
+      title:
+        initialData?.title ||
+        (initialData?.shiftTypeId
+          ? shiftTypes.find((st) => st.id === initialData.shiftTypeId)?.name ?? ''
+          : ''),
       userId: initialData?.userId || '',
       areaId: initialData?.areaId || '',
       shiftTypeId: initialData?.shiftTypeId || '',
@@ -82,6 +88,17 @@ export function ShiftForm({
   })
 
   const areaId = form.watch('areaId')
+  const shiftTypeId = form.watch('shiftTypeId')
+  const startDate = form.watch('startDate')
+  const startTime = form.watch('startTime')
+  const [userSearchQuery, setUserSearchQuery] = useState('')
+  const [userPopoverOpen, setUserPopoverOpen] = useState(false)
+
+  const selectedShiftType = useMemo(
+    () => shiftTypes.find((st) => st.id === shiftTypeId),
+    [shiftTypes, shiftTypeId]
+  )
+
   const availableShiftTypes = useMemo(() => {
     if (!areaId) return shiftTypes
     return shiftTypes.filter(
@@ -91,10 +108,41 @@ export function ShiftForm({
 
   const availableUsers = useMemo(() => {
     if (!areaId) return []
-    return users.filter(
+    const filtered = users.filter(
       (u) => u.role !== 'STAFF_HEALTH' || (Array.isArray(u.areaIds) && u.areaIds.includes(areaId))
     )
-  }, [users, areaId])
+    if (!userSearchQuery.trim()) return filtered
+    const q = userSearchQuery.trim().toLowerCase()
+    return filtered.filter((u) => u.name.toLowerCase().includes(q))
+  }, [users, areaId, userSearchQuery])
+
+  useEffect(() => {
+    if (!selectedShiftType || !startDate || !startTime) {
+      if (!selectedShiftType) {
+        form.setValue('endDate', undefined)
+        form.setValue('endTime', '17:00')
+      }
+      return
+    }
+
+    try {
+      const [startHour, startMinute] = startTime.split(':').map(Number)
+      const startDateTime = new Date(startDate)
+      startDateTime.setHours(startHour, startMinute, 0, 0)
+
+      const endDateTime = addMinutes(startDateTime, selectedShiftType.durationMinutes)
+      const endDateStr = format(endDateTime, 'yyyy-MM-dd')
+      const endTimeStr = format(endDateTime, 'HH:mm')
+
+      const currentEndDate = form.getValues('endDate')
+      const currentEndTime = form.getValues('endTime')
+
+      if (currentEndDate !== endDateStr) form.setValue('endDate', endDateStr)
+      if (currentEndTime !== endTimeStr) form.setValue('endTime', endTimeStr)
+    } catch (error) {
+      console.error('Error calculating end date/time:', error)
+    }
+  }, [selectedShiftType, startDate, startTime, form])
 
   useEffect(() => {
     const currentId = form.getValues('shiftTypeId')
@@ -108,6 +156,13 @@ export function ShiftForm({
       form.setValue('userId', '')
   }, [availableUsers, form])
 
+  useEffect(() => {
+    if (!areaId) {
+      form.setValue('userId', '')
+      setUserSearchQuery('')
+    }
+  }, [areaId, form])
+
   const selectedArea = areas.find((area) => area.id === areaId)
 
   const handleSubmit = async (data: CreateShiftFormData) => {
@@ -115,9 +170,9 @@ export function ShiftForm({
     const [startHour, startMinute] = data.startTime.split(':')
     startDateTime.setHours(parseInt(startHour), parseInt(startMinute), 0, 0)
 
-    const endDateTime = data.endDate ? new Date(data.endDate) : new Date(data.startDate)
-    const [endHour, endMinute] = data.endTime.split(':')
-    endDateTime.setHours(parseInt(endHour), parseInt(endMinute), 0, 0)
+    const shiftType = shiftTypes.find((st) => st.id === data.shiftTypeId)
+    if (!shiftType) return
+    const endDateTime = addMinutes(startDateTime, shiftType.durationMinutes)
 
     setIsCheckingConflicts(true)
     try {
@@ -145,27 +200,34 @@ export function ShiftForm({
     <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
       <div className="grid gap-4 md:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="title">{t('title.label')}</Label>
-          <Input id="title" placeholder={t('title.placeholder')} {...form.register('title')} />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="userId">{t('user.label')}</Label>
+          <Label htmlFor="shiftTypeId">{t('shiftType.label')}</Label>
           <Select
-            value={form.watch('userId')}
-            onValueChange={(value) => form.setValue('userId', value)}
+            value={form.watch('shiftTypeId')}
+            onValueChange={(value) => {
+              form.setValue('shiftTypeId', value)
+              const type = shiftTypes.find((st) => st.id === value)
+              if (type) form.setValue('title', type.name)
+            }}
           >
             <SelectTrigger>
-              <SelectValue placeholder={t('user.placeholder')} />
+              <SelectValue placeholder={t('shiftType.placeholder')} />
             </SelectTrigger>
             <SelectContent>
-              {availableUsers.map((user) => (
-                <SelectItem key={user.id} value={user.id}>
-                  {user.name} ({user.role})
+              {availableShiftTypes.map((type) => (
+                <SelectItem key={type.id} value={type.id}>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: type.color }} />
+                    {type.name}
+                  </div>
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="title">{t('title.label')}</Label>
+          <Input id="title" placeholder={t('title.placeholder')} {...form.register('title')} />
         </div>
       </div>
 
@@ -193,25 +255,61 @@ export function ShiftForm({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="shiftTypeId">{t('shiftType.label')}</Label>
-          <Select
-            value={form.watch('shiftTypeId')}
-            onValueChange={(value) => form.setValue('shiftTypeId', value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder={t('shiftType.placeholder')} />
-            </SelectTrigger>
-            <SelectContent>
-              {availableShiftTypes.map((type) => (
-                <SelectItem key={type.id} value={type.id}>
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: type.color }} />
-                    {type.name}
+          <Label htmlFor="userId">{t('user.label')}</Label>
+          <Popover open={userPopoverOpen} onOpenChange={setUserPopoverOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                role="combobox"
+                className="w-full justify-between"
+                disabled={!areaId}
+                type="button"
+              >
+                <span className="truncate">
+                  {form.watch('userId')
+                    ? availableUsers.find((u) => u.id === form.watch('userId'))?.name ||
+                      t('user.placeholder')
+                    : t('user.placeholder')}
+                </span>
+                <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-full p-0" align="start">
+              <div className="flex items-center border-b px-3 py-2">
+                <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+                <Input
+                  placeholder={t('user.search')}
+                  value={userSearchQuery}
+                  onChange={(e) => setUserSearchQuery(e.target.value)}
+                  className="border-0 focus-visible:ring-0"
+                  autoFocus
+                />
+              </div>
+              <div className="max-h-[300px] overflow-y-auto p-1">
+                {availableUsers.length === 0 ? (
+                  <div className="py-6 text-center text-sm text-muted-foreground">
+                    {!areaId ? t('user.selectAreaFirst') : t('user.noUsersFound')}
                   </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+                ) : (
+                  availableUsers.map((user) => (
+                    <Button
+                      key={user.id}
+                      variant="ghost"
+                      className="w-full justify-start font-normal"
+                      onClick={() => {
+                        form.setValue('userId', user.id)
+                        setUserSearchQuery('')
+                        setUserPopoverOpen(false)
+                      }}
+                      type="button"
+                    >
+                      {user.name} ({user.role})
+                    </Button>
+                  ))
+                )}
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
 
@@ -223,7 +321,7 @@ export function ShiftForm({
               <Button variant="outline" className="w-full justify-start text-left font-normal">
                 <CalendarIcon className="mr-2 h-4 w-4" />
                 {form.watch('startDate') ? (
-                  format(form.watch('startDate'), 'PPP')
+                  formatDateLong(new Date(form.watch('startDate')), locale)
                 ) : (
                   <span>{t('date.placeholder')}</span>
                 )}
@@ -241,18 +339,24 @@ export function ShiftForm({
         </div>
 
         <div className="space-y-2">
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="differentEndDate"
-              checked={!!form.watch('endDate')}
-              onCheckedChange={(checked: boolean) =>
-                form.setValue('endDate', checked ? form.watch('startDate').toString() : undefined)
-              }
-            />
-            <Label htmlFor="differentEndDate" className="text-sm font-normal">
-              {t('differentEndDate')}
-            </Label>
-          </div>
+          <Label htmlFor="endDate">{t('endDate.label')}</Label>
+          <Input
+            id="endDate"
+            type="text"
+            value={
+              (() => {
+                const endDate = form.watch('endDate')
+                return endDate
+                  ? formatDateLong(new Date(endDate), locale)
+                  : selectedShiftType
+                    ? t('endDate.calculated')
+                    : t('endDate.selectShiftType')
+              })()
+            }
+            disabled
+            className="bg-muted cursor-not-allowed"
+            aria-label={t('endDate.label')}
+          />
         </div>
       </div>
 
@@ -264,7 +368,14 @@ export function ShiftForm({
 
         <div className="space-y-2">
           <Label htmlFor="endTime">{t('endTime.label')}</Label>
-          <Input id="endTime" type="time" {...form.register('endTime')} />
+          <Input
+            id="endTime"
+            type="time"
+            value={form.watch('endTime')}
+            disabled
+            className="bg-muted cursor-not-allowed"
+            aria-label={t('endTime.label')}
+          />
         </div>
       </div>
 
@@ -287,7 +398,10 @@ export function ShiftForm({
         >
           {t('cancel')}
         </Button>
-        <Button type="submit" disabled={isPending || isCheckingConflicts}>
+        <Button
+          type="submit"
+          disabled={isPending || isCheckingConflicts || !shiftTypeId || !form.watch('userId')}
+        >
           {isPending || isCheckingConflicts ? (
             <>
               <Clock className="mr-2 h-4 w-4 animate-spin" />

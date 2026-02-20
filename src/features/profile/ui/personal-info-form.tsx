@@ -4,10 +4,11 @@ import { useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { format } from 'date-fns'
-import { CalendarIcon, Loader2 } from 'lucide-react'
+import { CalendarIcon } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
+import { Spinner } from '@/src/shared/ui/atoms'
 import { cn } from '@/src/shared/lib/utils'
 import { Button } from '@/src/shared/ui/button'
 import { Calendar } from '@/src/shared/ui/calendar'
@@ -175,7 +176,7 @@ export function PersonalInfoForm({ initialData }: PersonalInfoFormProps) {
           )}
 
           <Button type="submit" disabled={isPending}>
-            {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {isPending && <Spinner size="sm" className="mr-2" />}
             {t('save')}
           </Button>
         </form>

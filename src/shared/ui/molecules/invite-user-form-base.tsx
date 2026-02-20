@@ -3,8 +3,9 @@
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import type { Role } from '@prisma/client'
-import { AlertCircle, CheckCircle2, Loader2, Mail, Search, User } from 'lucide-react'
+import { AlertCircle, CheckCircle2, Mail, Search, User } from 'lucide-react'
 
+import { Spinner } from '@/src/shared/ui/atoms'
 import { formatTaxId, getTaxIdConfig, validateTaxId } from '@/src/shared/lib/utils/tax-id-config'
 import { validateEmail } from '@/src/shared/lib/validation'
 import { Alert, AlertDescription } from '@/src/shared/ui/alert'
@@ -190,7 +191,7 @@ export function InviteUserFormBase({
         >
           {isSearching ? (
             <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <Spinner size="sm" className="mr-2" />
               {t('searching')}
             </>
           ) : (
@@ -272,7 +273,7 @@ export function InviteUserFormBase({
               >
                 {isPending ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <Spinner size="sm" className="mr-2" />
                     {t('inviting')}
                   </>
                 ) : (

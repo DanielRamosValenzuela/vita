@@ -2,14 +2,27 @@
 
 import { useMemo, useState } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
-import { addMonths, format, subMonths } from 'date-fns'
+import {
+  addDays,
+  addMonths,
+  format,
+  isSameDay,
+  isSameMonth,
+  startOfMonth,
+  startOfWeek,
+  subMonths,
+} from 'date-fns'
 import { enUS, es } from 'date-fns/locale'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
+import holidaysClSample from '@/src/shared/lib/constants/holidays-cl-sample.json'
+import type { BoostrHolidaysResponse } from '@/src/shared/lib/types/holidays'
+import { cn } from '@/src/shared/lib/utils'
 import { Button } from '@/src/shared/ui/button'
-import { Calendar } from '@/src/shared/ui/calendar'
 import { Card, CardContent, CardHeader, CardTitle } from '@/src/shared/ui/card'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/src/shared/ui/tooltip'
+
+const LEGEND_SEP = '\u00B7'
 
 interface CalendarEvent {
   id: string
@@ -145,6 +158,12 @@ export function ShiftCalendar({
     return Array.from(seen.values())
   }, [shifts])
 
+  const holidayDatesSet = useMemo(() => {
+    const data = (holidaysClSample as BoostrHolidaysResponse).data
+    const year = currentMonth.getFullYear()
+    return new Set(data.filter((h) => h.date.startsWith(String(year))).map((h) => h.date))
+  }, [currentMonth])
+
   const getEventsForDay = (date: Date) => {
     const dateKey = format(date, 'yyyy-MM-dd')
     return shiftsByDay[dateKey] || []
@@ -166,9 +185,24 @@ export function ShiftCalendar({
     return monthStr.charAt(0).toUpperCase() + monthStr.slice(1)
   }
 
+  const calendarDays = useMemo(() => {
+    const first = startOfWeek(startOfMonth(currentMonth), { locale: dateLocale })
+    return Array.from({ length: 42 }, (_, i) => addDays(first, i))
+  }, [currentMonth, dateLocale])
+
+  const weekDays = useMemo(() => {
+    return Array.from({ length: 7 }, (_, i) =>
+      format(addDays(startOfWeek(new Date(), { locale: dateLocale }), i), 'EEEEEE', {
+        locale: dateLocale,
+      })
+    )
+  }, [dateLocale])
+
+  const today = new Date()
+
   return (
     <TooltipProvider delayDuration={200}>
-      <Card>
+      <Card className="w-full">
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg">{formatMonthTitle(currentMonth)}</CardTitle>
@@ -182,68 +216,103 @@ export function ShiftCalendar({
             </div>
           </div>
         </CardHeader>
-        <CardContent>
-          <Calendar
-            mode="single"
-            selected={selectedDate}
-            onSelect={(date) => date && onDateSelect?.(date)}
-            month={currentMonth}
-            onMonthChange={(month) => {
-              setCurrentMonth(month)
-              onMonthChange?.(month)
-            }}
-            locale={dateLocale}
-            className="rounded-md border"
-            required={false}
-            classNames={{
-              months: 'flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0',
-              month: 'space-y-4',
-              caption: 'flex justify-center pt-1 relative items-center',
-              caption_label: 'text-sm font-medium',
-              nav: 'space-x-1 flex items-center',
-              nav_button: 'h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100',
-              nav_button_previous: 'absolute left-1',
-              nav_button_next: 'absolute right-1',
-              table: 'w-full border-collapse space-y-1',
-              head_row: 'flex',
-              head_cell: 'text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]',
-              row: 'flex w-full mt-2',
-              cell: 'relative h-28 w-full p-0 text-center text-sm align-top [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l last:[&:has([aria-selected])]:rounded-r focus-within:relative focus-within:z-20',
-              day: 'h-9 w-9 p-0 font-normal aria-selected:opacity-100',
-              day_range_end: 'day-range-end',
-              day_selected: 'bg-primary text-primary-foreground',
-              day_today: 'bg-accent text-accent-foreground',
-              day_outside: 'text-muted-foreground opacity-50',
-              day_disabled: 'text-muted-foreground opacity-50',
-              day_range_middle: 'aria-selected:bg-accent aria-selected:text-accent-foreground',
-              day_hidden: 'invisible',
-            }}
-            components={{
-              Day: ({ day, ...props }) => (
-                <td {...props}>
-                  <div className="h-28 w-full p-0">
-                    <ShiftCalendarDayCell
-                      date={day.date}
-                      shifts={getEventsForDay(day.date)}
-                      onShiftClick={onShiftClick}
-                      moreLabel={t('more')}
-                    />
-                  </div>
-                </td>
-              ),
-            }}
-          />
+        <CardContent className="w-full">
+          <div className="w-full min-w-0 overflow-x-auto rounded-md border">
+            <table
+              className="w-full table-fixed border-collapse"
+              style={{ tableLayout: 'fixed' }}
+              role="grid"
+              aria-label={formatMonthTitle(currentMonth)}
+            >
+              <thead>
+                <tr>
+                  {weekDays.map((dayName) => (
+                    <th
+                      key={dayName}
+                      className="border-b p-1 text-center text-[0.8rem] font-normal text-muted-foreground"
+                      scope="col"
+                    >
+                      {dayName}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {Array.from({ length: 6 }, (_, rowIndex) => (
+                  <tr key={rowIndex}>
+                    {calendarDays.slice(rowIndex * 7, rowIndex * 7 + 7).map((date) => {
+                      const dateKey = format(date, 'yyyy-MM-dd')
+                      const isCurrentMonth = isSameMonth(date, currentMonth)
+                      const isTodayCell = isSameDay(date, today)
+                      const isWeekend = date.getDay() === 0 || date.getDay() === 6
+                      const isHoliday = holidayDatesSet.has(dateKey)
+                      const isSelected =
+                        selectedDate != null && isSameDay(date, selectedDate)
+                      return (
+                        <td
+                          key={dateKey}
+                          className={cn(
+                            'relative h-32 min-h-32 border-b border-r p-0 align-top last:border-r-0',
+                            !isCurrentMonth && 'text-muted-foreground/60',
+                            isTodayCell &&
+                              'bg-primary/25 ring-2 ring-primary/50 ring-inset',
+                            isHoliday && !isTodayCell && 'bg-amber-500/15',
+                            isWeekend && !isHoliday && !isTodayCell && 'bg-muted/75',
+                            isSelected && 'bg-accent'
+                          )}
+                          onClick={() => onDateSelect?.(date)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') onDateSelect?.(date)
+                          }}
+                          role="gridcell"
+                          tabIndex={0}
+                          aria-selected={isSelected}
+                        >
+                          <div className="h-full w-full overflow-hidden p-0.5">
+                            <ShiftCalendarDayCell
+                              date={date}
+                              shifts={getEventsForDay(date)}
+                              onShiftClick={onShiftClick}
+                              moreLabel={t('more')}
+                            />
+                          </div>
+                        </td>
+                      )
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
-          {uniqueShiftTypes.length > 0 && (
-            <div className="mt-4 flex flex-wrap gap-3">
-              {uniqueShiftTypes.map((st) => (
-                <div key={st.color} className="flex items-center gap-1.5 text-xs">
-                  <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: st.color }} />
-                  <span className="text-muted-foreground">{st.name}</span>
-                </div>
-              ))}
+          <div className="mt-4 flex flex-wrap items-center gap-4 border-t pt-4">
+            {uniqueShiftTypes.length > 0 && (
+              <>
+                {uniqueShiftTypes.map((st) => (
+                  <div key={st.color} className="flex items-center gap-1.5 text-xs">
+                    <div
+                      className="h-2.5 w-2.5 shrink-0 rounded-full"
+                      style={{ backgroundColor: st.color }}
+                    />
+                    <span className="text-muted-foreground">{st.name}</span>
+                  </div>
+                ))}
+                <span className="text-muted-foreground/50" aria-hidden>{LEGEND_SEP}</span>
+              </>
+            )}
+            <div className="flex items-center gap-1.5 text-xs">
+              <div className="h-2.5 w-2.5 shrink-0 rounded bg-primary/50 ring-1 ring-primary/60" />
+              <span className="text-muted-foreground">{t('legend.today')}</span>
             </div>
-          )}
+            <div className="flex items-center gap-1.5 text-xs">
+              <div className="h-2.5 w-2.5 shrink-0 rounded bg-muted" />
+              <span className="text-muted-foreground">{t('legend.weekend')}</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-xs">
+              <div className="h-2.5 w-2.5 shrink-0 rounded bg-amber-500/30" />
+              <span className="text-muted-foreground">{t('legend.holiday')}</span>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </TooltipProvider>

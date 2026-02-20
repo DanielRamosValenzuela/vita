@@ -11,6 +11,18 @@ export function formatDate(
   return formatDateFns(date, pattern, { locale: DATE_LOCALES[locale] })
 }
 
+export function formatDateLong(date: Date, locale: 'es' | 'en' = 'es'): string {
+  return formatDateFns(date, 'PPP', { locale: DATE_LOCALES[locale] })
+}
+
+export function formatDateShort(date: Date, locale: 'es' | 'en' = 'es'): string {
+  return formatDateFns(date, locale === 'es' ? 'dd/MM/yyyy' : 'MM/dd/yyyy', {
+    locale: DATE_LOCALES[locale],
+  })
+}
+
+export { DATE_LOCALES }
+
 export const formatCurrency = (amount: number): string => {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',

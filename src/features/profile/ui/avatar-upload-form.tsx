@@ -4,9 +4,10 @@ import { useRef, useState, useTransition } from 'react'
 import { useSession } from 'next-auth/react'
 import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
-import { AlertCircle, Camera, Loader2, Trash2 } from 'lucide-react'
+import { AlertCircle, Camera, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 
+import { Spinner } from '@/src/shared/ui/atoms'
 import { getUserInitials } from '@/src/shared/lib/utils/profile-image'
 import {
   AlertDialog,
@@ -126,7 +127,7 @@ export function AvatarUploadForm({ currentImage, customImage, userName }: Avatar
 
           {isPending && (
             <div className="bg-background/80 absolute inset-0 flex items-center justify-center rounded-full">
-              <Loader2 className="h-8 w-8 animate-spin" />
+              <Spinner size="lg" />
             </div>
           )}
         </div>

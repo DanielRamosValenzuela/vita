@@ -225,6 +225,7 @@ export function ShiftsPageContent({
           users={formUsers}
           areas={formAreas}
           shiftTypes={shiftTypes}
+          initialAreaId={selectedAreaId}
         />
       </div>
 
@@ -238,7 +239,7 @@ export function ShiftsPageContent({
         <div className="text-sm text-muted-foreground animate-pulse">{t('loading')}</div>
       )}
 
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">{t('stats.totalShifts')}</CardTitle>
@@ -254,7 +255,14 @@ export function ShiftsPageContent({
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {shifts.filter((s) => s.status === 'SCHEDULED').length}
+              {shifts.filter((s) => {
+                const shiftDate = new Date(s.startTime)
+                const now = new Date()
+                return (
+                  shiftDate.getMonth() === now.getMonth() &&
+                  shiftDate.getFullYear() === now.getFullYear()
+                )
+              }).length}
             </div>
           </CardContent>
         </Card>
@@ -269,34 +277,21 @@ export function ShiftsPageContent({
             </div>
           </CardContent>
         </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('stats.completed')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {shifts.filter((s) => s.status === 'COMPLETED').length}
-            </div>
-          </CardContent>
-        </Card>
       </div>
 
       <Card>
-        <CardHeader>
-          <CardTitle>{t('filters.title')}</CardTitle>
-        </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           <ShiftFilters
             users={formUsers}
             areas={formAreas}
             shiftTypes={shiftTypes}
+            selectedAreaId={selectedAreaId}
             onFiltersChange={handleFiltersChange}
           />
         </CardContent>
       </Card>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="space-y-6">
         <ShiftCalendar shifts={calendarShifts} onMonthChange={handleMonthChange} />
 
         <Card>

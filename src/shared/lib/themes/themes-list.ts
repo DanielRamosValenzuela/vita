@@ -5,6 +5,6 @@ export const themesList: Theme[] = [
   { id: 'soleil', name: 'Soleil' },
   { id: 'lavande', name: 'Lavande' },
   { id: 'nemesis', name: 'Némesis' },
-  { id: 'azur', name: 'Azur' },
+  { id: 'azur', name: 'Fuchsia' },
   { id: 'rose', name: 'Rose' },
 ]

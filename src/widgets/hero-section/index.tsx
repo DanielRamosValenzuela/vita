@@ -107,7 +107,7 @@ export function HeroSection({ locale }: HeroSectionProps) {
       </div>
 
       <div className="from-background via-background/95 to-background absolute inset-0 z-0 bg-linear-to-b" />
-      <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.1),transparent_50%)]" />
+      <div className="bg-primary/5 absolute inset-0 z-0 [mask-image:radial-gradient(circle_at_50%_50%,black,transparent_70%)]" />
     </section>
   )
 }

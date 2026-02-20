@@ -3,10 +3,10 @@
 import { useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Loader2 } from 'lucide-react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 
+import { Spinner } from '@/src/shared/ui/atoms'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/src/shared/ui/card'
 import { Input } from '@/src/shared/ui/input'
@@ -223,7 +223,7 @@ export function CreateOrganizationForm() {
         <Button type="submit" disabled={isPending}>
           {isPending ? (
             <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <Spinner size="sm" className="mr-2" />
               {t('form.submitting')}
             </>
           ) : (

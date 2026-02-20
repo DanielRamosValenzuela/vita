@@ -1,11 +1,17 @@
+import { Role } from '@prisma/client'
 import { getTranslations } from 'next-intl/server'
 
-import { requireAdminHR } from '@/src/shared/lib/auth/session'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
+import { getAreasAction } from '@/src/features/area/api'
 import { getShiftTypesAction } from '@/src/features/shifts/api'
 import { ShiftTypesPage } from '@/src/features/shifts/ui'
-
-import { getAreas } from '@/src/entities/area'
+import { requireAdminHROrChiefArea } from '@/src/shared/lib/auth/session'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/src/shared/ui/card'
 
 interface ShiftTypesProps {
   params: Promise<{ locale: string }>
@@ -24,11 +30,12 @@ export async function generateMetadata({ params }: ShiftTypesProps) {
 export default async function ShiftTypes({ params }: ShiftTypesProps) {
   const { locale } = await params
   const [session, t] = await Promise.all([
-    requireAdminHR(locale),
+    requireAdminHROrChiefArea(locale),
     getTranslations('shifts.shiftTypes'),
   ])
 
-  if (!session.organizationId)
+  const isAdminHR = session.role === Role.ADMIN_HR
+  if (isAdminHR && !session.organizationId)
     return (
       <div className="space-y-8">
         <div>
@@ -38,10 +45,15 @@ export default async function ShiftTypes({ params }: ShiftTypesProps) {
       </div>
     )
 
-  const [shiftTypesResult, areas] = await Promise.all([
+  const [shiftTypesResult, areasResult] = await Promise.all([
     getShiftTypesAction(),
-    session.organizationId ? getAreas(session.organizationId) : [],
+    getAreasAction(),
   ])
+
+  const areas =
+    areasResult.success && Array.isArray(areasResult.data)
+      ? areasResult.data.map((a: { id: string; name: string }) => ({ id: a.id, name: a.name }))
+      : []
 
   if (!shiftTypesResult.success || !shiftTypesResult.data)
     return (
@@ -68,7 +80,12 @@ export default async function ShiftTypes({ params }: ShiftTypesProps) {
           <CardDescription>{t('description')}</CardDescription>
         </CardHeader>
         <CardContent>
-          <ShiftTypesPage shiftTypes={shiftTypes || []} areas={areas} />
+          <ShiftTypesPage
+            shiftTypes={shiftTypes || []}
+            areas={areas}
+            canCreateGlobal={isAdminHR}
+            isChief={session.role === Role.CHIEF_AREA}
+          />
         </CardContent>
       </Card>
     </div>

@@ -23,6 +23,7 @@ interface ShiftTypesTableProps {
   getStatusBadge: (isActive: boolean) => ReactNode
   onEdit: (shiftType: ShiftType) => void
   onDelete: (shiftType: ShiftType) => void
+  isChief?: boolean
 }
 
 export function ShiftTypesTable({
@@ -31,6 +32,7 @@ export function ShiftTypesTable({
   getStatusBadge,
   onEdit,
   onDelete,
+  isChief = false,
 }: ShiftTypesTableProps) {
   const t = useTranslations('shifts.shiftTypes')
 
@@ -90,19 +92,23 @@ export function ShiftTypesTable({
               </span>
             </TableCell>
             <TableCell>
-              <span className="flex items-center gap-2">
-                <Button variant="outline" size="sm" onClick={() => onEdit(shiftType)}>
-                  <Edit className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onDelete(shiftType)}
-                  className="text-destructive hover:text-destructive"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </span>
+              {isChief && shiftType.isGlobal ? (
+                <span className="text-muted-foreground text-sm">{t('table.notAvailable')}</span>
+              ) : (
+                <span className="flex items-center gap-2">
+                  <Button variant="outline" size="sm" onClick={() => onEdit(shiftType)}>
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => onDelete(shiftType)}
+                    className="text-destructive hover:text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </span>
+              )}
             </TableCell>
           </TableRow>
         ))}

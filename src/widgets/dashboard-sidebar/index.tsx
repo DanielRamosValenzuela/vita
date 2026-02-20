@@ -4,13 +4,20 @@ import { signOut } from 'next-auth/react'
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import { useParams } from 'next/navigation'
+import { ChevronsUpDown } from 'lucide-react'
 
 import { cn } from '@/src/shared/lib/utils/cn'
 import { LanguageSelector } from '@/src/shared/ui/atoms/language-selector'
 import { ThemeSelector } from '@/src/shared/ui/atoms/theme-selector'
 import { ThemeToggle } from '@/src/shared/ui/atoms/theme-toggle'
 import { Badge } from '@/src/shared/ui/badge'
-import { Button } from '@/src/shared/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/src/shared/ui/dropdown-menu'
 
 import { Link, usePathname } from '@/i18n/navigation'
 
@@ -71,7 +78,7 @@ export function DashboardSidebar({
               className={cn(
                 'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
                 active
-                  ? 'bg-primary text-primary-foreground'
+                  ? 'bg-primary/10 text-primary border-l-2 border-primary font-semibold'
                   : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
               )}
             >
@@ -87,42 +94,55 @@ export function DashboardSidebar({
         })}
       </nav>
 
-      <div className="space-y-4 border-t p-4">
-        <div className="flex flex-col gap-2">
-          <ThemeSelector />
-          <div className="flex items-center gap-2">
-            <LanguageSelector />
-            <ThemeToggle />
-          </div>
+      <div className="space-y-3 border-t p-4">
+        <div className="flex items-center justify-between">
+          <LanguageSelector />
+          <ThemeToggle />
         </div>
+        <ThemeSelector />
 
-        <div className="bg-accent flex items-center gap-3 rounded-lg p-3">
-          {user.customImage || user.image ? (
-            <div className="ring-border relative h-10 w-10 overflow-hidden rounded-full ring-2">
-              <Image
-                src={user.customImage || user.image || ''}
-                alt={user.name}
-                fill
-                className="rounded-full object-cover"
-                sizes="40px"
-                loading="eager"
-                unoptimized
-              />
-            </div>
-          ) : (
-            <div className="bg-primary text-primary-foreground flex h-10 w-10 items-center justify-center rounded-full">
-              {user.name.charAt(0).toUpperCase()}
-            </div>
-          )}
-          <div className="flex-1 overflow-hidden">
-            <p className="truncate text-sm font-medium">{user.name}</p>
-            <p className="text-muted-foreground truncate text-xs">{user.email}</p>
-          </div>
-        </div>
-
-        <Button onClick={handleLogout} variant="outline" className="w-full">
-          {tCommon('logout')}
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="bg-accent hover:bg-accent/80 flex w-full items-center gap-3 rounded-lg p-3 transition-colors">
+              {user.customImage || user.image ? (
+                <div className="ring-border relative h-10 w-10 shrink-0 overflow-hidden rounded-full ring-2">
+                  <Image
+                    src={user.customImage || user.image || ''}
+                    alt={user.name}
+                    fill
+                    className="rounded-full object-cover"
+                    sizes="40px"
+                    loading="eager"
+                    unoptimized
+                  />
+                </div>
+              ) : (
+                <div className="bg-primary text-primary-foreground flex h-10 w-10 shrink-0 items-center justify-center rounded-full">
+                  {user.name.charAt(0).toUpperCase()}
+                </div>
+              )}
+              <div className="flex-1 overflow-hidden text-left">
+                <p className="truncate text-sm font-medium">{user.name}</p>
+                <p className="text-muted-foreground truncate text-xs">{user.email}</p>
+              </div>
+              <ChevronsUpDown className="text-muted-foreground h-4 w-4 shrink-0" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent side="top" align="start" className="w-56">
+            <DropdownMenuItem asChild>
+              <Link href="/dashboard/profile" className="w-full cursor-pointer">
+                {tCommon('profile')}
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={handleLogout}
+              className="text-destructive focus:text-destructive cursor-pointer"
+            >
+              {tCommon('logout')}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </aside>
   )

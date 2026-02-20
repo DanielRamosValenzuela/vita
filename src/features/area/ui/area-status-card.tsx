@@ -2,8 +2,7 @@
 
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
-import { Loader2 } from 'lucide-react'
-
+import { Spinner } from '@/src/shared/ui/atoms'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -81,7 +80,7 @@ export function AreaStatusCard({
 
       <div className="flex gap-4">
         <Button onClick={handleSave} disabled={!hasChanges || isPending}>
-          {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          {isPending && <Spinner size="sm" className="mr-2" />}
           {t('save')}
         </Button>
         <Button variant="outline" asChild>
@@ -101,7 +100,7 @@ export function AreaStatusCard({
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isPending}>{t('saveConfirm.cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={onPerformSave} disabled={isPending}>
-              {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isPending && <Spinner size="sm" className="mr-2" />}
               {t('saveConfirm.confirm')}
             </AlertDialogAction>
           </AlertDialogFooter>

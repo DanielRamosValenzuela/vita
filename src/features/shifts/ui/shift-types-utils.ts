@@ -73,7 +73,7 @@ export type ShiftTypesAction =
   | { type: 'TOGGLE_SAVE_CONFIRM'; open: boolean }
   | { type: 'RESET_FORM' }
 
-const DEFAULT_FORM_DATA: ShiftTypeFormData = {
+export const DEFAULT_FORM_DATA: ShiftTypeFormData = {
   name: '',
   description: '',
   icon: 'Clock',

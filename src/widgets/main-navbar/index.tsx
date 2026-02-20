@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { Menu } from 'lucide-react'
+import { Menu, Settings } from 'lucide-react'
 
 import { LanguageSelector, Logo, ThemeSelector, ThemeToggle } from '@/src/shared/ui/atoms'
 import { Button } from '@/src/shared/ui/button'
@@ -18,6 +18,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/src/shared/ui/dropdown-menu'
+import { Label } from '@/src/shared/ui/label'
+import { Popover, PopoverContent, PopoverTrigger } from '@/src/shared/ui/popover'
 import { Sheet, SheetContent, SheetTrigger } from '@/src/shared/ui/sheet'
 
 import { getNavLinks } from './constants'
@@ -27,6 +29,7 @@ export function MainNavbar() {
   const params = useParams()
   const locale = (params?.locale as string) || 'es'
   const t = useTranslations('nav')
+  const tCommon = useTranslations('common')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const isLoading = status === 'loading'
@@ -52,9 +55,27 @@ export function MainNavbar() {
         </div>
 
         <div className="flex items-center gap-2">
-          <ThemeSelector />
-          <ThemeToggle />
-          <LanguageSelector />
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="ghost" size="icon" aria-label={tCommon('settings')}>
+                <Settings className="h-4 w-4" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-64 space-y-4">
+              <div className="space-y-2">
+                <Label>{tCommon('theme')}</Label>
+                <ThemeSelector />
+              </div>
+              <div className="flex items-center justify-between">
+                <Label>{tCommon('darkMode')}</Label>
+                <ThemeToggle />
+              </div>
+              <div className="space-y-2">
+                <Label>{tCommon('language')}</Label>
+                <LanguageSelector />
+              </div>
+            </PopoverContent>
+          </Popover>
 
           {isLoading ? (
             <div className="bg-muted h-9 w-20 animate-pulse rounded-md" />

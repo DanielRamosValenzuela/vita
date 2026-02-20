@@ -7,13 +7,19 @@
     "edit": "Editar",
     "create": "Crear",
     "loading": "Cargando...",
+    "loadingApp": "Cargando aplicación...",
     "error": "Error",
     "success": "Éxito",
     "logout": "Cerrar Sesión",
     "appName": "VITA",
     "selectLanguage": "Seleccionar idioma",
     "theme": "Tema",
+    "toggleTheme": "Cambiar tema",
+    "darkMode": "Modo oscuro",
+    "language": "Idioma",
     "logoLabel": "VITA - Inicio",
+    "profile": "Perfil",
+    "settings": "Configuración",
     "languages": {
       "es": "Español",
       "en": "Inglés"
@@ -304,6 +310,11 @@
       "noRole": "N/A"
     },
     "more": "más",
+    "legend": {
+      "today": "Hoy",
+      "weekend": "Fin de semana",
+      "holiday": "Feriado"
+    },
     "status": {
       "scheduled": "Programado",
       "inProgress": "En Progreso",
@@ -324,7 +335,10 @@
       "differentEndDate": "Fecha de fin diferente",
       "user": {
         "label": "Usuario",
-        "placeholder": "Seleccionar usuario"
+        "placeholder": "Seleccionar usuario",
+        "search": "Buscar usuario...",
+        "selectAreaFirst": "Selecciona un área primero",
+        "noUsersFound": "No se encontraron usuarios"
       },
       "area": {
         "label": "Área",
@@ -337,6 +351,11 @@
       "date": {
         "label": "Fecha",
         "placeholder": "Seleccionar fecha"
+      },
+      "endDate": {
+        "label": "Fecha de Término",
+        "calculated": "Se calculará automáticamente",
+        "selectShiftType": "Selecciona un tipo de turno"
       },
       "startTime": {
         "label": "Hora Inicio",
@@ -400,9 +419,10 @@
         "global": "Global",
         "globalYes": "Sí",
         "globalNo": "No",
-        "shiftsCount": "Asignado",
+        "shiftsCount": "Turnos",
         "areasCount": "Áreas",
-        "actions": "Acciones"
+        "actions": "Acciones",
+        "notAvailable": "N/A"
       },
       "createModal": {
         "title": "Nuevo tipo de turno",
@@ -1543,6 +1563,11 @@
         "applicableShiftTypes": "Tipos de Turno Aplicables",
         "applicableShiftTypesTooltip": "Selecciona los tipos de turno a los que se aplicará este componente. Por ejemplo, si es un 'Bono Guardia Larga', selecciona solo el tipo de turno 'Guardia Larga'.",
         "noShiftTypes": "No hay tipos de turno disponibles. Crea tipos de turno primero.",
+        "searchShiftTypes": "Buscar tipos de turno",
+        "filterByArea": "Filtrar por área",
+        "filterAllAreas": "Todas las áreas",
+        "noMatchingShiftTypes": "Ningún tipo de turno coincide con el filtro.",
+        "global": "Global",
         "customName": "Nombre Personalizado (opcional)",
         "customNamePlaceholder": "ej: Bono por turno largo",
         "description": "Descripción (opcional)",

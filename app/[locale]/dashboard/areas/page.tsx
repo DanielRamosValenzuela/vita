@@ -40,8 +40,8 @@ export default async function AreasPage({ params }: AreasPageProps) {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
-          <p className="text-muted-foreground mt-2">{t('description')}</p>
+          <h1 className="text-2xl font-bold tracking-tight">{t('title')}</h1>
+          <p className="text-muted-foreground mt-1">{t('description')}</p>
         </div>
         <div className="bg-destructive/10 text-destructive border-destructive/20 rounded-lg border p-4">
           {t('noOrganization')}
@@ -63,8 +63,8 @@ export default async function AreasPage({ params }: AreasPageProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
-        <p className="text-muted-foreground mt-2">{t('description')}</p>
+        <h1 className="text-2xl font-bold tracking-tight">{t('title')}</h1>
+        <p className="text-muted-foreground mt-1">{t('description')}</p>
       </div>
 
       <AreasTable areas={areas} canCreate={!isChiefArea(user)} canDelete={!isChiefArea(user)} />

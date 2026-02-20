@@ -2,11 +2,19 @@ import * as React from 'react'
 
 import { cn } from '@/src/shared/lib/utils/cn'
 
-function Skeleton({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+function Skeleton({
+  className,
+  variant = 'pulse',
+  ...props
+}: React.HTMLAttributes<HTMLDivElement> & { variant?: 'pulse' | 'wave' }) {
   return (
     <div
       data-slot="skeleton"
-      className={cn('bg-accent animate-pulse rounded-md', className)}
+      className={cn(
+        'rounded-md',
+        variant === 'wave' ? 'animate-skeleton-wave' : 'bg-accent animate-pulse',
+        className,
+      )}
       {...props}
     />
   )

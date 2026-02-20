@@ -22,9 +22,8 @@ interface PageProps {
 
 const OrganizationsPage = async ({ searchParams }: PageProps) => {
   await requireSuperAdmin()
-  const [t, tCommon, params] = await Promise.all([
+  const [t, params] = await Promise.all([
     getTranslations('superAdmin.organizations'),
-    getTranslations('common'),
     searchParams,
   ])
   const search = params.search || ''
@@ -48,7 +47,7 @@ const OrganizationsPage = async ({ searchParams }: PageProps) => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
+          <h1 className="text-2xl font-bold tracking-tight">{t('title')}</h1>
           <p className="text-muted-foreground">{t('subtitle')}</p>
         </div>
         <Link href="/dashboard/organizations/new">
@@ -59,7 +58,22 @@ const OrganizationsPage = async ({ searchParams }: PageProps) => {
         </Link>
       </div>
 
-      <Suspense fallback={<div>{tCommon('loading')}</div>}>
+      <Suspense
+        fallback={
+          <div className="rounded-lg border">
+            <div className="divide-y">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="flex items-center gap-4 p-4">
+                  <div className="bg-accent animate-pulse h-5 w-48 rounded-md" />
+                  <div className="bg-accent animate-pulse h-5 w-20 rounded-md" />
+                  <div className="bg-accent animate-pulse h-6 w-16 rounded-full" />
+                  <div className="bg-accent animate-pulse ml-auto h-8 w-8 rounded" />
+                </div>
+              ))}
+            </div>
+          </div>
+        }
+      >
         <OrganizationsTableClient
           initialOrganizations={organizations}
           initialTotal={total}

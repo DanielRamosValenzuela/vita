@@ -13,6 +13,8 @@ import {
 } from 'date-fns'
 import { Calendar as CalendarIcon } from 'lucide-react'
 
+import { Spinner } from '@/src/shared/ui/atoms'
+
 import { DAY_TYPES, getDayTypeColor, getLocaleByCountry } from '@/src/shared/lib/constants'
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
@@ -176,7 +178,7 @@ export function OrganizationCalendarView({
 
         {isLoading && (
           <div className="flex justify-center py-8">
-            <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+            <Spinner size="lg" className="text-primary" />
           </div>
         )}
 

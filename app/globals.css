@@ -179,11 +179,12 @@
       background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
       color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  *,
-  *::before,
-  *::after {
+  [data-slot],
+  aside, header, nav a,
+  .bg-card, .bg-background, .bg-primary,
+  .bg-accent, .bg-muted, .bg-secondary {
     transition-property: background-color, border-color, color, fill, stroke;
-    transition-duration: 0.4s;
+    transition-duration: 0.3s;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   }
   button,
@@ -243,4 +244,33 @@
     transparent 100%
   );
   background-size: 200% 100%;
+}
+
+@keyframes vita-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.03); }
+}
+.animate-vita-pulse {
+  animation: vita-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes vita-heartbeat {
+  0%, 100% { transform: scale(1); }
+  14% { transform: scale(1.15); }
+  28% { transform: scale(1); }
+  42% { transform: scale(1.1); }
+  70% { transform: scale(1); }
+}
+.animate-vita-heartbeat {
+  animation: vita-heartbeat 1.8s ease-in-out infinite;
+}
+
+@keyframes skeleton-wave {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.animate-skeleton-wave {
+  background: linear-gradient(90deg, var(--accent) 25%, color-mix(in oklch, var(--accent) 60%, var(--background) 40%) 37%, var(--accent) 63%);
+  background-size: 200% 100%;
+  animation: skeleton-wave 1.8s ease-in-out infinite;
 }

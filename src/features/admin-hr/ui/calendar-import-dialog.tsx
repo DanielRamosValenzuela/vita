@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { format, isSameDay } from 'date-fns'
 import { toast } from 'sonner'
 
+import { Spinner } from '@/src/shared/ui/atoms'
 import type { MappedHoliday } from '@/src/shared/lib/types/holidays'
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
@@ -210,7 +211,7 @@ export function CalendarImportDialog({
 
         {state.loadingHolidays && (
           <div className="flex items-center justify-center py-8">
-            <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+            <Spinner size="lg" className="text-primary" />
             <span className="ml-2 text-sm text-muted-foreground">{t('loadingHolidays')}</span>
           </div>
         )}

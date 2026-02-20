@@ -29,10 +29,10 @@ export default async function StaffPage({ params }: StaffPageProps) {
 
   if (!result.success || !result.data)
     return (
-      <div className="container mx-auto py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight">{t('staff')}</h1>
-          <p className="text-muted-foreground mt-2">{t('staffDescription')}</p>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">{t('staff')}</h1>
+          <p className="text-muted-foreground mt-1">{t('staffDescription')}</p>
         </div>
         <p className="text-muted-foreground">{t('staffComingSoon')}</p>
       </div>
@@ -42,10 +42,10 @@ export default async function StaffPage({ params }: StaffPageProps) {
 
   if (staff.length === 0)
     return (
-      <div className="container mx-auto py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight">{t('staff')}</h1>
-          <p className="text-muted-foreground mt-2">{t('staffDescription')}</p>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">{t('staff')}</h1>
+          <p className="text-muted-foreground mt-1">{t('staffDescription')}</p>
         </div>
         <Alert variant="default">
           <AlertTitle>{t('staff')}</AlertTitle>
@@ -55,10 +55,10 @@ export default async function StaffPage({ params }: StaffPageProps) {
     )
 
   return (
-    <div className="container mx-auto py-8 space-y-8">
+    <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">{t('staff')}</h1>
-        <p className="text-muted-foreground mt-2">{t('staffDescription')}</p>
+        <h1 className="text-2xl font-bold tracking-tight">{t('staff')}</h1>
+        <p className="text-muted-foreground mt-1">{t('staffDescription')}</p>
       </div>
 
       <StaffViewPage staff={staff} canManageRates={isAdminHR(session)} />

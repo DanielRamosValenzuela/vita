@@ -1,8 +1,9 @@
 'use client'
 
+import { useMemo, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import type { Currency } from '@prisma/client'
-import { GripVertical, Info, Trash2 } from 'lucide-react'
+import { GripVertical, Info, Search, Trash2 } from 'lucide-react'
 
 import {
   APPLY_CONDITIONS,
@@ -27,12 +28,11 @@ import {
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/src/shared/ui/tooltip'
 
 import type { RateComponentData } from '../api/rate-template-actions'
+import type { ShiftTypeOption } from './rate-template-form'
 
-interface ShiftTypeOption {
+interface AreaOption {
   id: string
   name: string
-  color: string
-  icon?: string | null
 }
 
 interface RateComponentFormProps {
@@ -40,21 +40,39 @@ interface RateComponentFormProps {
   index: number
   currency: Currency
   shiftTypes: ShiftTypeOption[]
+  areas?: AreaOption[]
   onUpdate: (index: number, data: Partial<RateComponentData>) => void
   onRemove: (index: number) => void
   canRemove: boolean
 }
+
+const FILTER_ALL = '__all__'
 
 export function RateComponentForm({
   component,
   index,
   currency,
   shiftTypes,
+  areas = [],
   onUpdate,
   onRemove,
   canRemove,
 }: RateComponentFormProps) {
   const t = useTranslations('adminHR.rates.componentForm')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [areaFilterId, setAreaFilterId] = useState<string>(FILTER_ALL)
+
+  const filteredShiftTypes = useMemo(() => {
+    let list = shiftTypes
+    const q = searchQuery.trim().toLowerCase()
+    if (q)
+      list = list.filter((st) => st.name.toLowerCase().includes(q))
+    if (areaFilterId !== FILTER_ALL)
+      list = list.filter(
+        (st) => st.isGlobal || st.areas.some((a) => a.id === areaFilterId)
+      )
+    return list
+  }, [shiftTypes, searchQuery, areaFilterId])
 
   const handleShiftTypeToggle = (shiftTypeId: string, checked: boolean) => {
     const currentIds = component.applicableShiftTypeIds || []
@@ -228,8 +246,8 @@ export function RateComponentForm({
         )}
 
         {component.applyCondition === APPLY_CONDITIONS.SPECIFIC_SHIFT_TYPE && (
-          <div>
-            <div className="flex items-center gap-2 mb-2">
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
               <Label>{t('applicableShiftTypes')}</Label>
               <TooltipProvider>
                 <Tooltip>
@@ -247,29 +265,73 @@ export function RateComponentForm({
                 {t('noShiftTypes')}
               </div>
             ) : (
-              <div className="border rounded-md p-3 sm:p-4 space-y-2 sm:space-y-3 max-h-48 overflow-y-auto">
-                {shiftTypes.map((shiftType) => (
-                  <div key={shiftType.id} className="flex items-center gap-2 sm:gap-3">
-                    <Checkbox
-                      id={`shift-type-${index}-${shiftType.id}`}
-                      checked={component.applicableShiftTypeIds?.includes(shiftType.id) || false}
-                      onCheckedChange={(checked) =>
-                        handleShiftTypeToggle(shiftType.id, checked === true)
-                      }
+              <>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      type="search"
+                      placeholder={t('searchShiftTypes')}
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-8"
+                      aria-label={t('searchShiftTypes')}
                     />
-                    <Label
-                      htmlFor={`shift-type-${index}-${shiftType.id}`}
-                      className="flex items-center gap-2 cursor-pointer flex-1 text-sm sm:text-base"
-                    >
-                      <div
-                        className="w-3 h-3 rounded-full flex-shrink-0"
-                        style={{ backgroundColor: shiftType.color }}
-                      />
-                      <span className="break-words">{shiftType.name}</span>
-                    </Label>
                   </div>
-                ))}
-              </div>
+                  {areas.length > 0 && (
+                    <Select
+                      value={areaFilterId}
+                      onValueChange={setAreaFilterId}
+                    >
+                      <SelectTrigger className="w-full sm:w-[180px]">
+                        <SelectValue placeholder={t('filterByArea')} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value={FILTER_ALL}>{t('filterAllAreas')}</SelectItem>
+                        {areas.map((area) => (
+                          <SelectItem key={area.id} value={area.id}>
+                            {area.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
+                <div className="border rounded-md p-3 sm:p-4 space-y-2 sm:space-y-3 max-h-48 overflow-y-auto">
+                  {filteredShiftTypes.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">{t('noMatchingShiftTypes')}</p>
+                  ) : (
+                    filteredShiftTypes.map((shiftType) => (
+                      <div key={shiftType.id} className="flex items-center gap-2 sm:gap-3">
+                        <Checkbox
+                          id={`shift-type-${index}-${shiftType.id}`}
+                          checked={component.applicableShiftTypeIds?.includes(shiftType.id) || false}
+                          onCheckedChange={(checked) =>
+                            handleShiftTypeToggle(shiftType.id, checked === true)
+                          }
+                        />
+                        <Label
+                          htmlFor={`shift-type-${index}-${shiftType.id}`}
+                          className="flex flex-wrap items-center gap-2 cursor-pointer flex-1 text-sm sm:text-base"
+                        >
+                          <div
+                            className="w-3 h-3 rounded-full shrink-0"
+                            style={{ backgroundColor: shiftType.color }}
+                          />
+                          <span className="wrap-break-word">{shiftType.name}</span>
+                          <span className="text-muted-foreground text-xs font-normal">
+                            {shiftType.isGlobal
+                              ? `(${t('global')})`
+                              : shiftType.areas.length > 0
+                                ? `(${shiftType.areas.map((a) => a.name).join(', ')})`
+                                : ''}
+                          </span>
+                        </Label>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </>
             )}
           </div>
         )}

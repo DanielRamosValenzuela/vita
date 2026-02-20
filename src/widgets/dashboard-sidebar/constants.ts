@@ -59,7 +59,7 @@ export function getNavItems(t: (key: string) => string, userRole: Role): NavItem
       href: '/dashboard/shift-types',
       label: t('shiftTypes'),
       icon: Clock,
-      roles: [Role.ADMIN_HR],
+      roles: [Role.ADMIN_HR, Role.CHIEF_AREA],
     },
     {
       href: '/dashboard/rates',

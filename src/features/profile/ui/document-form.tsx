@@ -4,10 +4,10 @@ import { useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Country } from '@prisma/client'
-import { Loader2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
+import { Spinner } from '@/src/shared/ui/atoms'
 import { formatTaxId, getTaxIdConfig } from '@/src/shared/lib/utils/tax-id-config'
 import { Alert, AlertDescription } from '@/src/shared/ui/alert'
 import { Button } from '@/src/shared/ui/button'
@@ -165,7 +165,7 @@ export function DocumentForm({ initialData, onCancel, onSuccess }: DocumentFormP
               </Button>
             )}
             <Button type="submit" disabled={isPending || !selectedCountry}>
-              {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isPending && <Spinner size="sm" className="mr-2" />}
               {t('save')}
             </Button>
           </div>

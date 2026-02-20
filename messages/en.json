@@ -7,13 +7,19 @@
     "edit": "Edit",
     "create": "Create",
     "loading": "Loading...",
+    "loadingApp": "Loading application...",
     "error": "Error",
     "success": "Success",
     "logout": "Sign Out",
     "appName": "VITA",
     "selectLanguage": "Select language",
     "theme": "Theme",
+    "toggleTheme": "Toggle theme",
+    "darkMode": "Dark mode",
+    "language": "Language",
     "logoLabel": "VITA - Home",
+    "profile": "Profile",
+    "settings": "Settings",
     "languages": {
       "es": "Spanish",
       "en": "English"
@@ -304,6 +310,11 @@
       "noRole": "N/A"
     },
     "more": "more",
+    "legend": {
+      "today": "Today",
+      "weekend": "Weekend",
+      "holiday": "Holiday"
+    },
     "status": {
       "scheduled": "Scheduled",
       "inProgress": "In Progress",
@@ -324,7 +335,10 @@
       "differentEndDate": "Different end date",
       "user": {
         "label": "User",
-        "placeholder": "Select user"
+        "placeholder": "Select user",
+        "search": "Search user...",
+        "selectAreaFirst": "Select an area first",
+        "noUsersFound": "No users found"
       },
       "area": {
         "label": "Area",
@@ -337,6 +351,11 @@
       "date": {
         "label": "Date",
         "placeholder": "Select date"
+      },
+      "endDate": {
+        "label": "End Date",
+        "calculated": "Will be calculated automatically",
+        "selectShiftType": "Select a shift type"
       },
       "startTime": {
         "label": "Start Time",
@@ -400,9 +419,10 @@
         "global": "Global",
         "globalYes": "Yes",
         "globalNo": "No",
-        "shiftsCount": "Assigned",
+        "shiftsCount": "Shifts",
         "areasCount": "Areas",
-        "actions": "Actions"
+        "actions": "Actions",
+        "notAvailable": "N/A"
       },
       "createModal": {
         "title": "New shift type",
@@ -1570,6 +1590,11 @@
         "applicableShiftTypes": "Applicable Shift Types",
         "applicableShiftTypesTooltip": "Select the shift types to which this component will be applied. For example, if it's a 'Long Shift Bonus', select only the 'Long Shift' type.",
         "noShiftTypes": "No shift types available. Create shift types first.",
+        "searchShiftTypes": "Search shift types",
+        "filterByArea": "Filter by area",
+        "filterAllAreas": "All areas",
+        "noMatchingShiftTypes": "No shift types match the filter.",
+        "global": "Global",
         "customName": "Custom Name (optional)",
         "customNamePlaceholder": "e.g. Long shift bonus",
         "description": "Description (optional)",

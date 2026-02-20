@@ -2,9 +2,10 @@
 
 import { useEffect, useState, useTransition } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
-import { CheckCircle2, Loader2, XCircle } from 'lucide-react'
+import { CheckCircle2, XCircle } from 'lucide-react'
 import { toast } from 'sonner'
 
+import { Spinner } from '@/src/shared/ui/atoms'
 import { formatDate } from '@/src/shared/lib/utils/format'
 import { Alert, AlertDescription } from '@/src/shared/ui/alert'
 import { Badge } from '@/src/shared/ui/badge'
@@ -78,7 +79,7 @@ export function InvitationsSection() {
         </CardHeader>
         <CardContent>
           <p className="flex items-center justify-center py-8" role="status" aria-live="polite">
-            <Loader2 className="text-muted-foreground h-6 w-6 animate-spin" aria-hidden />
+            <Spinner size="lg" className="text-muted-foreground" />
           </p>
         </CardContent>
       </Card>

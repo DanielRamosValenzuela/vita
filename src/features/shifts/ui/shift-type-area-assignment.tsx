@@ -14,46 +14,51 @@ interface ShiftTypeAreaAssignmentProps {
   formData: ShiftTypeFormData
   dispatch: Dispatch<ShiftTypesAction>
   areas: AreaOption[]
+  canCreateGlobal?: boolean
 }
 
 export function ShiftTypeAreaAssignment({
   formData,
   dispatch,
   areas,
+  canCreateGlobal = true,
 }: ShiftTypeAreaAssignmentProps) {
   const t = useTranslations('shifts.shiftTypes')
+  const showAreasSelector = !canCreateGlobal || !formData.isGlobal
 
   return (
     <>
-      <div className="flex items-center space-x-2">
-        <input
-          type="checkbox"
-          id="isGlobal"
-          checked={formData.isGlobal}
-          onChange={(e) =>
-            dispatch({ type: 'UPDATE_FORM', field: 'isGlobal', value: e.target.checked })
-          }
-          className="rounded border-gray-300"
-        />
-        <div className="flex items-center gap-1.5">
-          <Label htmlFor="isGlobal">{t('form.isGlobal')}</Label>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                type="button"
-                className="text-muted-foreground inline-flex cursor-help rounded p-0.5"
-              >
-                <Info className="h-3.5 w-3.5 shrink-0" aria-hidden />
-                <span className="sr-only">{t('form.isGlobal')}</span>
-              </button>
-            </TooltipTrigger>
-            <TooltipContent side="top" className="max-w-xs">
-              {t('form.isGlobalTooltip')}
-            </TooltipContent>
-          </Tooltip>
+      {canCreateGlobal && (
+        <div className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="isGlobal"
+            checked={formData.isGlobal}
+            onChange={(e) =>
+              dispatch({ type: 'UPDATE_FORM', field: 'isGlobal', value: e.target.checked })
+            }
+            className="rounded border-gray-300"
+          />
+          <div className="flex items-center gap-1.5">
+            <Label htmlFor="isGlobal">{t('form.isGlobal')}</Label>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  className="text-muted-foreground inline-flex cursor-help rounded p-0.5"
+                >
+                  <Info className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                  <span className="sr-only">{t('form.isGlobal')}</span>
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="max-w-xs">
+                {t('form.isGlobalTooltip')}
+              </TooltipContent>
+            </Tooltip>
+          </div>
         </div>
-      </div>
-      {!formData.isGlobal && (
+      )}
+      {showAreasSelector && (
         <div className="grid gap-2">
           <Label id="areas-label">{t('form.areasLabel')}</Label>
           <SearchableAddableList<AreaOption>

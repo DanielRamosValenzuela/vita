@@ -1,8 +1,7 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { Loader2 } from 'lucide-react'
-
+import { Spinner } from '@/src/shared/ui/atoms'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -60,7 +59,7 @@ export function EmailDialogs({
             >
               {isPending ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Spinner size="sm" className="mr-2" />
                   {t('deleteConfirm.deleting') || ''}
                 </>
               ) : (
@@ -89,7 +88,7 @@ export function EmailDialogs({
             >
               {isPending ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Spinner size="sm" className="mr-2" />
                   {t('unlinkConfirm.unlinking') || ''}
                 </>
               ) : (

@@ -1,12 +1,14 @@
 'use client'
 
-import { useEffect, useState, useTransition } from 'react'
+import { useCallback, useEffect, useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import type { Currency } from '@prisma/client'
 import { Info, Plus } from 'lucide-react'
 import { toast } from 'sonner'
 
+import { getAreasAction } from '@/src/features/area/api'
+import { getShiftTypesAction } from '@/src/features/shifts/api/shift-type-actions'
 import { APPLY_CONDITIONS, COMPONENT_TYPES, COMPONENT_UNITS } from '@/src/shared/lib/constants'
 import { Button } from '@/src/shared/ui/button'
 import {
@@ -20,7 +22,6 @@ import { Input } from '@/src/shared/ui/input'
 import { Label } from '@/src/shared/ui/label'
 import { Textarea } from '@/src/shared/ui/textarea'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/src/shared/ui/tooltip'
-import { getShiftTypesAction } from '@/src/features/shifts/api/shift-type-actions'
 
 import {
   createRateTemplateAction,
@@ -30,11 +31,13 @@ import {
 } from '../api/rate-template-actions'
 import { RateComponentForm } from './rate-component-form'
 
-interface ShiftTypeOption {
+export interface ShiftTypeOption {
   id: string
   name: string
   color: string
   icon?: string | null
+  isGlobal: boolean
+  areas: Array<{ id: string; name: string }>
 }
 
 interface RateTemplateFormProps {
@@ -77,6 +80,7 @@ export function RateTemplateForm({
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [shiftTypes, setShiftTypes] = useState<ShiftTypeOption[]>([])
+  const [areas, setAreas] = useState<Array<{ id: string; name: string }>>([])
   const [isLoadingShiftTypes, setIsLoadingShiftTypes] = useState(false)
   const [formState, setFormState] = useState<RateTemplateFormState>(() =>
     mapTemplateToState(existingTemplate)
@@ -84,28 +88,54 @@ export function RateTemplateForm({
 
   const { name, description, components } = formState
 
-  useEffect(() => {
-    if (mode === 'edit' && existingTemplate) setFormState(mapTemplateToState(existingTemplate))
-  }, [mode, existingTemplate, open])
-
-  const loadShiftTypes = async () => {
+  const loadShiftTypesAndAreas = useCallback(async () => {
     setIsLoadingShiftTypes(true)
-    const result = await getShiftTypesAction()
-    if (result.success && result.data)
+    const [shiftResult, areasResult] = await Promise.all([
+      getShiftTypesAction(),
+      getAreasAction(),
+    ])
+    if (shiftResult.success && shiftResult.data)
       setShiftTypes(
-        result.data.map((st) => ({
+        shiftResult.data.map((st) => ({
           id: st.id,
           name: st.name,
           color: st.color,
           icon: st.icon,
+          isGlobal: st.isGlobal,
+          areas:
+            st.areaShiftTypes
+              ?.filter((a) => {
+                const areaId = a.area?.id ?? a.areaId
+                const areaName = a.area?.name ?? ''
+                return areaId && areaName
+              })
+              .map((a) => ({
+                id: a.area?.id ?? a.areaId,
+                name: a.area?.name ?? '',
+              })) ?? [],
         }))
       )
-    else toast.error(result.error || 'Error al cargar tipos de turno')
+    else toast.error(shiftResult.error || 'Error al cargar tipos de turno')
+    if (areasResult.success && Array.isArray(areasResult.data))
+      setAreas(
+        (areasResult.data as Array<{ id: string; name: string }>)
+          .filter((a) => a.id && a.name)
+          .map((a) => ({ id: a.id, name: a.name }))
+      )
     setIsLoadingShiftTypes(false)
-  }
+  }, [])
+
+  useEffect(() => {
+    if (mode === 'edit' && existingTemplate) setFormState(mapTemplateToState(existingTemplate))
+  }, [mode, existingTemplate, open])
+
+  useEffect(() => {
+    if (open && shiftTypes.length === 0 && !isLoadingShiftTypes) void loadShiftTypesAndAreas()
+  }, [open, shiftTypes.length, isLoadingShiftTypes, loadShiftTypesAndAreas])
 
   const handleDialogOpenChange = (nextOpen: boolean) => {
-    if (nextOpen && shiftTypes.length === 0 && !isLoadingShiftTypes) void loadShiftTypes()
+    if (nextOpen && shiftTypes.length === 0 && !isLoadingShiftTypes)
+      void loadShiftTypesAndAreas()
     onOpenChange(nextOpen)
   }
 
@@ -289,6 +319,7 @@ export function RateTemplateForm({
                     index={index}
                     currency={currency}
                     shiftTypes={shiftTypes}
+                    areas={areas}
                     onUpdate={handleUpdateComponent}
                     onRemove={handleRemoveComponent}
                     canRemove={components.length > 1}

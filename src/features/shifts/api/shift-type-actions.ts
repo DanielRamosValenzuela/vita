@@ -1,6 +1,6 @@
 'use server'
 
-import { requireAdminHROrChiefArea, requireAdminHRWithOrg } from '@/src/shared/lib/auth'
+import { requireAdminHROrChiefArea } from '@/src/shared/lib/auth'
 import { isChiefArea } from '@/src/shared/lib/auth/rbac'
 import { prisma } from '@/src/shared/lib/db'
 import type { ActionResult } from '@/src/shared/lib/types'
@@ -124,7 +124,19 @@ export const createShiftTypeAction = async (data: {
   areaConfigs?: Array<{ areaId: string; isActive: boolean }>
 }): Promise<ActionResult<ShiftType>> => {
   try {
-    const session = await requireAdminHRWithOrg()
+    const session = await requireAdminHROrChiefArea()
+    const isChief = isChiefArea(session)
+    let orgId: string | null = session.organizationId ?? null
+    if (isChief && !orgId) {
+      const firstArea = await prisma.userArea.findFirst({
+        where: { userId: session.id },
+        select: { area: { select: { organizationId: true } } },
+      })
+      orgId = firstArea?.area?.organizationId ?? null
+    }
+    if (!orgId)
+      return { success: false, error: 'No tienes una organización asignada' }
+    const organizationId = orgId
 
     const color = data.color ?? '#3b82f6'
     const colorRegex = /^#[0-9A-Fa-f]{6}$/
@@ -140,33 +152,51 @@ export const createShiftTypeAction = async (data: {
         error: 'La duración debe estar entre 30 minutos y 24 horas (1440 min)',
       }
 
-    const isGlobal = data.isGlobal ?? true
     const areaConfigs = data.areaConfigs ?? []
-    if (!isGlobal && areaConfigs.length === 0)
-      return {
-        success: false,
-        error: 'Si el tipo no es global, debes seleccionar al menos un área',
-      }
-
-    if (!isGlobal && areaConfigs.length > 0) {
-      const areaIds = areaConfigs.map((c) => c.areaId)
-      const areasInOrg = await prisma.area.count({
-        where: {
-          id: { in: areaIds },
-          organizationId: session.organizationId,
-        },
-      })
-      if (areasInOrg !== areaIds.length)
+    const isGlobal = isChief ? false : (data.isGlobal ?? true)
+    if (isChief) {
+      if (areaConfigs.length === 0)
         return {
           success: false,
-          error: 'Una o más áreas no pertenecen a tu organización',
+          error: 'Debes seleccionar al menos un área asignada a ti',
         }
+      const chiefAreas = await prisma.userArea.findMany({
+        where: { userId: session.id },
+        select: { areaId: true },
+      })
+      const chiefAreaIds = new Set(chiefAreas.map((a) => a.areaId))
+      const invalidArea = areaConfigs.find((c) => !chiefAreaIds.has(c.areaId))
+      if (invalidArea)
+        return {
+          success: false,
+          error: 'Solo puedes asignar el tipo de turno a áreas en las que estés asignado',
+        }
+    } else {
+      if (!isGlobal && areaConfigs.length === 0)
+        return {
+          success: false,
+          error: 'Si el tipo no es global, debes seleccionar al menos un área',
+        }
+      if (!isGlobal && areaConfigs.length > 0) {
+        const areaIds = areaConfigs.map((c) => c.areaId)
+        const areasInOrg = await prisma.area.count({
+          where: {
+            id: { in: areaIds },
+            organizationId,
+          },
+        })
+        if (areasInOrg !== areaIds.length)
+          return {
+            success: false,
+            error: 'Una o más áreas no pertenecen a tu organización',
+          }
+      }
     }
 
     const existingType = await prisma.shiftType.findFirst({
       where: {
         name: data.name,
-        organizationId: session.organizationId,
+        organizationId,
       },
     })
 
@@ -190,7 +220,7 @@ export const createShiftTypeAction = async (data: {
         suggestedRestDays: data.suggestedRestDays ?? 1,
         isGlobal,
         isActive: data.isActive ?? true,
-        organizationId: session.organizationId,
+        organizationId,
       },
       include: {
         _count: { select: { shifts: true, areaShiftTypes: true } },
@@ -253,7 +283,19 @@ export const updateShiftTypeAction = async (
   }
 ): Promise<ActionResult<ShiftType>> => {
   try {
-    const session = await requireAdminHRWithOrg()
+    const session = await requireAdminHROrChiefArea()
+    const isChief = isChiefArea(session)
+    let orgId: string | null = session.organizationId ?? null
+    if (isChief && !orgId) {
+      const firstArea = await prisma.userArea.findFirst({
+        where: { userId: session.id },
+        select: { area: { select: { organizationId: true } } },
+      })
+      orgId = firstArea?.area?.organizationId ?? null
+    }
+    if (!orgId)
+      return { success: false, error: 'No tienes una organización asignada' }
+    const organizationId = orgId
 
     if (data.color) {
       const colorRegex = /^#[0-9A-Fa-f]{6}$/
@@ -275,6 +317,9 @@ export const updateShiftTypeAction = async (
 
     const existingType = await prisma.shiftType.findUnique({
       where: { id },
+      include: {
+        areaShiftTypes: { select: { areaId: true } },
+      },
     })
 
     if (!existingType)
@@ -283,40 +328,68 @@ export const updateShiftTypeAction = async (
         error: 'Tipo de turno no encontrado',
       }
 
-    if (existingType.organizationId !== session.organizationId)
+    if (existingType.organizationId !== organizationId)
       return {
         success: false,
         error: 'El tipo de turno no pertenece a tu organización',
       }
 
-    const isGlobal = data.isGlobal ?? existingType.isGlobal
-    const areaConfigs = data.areaConfigs ?? []
-    if (!isGlobal && areaConfigs.length === 0)
-      return {
-        success: false,
-        error: 'Si el tipo no es global, debes seleccionar al menos un área',
-      }
-
-    if (!isGlobal && areaConfigs.length > 0) {
-      const areaIds = areaConfigs.map((c) => c.areaId)
-      const areasInOrg = await prisma.area.count({
-        where: {
-          id: { in: areaIds },
-          organizationId: session.organizationId,
-        },
-      })
-      if (areasInOrg !== areaIds.length)
+    if (isChief) {
+      if (existingType.isGlobal)
         return {
           success: false,
-          error: 'Una o más áreas no pertenecen a tu organización',
+          error: 'No puedes editar un tipo de turno global',
         }
+      const chiefAreas = await prisma.userArea.findMany({
+        where: { userId: session.id },
+        select: { areaId: true },
+      })
+      const chiefAreaIds = new Set(chiefAreas.map((a) => a.areaId))
+      const areaConfigs = data.areaConfigs ?? existingType.areaShiftTypes?.map((a) => ({ areaId: a.areaId, isActive: true })) ?? []
+      if (areaConfigs.length === 0)
+        return {
+          success: false,
+          error: 'Debes seleccionar al menos un área asignada a ti',
+        }
+      const invalidArea = areaConfigs.find((c) => !chiefAreaIds.has(c.areaId))
+      if (invalidArea)
+        return {
+          success: false,
+          error: 'Solo puedes asignar el tipo de turno a áreas en las que estés asignado',
+        }
+    }
+
+    const isGlobal = isChief ? false : (data.isGlobal ?? existingType.isGlobal)
+    const areaConfigsForDb =
+      data.areaConfigs ??
+      (existingType.areaShiftTypes?.map((a) => ({ areaId: a.areaId, isActive: true })) ?? [])
+    if (!isChief) {
+      if (!isGlobal && areaConfigsForDb.length === 0)
+        return {
+          success: false,
+          error: 'Si el tipo no es global, debes seleccionar al menos un área',
+        }
+      if (!isGlobal && areaConfigsForDb.length > 0) {
+        const areaIds = areaConfigsForDb.map((c) => c.areaId)
+        const areasInOrg = await prisma.area.count({
+          where: {
+            id: { in: areaIds },
+            organizationId,
+          },
+        })
+        if (areasInOrg !== areaIds.length)
+          return {
+            success: false,
+            error: 'Una o más áreas no pertenecen a tu organización',
+          }
+      }
     }
 
     if (data.name && data.name !== existingType.name) {
       const duplicateType = await prisma.shiftType.findFirst({
         where: {
           name: data.name,
-          organizationId: session.organizationId,
+          organizationId,
           id: { not: id },
         },
       })
@@ -331,13 +404,13 @@ export const updateShiftTypeAction = async (
     const { areaConfigs: _areaConfigs, ...updateData } = data
     await prisma.shiftType.update({
       where: { id },
-      data: updateData,
+      data: { ...updateData, isGlobal },
     })
 
     await prisma.areaShiftType.deleteMany({ where: { shiftTypeId: id } })
-    if (!isGlobal && areaConfigs.length > 0)
+    if (!isGlobal && areaConfigsForDb.length > 0)
       await prisma.areaShiftType.createMany({
-        data: areaConfigs.map((c) => ({
+        data: areaConfigsForDb.map((c) => ({
           areaId: c.areaId,
           shiftTypeId: id,
           isActive: false,
@@ -371,16 +444,24 @@ export const updateShiftTypeAction = async (
 
 export const deleteShiftTypeAction = async (id: string): Promise<ActionResult<null>> => {
   try {
-    const session = await requireAdminHRWithOrg()
+    const session = await requireAdminHROrChiefArea()
+    const isChief = isChiefArea(session)
+    let orgId: string | null = session.organizationId ?? null
+    if (isChief && !orgId) {
+      const firstArea = await prisma.userArea.findFirst({
+        where: { userId: session.id },
+        select: { area: { select: { organizationId: true } } },
+      })
+      orgId = firstArea?.area?.organizationId ?? null
+    }
+    if (!orgId)
+      return { success: false, error: 'No tienes una organización asignada' }
 
     const existingType = await prisma.shiftType.findUnique({
       where: { id },
       include: {
-        _count: {
-          select: {
-            shifts: true,
-          },
-        },
+        _count: { select: { shifts: true } },
+        areaShiftTypes: { select: { areaId: true } },
       },
     })
 
@@ -390,11 +471,31 @@ export const deleteShiftTypeAction = async (id: string): Promise<ActionResult<nu
         error: 'Tipo de turno no encontrado',
       }
 
-    if (existingType.organizationId !== session.organizationId)
+    if (existingType.organizationId !== orgId)
       return {
         success: false,
         error: 'El tipo de turno no pertenece a tu organización',
       }
+
+    if (isChief) {
+      if (existingType.isGlobal)
+        return {
+          success: false,
+          error: 'No puedes eliminar un tipo de turno global',
+        }
+      const chiefAreas = await prisma.userArea.findMany({
+        where: { userId: session.id },
+        select: { areaId: true },
+      })
+      const chiefAreaIds = new Set(chiefAreas.map((a) => a.areaId))
+      const typeAreaIds = existingType.areaShiftTypes?.map((a) => a.areaId) ?? []
+      const hasAreaOutsideChief = typeAreaIds.some((areaId) => !chiefAreaIds.has(areaId))
+      if (hasAreaOutsideChief)
+        return {
+          success: false,
+          error: 'Solo puedes eliminar tipos de turno asignados únicamente a tus áreas',
+        }
+    }
 
     if (existingType._count.shifts > 0)
       return {

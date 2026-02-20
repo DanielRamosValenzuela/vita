@@ -1,16 +1,16 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import type { ShiftStatus } from '@prisma/client'
-import { endOfDay, format, startOfDay } from 'date-fns'
-import { Calendar as CalendarIcon, Clock, Filter, Search, Users, X } from 'lucide-react'
+import { endOfDay, startOfDay } from 'date-fns'
+import { Calendar as CalendarIcon, Clock, Filter, Users, X } from 'lucide-react'
 
 import { SHIFT_STATUS } from '@/src/shared/lib/constants'
+import { formatDateLong, formatDateShort } from '@/src/shared/lib/utils/format'
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 import { Calendar as DatePicker } from '@/src/shared/ui/calendar'
-import { Input } from '@/src/shared/ui/input'
 import { Popover, PopoverContent, PopoverTrigger } from '@/src/shared/ui/popover'
 import {
   Select,
@@ -37,6 +37,7 @@ interface ShiftFiltersProps {
   users: Array<{ id: string; name: string; role: string }>
   areas: Array<{ id: string; name: string }>
   shiftTypes: Array<{ id: string; name: string; color: string }>
+  selectedAreaId?: string | null
   onFiltersChange?: (filters: FilterState) => void
   initialFilters?: Partial<FilterState>
 }
@@ -78,6 +79,8 @@ interface ActiveFiltersBadgesProps {
   users: Array<{ id: string; name: string; role: string }>
   areas: Array<{ id: string; name: string }>
   shiftTypes: Array<{ id: string; name: string; color: string }>
+  selectedAreaId?: string | null
+  locale: 'es' | 'en'
   getStatusColor: (status: ShiftStatus) => string
   getStatusLabel: (status: ShiftStatus) => string
 }
@@ -87,6 +90,8 @@ function ActiveFiltersBadges({
   users,
   areas,
   shiftTypes,
+  selectedAreaId,
+  locale,
   getStatusColor,
   getStatusLabel,
 }: ActiveFiltersBadgesProps) {
@@ -95,13 +100,6 @@ function ActiveFiltersBadges({
   return (
     <div className="flex flex-wrap gap-2 p-3 bg-muted/50 rounded-lg">
       <span className="text-sm text-muted-foreground">{t('activeFilters')}:</span>
-
-      {filters.search && (
-        <Badge variant="secondary" className="gap-1">
-          <Search className="h-3 w-3" />
-          {filters.search}
-        </Badge>
-      )}
 
       {filters.status && (
         <Badge className={`gap-1 ${getStatusColor(filters.status as ShiftStatus)}`}>
@@ -116,7 +114,7 @@ function ActiveFiltersBadges({
         </Badge>
       )}
 
-      {filters.areaId && (
+      {filters.areaId && !selectedAreaId && (
         <Badge variant="secondary" className="gap-1">
           <Filter className="h-3 w-3" />
           {areas.find((a) => a.id === filters.areaId)?.name}
@@ -138,9 +136,9 @@ function ActiveFiltersBadges({
       {(filters.startDate || filters.endDate) && (
         <Badge variant="secondary" className="gap-1">
           <CalendarIcon className="h-3 w-3" />
-          {filters.startDate && format(filters.startDate, 'dd/MM/yyyy')}
+          {filters.startDate && formatDateShort(filters.startDate, locale)}
           {filters.startDate && filters.endDate && ' - '}
-          {filters.endDate && format(filters.endDate, 'dd/MM/yyyy')}
+          {filters.endDate && formatDateShort(filters.endDate, locale)}
         </Badge>
       )}
     </div>
@@ -151,10 +149,12 @@ export function ShiftFilters({
   users,
   areas,
   shiftTypes,
+  selectedAreaId,
   onFiltersChange,
   initialFilters = EMPTY_INITIAL_FILTERS,
 }: ShiftFiltersProps) {
   const t = useTranslations('shifts.filters')
+  const locale = useLocale() as 'es' | 'en'
   const [filters, setFilters] = useState<FilterState>({
     search: '',
     status: '',
@@ -167,14 +167,14 @@ export function ShiftFilters({
 
   const hasActiveFilters = useMemo(() => {
     return (
-      filters.search ||
       filters.status ||
       filters.userId ||
       filters.shiftTypeId ||
       filters.startDate ||
-      filters.endDate
+      filters.endDate ||
+      (filters.areaId && !selectedAreaId)
     )
-  }, [filters])
+  }, [filters, selectedAreaId])
 
   const updateFilters = (newFilters: Partial<FilterState>) => {
     const updatedFilters = { ...filters, ...newFilters }
@@ -195,6 +195,8 @@ export function ShiftFilters({
     onFiltersChange?.(clearedFilters)
   }
 
+  const showAreaFilter = !selectedAreaId
+
   const getStatusLabel = (status: ShiftStatus) => {
     switch (status) {
       case SHIFT_STATUS.SCHEDULED:
@@ -214,209 +216,230 @@ export function ShiftFilters({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">{t('title')}</h3>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h2 className="text-base font-semibold">{t('title')}</h2>
         {hasActiveFilters && (
-          <Button variant="outline" size="sm" onClick={clearFilters} className="gap-2">
+          <Button variant="ghost" size="sm" onClick={clearFilters} className="gap-1.5 text-muted-foreground hover:text-foreground">
             <X className="h-4 w-4" />
             {t('clear')}
           </Button>
         )}
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder={t('searchPlaceholder')}
-            value={filters.search}
-            onChange={(e) => updateFilters({ search: e.target.value })}
-            className="pl-10"
-          />
+      <div className="rounded-lg border bg-muted/20 p-4">
+        <div className="grid grid-cols-2 gap-x-4 gap-y-4 lg:grid-cols-4">
+          <div className="space-y-1.5">
+            <label className="text-xs font-medium text-muted-foreground">{t('statusPlaceholder')}</label>
+            <Select
+              value={filters.status || FILTER_ALL}
+              onValueChange={(value) =>
+                updateFilters({ status: value === FILTER_ALL ? '' : (value as ShiftStatus) })
+              }
+            >
+              <SelectTrigger className="h-9 bg-background">
+                <SelectValue placeholder={t('allStatuses')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={FILTER_ALL}>{t('allStatuses')}</SelectItem>
+                <StatusSelectItem status={SHIFT_STATUS.SCHEDULED} label={t('status.scheduled')} />
+                <StatusSelectItem status={SHIFT_STATUS.IN_PROGRESS} label={t('status.inProgress')} />
+                <StatusSelectItem status={SHIFT_STATUS.COMPLETED} label={t('status.completed')} />
+                <StatusSelectItem status={SHIFT_STATUS.CANCELLED} label={t('status.cancelled')} />
+                <StatusSelectItem status={SHIFT_STATUS.NO_SHOW} label={t('status.noShow')} />
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-medium text-muted-foreground">{t('userPlaceholder')}</label>
+            <Select
+              value={filters.userId || FILTER_ALL}
+              onValueChange={(value) => updateFilters({ userId: value === FILTER_ALL ? '' : value })}
+            >
+              <SelectTrigger className="h-9 bg-background">
+                <SelectValue placeholder={t('allUsers')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={FILTER_ALL}>{t('allUsers')}</SelectItem>
+                {users.map((user) => (
+                  <SelectItem key={user.id} value={user.id}>
+                    <div className="flex items-center gap-2">
+                      <Users className="h-4 w-4 text-muted-foreground" />
+                      {user.name}
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {showAreaFilter ? (
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground">{t('areaPlaceholder')}</label>
+              <Select
+                value={filters.areaId || FILTER_ALL}
+                onValueChange={(value) => updateFilters({ areaId: value === FILTER_ALL ? '' : value })}
+              >
+                <SelectTrigger className="h-9 bg-background">
+                  <SelectValue placeholder={t('allAreas')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={FILTER_ALL}>{t('allAreas')}</SelectItem>
+                  {areas.map((area) => (
+                    <SelectItem key={area.id} value={area.id}>
+                      {area.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          ) : (
+            <div aria-hidden className="hidden lg:block" />
+          )}
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-medium text-muted-foreground">{t('shiftTypePlaceholder')}</label>
+            <Select
+              value={filters.shiftTypeId || FILTER_ALL}
+              onValueChange={(value) =>
+                updateFilters({ shiftTypeId: value === FILTER_ALL ? '' : value })
+              }
+            >
+              <SelectTrigger className="h-9 bg-background">
+                <SelectValue placeholder={t('allShiftTypes')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={FILTER_ALL}>{t('allShiftTypes')}</SelectItem>
+                {shiftTypes.map((type) => (
+                  <SelectItem key={type.id} value={type.id}>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: type.color }} />
+                      {type.name}
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="col-span-2 grid grid-cols-1 gap-4 border-t border-border/60 pt-4 lg:col-span-4 lg:grid-cols-3">
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground">{t('startDatePlaceholder')}</label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="h-9 w-full justify-start bg-background text-left font-normal">
+                    <CalendarIcon className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" />
+                    <span className="truncate">
+                      {filters.startDate ? formatDateLong(filters.startDate, locale) : t('startDatePlaceholder')}
+                    </span>
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <DatePicker
+                    mode="single"
+                    selected={filters.startDate}
+                    onSelect={(date) => date && updateFilters({ startDate: date })}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground">{t('endDatePlaceholder')}</label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="h-9 w-full justify-start bg-background text-left font-normal">
+                    <CalendarIcon className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" />
+                    <span className="truncate">
+                      {filters.endDate ? formatDateLong(filters.endDate, locale) : t('endDatePlaceholder')}
+                    </span>
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <DatePicker
+                    mode="single"
+                    selected={filters.endDate}
+                    onSelect={(date) => date && updateFilters({ endDate: date })}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground">{t('quickDatePlaceholder')}</label>
+              <Select
+                value={quickRange || FILTER_CUSTOM}
+                onValueChange={(value) => {
+                  const now = new Date()
+                  let startDate: Date | undefined
+                  let endDate: Date | undefined
+                  let range: '' | 'today' | 'week' | 'month' = ''
+
+                  if (value === FILTER_CUSTOM) {
+                    setQuickRange('')
+                    updateFilters({ startDate: undefined, endDate: undefined })
+                    return
+                  }
+
+                  switch (value) {
+                    case 'today':
+                      startDate = startOfDay(now)
+                      endDate = endOfDay(now)
+                      range = 'today'
+                      break
+                    case 'week':
+                      startDate = new Date(
+                        now.getFullYear(),
+                        now.getMonth(),
+                        now.getDate() - now.getDay()
+                      )
+                      endDate = new Date(startDate.getTime() + 6 * 24 * 60 * 60 * 1000)
+                      range = 'week'
+                      break
+                    case 'month':
+                      startDate = new Date(now.getFullYear(), now.getMonth(), 1)
+                      endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0)
+                      range = 'month'
+                      break
+                    default:
+                      startDate = undefined
+                      endDate = undefined
+                  }
+
+                  setQuickRange(range)
+                  updateFilters({ startDate, endDate })
+                }}
+              >
+                <SelectTrigger className="h-9 bg-background">
+                  <SelectValue placeholder={t('quickDatePlaceholder')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={FILTER_CUSTOM}>{t('customDates')}</SelectItem>
+                  <SelectItem value="today">
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-4 w-4" />
+                      {t('today')}
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="week">
+                    <div className="flex items-center gap-2">
+                      <CalendarIcon className="h-4 w-4" />
+                      {t('thisWeek')}
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="month">
+                    <div className="flex items-center gap-2">
+                      <CalendarIcon className="h-4 w-4" />
+                      {t('thisMonth')}
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
         </div>
-
-        <Select
-          value={filters.status || FILTER_ALL}
-          onValueChange={(value) =>
-            updateFilters({ status: value === FILTER_ALL ? '' : (value as ShiftStatus) })
-          }
-        >
-          <SelectTrigger>
-            <SelectValue placeholder={t('statusPlaceholder')} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value={FILTER_ALL}>{t('allStatuses')}</SelectItem>
-            <StatusSelectItem status={SHIFT_STATUS.SCHEDULED} label={t('status.scheduled')} />
-            <StatusSelectItem status={SHIFT_STATUS.IN_PROGRESS} label={t('status.inProgress')} />
-            <StatusSelectItem status={SHIFT_STATUS.COMPLETED} label={t('status.completed')} />
-            <StatusSelectItem status={SHIFT_STATUS.CANCELLED} label={t('status.cancelled')} />
-            <StatusSelectItem status={SHIFT_STATUS.NO_SHOW} label={t('status.noShow')} />
-          </SelectContent>
-        </Select>
-
-        <Select
-          value={filters.userId || FILTER_ALL}
-          onValueChange={(value) => updateFilters({ userId: value === FILTER_ALL ? '' : value })}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder={t('userPlaceholder')} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value={FILTER_ALL}>{t('allUsers')}</SelectItem>
-            {users.map((user) => (
-              <SelectItem key={user.id} value={user.id}>
-                <div className="flex items-center gap-2">
-                  <Users className="h-4 w-4 text-muted-foreground" />
-                  {user.name}
-                </div>
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        <Select
-          value={filters.areaId || FILTER_ALL}
-          onValueChange={(value) => updateFilters({ areaId: value === FILTER_ALL ? '' : value })}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder={t('areaPlaceholder')} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value={FILTER_ALL}>{t('allAreas')}</SelectItem>
-            {areas.map((area) => (
-              <SelectItem key={area.id} value={area.id}>
-                {area.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Select
-          value={filters.shiftTypeId || FILTER_ALL}
-          onValueChange={(value) =>
-            updateFilters({ shiftTypeId: value === FILTER_ALL ? '' : value })
-          }
-        >
-          <SelectTrigger>
-            <SelectValue placeholder={t('shiftTypePlaceholder')} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value={FILTER_ALL}>{t('allShiftTypes')}</SelectItem>
-            {shiftTypes.map((type) => (
-              <SelectItem key={type.id} value={type.id}>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: type.color }} />
-                  {type.name}
-                </div>
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" className="w-full justify-start text-left font-normal">
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {filters.startDate ? format(filters.startDate, 'PPP') : t('startDatePlaceholder')}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <DatePicker
-              mode="single"
-              selected={filters.startDate}
-              onSelect={(date) => date && updateFilters({ startDate: date })}
-              initialFocus
-            />
-          </PopoverContent>
-        </Popover>
-
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" className="w-full justify-start text-left font-normal">
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {filters.endDate ? format(filters.endDate, 'PPP') : t('endDatePlaceholder')}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <DatePicker
-              mode="single"
-              selected={filters.endDate}
-              onSelect={(date) => date && updateFilters({ endDate: date })}
-              initialFocus
-            />
-          </PopoverContent>
-        </Popover>
-
-        <Select
-          value={quickRange || FILTER_CUSTOM}
-          onValueChange={(value) => {
-            const now = new Date()
-            let startDate: Date | undefined
-            let endDate: Date | undefined
-            let range: '' | 'today' | 'week' | 'month' = ''
-
-            if (value === FILTER_CUSTOM) {
-              setQuickRange('')
-              updateFilters({ startDate: undefined, endDate: undefined })
-              return
-            }
-
-            switch (value) {
-              case 'today':
-                startDate = startOfDay(now)
-                endDate = endOfDay(now)
-                range = 'today'
-                break
-              case 'week':
-                startDate = new Date(
-                  now.getFullYear(),
-                  now.getMonth(),
-                  now.getDate() - now.getDay()
-                )
-                endDate = new Date(startDate.getTime() + 6 * 24 * 60 * 60 * 1000)
-                range = 'week'
-                break
-              case 'month':
-                startDate = new Date(now.getFullYear(), now.getMonth(), 1)
-                endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0)
-                range = 'month'
-                break
-              default:
-                startDate = undefined
-                endDate = undefined
-            }
-
-            setQuickRange(range)
-            updateFilters({ startDate, endDate })
-          }}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder={t('quickDatePlaceholder')} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value={FILTER_CUSTOM}>{t('customDates')}</SelectItem>
-            <SelectItem value="today">
-              <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4" />
-                {t('today')}
-              </div>
-            </SelectItem>
-            <SelectItem value="week">
-              <div className="flex items-center gap-2">
-                <CalendarIcon className="h-4 w-4" />
-                {t('thisWeek')}
-              </div>
-            </SelectItem>
-            <SelectItem value="month">
-              <div className="flex items-center gap-2">
-                <CalendarIcon className="h-4 w-4" />
-                {t('thisMonth')}
-              </div>
-            </SelectItem>
-          </SelectContent>
-        </Select>
       </div>
 
       {hasActiveFilters && (
@@ -425,6 +448,8 @@ export function ShiftFilters({
           users={users}
           areas={areas}
           shiftTypes={shiftTypes}
+          selectedAreaId={selectedAreaId}
+          locale={locale}
           getStatusColor={getStatusColor}
           getStatusLabel={getStatusLabel}
         />

@@ -29,20 +29,20 @@ export default async function AdminHRDashboardPage({ params }: AdminHRDashboardP
 
   if (!statsResult.success || !statsResult.data)
     return (
-      <div className="space-y-8">
+      <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
-          <p className="text-muted-foreground mt-2">{t('description')}</p>
+          <h1 className="text-2xl font-bold tracking-tight">{t('title')}</h1>
+          <p className="text-muted-foreground mt-1">{t('description')}</p>
         </div>
         <p className="text-destructive">{statsResult.error || t('errorLoading')}</p>
       </div>
     )
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
-        <p className="text-muted-foreground mt-2">{t('description')}</p>
+        <h1 className="text-2xl font-bold tracking-tight">{t('title')}</h1>
+        <p className="text-muted-foreground mt-1">{t('description')}</p>
       </div>
 
       <DashboardStatsCards stats={statsResult.data} />

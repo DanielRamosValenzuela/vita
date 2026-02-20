@@ -35,6 +35,7 @@ interface ShiftTypeFormDialogProps {
   isPending: boolean
   hasChanges: boolean
   areas: AreaOption[]
+  canCreateGlobal?: boolean
   onSave: () => void
 }
 
@@ -46,6 +47,7 @@ export function ShiftTypeFormDialog({
   isPending,
   hasChanges,
   areas,
+  canCreateGlobal = true,
   onSave,
 }: ShiftTypeFormDialogProps) {
   const t = useTranslations('shifts.shiftTypes')
@@ -83,7 +85,12 @@ export function ShiftTypeFormDialog({
           </div>
           <ShiftTypeColorPicker formData={formData} dispatch={dispatch} />
           <ShiftTypeStaffFields formData={formData} dispatch={dispatch} />
-          <ShiftTypeAreaAssignment formData={formData} dispatch={dispatch} areas={areas} />
+          <ShiftTypeAreaAssignment
+            formData={formData}
+            dispatch={dispatch}
+            areas={areas}
+            canCreateGlobal={canCreateGlobal}
+          />
           <div className="flex items-center space-x-2">
             <input
               type="checkbox"

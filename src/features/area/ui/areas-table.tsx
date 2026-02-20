@@ -20,6 +20,14 @@ import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
 import { IconDisplay } from '@/src/shared/ui/icon-picker'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/src/shared/ui/table'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/src/shared/ui/tooltip'
 import { deleteAreaAction } from '@/src/features/area/api'
 
@@ -92,90 +100,74 @@ export function AreasTable({ areas, canCreate = true, canDelete = true }: AreasT
             )}
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b">
-                  <th className="text-muted-foreground pb-3 text-left text-sm font-medium">
-                    {t('table.name')}
-                  </th>
-                  <th className="text-muted-foreground pb-3 text-left text-sm font-medium">
-                    {t('table.description')}
-                  </th>
-                  <th className="text-muted-foreground pb-3 text-left text-sm font-medium">
-                    {t('table.shiftTypes')}
-                  </th>
-                  <th className="text-muted-foreground pb-3 text-left text-sm font-medium">
-                    {t('table.chiefs')}
-                  </th>
-                  <th className="text-muted-foreground pb-3 text-left text-sm font-medium">
-                    {t('table.staff')}
-                  </th>
-                  <th className="text-muted-foreground pb-3 text-left text-sm font-medium">
-                    {t('table.status')}
-                  </th>
-                  <th className="text-muted-foreground pb-3 text-right text-sm font-medium">
-                    {t('table.actions')}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {areas.map((area) => (
-                  <tr key={area.id} className="border-b last:border-0">
-                    <td className="py-4">
-                      <span className="flex items-center gap-2">
-                        <span style={{ color: area.color }}>
-                          <IconDisplay iconName={area.icon ?? DEFAULT_AREA_ICON} size={18} />
-                        </span>
-                        <span className="font-medium">{area.name}</span>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>{t('table.name')}</TableHead>
+                <TableHead>{t('table.description')}</TableHead>
+                <TableHead>{t('table.shiftTypes')}</TableHead>
+                <TableHead>{t('table.chiefs')}</TableHead>
+                <TableHead>{t('table.staff')}</TableHead>
+                <TableHead>{t('table.status')}</TableHead>
+                <TableHead className="text-right">{t('table.actions')}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {areas.map((area) => (
+                <TableRow key={area.id}>
+                  <TableCell>
+                    <span className="flex items-center gap-2">
+                      <span style={{ color: area.color }}>
+                        <IconDisplay iconName={area.icon ?? DEFAULT_AREA_ICON} size={18} />
                       </span>
-                    </td>
-                    <td className="text-muted-foreground py-4 text-sm">
-                      {area.description || '-'}
-                    </td>
-                    <td className="py-4 text-sm">{area._count?.shiftTypes ?? 0}</td>
-                    <td className="py-4 text-sm">{area.chiefsCount ?? 0}</td>
-                    <td className="py-4 text-sm">{area.staffCount ?? 0}</td>
-                    <td className="py-4">
-                      <Badge variant={area.isActive ? 'default' : 'secondary'}>
-                        {area.isActive ? t('status.active') : t('status.inactive')}
-                      </Badge>
-                    </td>
-                    <td className="py-4 text-right">
-                      <div className="flex justify-end gap-2">
+                      <span className="font-medium">{area.name}</span>
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-muted-foreground text-sm">
+                    {area.description || '-'}
+                  </TableCell>
+                  <TableCell className="text-sm">{area._count?.shiftTypes ?? 0}</TableCell>
+                  <TableCell className="text-sm">{area.chiefsCount ?? 0}</TableCell>
+                  <TableCell className="text-sm">{area.staffCount ?? 0}</TableCell>
+                  <TableCell>
+                    <Badge variant={area.isActive ? 'default' : 'secondary'}>
+                      {area.isActive ? t('status.active') : t('status.inactive')}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-2">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button asChild variant="ghost" size="sm">
+                            <Link href={`/dashboard/areas/${area.id}/edit`}>
+                              <Eye className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                            </Link>
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="top">{t('table.view')}</TooltipContent>
+                      </Tooltip>
+                      {canDelete && (
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <Button asChild variant="ghost" size="sm">
-                              <Link href={`/dashboard/areas/${area.id}/edit`}>
-                                <Eye className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                              </Link>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setDeleteTarget({ id: area.id, name: area.name })}
+                              className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                              aria-label={t('delete')}
+                            >
+                              <Trash2 className="h-4 w-4" />
                             </Button>
                           </TooltipTrigger>
-                          <TooltipContent side="top">{t('table.view')}</TooltipContent>
+                          <TooltipContent side="top">{t('delete')}</TooltipContent>
                         </Tooltip>
-                        {canDelete && (
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setDeleteTarget({ id: area.id, name: area.name })}
-                                className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                                aria-label={t('delete')}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent side="top">{t('delete')}</TooltipContent>
-                          </Tooltip>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                      )}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         )}
       </CardContent>
 

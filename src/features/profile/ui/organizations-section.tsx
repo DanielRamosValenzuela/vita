@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
-import { Building2, Loader2 } from 'lucide-react'
+import { Building2 } from 'lucide-react'
 
+import { Spinner } from '@/src/shared/ui/atoms'
 import { ORGANIZATION_STATUS_BADGE_VARIANTS } from '@/src/shared/lib/constants'
 import type { ActionResult } from '@/src/shared/lib/types'
 import { Badge } from '@/src/shared/ui/badge'
@@ -60,7 +61,7 @@ export function OrganizationsSection() {
         </CardHeader>
         <CardContent>
           <p className="flex items-center justify-center py-8" role="status" aria-live="polite">
-            <Loader2 className="text-muted-foreground h-6 w-6 animate-spin" aria-hidden />
+            <Spinner size="lg" className="text-muted-foreground" />
           </p>
         </CardContent>
       </Card>

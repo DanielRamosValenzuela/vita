@@ -25,6 +25,7 @@ interface ShiftFormDialogProps {
   users: Array<{ id: string; name: string; role: string }>
   areas: Array<{ id: string; name: string; description?: string }>
   shiftTypes: ShiftTypeOption[]
+  initialAreaId?: string | null
 }
 
 export function ShiftFormDialog({
@@ -32,6 +33,7 @@ export function ShiftFormDialog({
   users,
   areas,
   shiftTypes,
+  initialAreaId,
 }: ShiftFormDialogProps) {
   const t = useTranslations('shifts')
   const tToast = useTranslations()
@@ -78,6 +80,7 @@ export function ShiftFormDialog({
           users={users}
           areas={areas}
           shiftTypes={shiftTypes}
+          initialData={initialAreaId ? { areaId: initialAreaId } : undefined}
           onSubmit={handleSubmit}
           onCancel={handleCancel}
           isPending={isSubmitting}

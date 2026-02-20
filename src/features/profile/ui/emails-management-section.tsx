@@ -2,9 +2,10 @@
 
 import { useEffect, useReducer, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
-import { Loader2, Mail, Plus } from 'lucide-react'
+import { Mail, Plus } from 'lucide-react'
 import { toast } from 'sonner'
 
+import { Spinner } from '@/src/shared/ui/atoms'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
 import { Input } from '@/src/shared/ui/input'
@@ -194,7 +195,7 @@ export function EmailsManagementSection({
           </div>
           <Button onClick={handleAddEmail} disabled={isPending || !newEmail.trim()}>
             {isPending ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <Spinner size="sm" className="mr-2" />
             ) : (
               <Plus className="mr-2 h-4 w-4" />
             )}
@@ -204,7 +205,7 @@ export function EmailsManagementSection({
 
         {isLoading ? (
           <div className="flex items-center justify-center py-8">
-            <Loader2 className="h-8 w-8 animate-spin" />
+            <Spinner size="lg" />
           </div>
         ) : emails.length === 0 ? (
           <p className="text-muted-foreground text-center py-8">{t('noEmails')}</p>

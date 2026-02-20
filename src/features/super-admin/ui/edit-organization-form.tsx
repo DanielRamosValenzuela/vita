@@ -4,11 +4,12 @@ import { useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { Organization } from '@prisma/client'
-import { ArrowLeft, Loader2 } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 import { useForm, useWatch } from 'react-hook-form'
 import type { FieldErrors, UseFormRegister, UseFormSetValue } from 'react-hook-form'
 import { toast } from 'sonner'
 
+import { Spinner } from '@/src/shared/ui/atoms'
 import { ROLES } from '@/src/shared/lib/constants'
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
@@ -282,7 +283,7 @@ export function EditOrganizationForm({ organization }: EditOrganizationFormProps
           {t('form.cancel')}
         </Button>
         <Button type="submit" disabled={isPending}>
-          {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          {isPending && <Spinner size="sm" className="mr-2" />}
           {t('form.submit')}
         </Button>
       </div>

@@ -2,9 +2,10 @@
 
 import { useMemo, useReducer, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
-import { Loader2, Palette, Plus } from 'lucide-react'
+import { Palette, Plus } from 'lucide-react'
 import { toast } from 'sonner'
 
+import { Spinner } from '@/src/shared/ui/atoms'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -31,6 +32,7 @@ import { DeleteShiftTypeDialog } from './delete-shift-type-dialog'
 import { ShiftTypeFormDialog } from './shift-type-form-dialog'
 import { ShiftTypesTable } from './shift-types-table'
 import {
+  DEFAULT_FORM_DATA,
   hasShiftTypeFormChanged,
   INITIAL_STATE,
   shiftTypesReducer,
@@ -41,9 +43,16 @@ import {
 interface ShiftTypesPageProps {
   shiftTypes: ShiftType[]
   areas: AreaOption[]
+  canCreateGlobal?: boolean
+  isChief?: boolean
 }
 
-export function ShiftTypesPage({ shiftTypes, areas }: ShiftTypesPageProps) {
+export function ShiftTypesPage({
+  shiftTypes,
+  areas,
+  canCreateGlobal = true,
+  isChief = false,
+}: ShiftTypesPageProps) {
   const t = useTranslations('shifts.shiftTypes')
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
@@ -76,6 +85,11 @@ export function ShiftTypesPage({ shiftTypes, areas }: ShiftTypesPageProps) {
 
   const handleCreate = () => {
     dispatch({ type: 'OPEN_CREATE' })
+    if (!canCreateGlobal)
+      dispatch({
+        type: 'SET_FORM_DATA',
+        formData: { ...DEFAULT_FORM_DATA, isGlobal: false, areaConfigs: [] },
+      })
   }
 
   const handleEdit = (shiftType: ShiftType) => {
@@ -195,6 +209,7 @@ export function ShiftTypesPage({ shiftTypes, areas }: ShiftTypesPageProps) {
               getStatusBadge={getStatusBadge}
               onEdit={handleEdit}
               onDelete={handleDelete}
+              isChief={isChief}
             />
           )}
         </CardContent>
@@ -208,6 +223,7 @@ export function ShiftTypesPage({ shiftTypes, areas }: ShiftTypesPageProps) {
         isPending={isPending}
         hasChanges={hasChanges}
         areas={areas}
+        canCreateGlobal={canCreateGlobal}
         onSave={handleSave}
       />
 
@@ -225,7 +241,7 @@ export function ShiftTypesPage({ shiftTypes, areas }: ShiftTypesPageProps) {
               {t('form.saveConfirm.cancel')}
             </AlertDialogCancel>
             <AlertDialogAction onClick={performSave} disabled={isPending}>
-              {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isPending && <Spinner size="sm" className="mr-2" />}
               {t('form.saveConfirm.confirm')}
             </AlertDialogAction>
           </AlertDialogFooter>
