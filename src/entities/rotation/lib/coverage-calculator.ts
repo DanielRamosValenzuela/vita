@@ -16,7 +16,7 @@ type RotationGroupInput = {
   memberCount: number;
 };
 
-export type RotationInput = {
+type RotationInput = {
   id: string;
   name: string;
   startDate: Date | null;

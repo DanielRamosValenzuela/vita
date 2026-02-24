@@ -59,18 +59,6 @@ export const updateRotationSchema = z.object({
     .optional(),
 });
 
-export const addGroupSchema = z.object({
-  rotationId: z.string().min(1),
-  name: z.string().min(1).max(20),
-  color: z.string().regex(/^#[0-9a-fA-F]{6}$/).default('#3b82f6'),
-  icon: z.string().max(30).default('Users'),
-});
-
-export const addMemberSchema = z.object({
-  rotationGroupId: z.string().min(1),
-  userId: z.string().min(1),
-});
-
 export const addMembersBulkSchema = z.object({
   rotationGroupId: z.string().min(1),
   userIds: z.array(z.string().min(1)).min(1).max(50),
