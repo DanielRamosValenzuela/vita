@@ -265,6 +265,11 @@
   animation: vita-heartbeat 1.8s ease-in-out infinite;
 }
 
+@keyframes processing-orbit {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 @keyframes skeleton-wave {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }

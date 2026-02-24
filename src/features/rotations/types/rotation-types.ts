@@ -10,6 +10,9 @@ export type RotationWithRelations = {
   organizationId: string
   createdAt: Date
   updatedAt: Date
+  _count: {
+    shifts: number
+  }
   area: {
     id: string
     name: string

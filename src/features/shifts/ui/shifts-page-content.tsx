@@ -20,6 +20,7 @@ import {
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/src/shared/ui/card'
+import { Skeleton } from '@/src/shared/ui/skeleton'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/src/shared/ui/tooltip'
 import {
   Table,
@@ -33,8 +34,11 @@ import {
 import { useRouter } from '@/i18n/navigation'
 
 import { deleteShiftAction, getShiftsAction } from '../api/shift-actions'
+import { groupShiftsForCalendar } from '../lib/calendar-grouping'
 import type { ShiftWithRelations } from '../types/shift-types'
 import { AreaSwitcher } from './area-switcher'
+import { RotationShiftsDetailDialog } from './rotation-shifts-detail-dialog'
+import type { RotationGroupCalendarEvent } from './shift-calendar'
 import { ShiftCalendar } from './shift-calendar'
 import { ShiftFilters } from './shift-filters'
 import type { ShiftTypeOption } from './shift-form'
@@ -80,20 +84,12 @@ export function ShiftsPageContent({
   const [editingShift, setEditingShift] = useState<ShiftWithRelations | null>(null)
   const [shiftToDelete, setShiftToDelete] = useState<ShiftWithRelations | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [rotationDetailOpen, setRotationDetailOpen] = useState(false)
+  const [rotationDetailShifts, setRotationDetailShifts] = useState<ShiftWithRelations[]>([])
+  const [rotationDetailMeta, setRotationDetailMeta] = useState<{ shiftTypeName: string; date: string }>({ shiftTypeName: '', date: '' })
 
   const calendarShifts = useMemo(
-    () =>
-      shifts.map((shift) => ({
-        id: shift.id,
-        title: shift.title || t('table.noTitle'),
-        startTime: shift.startTime,
-        endTime: shift.endTime,
-        status: shift.status,
-        userName: shift.user.name,
-        areaName: shift.area.name,
-        color: shift.shiftType.color,
-        icon: shift.shiftType.icon ?? 'Clock',
-      })),
+    () => groupShiftsForCalendar(shifts, t('table.noTitle')),
     [shifts, t]
   )
 
@@ -210,6 +206,22 @@ export function ShiftsPageContent({
   const handleShiftDeleteClick = (calendarEvent: { id: string }) => {
     const fullShift = shifts.find((s) => s.id === calendarEvent.id)
     if (fullShift) setShiftToDelete(fullShift)
+  }
+
+  const handleRotationBlockClick = (block: RotationGroupCalendarEvent) => {
+    const blockShifts = shifts.filter((s) => block.shiftIds.includes(s.id))
+    setRotationDetailShifts(blockShifts)
+    setRotationDetailMeta({
+      shiftTypeName: block.title,
+      date: format(block.startTime, 'dd/MM/yyyy'),
+    })
+    setRotationDetailOpen(true)
+  }
+
+  const handleEditShiftFromRotationDetail = (shift: ShiftWithRelations) => {
+    setRotationDetailOpen(false)
+    setEditingShift(shift)
+    setDialogOpen(true)
   }
 
   const handleDeleteConfirm = async () => {
@@ -331,17 +343,15 @@ export function ShiftsPageContent({
         onAreaChange={handleAreaChange}
       />
 
-      {isPending && (
-        <div className="text-sm text-muted-foreground animate-pulse">{t('loading')}</div>
-      )}
-
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">{t('stats.totalShifts')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{shifts.length}</div>
+            {isPending
+              ? <Skeleton className="h-8 w-12" />
+              : <div className="text-2xl font-bold">{shifts.length}</div>}
           </CardContent>
         </Card>
 
@@ -350,16 +360,20 @@ export function ShiftsPageContent({
             <CardTitle className="text-sm font-medium">{t('stats.thisMonth')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {shifts.filter((s) => {
-                const shiftDate = new Date(s.startTime)
-                const now = new Date()
-                return (
-                  shiftDate.getMonth() === now.getMonth() &&
-                  shiftDate.getFullYear() === now.getFullYear()
-                )
-              }).length}
-            </div>
+            {isPending
+              ? <Skeleton className="h-8 w-12" />
+              : (
+                <div className="text-2xl font-bold">
+                  {shifts.filter((s) => {
+                    const shiftDate = new Date(s.startTime)
+                    const now = new Date()
+                    return (
+                      shiftDate.getMonth() === now.getMonth() &&
+                      shiftDate.getFullYear() === now.getFullYear()
+                    )
+                  }).length}
+                </div>
+              )}
           </CardContent>
         </Card>
 
@@ -368,9 +382,13 @@ export function ShiftsPageContent({
             <CardTitle className="text-sm font-medium">{t('stats.inProgress')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {shifts.filter((s) => s.status === 'IN_PROGRESS').length}
-            </div>
+            {isPending
+              ? <Skeleton className="h-8 w-12" />
+              : (
+                <div className="text-2xl font-bold">
+                  {shifts.filter((s) => s.status === 'IN_PROGRESS').length}
+                </div>
+              )}
           </CardContent>
         </Card>
       </div>
@@ -390,9 +408,22 @@ export function ShiftsPageContent({
       <div className="space-y-6">
         <ShiftCalendar
           shifts={calendarShifts}
+          loading={isPending}
           onMonthChange={handleMonthChange}
           onShiftClick={handleShiftClick}
           onShiftDelete={handleShiftDeleteClick}
+          onRotationBlockClick={handleRotationBlockClick}
+        />
+
+        <RotationShiftsDetailDialog
+          open={rotationDetailOpen}
+          onOpenChange={setRotationDetailOpen}
+          shifts={rotationDetailShifts}
+          shiftTypeName={rotationDetailMeta.shiftTypeName}
+          date={rotationDetailMeta.date}
+          onEditShift={handleEditShiftFromRotationDetail}
+          getStatusColor={(status) => getStatusColor(status as ShiftStatus)}
+          getStatusLabel={(status) => getStatusLabel(status as ShiftStatus)}
         />
 
         <Card>
@@ -400,7 +431,19 @@ export function ShiftsPageContent({
             <CardTitle>{t('recent.title')}</CardTitle>
           </CardHeader>
           <CardContent>
-            {shifts.length === 0 ? (
+            {isPending ? (
+              <div className="space-y-3">
+                {Array.from({ length: 5 }, (_, i) => (
+                  <div key={i} className="flex items-center gap-4">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-4 w-20" />
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-5 w-20 rounded-full" />
+                  </div>
+                ))}
+              </div>
+            ) : shifts.length === 0 ? (
               <p className="text-muted-foreground text-center py-8">{t('recent.noShifts')}</p>
             ) : (
               <Table>
@@ -419,7 +462,7 @@ export function ShiftsPageContent({
                       <TableCell className="font-medium">{shift.user.name}</TableCell>
                       <TableCell>
                         <span className="inline-flex items-center gap-1">
-                          {shift.title || t('table.noTitle')}
+                          {shift.title || shift.rotation?.name || t('table.noTitle')}
                           {shift.rotationId && (
                             <Tooltip>
                               <TooltipTrigger asChild>
@@ -451,7 +494,7 @@ export function ShiftsPageContent({
               </Table>
             )}
 
-            {shifts.length > 10 && (
+            {!isPending && shifts.length > 10 && (
               <div className="mt-4 text-center">
                 <Button variant="outline">{t('recent.viewAll')}</Button>
               </div>

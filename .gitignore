@@ -40,3 +40,6 @@ client_secrets.json
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# scripts
+scripts

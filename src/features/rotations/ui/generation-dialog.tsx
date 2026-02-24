@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useMemo, useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
-import { Loader2 } from 'lucide-react'
+import { CalendarPlus, Eye, RefreshCw } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Badge } from '@/src/shared/ui/badge'
@@ -26,6 +26,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/src/shared/ui/table'
+import { ProcessingOverlay } from '@/src/shared/ui/atoms/processing-overlay'
 
 import { generateShiftsAction, previewGenerationAction, regenerateShiftsAction } from '../api/generation-actions'
 import type { GenerationPreview } from '../types/rotation-types'
@@ -39,7 +40,8 @@ interface GenerationDialogProps {
   regenerateMode?: boolean
 }
 
-type Step = 'dates' | 'preview' | 'generating'
+type Step = 'dates' | 'preview'
+type PendingOp = 'none' | 'preview' | 'generate'
 
 export function GenerationDialog({
   rotationId,
@@ -57,8 +59,24 @@ export function GenerationDialog({
   const [replaceExisting, setReplaceExisting] = useState(false)
   const [step, setStep] = useState<Step>('dates')
   const [isPending, startTransition] = useTransition()
+  const [pendingOp, setPendingOp] = useState<PendingOp>('none')
+  const [generateComplete, setGenerateComplete] = useState(false)
+
+  const previewMessages = useMemo(() => [
+    t('generation.processingPreviewMsg1'),
+    t('generation.processingPreviewMsg2'),
+    t('generation.processingPreviewMsg3'),
+  ], [t])
+
+  const generateMessages = useMemo(() => [
+    t('generation.processingGenerateMsg1'),
+    t('generation.processingGenerateMsg2'),
+    t('generation.processingGenerateMsg3'),
+    t('generation.processingGenerateMsg4'),
+  ], [t])
 
   const handleOpenChange = (isOpen: boolean) => {
+    if (isPending) return
     if (!isOpen) {
       setStartDate(undefined)
       setEndDate(undefined)
@@ -66,6 +84,8 @@ export function GenerationDialog({
       setOverrideConflicts(false)
       setReplaceExisting(false)
       setStep('dates')
+      setPendingOp('none')
+      setGenerateComplete(false)
     }
     onOpenChange(isOpen)
   }
@@ -73,6 +93,7 @@ export function GenerationDialog({
   const handlePreview = () => {
     if (!startDate || !endDate) return
 
+    setPendingOp('preview')
     startTransition(async () => {
       const result = await previewGenerationAction({
         rotationId,
@@ -80,6 +101,7 @@ export function GenerationDialog({
         endDate,
       })
 
+      setPendingOp('none')
       if (result.success && result.data) {
         setPreview(result.data)
         setStep('preview')
@@ -91,6 +113,8 @@ export function GenerationDialog({
   const handleGenerate = () => {
     if (!startDate || !endDate || !preview) return
 
+    setPendingOp('generate')
+    setGenerateComplete(false)
     startTransition(async () => {
       let result
       if (regenerateMode)
@@ -109,19 +133,47 @@ export function GenerationDialog({
         })
 
       if (result.success) {
+        setGenerateComplete(true)
         toast.success(t('generation.shiftsCreated', { count: result.data?.shiftsCreated ?? 0 }))
-        onGenerated()
-        onOpenChange(false)
-      } else
+      } else {
+        setPendingOp('none')
         toast.error(result.error ?? t('loadError'))
+      }
     })
+  }
+
+  const handleGenerateAnimationComplete = () => {
+    setPendingOp('none')
+    setGenerateComplete(false)
+    onGenerated()
+    onOpenChange(false)
   }
 
   const canPreview = !!startDate && !!endDate && startDate <= endDate
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-lg overflow-hidden">
+        <ProcessingOverlay
+          isActive={pendingOp === 'preview'}
+          icon={<Eye className="h-6 w-6" aria-hidden />}
+          title={t('generation.processingPreviewTitle')}
+          messages={previewMessages}
+        />
+
+        <ProcessingOverlay
+          isActive={pendingOp === 'generate'}
+          icon={
+            regenerateMode
+              ? <RefreshCw className="h-6 w-6" aria-hidden />
+              : <CalendarPlus className="h-6 w-6" aria-hidden />
+          }
+          title={t('generation.processingGenerateTitle')}
+          messages={generateMessages}
+          isComplete={generateComplete}
+          onComplete={handleGenerateAnimationComplete}
+        />
+
         <DialogHeader>
           <DialogTitle>
             {regenerateMode ? t('generation.regenerateMode') : t('generation.generateShifts')}
@@ -296,7 +348,6 @@ export function GenerationDialog({
                 disabled={!canPreview || isPending}
                 className="gap-2"
               >
-                {isPending && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
                 {t('generation.previewButton')}
               </Button>
             </>
@@ -316,12 +367,9 @@ export function GenerationDialog({
                 disabled={isPending || (!regenerateMode && (preview?.conflicts?.length ?? 0) > 0 && !overrideConflicts)}
                 className="gap-2"
               >
-                {isPending && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
-                {isPending
-                  ? t('generation.generating')
-                  : regenerateMode
-                    ? t('generation.regenerateButton')
-                    : t('generation.generateButton')}
+                {regenerateMode
+                  ? t('generation.regenerateButton')
+                  : t('generation.generateButton')}
               </Button>
             </>
           )}

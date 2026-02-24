@@ -294,7 +294,8 @@
       "selectDate": "Seleccionar fecha"
     },
     "calendar": {
-      "title": "Calendario de Turnos"
+      "title": "Calendario de Turnos",
+      "rotationBlockPersons": "{count, plural, one {# persona} other {# personas}}"
     },
     "recent": {
       "title": "Turnos Recientes",
@@ -316,7 +317,18 @@
     "legend": {
       "today": "Hoy",
       "weekend": "Fin de semana",
-      "holiday": "Feriado"
+      "holiday": "Feriado",
+      "rotation": "Rotativa"
+    },
+    "rotationDetail": {
+      "title": "Turnos de Rotativa",
+      "description": "Turnos generados por rotativa para {date}",
+      "person": "Persona",
+      "time": "Horario",
+      "status": "Estado",
+      "editShift": "Editar turno",
+      "modified": "Modificado",
+      "noShifts": "No hay turnos en este grupo"
     },
     "status": {
       "scheduled": "Programado",
@@ -2076,7 +2088,10 @@
       "removeCancelShifts": "Quitar y cancelar turnos futuros",
       "selectUser": "Seleccionar personal",
       "noAvailableUsers": "No hay personal disponible",
-      "memberAlreadyInGroup": "Este miembro ya está en otro grupo de esta rotativa"
+      "searchMember": "Buscar por nombre o email...",
+      "noSearchResults": "Sin resultados para esa búsqueda",
+      "memberAlreadyInGroup": "Este miembro ya está en otro grupo de esta rotativa",
+      "addSelected": "Agregar {count} seleccionados"
     },
     "generation": {
       "title": "Generar Turnos",
@@ -2119,7 +2134,16 @@
       "preserveManualShifts": "Los turnos modificados manualmente se preservarán",
       "regenerateButton": "Regenerar",
       "generateDialogDescription": "Selecciona un rango de fechas para generar los turnos de {name}",
-      "regenerateDialogDescription": "Regenera los turnos de {name} en el rango seleccionado"
+      "regenerateDialogDescription": "Regenera los turnos de {name} en el rango seleccionado",
+      "processingPreviewTitle": "Calculando vista previa...",
+      "processingPreviewMsg1": "Analizando patrón de rotativa",
+      "processingPreviewMsg2": "Verificando conflictos de horario",
+      "processingPreviewMsg3": "Calculando turnos por grupo",
+      "processingGenerateTitle": "Generando turnos...",
+      "processingGenerateMsg1": "Creando turnos en la base de datos",
+      "processingGenerateMsg2": "Verificando conflictos de horario",
+      "processingGenerateMsg3": "Asignando contratos vigentes",
+      "processingGenerateMsg4": "Enviando notificaciones al personal"
     },
     "coverage": {
       "title": "Cobertura",
@@ -2205,6 +2229,7 @@
       }
     },
     "detail": {
+      "pageTitle": "Detalle de Rotativa",
       "backToList": "Volver a rotativas",
       "activate": "Activar",
       "deactivate": "Desactivar",
@@ -2219,7 +2244,15 @@
       "patternTitle": "Patrón",
       "shiftConfigsTitle": "Horarios de turno",
       "shiftType": "Tipo de turno",
-      "startTime": "Hora de inicio"
+      "startTime": "Hora de inicio",
+      "view": "Ver detalle",
+      "editPattern": "Editar patrón",
+      "patternLocked": "No se puede editar el patrón porque ya tiene turnos generados",
+      "savePattern": "Guardar patrón",
+      "patternSaved": "Patrón actualizado",
+      "editConfigs": "Editar horarios",
+      "saveConfigs": "Guardar horarios",
+      "configsSaved": "Horarios actualizados"
     },
     "common": {
       "rotation": "Rotativa",

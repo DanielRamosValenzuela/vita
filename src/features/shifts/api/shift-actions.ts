@@ -538,6 +538,12 @@ export const getShiftsAction = async (
               color: true,
             },
           },
+          rotation: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
         },
       }),
       prisma.shift.count({ where }),

@@ -64,6 +64,7 @@ const rotationInclude = {
       icon: true,
       cycleOffset: true,
       members: {
+        where: { leftAt: null },
         select: {
           id: true,
           userId: true,
@@ -79,9 +80,14 @@ const rotationInclude = {
       },
       _count: {
         select: {
-          members: true,
+          members: { where: { leftAt: null } },
         },
       },
+    },
+  },
+  _count: {
+    select: {
+      shifts: true,
     },
   },
 } as const
@@ -295,7 +301,7 @@ export const getRotationsAction = async (
             select: {
               id: true,
               _count: {
-                select: { members: true },
+                select: { members: { where: { leftAt: null } } },
               },
             },
           },
@@ -549,7 +555,7 @@ export const updateRotationAction = async (
         where: { rotationId },
         select: {
           id: true,
-          _count: { select: { members: true } },
+          _count: { select: { members: { where: { leftAt: null } } } },
         },
       })
 

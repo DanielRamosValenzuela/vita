@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useMemo, useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
-import { Loader2, Plus, UserMinus } from 'lucide-react'
+import { Check, Loader2, Plus, Search as SearchIcon, UserMinus } from 'lucide-react'
 import { toast } from 'sonner'
 
 import {
@@ -19,16 +19,20 @@ import { Avatar, AvatarFallback } from '@/src/shared/ui/avatar'
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/src/shared/ui/card'
+import { IconDisplay } from '@/src/shared/ui/icon-picker'
+import { Input } from '@/src/shared/ui/input'
 import { Popover, PopoverContent, PopoverTrigger } from '@/src/shared/ui/popover'
 import { Skeleton } from '@/src/shared/ui/skeleton'
 
 import {
-  addMemberAction,
+  addMembersBulkAction,
   getAvailableStaffAction,
   removeMemberAction,
 } from '../api/group-actions'
 import type { AvailableStaffMember } from '../api/group-actions'
 import type { RotationWithRelations } from '../types/rotation-types'
+
+const DEFAULT_GROUP_ICON = 'Users'
 
 interface RotationGroupsSectionProps {
   rotation: RotationWithRelations
@@ -54,10 +58,24 @@ function AddMemberPopover({ groupId, rotationId, onAdded }: AddMemberPopoverProp
   const [staff, setStaff] = useState<AvailableStaffMember[]>([])
   const [loadingStaff, setLoadingStaff] = useState(false)
   const [isPending, startTransition] = useTransition()
+  const [search, setSearch] = useState('')
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+
+  const filteredStaff = useMemo(() => {
+    if (!search.trim()) return staff
+    const q = search.trim().toLowerCase()
+    return staff.filter(
+      (m) => m.name.toLowerCase().includes(q) || m.email.toLowerCase().includes(q)
+    )
+  }, [staff, search])
 
   const handleOpen = async (isOpen: boolean) => {
     setOpen(isOpen)
-    if (!isOpen) return
+    if (!isOpen) {
+      setSearch('')
+      setSelectedIds(new Set())
+      return
+    }
 
     setLoadingStaff(true)
     const result = await getAvailableStaffAction(rotationId)
@@ -69,9 +87,25 @@ function AddMemberPopover({ groupId, rotationId, onAdded }: AddMemberPopoverProp
       toast.error(result.error ?? t('loadError'))
   }
 
-  const handleAdd = (userId: string) => {
+  const toggleMember = (userId: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(userId))
+        next.delete(userId)
+      else
+        next.add(userId)
+      return next
+    })
+  }
+
+  const handleConfirm = () => {
+    if (selectedIds.size === 0) return
+
     startTransition(async () => {
-      const result = await addMemberAction({ rotationGroupId: groupId, userId })
+      const result = await addMembersBulkAction({
+        rotationGroupId: groupId,
+        userIds: Array.from(selectedIds),
+      })
 
       if (result.success) {
         toast.success(result.message ?? t('groups.addMember'))
@@ -90,37 +124,82 @@ function AddMemberPopover({ groupId, rotationId, onAdded }: AddMemberPopoverProp
           {t('groups.addMember')}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-64 p-2" align="start">
+      <PopoverContent className="w-72 p-3" align="start">
         {loadingStaff ? (
-          <div className="space-y-2 p-2">
+          <div className="space-y-2">
             <Skeleton className="h-8 w-full" />
             <Skeleton className="h-8 w-full" />
             <Skeleton className="h-8 w-full" />
           </div>
         ) : staff.length === 0 ? (
-          <p className="text-muted-foreground p-2 text-sm">{t('groups.noAvailableUsers')}</p>
+          <p className="text-muted-foreground py-4 text-center text-sm">
+            {t('groups.noAvailableUsers')}
+          </p>
         ) : (
-          <ul role="listbox" aria-label={t('groups.selectUser')} className="space-y-1">
-            {staff.map((member) => (
-              <li key={member.id}>
-                <button
-                  type="button"
-                  className="hover:bg-accent focus-visible:ring-ring flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-left text-sm transition-colors focus-visible:outline-none focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50"
-                  disabled={isPending}
-                  onClick={() => handleAdd(member.id)}
-                >
-                  <Avatar size="sm">
-                    <AvatarFallback>{member.name.charAt(0).toUpperCase()}</AvatarFallback>
-                  </Avatar>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate font-medium">{member.name}</p>
-                    <p className="text-muted-foreground truncate text-xs">{member.email}</p>
-                  </div>
-                  {isPending && <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />}
-                </button>
-              </li>
-            ))}
-          </ul>
+          <div className="space-y-2">
+            <div className="relative">
+              <SearchIcon
+                className="text-muted-foreground pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2"
+                aria-hidden
+              />
+              <Input
+                type="search"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder={t('groups.searchMember')}
+                className="h-8 pl-8 text-sm"
+              />
+            </div>
+            <div className="max-h-48 overflow-y-auto">
+              {filteredStaff.length === 0 ? (
+                <p className="text-muted-foreground py-3 text-center text-xs">
+                  {t('groups.noSearchResults')}
+                </p>
+              ) : (
+                <ul role="listbox" aria-label={t('groups.selectUser')} aria-multiselectable className="space-y-0.5">
+                  {filteredStaff.map((member) => {
+                    const isSelected = selectedIds.has(member.id)
+                    return (
+                      <li key={member.id} role="option" aria-selected={isSelected}>
+                        <button
+                          type="button"
+                          className={`focus-visible:ring-ring flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm transition-colors focus-visible:outline-none focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50 ${isSelected ? 'bg-accent' : 'hover:bg-accent/50'}`}
+                          disabled={isPending}
+                          onClick={() => toggleMember(member.id)}
+                        >
+                          <div className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border ${isSelected ? 'border-primary bg-primary text-primary-foreground' : 'border-muted-foreground/40'}`}>
+                            {isSelected && <Check className="h-3 w-3" aria-hidden />}
+                          </div>
+                          <Avatar size="sm">
+                            <AvatarFallback>{member.name.charAt(0).toUpperCase()}</AvatarFallback>
+                          </Avatar>
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-sm font-medium">{member.name}</p>
+                            <p className="text-muted-foreground truncate text-xs">{member.email}</p>
+                          </div>
+                        </button>
+                      </li>
+                    )
+                  })}
+                </ul>
+              )}
+            </div>
+            {selectedIds.size > 0 && (
+              <Button
+                size="sm"
+                className="w-full gap-2"
+                onClick={handleConfirm}
+                disabled={isPending}
+              >
+                {isPending ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
+                ) : (
+                  <Plus className="h-3.5 w-3.5" aria-hidden />
+                )}
+                {t('groups.addSelected', { count: selectedIds.size })}
+              </Button>
+            )}
+          </div>
         )}
       </PopoverContent>
     </Popover>
@@ -154,14 +233,26 @@ export function RotationGroupsSection({ rotation, onMemberChanged }: RotationGro
     <>
       <div className="grid gap-4 md:grid-cols-2">
         {rotation.groups.map((group) => (
-          <Card key={group.id} className="border-border/60">
+          <Card
+            key={group.id}
+            className="border-border/60 border-l-4"
+            style={{ borderLeftColor: group.color }}
+          >
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between gap-2">
-                <div>
-                  <CardTitle className="text-base">{group.name}</CardTitle>
-                  <p className="text-muted-foreground mt-0.5 text-xs">
-                    {t('groups.offset', { days: group.cycleOffset })}
-                  </p>
+                <div className="flex items-center gap-2">
+                  <div
+                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
+                    style={{ backgroundColor: group.color + '20' }}
+                  >
+                    <IconDisplay iconName={group.icon ?? DEFAULT_GROUP_ICON} className="text-foreground" size={16} />
+                  </div>
+                  <div>
+                    <CardTitle className="text-base">{group.name}</CardTitle>
+                    <p className="text-muted-foreground mt-0.5 text-xs">
+                      {t('groups.offset', { days: group.cycleOffset })}
+                    </p>
+                  </div>
                 </div>
                 <Badge variant="secondary" className="shrink-0">
                   {t('groups.members', { count: group._count.members })}

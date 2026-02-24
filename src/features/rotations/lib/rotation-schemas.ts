@@ -71,6 +71,11 @@ export const addMemberSchema = z.object({
   userId: z.string().min(1),
 });
 
+export const addMembersBulkSchema = z.object({
+  rotationGroupId: z.string().min(1),
+  userIds: z.array(z.string().min(1)).min(1).max(50),
+});
+
 export const removeMemberSchema = z.object({
   rotationGroupId: z.string().min(1),
   userId: z.string().min(1),

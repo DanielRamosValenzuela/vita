@@ -10,7 +10,7 @@ import type { ActionResult } from '@/src/shared/lib/types'
 
 import { createNotification } from '@/src/features/notifications/lib/notification-service'
 
-import { addGroupSchema, addMemberSchema, removeMemberSchema } from '../lib/rotation-schemas'
+import { addGroupSchema, addMemberSchema, addMembersBulkSchema, removeMemberSchema } from '../lib/rotation-schemas'
 import type { RotationWithRelations } from '../types/rotation-types'
 
 const rotationInclude = {
@@ -58,6 +58,7 @@ const rotationInclude = {
       icon: true,
       cycleOffset: true,
       members: {
+        where: { leftAt: null },
         select: {
           id: true,
           userId: true,
@@ -73,9 +74,14 @@ const rotationInclude = {
       },
       _count: {
         select: {
-          members: true,
+          members: { where: { leftAt: null } },
         },
       },
+    },
+  },
+  _count: {
+    select: {
+      shifts: true,
     },
   },
 } as const
@@ -122,7 +128,9 @@ export const getAvailableStaffAction = async (
     const activeMemberships = await prisma.rotationMember.findMany({
       where: {
         leftAt: null,
-        rotationGroup: { rotationId },
+        rotationGroup: {
+          rotation: { organizationId },
+        },
       },
       select: { userId: true },
     })
@@ -380,35 +388,45 @@ export const addMemberAction = async (
         userId: validatedData.userId,
         leftAt: null,
         rotationGroup: {
-          rotationId: group.rotation.id,
+          rotation: { organizationId },
+        },
+      },
+      select: {
+        rotationGroup: {
+          select: {
+            rotation: { select: { name: true } },
+          },
         },
       },
     })
 
     if (existingMembership)
-      return { success: false, error: 'Este usuario ya está asignado a otro grupo en esta rotativa' }
+      return {
+        success: false,
+        error: `${targetUser.name} ya pertenece a la rotativa "${existingMembership.rotationGroup.rotation.name}". Solo puede estar en una rotativa por organización`,
+      }
 
-    const conflictingRotation = await prisma.rotationMember.findFirst({
+    const previousMember = await prisma.rotationMember.findUnique({
       where: {
-        userId: validatedData.userId,
-        leftAt: null,
-        rotationGroup: {
-          rotation: {
-            areaId: group.rotation.areaId,
-            status: 'ACTIVE',
-            id: { not: group.rotation.id },
-          },
+        rotationGroupId_userId: {
+          rotationGroupId: validatedData.rotationGroupId,
+          userId: validatedData.userId,
         },
       },
-      select: { id: true },
     })
 
-    await prisma.rotationMember.create({
-      data: {
-        rotationGroupId: validatedData.rotationGroupId,
-        userId: validatedData.userId,
-      },
-    })
+    if (previousMember)
+      await prisma.rotationMember.update({
+        where: { id: previousMember.id },
+        data: { leftAt: null },
+      })
+    else
+      await prisma.rotationMember.create({
+        data: {
+          rotationGroupId: validatedData.rotationGroupId,
+          userId: validatedData.userId,
+        },
+      })
 
     await createNotification({
       type: 'ROTATION_ASSIGNED',
@@ -426,16 +444,149 @@ export const addMemberAction = async (
 
     revalidatePath('/dashboard/rotations')
 
-    const message = conflictingRotation
-      ? `Miembro añadido. Advertencia: ${targetUser.name} ya está en otra rotativa activa del área`
-      : 'Miembro añadido exitosamente'
-
-    return { success: true, data: updatedRotation as RotationWithRelations, message }
+    return { success: true, data: updatedRotation as RotationWithRelations, message: 'Miembro añadido exitosamente' }
   } catch (error) {
     console.error('[addMemberAction] Error:', error)
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Error al añadir miembro',
+    }
+  }
+}
+
+export const addMembersBulkAction = async (
+  data: z.infer<typeof addMembersBulkSchema>
+): Promise<ActionResult<RotationWithRelations>> => {
+  try {
+    const session = await requireAdminHROrChiefArea()
+
+    let derivedOrgId: string | null = session.organizationId ?? null
+    if (isChiefArea(session) && !derivedOrgId) {
+      const firstArea = await prisma.userArea.findFirst({
+        where: { userId: session.id },
+        select: { area: { select: { organizationId: true } } },
+      })
+      derivedOrgId = firstArea?.area?.organizationId ?? null
+    }
+    if (!derivedOrgId)
+      return { success: false, error: 'No tienes una organización asignada' }
+    const organizationId = derivedOrgId
+
+    const validatedData = addMembersBulkSchema.parse(data)
+
+    const group = await prisma.rotationGroup.findFirst({
+      where: { id: validatedData.rotationGroupId },
+      select: {
+        id: true,
+        rotation: {
+          select: {
+            id: true,
+            areaId: true,
+            organizationId: true,
+          },
+        },
+      },
+    })
+
+    if (!group || group.rotation.organizationId !== organizationId)
+      return { success: false, error: 'Grupo no encontrado' }
+
+    if (isChiefArea(session)) {
+      const chiefArea = await prisma.userArea.findFirst({
+        where: { userId: session.id, areaId: group.rotation.areaId },
+      })
+      if (!chiefArea)
+        return { success: false, error: 'Solo puedes gestionar rotativas en las áreas que tienes asignadas' }
+    }
+
+    const targetUsers = await prisma.user.findMany({
+      where: { id: { in: validatedData.userIds }, organizationId, role: 'STAFF_HEALTH' },
+      select: { id: true, name: true },
+    })
+
+    if (targetUsers.length === 0)
+      return { success: false, error: 'No se encontraron usuarios válidos' }
+
+    const validUserIds = targetUsers.map((u) => u.id)
+
+    const userAreas = await prisma.userArea.findMany({
+      where: { userId: { in: validUserIds }, areaId: group.rotation.areaId },
+      select: { userId: true },
+    })
+    const usersInArea = new Set(userAreas.map((ua) => ua.userId))
+
+    const existingMemberships = await prisma.rotationMember.findMany({
+      where: {
+        userId: { in: validUserIds },
+        leftAt: null,
+        rotationGroup: {
+          rotation: { organizationId },
+        },
+      },
+      select: { userId: true },
+    })
+    const alreadyInRotation = new Set(existingMemberships.map((m) => m.userId))
+
+    const eligibleUserIds = validUserIds.filter(
+      (id) => usersInArea.has(id) && !alreadyInRotation.has(id)
+    )
+
+    if (eligibleUserIds.length === 0)
+      return { success: false, error: 'Ninguno de los usuarios seleccionados es elegible' }
+
+    const previousMembers = await prisma.rotationMember.findMany({
+      where: {
+        rotationGroupId: validatedData.rotationGroupId,
+        userId: { in: eligibleUserIds },
+        leftAt: { not: null },
+      },
+      select: { id: true, userId: true },
+    })
+    const previousUserIds = new Set(previousMembers.map((m) => m.userId))
+
+    if (previousMembers.length > 0)
+      await prisma.rotationMember.updateMany({
+        where: { id: { in: previousMembers.map((m) => m.id) } },
+        data: { leftAt: null },
+      })
+
+    const newUserIds = eligibleUserIds.filter((id) => !previousUserIds.has(id))
+    if (newUserIds.length > 0)
+      await prisma.rotationMember.createMany({
+        data: newUserIds.map((userId) => ({
+          rotationGroupId: validatedData.rotationGroupId,
+          userId,
+        })),
+      })
+
+    await prisma.notification.createMany({
+      data: eligibleUserIds.map((userId) => ({
+        type: 'ROTATION_ASSIGNED' as const,
+        userId,
+        actorId: session.id,
+        organizationId,
+        title: 'Has sido asignado a una rotativa',
+        actionUrl: `/dashboard/rotations/${group.rotation.id}`,
+      })),
+    })
+
+    const updatedRotation = await prisma.rotation.findUniqueOrThrow({
+      where: { id: group.rotation.id },
+      include: rotationInclude,
+    })
+
+    revalidatePath('/dashboard/rotations')
+
+    return {
+      success: true,
+      data: updatedRotation as RotationWithRelations,
+      message: `${eligibleUserIds.length} miembros añadidos exitosamente`,
+    }
+  } catch (error) {
+    console.error('[addMembersBulkAction] Error:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Error al añadir miembros',
     }
   }
 }

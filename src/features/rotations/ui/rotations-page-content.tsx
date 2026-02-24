@@ -2,8 +2,10 @@
 
 import { useEffect, useRef, useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
-import { AlertTriangle, Plus, RefreshCw, Search, Trash2 } from 'lucide-react'
+import { AlertTriangle, Pencil, Plus, RefreshCw, Search, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
+
+import { Link } from '@/i18n/navigation'
 
 import { Alert, AlertDescription } from '@/src/shared/ui/alert'
 import {
@@ -35,10 +37,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/src/shared/ui/table'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/src/shared/ui/tooltip'
 
 import { checkCoverageAlertsAction, deleteRotationAction, getRotationsAction } from '../api'
 import type { CoverageAlert, RotationListItem } from '../types/rotation-types'
-import { RotationDetailDialog } from './rotation-detail-dialog'
 import { RotationFormDialog } from './rotation-form-dialog'
 
 interface RotationsPageContentProps {
@@ -66,8 +68,6 @@ export function RotationsPageContent({
   const [areaFilter, setAreaFilter] = useState<string>('')
   const [statusFilter, setStatusFilter] = useState<string>('')
   const [rotationToDelete, setRotationToDelete] = useState<RotationListItem | null>(null)
-  const [selectedRotationId, setSelectedRotationId] = useState<string | null>(null)
-  const [detailOpen, setDetailOpen] = useState(false)
   const [createOpen, setCreateOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
   const [coverageAlerts, setCoverageAlerts] = useState<
@@ -146,11 +146,6 @@ export function RotationsPageContent({
 
   const handleCreate = () => {
     setCreateOpen(true)
-  }
-
-  const handleRowClick = (rotation: RotationListItem) => {
-    setSelectedRotationId(rotation.id)
-    setDetailOpen(true)
   }
 
   return (
@@ -263,18 +258,14 @@ export function RotationsPageContent({
                         {t('list.columns.shifts')}
                       </TableHead>
                       <TableHead>{t('list.columns.status')}</TableHead>
-                      <TableHead className="w-16 text-right">
+                      <TableHead className="w-24 text-right">
                         {t('list.columns.actions')}
                       </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {rotations.map((rotation) => (
-                      <TableRow
-                        key={rotation.id}
-                        className="cursor-pointer"
-                        onClick={() => handleRowClick(rotation)}
-                      >
+                      <TableRow key={rotation.id} className="hover:bg-transparent">
                         <TableCell className="font-medium">{rotation.name}</TableCell>
                         <TableCell className="text-muted-foreground">
                           {rotation.area.name}
@@ -291,17 +282,35 @@ export function RotationsPageContent({
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              setRotationToDelete(rotation)
-                            }}
-                            aria-label={t('detail.delete')}
-                          >
-                            <Trash2 className="h-4 w-4" aria-hidden />
-                          </Button>
+                          <div className="flex items-center justify-end gap-1">
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Link href={`/dashboard/rotations/${rotation.id}`}>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    aria-label={t('detail.view')}
+                                  >
+                                    <Pencil className="h-4 w-4" aria-hidden />
+                                  </Button>
+                                </Link>
+                              </TooltipTrigger>
+                              <TooltipContent>{t('detail.view')}</TooltipContent>
+                            </Tooltip>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => setRotationToDelete(rotation)}
+                                  aria-label={t('detail.delete')}
+                                >
+                                  <Trash2 className="h-4 w-4" aria-hidden />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>{t('detail.delete')}</TooltipContent>
+                            </Tooltip>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -315,13 +324,6 @@ export function RotationsPageContent({
           )}
         </CardContent>
       </Card>
-
-      <RotationDetailDialog
-        rotationId={selectedRotationId}
-        open={detailOpen}
-        onOpenChange={setDetailOpen}
-        onRotationUpdated={() => fetchRotations(searchTerm, areaFilter, statusFilter)}
-      />
 
       <RotationFormDialog
         open={createOpen}
