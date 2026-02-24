@@ -37,6 +37,173 @@ export type ShiftTypeOption = {
   areaShiftTypes?: Array<{ areaId: string; isActive: boolean }>
 }
 
+type FormTranslationFn = ReturnType<typeof useTranslations<'shifts.form'>>
+
+function UserCombobox({
+  selectedUserId,
+  onSelectUser,
+  availableUsers,
+  disabled,
+  t,
+}: {
+  selectedUserId: string
+  onSelectUser: (id: string) => void
+  availableUsers: Array<{ id: string; name: string; role: string }>
+  disabled: boolean
+  t: FormTranslationFn
+}) {
+  const [searchQuery, setSearchQuery] = useState('')
+  const [popoverOpen, setPopoverOpen] = useState(false)
+
+  const filteredUsers = useMemo(() => {
+    if (!searchQuery.trim()) return availableUsers
+    const q = searchQuery.trim().toLowerCase()
+    return availableUsers.filter((u) => u.name.toLowerCase().includes(q))
+  }, [availableUsers, searchQuery])
+
+  return (
+    <div className="space-y-2">
+      <Label htmlFor="userId">{t('user.label')}</Label>
+      <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-controls="user-listbox"
+            aria-expanded={popoverOpen}
+            className="w-full justify-between"
+            disabled={disabled}
+            type="button"
+          >
+            <span className="truncate">
+              {selectedUserId
+                ? availableUsers.find((u) => u.id === selectedUserId)?.name || t('user.placeholder')
+                : t('user.placeholder')}
+            </span>
+            <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-full p-0" align="start">
+          <div className="flex items-center border-b px-3 py-2">
+            <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+            <Input
+              placeholder={t('user.search')}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="border-0 focus-visible:ring-0"
+              data-autofocus
+            />
+          </div>
+          <div id="user-listbox" role="listbox" className="max-h-[300px] overflow-y-auto p-1">
+            {filteredUsers.length === 0 ? (
+              <div className="py-6 text-center text-sm text-muted-foreground">
+                {disabled ? t('user.selectAreaFirst') : t('user.noUsersFound')}
+              </div>
+            ) : (
+              filteredUsers.map((user) => (
+                <Button
+                  key={user.id}
+                  variant="ghost"
+                  className="w-full justify-start font-normal"
+                  onClick={() => {
+                    onSelectUser(user.id)
+                    setSearchQuery('')
+                    setPopoverOpen(false)
+                  }}
+                  type="button"
+                >
+                  {user.name} ({user.role})
+                </Button>
+              ))
+            )}
+          </div>
+        </PopoverContent>
+      </Popover>
+    </div>
+  )
+}
+
+function DateTimeFields({
+  form,
+  selectedShiftType,
+  locale,
+  t,
+}: {
+  form: ReturnType<typeof useForm<ShiftFormData>>
+  selectedShiftType: ShiftTypeOption | undefined
+  locale: 'es' | 'en'
+  t: FormTranslationFn
+}) {
+  const endDateDisplay = (() => {
+    const endDate = form.watch('endDate')
+    if (!endDate)
+      return selectedShiftType ? t('endDate.calculated') : t('endDate.selectShiftType')
+    const [year, month, day] = endDate.split('-').map(Number)
+    return formatDateLong(new Date(year, month - 1, day), locale)
+  })()
+
+  return (
+    <>
+      <div className="grid gap-4 md:grid-cols-2">
+        <div className="space-y-2">
+          <Label htmlFor="startDate">{t('date.label')}</Label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" className="w-full justify-start text-left font-normal">
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {form.watch('startDate') ? (
+                  formatDateLong(new Date(form.watch('startDate')), locale)
+                ) : (
+                  <span>{t('date.placeholder')}</span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={form.watch('startDate') ? new Date(form.watch('startDate')) : undefined}
+                onSelect={(date) => date && form.setValue('startDate', date)}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="endDate">{t('endDate.label')}</Label>
+          <Input
+            id="endDate"
+            type="text"
+            value={endDateDisplay}
+            disabled
+            className="bg-muted cursor-not-allowed"
+            aria-label={t('endDate.label')}
+          />
+        </div>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <div className="space-y-2">
+          <Label htmlFor="startTime">{t('startTime.label')}</Label>
+          <Input id="startTime" type="time" {...form.register('startTime')} />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="endTime">{t('endTime.label')}</Label>
+          <Input
+            id="endTime"
+            type="time"
+            value={form.watch('endTime')}
+            disabled
+            className="bg-muted cursor-not-allowed"
+            aria-label={t('endTime.label')}
+          />
+        </div>
+      </div>
+    </>
+  )
+}
+
 interface ShiftFormProps {
   _organizationId: string
   users: Array<{ id: string; name: string; role: string; areaIds?: string[] }>
@@ -91,8 +258,6 @@ export function ShiftForm({
   const shiftTypeId = form.watch('shiftTypeId')
   const startDate = form.watch('startDate')
   const startTime = form.watch('startTime')
-  const [userSearchQuery, setUserSearchQuery] = useState('')
-  const [userPopoverOpen, setUserPopoverOpen] = useState(false)
 
   const selectedShiftType = useMemo(
     () => shiftTypes.find((st) => st.id === shiftTypeId),
@@ -108,13 +273,10 @@ export function ShiftForm({
 
   const availableUsers = useMemo(() => {
     if (!areaId) return []
-    const filtered = users.filter(
+    return users.filter(
       (u) => u.role !== 'STAFF_HEALTH' || (Array.isArray(u.areaIds) && u.areaIds.includes(areaId))
     )
-    if (!userSearchQuery.trim()) return filtered
-    const q = userSearchQuery.trim().toLowerCase()
-    return filtered.filter((u) => u.name.toLowerCase().includes(q))
-  }, [users, areaId, userSearchQuery])
+  }, [users, areaId])
 
   useEffect(() => {
     if (!selectedShiftType || !startDate || !startTime) {
@@ -158,10 +320,8 @@ export function ShiftForm({
   }, [availableUsers, form])
 
   useEffect(() => {
-    if (!areaId) {
+    if (!areaId)
       form.setValue('userId', '')
-      setUserSearchQuery('')
-    }
   }, [areaId, form])
 
   const selectedArea = areas.find((area) => area.id === areaId)
@@ -255,133 +415,21 @@ export function ShiftForm({
           )}
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="userId">{t('user.label')}</Label>
-          <Popover open={userPopoverOpen} onOpenChange={setUserPopoverOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                role="combobox"
-                className="w-full justify-between"
-                disabled={!areaId}
-                type="button"
-              >
-                <span className="truncate">
-                  {form.watch('userId')
-                    ? availableUsers.find((u) => u.id === form.watch('userId'))?.name ||
-                      t('user.placeholder')
-                    : t('user.placeholder')}
-                </span>
-                <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-full p-0" align="start">
-              <div className="flex items-center border-b px-3 py-2">
-                <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
-                <Input
-                  placeholder={t('user.search')}
-                  value={userSearchQuery}
-                  onChange={(e) => setUserSearchQuery(e.target.value)}
-                  className="border-0 focus-visible:ring-0"
-                  autoFocus
-                />
-              </div>
-              <div className="max-h-[300px] overflow-y-auto p-1">
-                {availableUsers.length === 0 ? (
-                  <div className="py-6 text-center text-sm text-muted-foreground">
-                    {!areaId ? t('user.selectAreaFirst') : t('user.noUsersFound')}
-                  </div>
-                ) : (
-                  availableUsers.map((user) => (
-                    <Button
-                      key={user.id}
-                      variant="ghost"
-                      className="w-full justify-start font-normal"
-                      onClick={() => {
-                        form.setValue('userId', user.id)
-                        setUserSearchQuery('')
-                        setUserPopoverOpen(false)
-                      }}
-                      type="button"
-                    >
-                      {user.name} ({user.role})
-                    </Button>
-                  ))
-                )}
-              </div>
-            </PopoverContent>
-          </Popover>
-        </div>
+        <UserCombobox
+          selectedUserId={form.watch('userId')}
+          onSelectUser={(id) => form.setValue('userId', id)}
+          availableUsers={availableUsers}
+          disabled={!areaId}
+          t={t}
+        />
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="startDate">{t('date.label')}</Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" className="w-full justify-start text-left font-normal">
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {form.watch('startDate') ? (
-                  formatDateLong(new Date(form.watch('startDate')), locale)
-                ) : (
-                  <span>{t('date.placeholder')}</span>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="single"
-                selected={form.watch('startDate') ? new Date(form.watch('startDate')) : undefined}
-                onSelect={(date) => date && form.setValue('startDate', date)}
-                initialFocus
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="endDate">{t('endDate.label')}</Label>
-          <Input
-            id="endDate"
-            type="text"
-            value={
-              (() => {
-                const endDate = form.watch('endDate')
-                if (!endDate)
-                  return selectedShiftType
-                    ? t('endDate.calculated')
-                    : t('endDate.selectShiftType')
-
-                const [year, month, day] = endDate.split('-').map(Number)
-                const endDateObj = new Date(year, month - 1, day)
-                return formatDateLong(endDateObj, locale)
-              })()
-            }
-            disabled
-            className="bg-muted cursor-not-allowed"
-            aria-label={t('endDate.label')}
-          />
-        </div>
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="startTime">{t('startTime.label')}</Label>
-          <Input id="startTime" type="time" {...form.register('startTime')} />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="endTime">{t('endTime.label')}</Label>
-          <Input
-            id="endTime"
-            type="time"
-            value={form.watch('endTime')}
-            disabled
-            className="bg-muted cursor-not-allowed"
-            aria-label={t('endTime.label')}
-          />
-        </div>
-      </div>
+      <DateTimeFields
+        form={form}
+        selectedShiftType={selectedShiftType}
+        locale={locale}
+        t={t}
+      />
 
       <div className="space-y-2">
         <Label htmlFor="notes">{t('notes.label')}</Label>

@@ -47,13 +47,14 @@ interface RateComponentFormProps {
 }
 
 const FILTER_ALL = '__all__'
+const EMPTY_AREAS: AreaOption[] = []
 
 export function RateComponentForm({
   component,
   index,
   currency,
   shiftTypes,
-  areas = [],
+  areas = EMPTY_AREAS,
   onUpdate,
   onRemove,
   canRemove,

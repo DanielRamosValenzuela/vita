@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useReducer, useRef } from 'react'
 import { CalendarPlus, Check } from 'lucide-react'
 
 import { cn } from '@/src/shared/lib/utils/cn'
@@ -28,6 +28,42 @@ const PROGRESS_STAGES = [
   { target: 92, durationMs: 12000 },
 ]
 
+type OverlayState = {
+  progress: number
+  messageIndex: number
+  visible: boolean
+  exiting: boolean
+}
+
+type OverlayAction =
+  | { type: 'ACTIVATE' }
+  | { type: 'START_EXIT' }
+  | { type: 'FINISH_EXIT' }
+  | { type: 'SET_PROGRESS'; value: number }
+  | { type: 'NEXT_MESSAGE'; total: number }
+  | { type: 'COMPLETE' }
+
+const INITIAL_STATE: OverlayState = { progress: 0, messageIndex: 0, visible: false, exiting: false }
+
+function overlayReducer(state: OverlayState, action: OverlayAction): OverlayState {
+  switch (action.type) {
+    case 'ACTIVATE':
+      return { progress: 0, messageIndex: 0, visible: true, exiting: false }
+    case 'START_EXIT':
+      return { ...state, exiting: true }
+    case 'FINISH_EXIT':
+      return INITIAL_STATE
+    case 'SET_PROGRESS':
+      return { ...state, progress: action.value }
+    case 'NEXT_MESSAGE':
+      return { ...state, messageIndex: (state.messageIndex + 1) % action.total }
+    case 'COMPLETE':
+      return { ...state, progress: 100 }
+    default:
+      return state
+  }
+}
+
 export function ProcessingOverlay({
   isActive,
   icon,
@@ -38,10 +74,7 @@ export function ProcessingOverlay({
   onComplete,
   className,
 }: ProcessingOverlayProps) {
-  const [progress, setProgress] = useState(0)
-  const [messageIndex, setMessageIndex] = useState(0)
-  const [visible, setVisible] = useState(false)
-  const [exiting, setExiting] = useState(false)
+  const [state, dispatch] = useReducer(overlayReducer, INITIAL_STATE)
   const stageIndexRef = useRef(0)
   const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([])
 
@@ -52,23 +85,25 @@ export function ProcessingOverlay({
   }, [])
 
   useEffect(() => {
-    if (isActive) {
-      setVisible(true)
-      setExiting(false)
-      setProgress(0)
-      setMessageIndex(0)
+    if (!isActive) return
+    dispatch({ type: 'ACTIVATE' })
+    stageIndexRef.current = 0
+  }, [isActive])
+
+  useEffect(() => {
+    if (isActive || !state.visible) return
+    dispatch({ type: 'START_EXIT' })
+  }, [isActive, state.visible])
+
+  useEffect(() => {
+    if (!state.exiting) return
+    const id = setTimeout(() => {
+      dispatch({ type: 'FINISH_EXIT' })
       stageIndexRef.current = 0
-    } else if (visible && !isActive) {
-      setExiting(true)
-      const id = setTimeout(() => {
-        setVisible(false)
-        setExiting(false)
-        setProgress(0)
-        stageIndexRef.current = 0
-      }, 400)
-      timeoutsRef.current.push(id)
-    }
-  }, [isActive, visible, clearAllTimeouts])
+    }, 400)
+    timeoutsRef.current.push(id)
+    return () => clearTimeout(id)
+  }, [state.exiting])
 
   useEffect(() => {
     if (!isActive || isComplete) return
@@ -77,7 +112,7 @@ export function ProcessingOverlay({
 
     for (const stage of PROGRESS_STAGES) {
       const id = setTimeout(() => {
-        setProgress(stage.target)
+        dispatch({ type: 'SET_PROGRESS', value: stage.target })
       }, stage.durationMs)
       timeoutsRef.current.push(id)
     }
@@ -89,7 +124,7 @@ export function ProcessingOverlay({
     if (!isActive || messages.length <= 1) return
 
     const interval = setInterval(() => {
-      setMessageIndex((prev) => (prev + 1) % messages.length)
+      dispatch({ type: 'NEXT_MESSAGE', total: messages.length })
     }, messageCycleMs)
 
     return () => clearInterval(interval)
@@ -98,7 +133,7 @@ export function ProcessingOverlay({
   useEffect(() => {
     if (!isComplete) return
 
-    setProgress(100)
+    dispatch({ type: 'COMPLETE' })
 
     if (onComplete) {
       const id = setTimeout(onComplete, 1200)
@@ -106,11 +141,9 @@ export function ProcessingOverlay({
     }
   }, [isComplete, onComplete])
 
-  useEffect(() => {
-    return clearAllTimeouts
-  }, [clearAllTimeouts])
+  useEffect(() => clearAllTimeouts, [clearAllTimeouts])
 
-  if (!visible) return null
+  if (!state.visible) return null
 
   const defaultIcon = <CalendarPlus className="h-6 w-6" aria-hidden />
   const activeIcon = icon ?? defaultIcon
@@ -122,7 +155,7 @@ export function ProcessingOverlay({
       className={cn(
         'absolute inset-0 z-50 flex items-center justify-center overflow-hidden rounded-[inherit]',
         'bg-background/80 backdrop-blur-sm',
-        exiting
+        state.exiting
           ? 'animate-out fade-out duration-300'
           : 'animate-in fade-in duration-300',
         className,
@@ -131,7 +164,7 @@ export function ProcessingOverlay({
       <div
         className={cn(
           'flex w-full max-w-xs flex-col items-center gap-5 px-4',
-          exiting
+          state.exiting
             ? 'animate-out fade-out zoom-out-95 duration-300'
             : 'animate-in fade-in zoom-in-95 duration-400',
         )}
@@ -173,7 +206,7 @@ export function ProcessingOverlay({
 
           <div className="w-full">
             <Progress
-              value={progress}
+              value={state.progress}
               className={cn(
                 'h-1.5 transition-all duration-700',
                 isComplete && 'bg-emerald-500/20 [&_[data-slot=progress-indicator]]:bg-emerald-500',
@@ -183,13 +216,13 @@ export function ProcessingOverlay({
 
           <div className="relative h-5 w-full overflow-hidden">
             <p
-              key={messageIndex}
+              key={state.messageIndex}
               className={cn(
                 'text-muted-foreground absolute inset-x-0 text-center text-xs',
                 'animate-in fade-in slide-in-from-bottom-1 duration-300',
               )}
             >
-              {messages[messageIndex]}
+              {messages[state.messageIndex]}
             </p>
           </div>
         </div>

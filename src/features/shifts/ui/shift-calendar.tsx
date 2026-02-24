@@ -72,6 +72,7 @@ interface ShiftCalendarDayCellProps {
 
 const SKELETON_PATTERN = [2, 0, 1, 3, 0, 2, 1, 0, 3, 1, 2, 0, 0, 1, 2, 3, 0, 1, 0, 2, 1, 3, 0, 0, 2, 1, 0, 3, 1, 2, 0, 1, 2, 0, 3, 1, 0, 2, 1, 0, 3, 2]
 const SKELETON_WIDTHS = ['w-3/4', 'w-1/2', 'w-2/3', 'w-5/6']
+const SKELETON_SLOT_IDS = ['a', 'b', 'c']
 
 function ShiftCalendarDayCellSkeleton({ date, dayIndex }: { date: Date; dayIndex: number }) {
   const formattedDay = format(date, 'd')
@@ -84,10 +85,10 @@ function ShiftCalendarDayCellSkeleton({ date, dayIndex }: { date: Date; dayIndex
       </div>
       {barCount > 0 && (
         <div className="flex min-h-0 flex-1 flex-col gap-1 p-1 pt-0">
-          {Array.from({ length: barCount }, (_, i) => (
+          {SKELETON_SLOT_IDS.slice(0, barCount).map((slotId, pos) => (
             <Skeleton
-              key={i}
-              className={cn('h-4 rounded', SKELETON_WIDTHS[(dayIndex + i) % SKELETON_WIDTHS.length])}
+              key={`sk-${dayIndex}-${slotId}`}
+              className={cn('h-4 rounded', SKELETON_WIDTHS[(dayIndex + pos) % SKELETON_WIDTHS.length])}
             />
           ))}
         </div>

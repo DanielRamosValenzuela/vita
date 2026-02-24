@@ -1,6 +1,6 @@
 import { daysBetween, getStepForDay } from "./rotation-helpers";
 
-export type RotationStepInput = {
+type RotationStepInput = {
   order: number;
   isRestDay: boolean;
   shiftTypeId: string | null;

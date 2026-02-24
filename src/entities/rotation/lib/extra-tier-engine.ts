@@ -1,6 +1,6 @@
 export type ShiftClassificationType = 'DAY' | 'NIGHT' | 'MIXED'
 
-export type ExtraTierType = 'TIER_1' | 'TIER_2' | 'TIER_3' | 'NEVER_RECOMMEND'
+type ExtraTierType = 'TIER_1' | 'TIER_2' | 'TIER_3' | 'NEVER_RECOMMEND'
 
 export type CandidateWarningType = {
   type: 'max_consecutive_hours' | 'min_rest_hours' | 'noche_to_largo' | 'came_from_noche'
@@ -20,7 +20,7 @@ export type CandidateShiftHistory = {
   }
 }
 
-export type TierResult = {
+type TierResult = {
   tier: ExtraTierType
   label: string
   warnings: CandidateWarningType[]

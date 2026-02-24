@@ -13,8 +13,10 @@ interface RotationDetailPageProps {
 
 export async function generateMetadata({ params }: RotationDetailPageProps) {
   const { locale, id } = await params
-  const t = await getTranslations({ locale, namespace: 'rotations' })
-  const result = await getRotationAction(id)
+  const [t, result] = await Promise.all([
+    getTranslations({ locale, namespace: 'rotations' }),
+    getRotationAction(id),
+  ])
 
   if (!result.success || !result.data)
     return { title: `${t('detail.pageTitle')} | VITA` }

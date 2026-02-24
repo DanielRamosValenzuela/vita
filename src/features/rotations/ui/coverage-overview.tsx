@@ -107,9 +107,9 @@ export function CoverageOverview({ rotationId, areaId }: CoverageOverviewProps) 
     <div className="space-y-4">
       {data.alerts.length > 0 && (
         <div className="space-y-2" role="region" aria-label={t('coverage.alertsTitle')}>
-          {data.alerts.slice(0, 5).map((alert, i) => (
+          {data.alerts.slice(0, 5).map((alert) => (
             <Alert
-              key={i}
+              key={alert.message}
               variant={alert.severity === 'error' ? 'destructive' : 'default'}
             >
               <AlertTriangle className="h-4 w-4" aria-hidden />
@@ -128,9 +128,9 @@ export function CoverageOverview({ rotationId, areaId }: CoverageOverviewProps) 
               <th className="bg-background sticky left-0 z-10 min-w-24 px-2 py-1.5 text-left font-medium">
                 {t('coverage.group')}
               </th>
-              {data.days.map((day, i) => (
+              {data.days.map((day) => (
                 <th
-                  key={i}
+                  key={day.date.toISOString()}
                   className={[
                     'min-w-16 px-1 py-1.5 text-center font-normal',
                     day.hasGap ? 'text-destructive' : 'text-muted-foreground',
@@ -147,16 +147,17 @@ export function CoverageOverview({ rotationId, areaId }: CoverageOverviewProps) 
                 <td className="bg-background sticky left-0 z-10 px-2 py-1 font-medium">
                   {group.name}
                 </td>
-                {data.days.map((day, dayIndex) => {
+                {data.days.map((day) => {
+                  const dayKey = day.date.toISOString()
                   const groupData = day.groups.find((g) => g.groupId === group.id)
 
                   if (!groupData)
-                    return <td key={dayIndex} className="px-1 py-1" />
+                    return <td key={dayKey} className="px-1 py-1" />
 
                   if (groupData.stepType === 'rest')
                     return (
                       <td
-                        key={dayIndex}
+                        key={dayKey}
                         className={[
                           'rounded px-1 py-1 text-center',
                           day.hasGap ? 'bg-destructive/10' : '',
@@ -167,7 +168,7 @@ export function CoverageOverview({ rotationId, areaId }: CoverageOverviewProps) 
                     )
 
                   if (!groupData.shiftType)
-                    return <td key={dayIndex} className="px-1 py-1" />
+                    return <td key={dayKey} className="px-1 py-1" />
 
                   const cellContent = (
                     <span
@@ -187,7 +188,7 @@ export function CoverageOverview({ rotationId, areaId }: CoverageOverviewProps) 
                   if (groupData.isUnderstaffed)
                     return (
                       <td
-                        key={dayIndex}
+                        key={dayKey}
                         className={[
                           'rounded px-1 py-1 text-center',
                           day.hasGap ? 'bg-destructive/10' : '',
@@ -247,7 +248,7 @@ export function CoverageOverview({ rotationId, areaId }: CoverageOverviewProps) 
 
                   return (
                     <td
-                      key={dayIndex}
+                      key={dayKey}
                       className={[
                         'rounded px-1 py-1 text-center',
                         day.hasGap ? 'bg-destructive/10' : '',

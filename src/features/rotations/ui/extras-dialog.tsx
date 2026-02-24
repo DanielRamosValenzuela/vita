@@ -115,9 +115,9 @@ function CandidateCard({ candidate, onAssign, isPending, assigningUserId, t }: C
 
       {candidate.warnings.length > 0 && (
         <div className="space-y-1">
-          {candidate.warnings.map((warning, i) => (
+          {candidate.warnings.map((warning) => (
             <Alert
-              key={i}
+              key={`${warning.type}-${warning.severity}`}
               variant={warning.severity === 'error' ? 'destructive' : 'default'}
               className="py-1.5 px-3"
             >
@@ -145,16 +145,16 @@ export function ExtrasDialog({
   onAssigned,
 }: ExtrasDialogProps) {
   const t = useTranslations('rotations')
-  const [result, setResult] = useState<GetExtraCandidatesResult | null>(null)
-  const [loadError, setLoadError] = useState<string | null>(null)
+  const [loadState, setLoadState] = useState<{
+    result: GetExtraCandidatesResult | null
+    error: string | null
+  }>({ result: null, error: null })
   const [isLoading, startLoadTransition] = useTransition()
   const [isPending, startAssignTransition] = useTransition()
   const [assigningUserId, setAssigningUserId] = useState<string | null>(null)
 
   useEffect(() => {
     if (!open) return
-    setResult(null)
-    setLoadError(null)
     startLoadTransition(async () => {
       const res = await getExtraCandidatesAction({
         areaId,
@@ -162,10 +162,11 @@ export function ExtrasDialog({
         shiftTypeId,
         rotationGroupId,
       })
-      if (res.success && res.data)
-        setResult(res.data)
-      else
-        setLoadError(res.error ?? t('loadError'))
+      setLoadState(
+        res.success && res.data
+          ? { result: res.data, error: null }
+          : { result: null, error: res.error ?? t('loadError') }
+      )
     })
   }, [open, areaId, date, shiftTypeId, rotationGroupId, t])
 
@@ -183,12 +184,11 @@ export function ExtrasDialog({
       toastActionResult(res, {
         successMessage: t('extras.assigned'),
       })
+      setAssigningUserId(null)
       if (res.success) {
-        setAssigningUserId(null)
         onOpenChange(false)
         onAssigned()
-      } else
-        setAssigningUserId(null)
+      }
     })
   }
 
@@ -203,13 +203,13 @@ export function ExtrasDialog({
         </DialogHeader>
 
         <div className="flex-1 overflow-y-auto space-y-4 pr-1">
-          {result && (
-            <Alert variant={result.understaffingGap > 0 ? 'destructive' : 'default'}>
+          {loadState.result && (
+            <Alert variant={loadState.result.understaffingGap > 0 ? 'destructive' : 'default'}>
               <AlertTriangle className="h-4 w-4" aria-hidden />
               <AlertDescription>
                 {t('extras.understaffingGap', {
-                  current: result.shiftType.currentStaffCount,
-                  required: result.shiftType.minStaffRequired,
+                  current: loadState.result.shiftType.currentStaffCount,
+                  required: loadState.result.shiftType.minStaffRequired,
                 })}
               </AlertDescription>
             </Alert>
@@ -217,25 +217,25 @@ export function ExtrasDialog({
 
           {isLoading && <CandidatesSkeleton />}
 
-          {loadError && !isLoading && (
+          {loadState.error && !isLoading && (
             <Alert variant="destructive">
               <AlertTriangle className="h-4 w-4" aria-hidden />
-              <AlertDescription>{loadError}</AlertDescription>
+              <AlertDescription>{loadState.error}</AlertDescription>
             </Alert>
           )}
 
-          {!isLoading && !loadError && result && result.candidates.length === 0 && (
+          {!isLoading && !loadState.error && loadState.result && loadState.result.candidates.length === 0 && (
             <p className="text-sm text-muted-foreground text-center py-4">
               {t('extras.noCandidates')}
             </p>
           )}
 
-          {!isLoading && !loadError && result && result.candidates.length > 0 && (
+          {!isLoading && !loadState.error && loadState.result && loadState.result.candidates.length > 0 && (
             <div className="space-y-2">
               <p className="text-xs text-muted-foreground font-medium">
                 {t('extras.candidates')}
               </p>
-              {result.candidates.map((candidate) => (
+              {loadState.result.candidates.map((candidate) => (
                 <CandidateCard
                   key={candidate.userId}
                   candidate={candidate}

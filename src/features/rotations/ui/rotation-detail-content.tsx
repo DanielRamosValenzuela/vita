@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useState, useTransition } from 'react'
+import { useCallback, useReducer, useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 import {
   CalendarPlus,
@@ -74,8 +74,14 @@ interface RotationDetailContentProps {
 type DeleteDialogState = 'none' | 'open'
 
 interface EditableStep {
+  _key: string
   isRestDay: boolean
   shiftTypeId?: string
+}
+
+let _detailKey = 0
+function genDetailKey() {
+  return `dk${++_detailKey}`
 }
 
 interface ShiftTypeOption {
@@ -116,25 +122,631 @@ function PatternStep({
   )
 }
 
+type DetailState = {
+  deleteDialogState: DeleteDialogState
+  generationOpen: boolean
+  regenerateOpen: boolean
+  editingConfigs: boolean
+  configTimes: Record<string, string>
+  editingPattern: boolean
+  editSteps: EditableStep[]
+  editShiftConfigs: Record<string, string>
+  shiftTypes: ShiftTypeOption[]
+  loadingShiftTypes: boolean
+}
+
+type DetailAction =
+  | { type: 'OPEN_DELETE_DIALOG' }
+  | { type: 'CLOSE_DELETE_DIALOG' }
+  | { type: 'SET_GENERATION_OPEN'; payload: boolean }
+  | { type: 'SET_REGENERATE_OPEN'; payload: boolean }
+  | { type: 'START_EDIT_CONFIGS'; configTimes: Record<string, string> }
+  | { type: 'CANCEL_EDIT_CONFIGS' }
+  | { type: 'SET_CONFIG_TIME'; shiftTypeId: string; value: string }
+  | { type: 'START_EDIT_PATTERN'; steps: EditableStep[]; configs: Record<string, string> }
+  | { type: 'CANCEL_EDIT_PATTERN' }
+  | { type: 'SET_EDIT_STEPS'; steps: EditableStep[] }
+  | { type: 'SET_EDIT_SHIFT_CONFIGS'; configs: Record<string, string> }
+  | { type: 'SET_SHIFT_TYPES'; types: ShiftTypeOption[] }
+  | { type: 'SET_LOADING_SHIFT_TYPES'; loading: boolean }
+  | { type: 'CONFIGS_SAVED' }
+  | { type: 'PATTERN_SAVED' }
+
+const initialDetailState: DetailState = {
+  deleteDialogState: 'none',
+  generationOpen: false,
+  regenerateOpen: false,
+  editingConfigs: false,
+  configTimes: {},
+  editingPattern: false,
+  editSteps: [],
+  editShiftConfigs: {},
+  shiftTypes: [],
+  loadingShiftTypes: false,
+}
+
+function detailReducer(state: DetailState, action: DetailAction): DetailState {
+  switch (action.type) {
+    case 'OPEN_DELETE_DIALOG':
+      return { ...state, deleteDialogState: 'open' }
+    case 'CLOSE_DELETE_DIALOG':
+      return { ...state, deleteDialogState: 'none' }
+    case 'SET_GENERATION_OPEN':
+      return { ...state, generationOpen: action.payload }
+    case 'SET_REGENERATE_OPEN':
+      return { ...state, regenerateOpen: action.payload }
+    case 'START_EDIT_CONFIGS':
+      return { ...state, editingConfigs: true, configTimes: action.configTimes }
+    case 'CANCEL_EDIT_CONFIGS':
+      return { ...state, editingConfigs: false, configTimes: {} }
+    case 'SET_CONFIG_TIME':
+      return {
+        ...state,
+        configTimes: { ...state.configTimes, [action.shiftTypeId]: action.value },
+      }
+    case 'START_EDIT_PATTERN':
+      return {
+        ...state,
+        editingPattern: true,
+        editSteps: action.steps,
+        editShiftConfigs: action.configs,
+      }
+    case 'CANCEL_EDIT_PATTERN':
+      return { ...state, editingPattern: false, editSteps: [], editShiftConfigs: {} }
+    case 'SET_EDIT_STEPS':
+      return { ...state, editSteps: action.steps }
+    case 'SET_EDIT_SHIFT_CONFIGS':
+      return { ...state, editShiftConfigs: action.configs }
+    case 'SET_SHIFT_TYPES':
+      return { ...state, shiftTypes: action.types }
+    case 'SET_LOADING_SHIFT_TYPES':
+      return { ...state, loadingShiftTypes: action.loading }
+    case 'CONFIGS_SAVED':
+      return { ...state, editingConfigs: false, configTimes: {} }
+    case 'PATTERN_SAVED':
+      return { ...state, editingPattern: false, editSteps: [], editShiftConfigs: {} }
+    default:
+      return state
+  }
+}
+
+interface PatternReadViewProps {
+  steps: RotationWithRelations['steps']
+}
+
+function PatternReadView({ steps }: PatternReadViewProps) {
+  return (
+    <div className="flex flex-wrap gap-1.5">
+      {steps.map((step) => (
+        <PatternStep key={step.id} step={step} />
+      ))}
+    </div>
+  )
+}
+
+interface PatternEditViewProps {
+  editSteps: EditableStep[]
+  editShiftConfigs: Record<string, string>
+  shiftTypes: ShiftTypeOption[]
+  loadingShiftTypes: boolean
+  isPending: boolean
+  dispatch: React.Dispatch<DetailAction>
+  t: ReturnType<typeof useTranslations<'rotations'>>
+  onSave: () => void
+}
+
+function PatternEditView({
+  editSteps,
+  editShiftConfigs,
+  shiftTypes,
+  loadingShiftTypes,
+  isPending,
+  dispatch,
+  t,
+  onSave,
+}: PatternEditViewProps) {
+  const usedShiftTypeIds = Array.from(
+    new Set(
+      editSteps
+        .filter((s) => !s.isRestDay && s.shiftTypeId)
+        .map((s) => s.shiftTypeId as string)
+    )
+  )
+
+  const isPatternValid = (() => {
+    if (editSteps.length < 2) return false
+    if (editSteps.some((s) => !s.isRestDay && !s.shiftTypeId)) return false
+    if (usedShiftTypeIds.some((id) => !editShiftConfigs[id] || !/^\d{2}:\d{2}$/.test(editShiftConfigs[id]))) return false
+    return true
+  })()
+
+  const handleStepToggleRest = (index: number, checked: boolean) => {
+    dispatch({
+      type: 'SET_EDIT_STEPS',
+      steps: editSteps.map((s, i) =>
+        i === index ? { ...s, _key: s._key, isRestDay: checked, shiftTypeId: undefined } : s
+      ),
+    })
+  }
+
+  const handleStepShiftType = (index: number, value: string) => {
+    dispatch({
+      type: 'SET_EDIT_STEPS',
+      steps: editSteps.map((s, i) => (i === index ? { ...s, shiftTypeId: value } : s)),
+    })
+  }
+
+  const handleMoveStep = (index: number, direction: 'up' | 'down') => {
+    const target = direction === 'up' ? index - 1 : index + 1
+    if (target < 0 || target >= editSteps.length) return
+    const next = [...editSteps]
+    const temp = next[index]
+    next[index] = next[target]
+    next[target] = temp
+    dispatch({ type: 'SET_EDIT_STEPS', steps: next })
+  }
+
+  const handleRemoveStep = (index: number) => {
+    if (editSteps.length <= 2) return
+    dispatch({
+      type: 'SET_EDIT_STEPS',
+      steps: editSteps.filter((_, i) => i !== index),
+    })
+  }
+
+  const handleAddStep = () => {
+    if (editSteps.length >= 8) return
+    dispatch({
+      type: 'SET_EDIT_STEPS',
+      steps: [...editSteps, { _key: genDetailKey(), isRestDay: false }],
+    })
+  }
+
+  const handleShiftConfigChange = (stId: string, value: string) => {
+    dispatch({
+      type: 'SET_EDIT_SHIFT_CONFIGS',
+      configs: { ...editShiftConfigs, [stId]: value },
+    })
+  }
+
+  return (
+    <div className="space-y-3">
+      <div className="space-y-2">
+        {editSteps.map((step, index) => (
+          <div
+            key={step._key}
+            className="bg-muted/40 flex items-center gap-2 rounded-md border px-3 py-2"
+          >
+            <span className="text-muted-foreground w-14 shrink-0 text-xs">
+              {t('steps.day', { number: index + 1 })}
+            </span>
+            <div className="flex items-center gap-1.5">
+              <Checkbox
+                id={`edit-step-rest-${index}`}
+                checked={step.isRestDay}
+                onCheckedChange={(checked) =>
+                  handleStepToggleRest(index, checked === true)
+                }
+                disabled={isPending}
+              />
+              <Label
+                htmlFor={`edit-step-rest-${index}`}
+                className="cursor-pointer text-xs font-normal"
+              >
+                {t('steps.restDay')}
+              </Label>
+            </div>
+            {!step.isRestDay && (
+              <div className="flex-1">
+                {loadingShiftTypes ? (
+                  <span className="text-muted-foreground flex items-center gap-1 text-xs">
+                    <Loader2 className="h-3 w-3 animate-spin" aria-hidden />
+                    {t('form.loadingShiftTypes')}
+                  </span>
+                ) : (
+                  <Select
+                    value={step.shiftTypeId ?? ''}
+                    onValueChange={(v) => handleStepShiftType(index, v)}
+                    disabled={isPending}
+                  >
+                    <SelectTrigger className="h-7 text-xs">
+                      <SelectValue placeholder={t('steps.shiftTypePlaceholder')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {shiftTypes.map((st) => (
+                        <SelectItem key={st.id} value={st.id}>
+                          <span className="flex items-center gap-1.5">
+                            <span
+                              className="inline-block h-2 w-2 shrink-0 rounded-full"
+                              style={{ backgroundColor: st.color }}
+                              aria-hidden
+                            />
+                            {st.name}
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              </div>
+            )}
+            {step.isRestDay && <div className="flex-1" />}
+            <div className="flex shrink-0 items-center gap-0.5">
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6"
+                onClick={() => handleMoveStep(index, 'up')}
+                disabled={isPending || index === 0}
+                aria-label={t('steps.moveUp')}
+              >
+                <ChevronUp className="h-3 w-3" aria-hidden />
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6"
+                onClick={() => handleMoveStep(index, 'down')}
+                disabled={isPending || index === editSteps.length - 1}
+                aria-label={t('steps.moveDown')}
+              >
+                <ChevronDown className="h-3 w-3" aria-hidden />
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6"
+                onClick={() => handleRemoveStep(index)}
+                disabled={isPending || editSteps.length <= 2}
+                aria-label={t('steps.removeStep')}
+              >
+                <X className="h-3 w-3" aria-hidden />
+              </Button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {editSteps.length < 8 && (
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={handleAddStep}
+          disabled={isPending}
+        >
+          <Plus className="mr-1.5 h-3.5 w-3.5" aria-hidden />
+          {t('steps.addStep')}
+        </Button>
+      )}
+
+      {usedShiftTypeIds.length > 0 && (
+        <div className="space-y-2 border-t pt-3">
+          <p className="text-sm font-medium">{t('detail.shiftConfigsTitle')}</p>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {usedShiftTypeIds.map((stId) => {
+              const st = shiftTypes.find((s) => s.id === stId)
+              if (!st) return null
+              return (
+                <div key={stId} className="flex items-center gap-3">
+                  <span
+                    className="inline-block h-2.5 w-2.5 shrink-0 rounded-full"
+                    style={{ backgroundColor: st.color }}
+                    aria-hidden
+                  />
+                  <Label className="min-w-0 flex-1 truncate text-sm">
+                    {st.name}
+                  </Label>
+                  <Input
+                    type="time"
+                    value={editShiftConfigs[stId] ?? ''}
+                    onChange={(e) => handleShiftConfigChange(stId, e.target.value)}
+                    className="w-32 shrink-0"
+                    disabled={isPending}
+                  />
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      <div className="flex gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => dispatch({ type: 'CANCEL_EDIT_PATTERN' })}
+          disabled={isPending}
+        >
+          {t('form.cancel')}
+        </Button>
+        <Button
+          size="sm"
+          onClick={onSave}
+          disabled={!isPatternValid || isPending}
+          className="gap-1.5"
+        >
+          {isPending ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
+          ) : (
+            <Save className="h-3.5 w-3.5" aria-hidden />
+          )}
+          {t('detail.savePattern')}
+        </Button>
+      </div>
+    </div>
+  )
+}
+
+interface ShiftConfigsCardProps {
+  shiftConfigs: RotationWithRelations['shiftConfigs']
+  editingConfigs: boolean
+  configTimes: Record<string, string>
+  isPending: boolean
+  dispatch: React.Dispatch<DetailAction>
+  t: ReturnType<typeof useTranslations<'rotations'>>
+  onSave: () => void
+}
+
+function ShiftConfigsCard({
+  shiftConfigs,
+  editingConfigs,
+  configTimes,
+  isPending,
+  dispatch,
+  t,
+  onSave,
+}: ShiftConfigsCardProps) {
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-sm font-semibold uppercase tracking-wide">
+            {t('detail.shiftConfigsTitle')}
+          </CardTitle>
+          {!editingConfigs && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7"
+                  onClick={() => {
+                    const times: Record<string, string> = {}
+                    for (const cfg of shiftConfigs)
+                      times[cfg.shiftTypeId] = cfg.startTime
+                    dispatch({ type: 'START_EDIT_CONFIGS', configTimes: times })
+                  }}
+                  disabled={isPending}
+                >
+                  <Pencil className="h-3.5 w-3.5" aria-hidden />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>{t('detail.editConfigs')}</TooltipContent>
+            </Tooltip>
+          )}
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>{t('detail.shiftType')}</TableHead>
+                <TableHead>{t('detail.startTime')}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {shiftConfigs.map((cfg) => (
+                <TableRow key={cfg.id}>
+                  <TableCell className="font-medium">
+                    {cfg.shiftType.name}
+                  </TableCell>
+                  <TableCell>
+                    {editingConfigs ? (
+                      <Input
+                        type="time"
+                        value={configTimes[cfg.shiftTypeId] ?? cfg.startTime}
+                        onChange={(e) =>
+                          dispatch({
+                            type: 'SET_CONFIG_TIME',
+                            shiftTypeId: cfg.shiftTypeId,
+                            value: e.target.value,
+                          })
+                        }
+                        className="h-8 w-32 font-mono"
+                        disabled={isPending}
+                      />
+                    ) : (
+                      <span className="font-mono">{cfg.startTime}</span>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+        {editingConfigs && (
+          <div className="mt-3 flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => dispatch({ type: 'CANCEL_EDIT_CONFIGS' })}
+              disabled={isPending}
+            >
+              {t('form.cancel')}
+            </Button>
+            <Button
+              size="sm"
+              onClick={onSave}
+              disabled={isPending}
+              className="gap-1.5"
+            >
+              {isPending ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
+              ) : (
+                <Save className="h-3.5 w-3.5" aria-hidden />
+              )}
+              {t('detail.saveConfigs')}
+            </Button>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  )
+}
+
+interface DetailFooterProps {
+  rotation: RotationWithRelations
+  state: DetailState
+  isPending: boolean
+  dispatch: React.Dispatch<DetailAction>
+  t: ReturnType<typeof useTranslations<'rotations'>>
+  onActivate: () => void
+  onDeactivate: () => void
+  onDelete: (deleteLinkedShifts: boolean) => void
+  onMemberChanged: () => void
+}
+
+function DetailFooter({
+  rotation,
+  state,
+  isPending,
+  dispatch,
+  t,
+  onActivate,
+  onDeactivate,
+  onDelete,
+  onMemberChanged,
+}: DetailFooterProps) {
+  return (
+    <>
+      <footer className="flex flex-wrap items-center justify-end gap-2 border-t pt-4">
+        {rotation.status === 'ACTIVE' ? (
+          <Button
+            variant="outline"
+            onClick={onDeactivate}
+            disabled={isPending}
+            className="gap-2"
+          >
+            {isPending ? (
+              <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+            ) : (
+              <PowerOff className="h-4 w-4" aria-hidden />
+            )}
+            {t('detail.deactivate')}
+          </Button>
+        ) : (
+          <Button
+            variant="outline"
+            onClick={onActivate}
+            disabled={isPending}
+            className="gap-2"
+          >
+            {isPending ? (
+              <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+            ) : (
+              <Power className="h-4 w-4" aria-hidden />
+            )}
+            {t('detail.activate')}
+          </Button>
+        )}
+        {rotation.status === 'ACTIVE' && (
+          <>
+            <Button
+              variant="outline"
+              onClick={() => dispatch({ type: 'SET_REGENERATE_OPEN', payload: true })}
+              disabled={isPending}
+              className="gap-2"
+            >
+              <RefreshCw className="h-4 w-4" aria-hidden />
+              {t('form.regenerate')}
+            </Button>
+            <Button
+              variant="default"
+              onClick={() => dispatch({ type: 'SET_GENERATION_OPEN', payload: true })}
+              disabled={isPending}
+              className="gap-2"
+            >
+              <CalendarPlus className="h-4 w-4" aria-hidden />
+              {t('generation.generateShifts')}
+            </Button>
+          </>
+        )}
+        <Button
+          variant="destructive"
+          onClick={() => dispatch({ type: 'OPEN_DELETE_DIALOG' })}
+          disabled={isPending}
+          className="gap-2"
+        >
+          <Trash2 className="h-4 w-4" aria-hidden />
+          {t('detail.delete')}
+        </Button>
+      </footer>
+
+      <AlertDialog
+        open={state.deleteDialogState === 'open'}
+        onOpenChange={(isOpen) => {
+          if (!isOpen) dispatch({ type: 'CLOSE_DELETE_DIALOG' })
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('detail.deleteConfirm')}</AlertDialogTitle>
+            <AlertDialogDescription>{t('detail.deleteDescription')}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-col gap-2 sm:flex-row">
+            <AlertDialogCancel disabled={isPending}>{t('form.cancel')}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => onDelete(false)}
+              disabled={isPending}
+              className="bg-secondary text-secondary-foreground hover:bg-secondary/80"
+            >
+              {t('detail.unlinkShifts')}
+            </AlertDialogAction>
+            <AlertDialogAction
+              onClick={() => onDelete(true)}
+              disabled={isPending}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {t('detail.deleteShifts')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <GenerationDialog
+        rotationId={rotation.id}
+        rotationName={rotation.name}
+        open={state.generationOpen}
+        onOpenChange={(v) => dispatch({ type: 'SET_GENERATION_OPEN', payload: v })}
+        onGenerated={onMemberChanged}
+      />
+      <GenerationDialog
+        rotationId={rotation.id}
+        rotationName={rotation.name}
+        open={state.regenerateOpen}
+        onOpenChange={(v) => dispatch({ type: 'SET_REGENERATE_OPEN', payload: v })}
+        onGenerated={onMemberChanged}
+        regenerateMode
+      />
+    </>
+  )
+}
+
 export function RotationDetailContent({
   initialRotation,
 }: RotationDetailContentProps) {
   const t = useTranslations('rotations')
   const router = useRouter()
-  const [rotation, setRotation] = useState<RotationWithRelations>(initialRotation)
-  const [deleteDialogState, setDeleteDialogState] = useState<DeleteDialogState>('none')
-  const [generationOpen, setGenerationOpen] = useState(false)
-  const [regenerateOpen, setRegenerateOpen] = useState(false)
+
+  const [rotation, setRotation] = useState<RotationWithRelations>(() => initialRotation)
+
+  const [state, dispatch] = useReducer(detailReducer, initialDetailState)
   const [isPending, startTransition] = useTransition()
-
-  const [editingConfigs, setEditingConfigs] = useState(false)
-  const [configTimes, setConfigTimes] = useState<Record<string, string>>({})
-
-  const [editingPattern, setEditingPattern] = useState(false)
-  const [editSteps, setEditSteps] = useState<EditableStep[]>([])
-  const [editShiftConfigs, setEditShiftConfigs] = useState<Record<string, string>>({})
-  const [shiftTypes, setShiftTypes] = useState<ShiftTypeOption[]>([])
-  const [loadingShiftTypes, setLoadingShiftTypes] = useState(false)
 
   const hasShifts = rotation._count.shifts > 0
   const canEditPattern = !hasShifts
@@ -182,23 +794,15 @@ export function RotationDetailContent({
 
       if (result.success) {
         toast.success(t('detail.deleteSuccess'))
-        setDeleteDialogState('none')
+        dispatch({ type: 'CLOSE_DELETE_DIALOG' })
         router.push('/dashboard/rotations')
       } else
         toast.error(result.error ?? t('loadError'))
     })
   }
 
-  const startEditConfigs = () => {
-    const times: Record<string, string> = {}
-    for (const cfg of rotation.shiftConfigs)
-      times[cfg.shiftTypeId] = cfg.startTime
-    setConfigTimes(times)
-    setEditingConfigs(true)
-  }
-
   const handleSaveConfigs = () => {
-    const shiftConfigs = Object.entries(configTimes).map(([shiftTypeId, startTime]) => ({
+    const shiftConfigs = Object.entries(state.configTimes).map(([shiftTypeId, startTime]) => ({
       shiftTypeId,
       startTime,
     }))
@@ -209,7 +813,7 @@ export function RotationDetailContent({
       if (result.success) {
         toast.success(t('detail.configsSaved'))
         if (result.data) setRotation(result.data)
-        setEditingConfigs(false)
+        dispatch({ type: 'CONFIGS_SAVED' })
       } else
         toast.error(result.error ?? t('loadError'))
     })
@@ -218,19 +822,19 @@ export function RotationDetailContent({
   const startEditPattern = () => {
     if (!canEditPattern) return
 
-    setEditSteps(
-      rotation.steps.map((s) => ({
-        isRestDay: s.isRestDay,
-        shiftTypeId: s.shiftType?.id,
-      }))
-    )
+    const steps = rotation.steps.map((s) => ({
+      _key: genDetailKey(),
+      isRestDay: s.isRestDay,
+      shiftTypeId: s.shiftType?.id,
+    }))
 
     const configs: Record<string, string> = {}
     for (const cfg of rotation.shiftConfigs)
       configs[cfg.shiftTypeId] = cfg.startTime
-    setEditShiftConfigs(configs)
 
-    setLoadingShiftTypes(true)
+    dispatch({ type: 'START_EDIT_PATTERN', steps, configs })
+
+    dispatch({ type: 'SET_LOADING_SHIFT_TYPES', loading: true })
     getShiftTypesAction()
       .then((result) => {
         if (result.success && result.data) {
@@ -239,71 +843,25 @@ export function RotationDetailContent({
               st.isGlobal ||
               st.areaShiftTypes?.some((ast) => ast.areaId === rotation.areaId)
           )
-          setShiftTypes(
-            areaTypes.map((st) => ({ id: st.id, name: st.name, color: st.color }))
-          )
+          dispatch({
+            type: 'SET_SHIFT_TYPES',
+            types: areaTypes.map((st) => ({ id: st.id, name: st.name, color: st.color })),
+          })
         }
       })
-      .finally(() => setLoadingShiftTypes(false))
-
-    setEditingPattern(true)
+      .finally(() => dispatch({ type: 'SET_LOADING_SHIFT_TYPES', loading: false }))
   }
-
-  const handleStepToggleRest = (index: number, checked: boolean) => {
-    setEditSteps((prev) =>
-      prev.map((s, i) =>
-        i === index ? { isRestDay: checked, shiftTypeId: undefined } : s
-      )
-    )
-  }
-
-  const handleStepShiftType = (index: number, value: string) => {
-    setEditSteps((prev) =>
-      prev.map((s, i) => (i === index ? { ...s, shiftTypeId: value } : s))
-    )
-  }
-
-  const handleMoveStep = (index: number, direction: 'up' | 'down') => {
-    const target = direction === 'up' ? index - 1 : index + 1
-    if (target < 0 || target >= editSteps.length) return
-    setEditSteps((prev) => {
-      const next = [...prev]
-      const temp = next[index]
-      next[index] = next[target]
-      next[target] = temp
-      return next
-    })
-  }
-
-  const handleRemoveStep = (index: number) => {
-    if (editSteps.length <= 2) return
-    setEditSteps((prev) => prev.filter((_, i) => i !== index))
-  }
-
-  const handleAddStep = () => {
-    if (editSteps.length >= 8) return
-    setEditSteps((prev) => [...prev, { isRestDay: false }])
-  }
-
-  const usedShiftTypeIds = Array.from(
-    new Set(
-      editSteps
-        .filter((s) => !s.isRestDay && s.shiftTypeId)
-        .map((s) => s.shiftTypeId as string)
-    )
-  )
-
-  const isPatternValid = (() => {
-    if (editSteps.length < 2) return false
-    if (editSteps.some((s) => !s.isRestDay && !s.shiftTypeId)) return false
-    if (usedShiftTypeIds.some((id) => !editShiftConfigs[id] || !/^\d{2}:\d{2}$/.test(editShiftConfigs[id]))) return false
-    return true
-  })()
 
   const handleSavePattern = () => {
-    if (!isPatternValid) return
+    const usedShiftTypeIds = Array.from(
+      new Set(
+        state.editSteps
+          .filter((s) => !s.isRestDay && s.shiftTypeId)
+          .map((s) => s.shiftTypeId as string)
+      )
+    )
 
-    const steps = editSteps.map((s, i) => ({
+    const steps = state.editSteps.map((s, i) => ({
       order: i,
       isRestDay: s.isRestDay,
       shiftTypeId: s.isRestDay ? undefined : s.shiftTypeId,
@@ -311,7 +869,7 @@ export function RotationDetailContent({
 
     const shiftConfigs = usedShiftTypeIds.map((shiftTypeId) => ({
       shiftTypeId,
-      startTime: editShiftConfigs[shiftTypeId],
+      startTime: state.editShiftConfigs[shiftTypeId],
     }))
 
     startTransition(async () => {
@@ -320,7 +878,7 @@ export function RotationDetailContent({
       if (result.success) {
         toast.success(t('detail.patternSaved'))
         if (result.data) setRotation(result.data)
-        setEditingPattern(false)
+        dispatch({ type: 'PATTERN_SAVED' })
       } else
         toast.error(result.error ?? t('loadError'))
     })
@@ -350,7 +908,7 @@ export function RotationDetailContent({
               <CardTitle className="text-sm font-semibold uppercase tracking-wide">
                 {t('detail.patternTitle')}
               </CardTitle>
-              {!editingPattern && (
+              {!state.editingPattern && (
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <span>
@@ -377,280 +935,33 @@ export function RotationDetailContent({
             </div>
           </CardHeader>
           <CardContent>
-            {editingPattern ? (
-              <div className="space-y-3">
-                <div className="space-y-2">
-                  {editSteps.map((step, index) => (
-                    <div
-                      key={index}
-                      className="bg-muted/40 flex items-center gap-2 rounded-md border px-3 py-2"
-                    >
-                      <span className="text-muted-foreground w-14 shrink-0 text-xs">
-                        {t('steps.day', { number: index + 1 })}
-                      </span>
-                      <div className="flex items-center gap-1.5">
-                        <Checkbox
-                          id={`edit-step-rest-${index}`}
-                          checked={step.isRestDay}
-                          onCheckedChange={(checked) =>
-                            handleStepToggleRest(index, checked === true)
-                          }
-                          disabled={isPending}
-                        />
-                        <Label
-                          htmlFor={`edit-step-rest-${index}`}
-                          className="cursor-pointer text-xs font-normal"
-                        >
-                          {t('steps.restDay')}
-                        </Label>
-                      </div>
-                      {!step.isRestDay && (
-                        <div className="flex-1">
-                          {loadingShiftTypes ? (
-                            <span className="text-muted-foreground flex items-center gap-1 text-xs">
-                              <Loader2 className="h-3 w-3 animate-spin" aria-hidden />
-                              {t('form.loadingShiftTypes')}
-                            </span>
-                          ) : (
-                            <Select
-                              value={step.shiftTypeId ?? ''}
-                              onValueChange={(v) => handleStepShiftType(index, v)}
-                              disabled={isPending}
-                            >
-                              <SelectTrigger className="h-7 text-xs">
-                                <SelectValue placeholder={t('steps.shiftTypePlaceholder')} />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {shiftTypes.map((st) => (
-                                  <SelectItem key={st.id} value={st.id}>
-                                    <span className="flex items-center gap-1.5">
-                                      <span
-                                        className="inline-block h-2 w-2 shrink-0 rounded-full"
-                                        style={{ backgroundColor: st.color }}
-                                        aria-hidden
-                                      />
-                                      {st.name}
-                                    </span>
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          )}
-                        </div>
-                      )}
-                      {step.isRestDay && <div className="flex-1" />}
-                      <div className="flex shrink-0 items-center gap-0.5">
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6"
-                          onClick={() => handleMoveStep(index, 'up')}
-                          disabled={isPending || index === 0}
-                          aria-label={t('steps.moveUp')}
-                        >
-                          <ChevronUp className="h-3 w-3" aria-hidden />
-                        </Button>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6"
-                          onClick={() => handleMoveStep(index, 'down')}
-                          disabled={isPending || index === editSteps.length - 1}
-                          aria-label={t('steps.moveDown')}
-                        >
-                          <ChevronDown className="h-3 w-3" aria-hidden />
-                        </Button>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6"
-                          onClick={() => handleRemoveStep(index)}
-                          disabled={isPending || editSteps.length <= 2}
-                          aria-label={t('steps.removeStep')}
-                        >
-                          <X className="h-3 w-3" aria-hidden />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {editSteps.length < 8 && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={handleAddStep}
-                    disabled={isPending}
-                  >
-                    <Plus className="mr-1.5 h-3.5 w-3.5" aria-hidden />
-                    {t('steps.addStep')}
-                  </Button>
-                )}
-
-                {usedShiftTypeIds.length > 0 && (
-                  <div className="space-y-2 border-t pt-3">
-                    <p className="text-sm font-medium">{t('detail.shiftConfigsTitle')}</p>
-                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                      {usedShiftTypeIds.map((stId) => {
-                        const st = shiftTypes.find((s) => s.id === stId)
-                        if (!st) return null
-                        return (
-                          <div key={stId} className="flex items-center gap-3">
-                            <span
-                              className="inline-block h-2.5 w-2.5 shrink-0 rounded-full"
-                              style={{ backgroundColor: st.color }}
-                              aria-hidden
-                            />
-                            <Label className="min-w-0 flex-1 truncate text-sm">
-                              {st.name}
-                            </Label>
-                            <Input
-                              type="time"
-                              value={editShiftConfigs[stId] ?? ''}
-                              onChange={(e) =>
-                                setEditShiftConfigs((prev) => ({
-                                  ...prev,
-                                  [stId]: e.target.value,
-                                }))
-                              }
-                              className="w-32 shrink-0"
-                              disabled={isPending}
-                            />
-                          </div>
-                        )
-                      })}
-                    </div>
-                  </div>
-                )}
-
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setEditingPattern(false)}
-                    disabled={isPending}
-                  >
-                    {t('form.cancel')}
-                  </Button>
-                  <Button
-                    size="sm"
-                    onClick={handleSavePattern}
-                    disabled={!isPatternValid || isPending}
-                    className="gap-1.5"
-                  >
-                    {isPending ? (
-                      <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
-                    ) : (
-                      <Save className="h-3.5 w-3.5" aria-hidden />
-                    )}
-                    {t('detail.savePattern')}
-                  </Button>
-                </div>
-              </div>
+            {state.editingPattern ? (
+              <PatternEditView
+                editSteps={state.editSteps}
+                editShiftConfigs={state.editShiftConfigs}
+                shiftTypes={state.shiftTypes}
+                loadingShiftTypes={state.loadingShiftTypes}
+                isPending={isPending}
+                dispatch={dispatch}
+                t={t}
+                onSave={handleSavePattern}
+              />
             ) : (
-              <div className="flex flex-wrap gap-1.5">
-                {rotation.steps.map((step) => (
-                  <PatternStep key={step.id} step={step} />
-                ))}
-              </div>
+              <PatternReadView steps={rotation.steps} />
             )}
           </CardContent>
         </Card>
 
-        {(rotation.shiftConfigs.length > 0 && !editingPattern) && (
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-semibold uppercase tracking-wide">
-                  {t('detail.shiftConfigsTitle')}
-                </CardTitle>
-                {!editingConfigs && (
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7"
-                        onClick={startEditConfigs}
-                        disabled={isPending}
-                      >
-                        <Pencil className="h-3.5 w-3.5" aria-hidden />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>{t('detail.editConfigs')}</TooltipContent>
-                  </Tooltip>
-                )}
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>{t('detail.shiftType')}</TableHead>
-                      <TableHead>{t('detail.startTime')}</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {rotation.shiftConfigs.map((cfg) => (
-                      <TableRow key={cfg.id}>
-                        <TableCell className="font-medium">
-                          {cfg.shiftType.name}
-                        </TableCell>
-                        <TableCell>
-                          {editingConfigs ? (
-                            <Input
-                              type="time"
-                              value={configTimes[cfg.shiftTypeId] ?? cfg.startTime}
-                              onChange={(e) =>
-                                setConfigTimes((prev) => ({
-                                  ...prev,
-                                  [cfg.shiftTypeId]: e.target.value,
-                                }))
-                              }
-                              className="h-8 w-32 font-mono"
-                              disabled={isPending}
-                            />
-                          ) : (
-                            <span className="font-mono">{cfg.startTime}</span>
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-              {editingConfigs && (
-                <div className="mt-3 flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setEditingConfigs(false)}
-                    disabled={isPending}
-                  >
-                    {t('form.cancel')}
-                  </Button>
-                  <Button
-                    size="sm"
-                    onClick={handleSaveConfigs}
-                    disabled={isPending}
-                    className="gap-1.5"
-                  >
-                    {isPending ? (
-                      <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
-                    ) : (
-                      <Save className="h-3.5 w-3.5" aria-hidden />
-                    )}
-                    {t('detail.saveConfigs')}
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+        {(rotation.shiftConfigs.length > 0 && !state.editingPattern) && (
+          <ShiftConfigsCard
+            shiftConfigs={rotation.shiftConfigs}
+            editingConfigs={state.editingConfigs}
+            configTimes={state.configTimes}
+            isPending={isPending}
+            dispatch={dispatch}
+            t={t}
+            onSave={handleSaveConfigs}
+          />
         )}
 
         <Card>
@@ -680,116 +991,18 @@ export function RotationDetailContent({
           </Card>
         )}
 
-        <footer className="flex flex-wrap items-center justify-end gap-2 border-t pt-4">
-          {rotation.status === 'ACTIVE' ? (
-            <Button
-              variant="outline"
-              onClick={handleDeactivate}
-              disabled={isPending}
-              className="gap-2"
-            >
-              {isPending ? (
-                <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-              ) : (
-                <PowerOff className="h-4 w-4" aria-hidden />
-              )}
-              {t('detail.deactivate')}
-            </Button>
-          ) : (
-            <Button
-              variant="outline"
-              onClick={handleActivate}
-              disabled={isPending}
-              className="gap-2"
-            >
-              {isPending ? (
-                <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-              ) : (
-                <Power className="h-4 w-4" aria-hidden />
-              )}
-              {t('detail.activate')}
-            </Button>
-          )}
-          {rotation.status === 'ACTIVE' && (
-            <>
-              <Button
-                variant="outline"
-                onClick={() => setRegenerateOpen(true)}
-                disabled={isPending}
-                className="gap-2"
-              >
-                <RefreshCw className="h-4 w-4" aria-hidden />
-                {t('form.regenerate')}
-              </Button>
-              <Button
-                variant="default"
-                onClick={() => setGenerationOpen(true)}
-                disabled={isPending}
-                className="gap-2"
-              >
-                <CalendarPlus className="h-4 w-4" aria-hidden />
-                {t('generation.generateShifts')}
-              </Button>
-            </>
-          )}
-          <Button
-            variant="destructive"
-            onClick={() => setDeleteDialogState('open')}
-            disabled={isPending}
-            className="gap-2"
-          >
-            <Trash2 className="h-4 w-4" aria-hidden />
-            {t('detail.delete')}
-          </Button>
-        </footer>
+        <DetailFooter
+          rotation={rotation}
+          state={state}
+          isPending={isPending}
+          dispatch={dispatch}
+          t={t}
+          onActivate={handleActivate}
+          onDeactivate={handleDeactivate}
+          onDelete={handleDelete}
+          onMemberChanged={handleMemberChanged}
+        />
       </div>
-
-      <AlertDialog
-        open={deleteDialogState === 'open'}
-        onOpenChange={(isOpen) => {
-          if (!isOpen) setDeleteDialogState('none')
-        }}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{t('detail.deleteConfirm')}</AlertDialogTitle>
-            <AlertDialogDescription>{t('detail.deleteDescription')}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="flex-col gap-2 sm:flex-row">
-            <AlertDialogCancel disabled={isPending}>{t('form.cancel')}</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => handleDelete(false)}
-              disabled={isPending}
-              className="bg-secondary text-secondary-foreground hover:bg-secondary/80"
-            >
-              {t('detail.unlinkShifts')}
-            </AlertDialogAction>
-            <AlertDialogAction
-              onClick={() => handleDelete(true)}
-              disabled={isPending}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              {t('detail.deleteShifts')}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      <GenerationDialog
-        rotationId={rotation.id}
-        rotationName={rotation.name}
-        open={generationOpen}
-        onOpenChange={setGenerationOpen}
-        onGenerated={handleMemberChanged}
-      />
-      <GenerationDialog
-        rotationId={rotation.id}
-        rotationName={rotation.name}
-        open={regenerateOpen}
-        onOpenChange={setRegenerateOpen}
-        onGenerated={handleMemberChanged}
-        regenerateMode
-      />
     </>
   )
 }

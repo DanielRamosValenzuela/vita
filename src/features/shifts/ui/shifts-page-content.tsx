@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState, useTransition } from 'react'
+import { useMemo, useReducer, useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 import type { ShiftStatus } from '@prisma/client'
 import { endOfMonth, format, startOfMonth } from 'date-fns'
@@ -44,6 +44,264 @@ import { ShiftFilters } from './shift-filters'
 import type { ShiftTypeOption } from './shift-form'
 import { ShiftFormDialog } from './shift-form-dialog'
 
+function getStatusColor(status: ShiftStatus): string {
+  switch (status) {
+    case 'SCHEDULED':
+      return 'bg-green-100 text-green-800 hover:bg-green-200'
+    case 'IN_PROGRESS':
+      return 'bg-blue-100 text-blue-800 hover:bg-blue-200'
+    case 'COMPLETED':
+      return 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+    case 'CANCELLED':
+      return 'bg-red-100 text-red-800 hover:bg-red-200'
+    case 'NO_SHOW':
+      return 'bg-orange-100 text-orange-800 hover:bg-orange-200'
+    default:
+      return 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+  }
+}
+
+function getStatusLabel(status: ShiftStatus, t: ReturnType<typeof useTranslations<'shifts'>>): string {
+  switch (status) {
+    case 'SCHEDULED':
+      return t('status.scheduled')
+    case 'IN_PROGRESS':
+      return t('status.inProgress')
+    case 'COMPLETED':
+      return t('status.completed')
+    case 'CANCELLED':
+      return t('status.cancelled')
+    case 'NO_SHOW':
+      return t('status.noShow')
+    default:
+      return status
+  }
+}
+
+type PageState = {
+  dialogOpen: boolean
+  editingShift: ShiftWithRelations | null
+  shiftToDelete: ShiftWithRelations | null
+  isDeleting: boolean
+  rotationDetail: {
+    open: boolean
+    shifts: ShiftWithRelations[]
+    meta: { shiftTypeName: string; date: string }
+  }
+  currentFilters: {
+    status?: string
+    userId?: string
+    shiftTypeId?: string
+    search?: string
+    startDate?: Date
+    endDate?: Date
+  }
+  currentMonth: Date
+}
+
+type PageAction =
+  | { type: 'OPEN_CREATE_DIALOG' }
+  | { type: 'OPEN_EDIT_DIALOG'; payload: ShiftWithRelations }
+  | { type: 'CLOSE_DIALOG' }
+  | { type: 'SET_DELETE_TARGET'; payload: ShiftWithRelations }
+  | { type: 'CLEAR_DELETE_TARGET' }
+  | { type: 'SET_DELETING'; payload: boolean }
+  | { type: 'OPEN_ROTATION_DETAIL'; payload: { shifts: ShiftWithRelations[]; meta: { shiftTypeName: string; date: string } } }
+  | { type: 'CLOSE_ROTATION_DETAIL' }
+  | { type: 'SET_FILTERS'; payload: PageState['currentFilters'] }
+  | { type: 'SET_MONTH'; payload: Date }
+
+const initialPageState: PageState = {
+  dialogOpen: false,
+  editingShift: null,
+  shiftToDelete: null,
+  isDeleting: false,
+  rotationDetail: {
+    open: false,
+    shifts: [],
+    meta: { shiftTypeName: '', date: '' },
+  },
+  currentFilters: {},
+  currentMonth: new Date(),
+}
+
+function pageReducer(state: PageState, action: PageAction): PageState {
+  switch (action.type) {
+    case 'OPEN_CREATE_DIALOG':
+      return { ...state, dialogOpen: true, editingShift: null }
+    case 'OPEN_EDIT_DIALOG':
+      return { ...state, dialogOpen: true, editingShift: action.payload }
+    case 'CLOSE_DIALOG':
+      return { ...state, dialogOpen: false, editingShift: null }
+    case 'SET_DELETE_TARGET':
+      return { ...state, shiftToDelete: action.payload }
+    case 'CLEAR_DELETE_TARGET':
+      return { ...state, shiftToDelete: null }
+    case 'SET_DELETING':
+      return { ...state, isDeleting: action.payload }
+    case 'OPEN_ROTATION_DETAIL':
+      return { ...state, rotationDetail: { open: true, shifts: action.payload.shifts, meta: action.payload.meta } }
+    case 'CLOSE_ROTATION_DETAIL':
+      return { ...state, rotationDetail: { ...state.rotationDetail, open: false } }
+    case 'SET_FILTERS':
+      return { ...state, currentFilters: action.payload }
+    case 'SET_MONTH':
+      return { ...state, currentMonth: action.payload }
+    default:
+      return state
+  }
+}
+
+function ShiftStatsCards({
+  shifts,
+  isPending,
+  t,
+}: {
+  shifts: ShiftWithRelations[]
+  isPending: boolean
+  t: ReturnType<typeof useTranslations<'shifts'>>
+}) {
+  return (
+    <div className="grid gap-4 md:grid-cols-3">
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">{t('stats.totalShifts')}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {isPending
+            ? <Skeleton className="h-8 w-12" />
+            : <div className="text-2xl font-bold">{shifts.length}</div>}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">{t('stats.thisMonth')}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {isPending
+            ? <Skeleton className="h-8 w-12" />
+            : (
+              <div className="text-2xl font-bold">
+                {shifts.filter((s) => {
+                  const shiftDate = new Date(s.startTime)
+                  const now = new Date()
+                  return (
+                    shiftDate.getMonth() === now.getMonth() &&
+                    shiftDate.getFullYear() === now.getFullYear()
+                  )
+                }).length}
+              </div>
+            )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">{t('stats.inProgress')}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {isPending
+            ? <Skeleton className="h-8 w-12" />
+            : (
+              <div className="text-2xl font-bold">
+                {shifts.filter((s) => s.status === 'IN_PROGRESS').length}
+              </div>
+            )}
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
+
+function ShiftsTableSection({
+  shifts,
+  isPending,
+  t,
+}: {
+  shifts: ShiftWithRelations[]
+  isPending: boolean
+  t: ReturnType<typeof useTranslations<'shifts'>>
+}) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>{t('recent.title')}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {isPending ? (
+          <div className="space-y-3">
+            {['a', 'b', 'c', 'd', 'e'].map((skId) => (
+              <div key={`table-sk-${skId}`} className="flex items-center gap-4">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-4 w-20" />
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-5 w-20 rounded-full" />
+              </div>
+            ))}
+          </div>
+        ) : shifts.length === 0 ? (
+          <p className="text-muted-foreground text-center py-8">{t('recent.noShifts')}</p>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>{t('table.user')}</TableHead>
+                <TableHead>{t('table.title')}</TableHead>
+                <TableHead>{t('table.role')}</TableHead>
+                <TableHead>{t('table.time')}</TableHead>
+                <TableHead>{t('table.status')}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {shifts.slice(0, 10).map((shift) => (
+                <TableRow key={shift.id}>
+                  <TableCell className="font-medium">{shift.user.name}</TableCell>
+                  <TableCell>
+                    <span className="inline-flex items-center gap-1">
+                      {shift.title || shift.rotation?.name || t('table.noTitle')}
+                      {shift.rotationId && (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <RefreshCw
+                              className="h-3 w-3 text-blue-500 shrink-0"
+                              aria-label={t('table.rotationGenerated')}
+                            />
+                          </TooltipTrigger>
+                          <TooltipContent>{t('table.rotationGenerated')}</TooltipContent>
+                        </Tooltip>
+                      )}
+                    </span>
+                  </TableCell>
+                  <TableCell>{shift.user.role || t('table.noRole')}</TableCell>
+                  <TableCell>
+                    {t('table.timeRange', {
+                      start: format(shift.startTime, 'HH:mm'),
+                      end: format(shift.endTime, 'HH:mm'),
+                    })}
+                  </TableCell>
+                  <TableCell>
+                    <Badge className={getStatusColor(shift.status)}>
+                      {getStatusLabel(shift.status, t)}
+                    </Badge>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+
+        {!isPending && shifts.length > 10 && (
+          <div className="mt-4 text-center">
+            <Button variant="outline">{t('recent.viewAll')}</Button>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  )
+}
+
 interface AreaOption {
   id: string
   name: string
@@ -80,13 +338,9 @@ export function ShiftsPageContent({
   const [shifts, setShifts] = useState<ShiftWithRelations[]>(() => initialShifts)
   const [selectedAreaId, setSelectedAreaId] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
-  const [dialogOpen, setDialogOpen] = useState(false)
-  const [editingShift, setEditingShift] = useState<ShiftWithRelations | null>(null)
-  const [shiftToDelete, setShiftToDelete] = useState<ShiftWithRelations | null>(null)
-  const [isDeleting, setIsDeleting] = useState(false)
-  const [rotationDetailOpen, setRotationDetailOpen] = useState(false)
-  const [rotationDetailShifts, setRotationDetailShifts] = useState<ShiftWithRelations[]>([])
-  const [rotationDetailMeta, setRotationDetailMeta] = useState<{ shiftTypeName: string; date: string }>({ shiftTypeName: '', date: '' })
+  const [state, dispatch] = useReducer(pageReducer, initialPageState)
+
+  const { dialogOpen, editingShift, shiftToDelete, isDeleting, rotationDetail, currentFilters, currentMonth } = state
 
   const calendarShifts = useMemo(
     () => groupShiftsForCalendar(shifts, t('table.noTitle')),
@@ -124,16 +378,6 @@ export function ShiftsPageContent({
       })),
     [users]
   )
-
-  const [currentFilters, setCurrentFilters] = useState<{
-    status?: string
-    userId?: string
-    shiftTypeId?: string
-    search?: string
-    startDate?: Date
-    endDate?: Date
-  }>({})
-  const [currentMonth, setCurrentMonth] = useState(new Date())
 
   const fetchShifts = (params: {
     areaId?: string | null
@@ -186,52 +430,49 @@ export function ShiftsPageContent({
       startDate: filters.startDate,
       endDate: filters.endDate,
     }
-    setCurrentFilters(newFilters)
+    dispatch({ type: 'SET_FILTERS', payload: newFilters })
     fetchShifts({ ...newFilters })
   }
 
   const handleMonthChange = (month: Date) => {
-    setCurrentMonth(month)
+    dispatch({ type: 'SET_MONTH', payload: month })
     fetchShifts({ monthDate: month, ...currentFilters })
   }
 
   const handleShiftClick = (calendarEvent: { id: string }) => {
     const fullShift = shifts.find((s) => s.id === calendarEvent.id)
-    if (fullShift) {
-      setEditingShift(fullShift)
-      setDialogOpen(true)
-    }
+    if (fullShift) dispatch({ type: 'OPEN_EDIT_DIALOG', payload: fullShift })
   }
 
   const handleShiftDeleteClick = (calendarEvent: { id: string }) => {
     const fullShift = shifts.find((s) => s.id === calendarEvent.id)
-    if (fullShift) setShiftToDelete(fullShift)
+    if (fullShift) dispatch({ type: 'SET_DELETE_TARGET', payload: fullShift })
   }
 
   const handleRotationBlockClick = (block: RotationGroupCalendarEvent) => {
     const blockShifts = shifts.filter((s) => block.shiftIds.includes(s.id))
-    setRotationDetailShifts(blockShifts)
-    setRotationDetailMeta({
-      shiftTypeName: block.title,
-      date: format(block.startTime, 'dd/MM/yyyy'),
+    dispatch({
+      type: 'OPEN_ROTATION_DETAIL',
+      payload: {
+        shifts: blockShifts,
+        meta: { shiftTypeName: block.title, date: format(block.startTime, 'dd/MM/yyyy') },
+      },
     })
-    setRotationDetailOpen(true)
   }
 
   const handleEditShiftFromRotationDetail = (shift: ShiftWithRelations) => {
-    setRotationDetailOpen(false)
-    setEditingShift(shift)
-    setDialogOpen(true)
+    dispatch({ type: 'CLOSE_ROTATION_DETAIL' })
+    dispatch({ type: 'OPEN_EDIT_DIALOG', payload: shift })
   }
 
   const handleDeleteConfirm = async () => {
     if (!shiftToDelete) return
-    setIsDeleting(true)
+    dispatch({ type: 'SET_DELETING', payload: true })
     try {
       const result = await deleteShiftAction(shiftToDelete.id)
       if (result.success) {
         toast.success(tToast('toast.shifts.deleted'))
-        setShiftToDelete(null)
+        dispatch({ type: 'CLEAR_DELETE_TARGET' })
         router.refresh()
         fetchShifts({ ...currentFilters })
       } else
@@ -240,41 +481,7 @@ export function ShiftsPageContent({
     } catch {
       toast.error(tToast('toast.shifts.errorDeleting'))
     } finally {
-      setIsDeleting(false)
-    }
-  }
-
-  const getStatusColor = (status: ShiftStatus) => {
-    switch (status) {
-      case 'SCHEDULED':
-        return 'bg-green-100 text-green-800 hover:bg-green-200'
-      case 'IN_PROGRESS':
-        return 'bg-blue-100 text-blue-800 hover:bg-blue-200'
-      case 'COMPLETED':
-        return 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-      case 'CANCELLED':
-        return 'bg-red-100 text-red-800 hover:bg-red-200'
-      case 'NO_SHOW':
-        return 'bg-orange-100 text-orange-800 hover:bg-orange-200'
-      default:
-        return 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-    }
-  }
-
-  const getStatusLabel = (status: ShiftStatus) => {
-    switch (status) {
-      case 'SCHEDULED':
-        return t('status.scheduled')
-      case 'IN_PROGRESS':
-        return t('status.inProgress')
-      case 'COMPLETED':
-        return t('status.completed')
-      case 'CANCELLED':
-        return t('status.cancelled')
-      case 'NO_SHOW':
-        return t('status.noShow')
-      default:
-        return status
+      dispatch({ type: 'SET_DELETING', payload: false })
     }
   }
 
@@ -288,10 +495,7 @@ export function ShiftsPageContent({
 
         <Button
           type="button"
-          onClick={() => {
-            setEditingShift(null)
-            setDialogOpen(true)
-          }}
+          onClick={() => dispatch({ type: 'OPEN_CREATE_DIALOG' })}
         >
           <CalendarDays className="mr-2 h-4 w-4" />
           {t('newShift')}
@@ -304,15 +508,14 @@ export function ShiftsPageContent({
           initialAreaId={selectedAreaId}
           open={dialogOpen}
           onOpenChange={(open) => {
-            setDialogOpen(open)
-            if (!open) setEditingShift(null)
+            if (!open) dispatch({ type: 'CLOSE_DIALOG' })
           }}
           editingShift={editingShift}
           onSuccess={() => fetchShifts({ ...currentFilters })}
         />
         <AlertDialog
           open={!!shiftToDelete}
-          onOpenChange={(open) => !open && setShiftToDelete(null)}
+          onOpenChange={(open) => !open && dispatch({ type: 'CLEAR_DELETE_TARGET' })}
         >
           <AlertDialogContent>
             <AlertDialogHeader>
@@ -343,55 +546,7 @@ export function ShiftsPageContent({
         onAreaChange={handleAreaChange}
       />
 
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('stats.totalShifts')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {isPending
-              ? <Skeleton className="h-8 w-12" />
-              : <div className="text-2xl font-bold">{shifts.length}</div>}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('stats.thisMonth')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {isPending
-              ? <Skeleton className="h-8 w-12" />
-              : (
-                <div className="text-2xl font-bold">
-                  {shifts.filter((s) => {
-                    const shiftDate = new Date(s.startTime)
-                    const now = new Date()
-                    return (
-                      shiftDate.getMonth() === now.getMonth() &&
-                      shiftDate.getFullYear() === now.getFullYear()
-                    )
-                  }).length}
-                </div>
-              )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('stats.inProgress')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {isPending
-              ? <Skeleton className="h-8 w-12" />
-              : (
-                <div className="text-2xl font-bold">
-                  {shifts.filter((s) => s.status === 'IN_PROGRESS').length}
-                </div>
-              )}
-          </CardContent>
-        </Card>
-      </div>
+      <ShiftStatsCards shifts={shifts} isPending={isPending} t={t} />
 
       <Card>
         <CardContent className="pt-6">
@@ -416,91 +571,17 @@ export function ShiftsPageContent({
         />
 
         <RotationShiftsDetailDialog
-          open={rotationDetailOpen}
-          onOpenChange={setRotationDetailOpen}
-          shifts={rotationDetailShifts}
-          shiftTypeName={rotationDetailMeta.shiftTypeName}
-          date={rotationDetailMeta.date}
+          open={rotationDetail.open}
+          onOpenChange={(open) => !open && dispatch({ type: 'CLOSE_ROTATION_DETAIL' })}
+          shifts={rotationDetail.shifts}
+          shiftTypeName={rotationDetail.meta.shiftTypeName}
+          date={rotationDetail.meta.date}
           onEditShift={handleEditShiftFromRotationDetail}
           getStatusColor={(status) => getStatusColor(status as ShiftStatus)}
-          getStatusLabel={(status) => getStatusLabel(status as ShiftStatus)}
+          getStatusLabel={(status) => getStatusLabel(status as ShiftStatus, t)}
         />
 
-        <Card>
-          <CardHeader>
-            <CardTitle>{t('recent.title')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {isPending ? (
-              <div className="space-y-3">
-                {Array.from({ length: 5 }, (_, i) => (
-                  <div key={i} className="flex items-center gap-4">
-                    <Skeleton className="h-4 w-24" />
-                    <Skeleton className="h-4 w-32" />
-                    <Skeleton className="h-4 w-20" />
-                    <Skeleton className="h-4 w-24" />
-                    <Skeleton className="h-5 w-20 rounded-full" />
-                  </div>
-                ))}
-              </div>
-            ) : shifts.length === 0 ? (
-              <p className="text-muted-foreground text-center py-8">{t('recent.noShifts')}</p>
-            ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>{t('table.user')}</TableHead>
-                    <TableHead>{t('table.title')}</TableHead>
-                    <TableHead>{t('table.role')}</TableHead>
-                    <TableHead>{t('table.time')}</TableHead>
-                    <TableHead>{t('table.status')}</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {shifts.slice(0, 10).map((shift) => (
-                    <TableRow key={shift.id}>
-                      <TableCell className="font-medium">{shift.user.name}</TableCell>
-                      <TableCell>
-                        <span className="inline-flex items-center gap-1">
-                          {shift.title || shift.rotation?.name || t('table.noTitle')}
-                          {shift.rotationId && (
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <RefreshCw
-                                  className="h-3 w-3 text-blue-500 shrink-0"
-                                  aria-label={t('table.rotationGenerated')}
-                                />
-                              </TooltipTrigger>
-                              <TooltipContent>{t('table.rotationGenerated')}</TooltipContent>
-                            </Tooltip>
-                          )}
-                        </span>
-                      </TableCell>
-                      <TableCell>{shift.user.role || t('table.noRole')}</TableCell>
-                      <TableCell>
-                        {t('table.timeRange', {
-                          start: format(shift.startTime, 'HH:mm'),
-                          end: format(shift.endTime, 'HH:mm'),
-                        })}
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={getStatusColor(shift.status)}>
-                          {getStatusLabel(shift.status)}
-                        </Badge>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            )}
-
-            {!isPending && shifts.length > 10 && (
-              <div className="mt-4 text-center">
-                <Button variant="outline">{t('recent.viewAll')}</Button>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        <ShiftsTableSection shifts={shifts} isPending={isPending} t={t} />
       </div>
     </div>
   )
