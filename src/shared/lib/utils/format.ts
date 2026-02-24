@@ -21,8 +21,6 @@ export function formatDateShort(date: Date, locale: 'es' | 'en' = 'es'): string 
   })
 }
 
-export { DATE_LOCALES }
-
 export const formatCurrency = (amount: number): string => {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',

@@ -5,7 +5,7 @@ import type { Prisma } from '@prisma/client'
 import { z } from 'zod'
 
 import { isChiefArea } from '@/src/shared/lib/auth/rbac'
-import { requireAdminHROrChiefArea, requireAuth } from '@/src/shared/lib/auth/session'
+import { requireAdminHROrChiefArea } from '@/src/shared/lib/auth/session'
 import { prisma } from '@/src/shared/lib/db'
 import type { ActionResult } from '@/src/shared/lib/types'
 
@@ -452,64 +452,6 @@ export const deleteRotationAction = async (
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Error al eliminar rotativa',
-    }
-  }
-}
-
-export const getMyRotationsAction = async (): Promise<
-  ActionResult<
-    Array<{
-      rotationId: string
-      rotationName: string
-      groupName: string
-      areaName: string
-      status: string
-    }>
-  >
-> => {
-  try {
-    const session = await requireAuth()
-
-    const members = await prisma.rotationMember.findMany({
-      where: {
-        userId: session.id,
-        leftAt: null,
-      },
-      select: {
-        rotationGroup: {
-          select: {
-            name: true,
-            rotation: {
-              select: {
-                id: true,
-                name: true,
-                status: true,
-                area: {
-                  select: {
-                    name: true,
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    })
-
-    const data = members.map((m) => ({
-      rotationId: m.rotationGroup.rotation.id,
-      rotationName: m.rotationGroup.rotation.name,
-      groupName: m.rotationGroup.name,
-      areaName: m.rotationGroup.rotation.area.name,
-      status: m.rotationGroup.rotation.status,
-    }))
-
-    return { success: true, data }
-  } catch (error) {
-    console.error('[getMyRotationsAction] Error:', error)
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Error al obtener rotativas',
     }
   }
 }

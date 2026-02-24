@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState, useTransition } from 'react'
+import { useMemo, useReducer, useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 import { Check, Loader2, Plus, Search as SearchIcon, UserMinus } from 'lucide-react'
 import { toast } from 'sonner'
@@ -52,64 +52,94 @@ interface AddMemberPopoverProps {
   onAdded: () => void
 }
 
+interface PopoverState {
+  open: boolean
+  staff: AvailableStaffMember[]
+  loadingStaff: boolean
+  search: string
+  selectedIds: Set<string>
+}
+
+type PopoverAction =
+  | { type: 'OPEN' }
+  | { type: 'CLOSE' }
+  | { type: 'SET_STAFF'; staff: AvailableStaffMember[] }
+  | { type: 'SET_SEARCH'; search: string }
+  | { type: 'TOGGLE_MEMBER'; userId: string }
+
+const popoverInit: PopoverState = {
+  open: false,
+  staff: [],
+  loadingStaff: false,
+  search: '',
+  selectedIds: new Set(),
+}
+
+function popoverReducer(state: PopoverState, action: PopoverAction): PopoverState {
+  switch (action.type) {
+    case 'OPEN':
+      return { ...state, open: true, loadingStaff: true }
+    case 'CLOSE':
+      return { ...popoverInit, selectedIds: new Set() }
+    case 'SET_STAFF':
+      return { ...state, staff: action.staff, loadingStaff: false }
+    case 'SET_SEARCH':
+      return { ...state, search: action.search }
+    case 'TOGGLE_MEMBER': {
+      const next = new Set(state.selectedIds)
+      if (next.has(action.userId))
+        next.delete(action.userId)
+      else
+        next.add(action.userId)
+      return { ...state, selectedIds: next }
+    }
+    default:
+      return state
+  }
+}
+
 function AddMemberPopover({ groupId, rotationId, onAdded }: AddMemberPopoverProps) {
   const t = useTranslations('rotations')
-  const [open, setOpen] = useState(false)
-  const [staff, setStaff] = useState<AvailableStaffMember[]>([])
-  const [loadingStaff, setLoadingStaff] = useState(false)
+  const [state, dispatch] = useReducer(popoverReducer, popoverInit)
   const [isPending, startTransition] = useTransition()
-  const [search, setSearch] = useState('')
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
 
   const filteredStaff = useMemo(() => {
-    if (!search.trim()) return staff
-    const q = search.trim().toLowerCase()
-    return staff.filter(
+    if (!state.search.trim()) return state.staff
+    const q = state.search.trim().toLowerCase()
+    return state.staff.filter(
       (m) => m.name.toLowerCase().includes(q) || m.email.toLowerCase().includes(q)
     )
-  }, [staff, search])
+  }, [state.staff, state.search])
 
   const handleOpen = async (isOpen: boolean) => {
-    setOpen(isOpen)
     if (!isOpen) {
-      setSearch('')
-      setSelectedIds(new Set())
+      dispatch({ type: 'CLOSE' })
       return
     }
 
-    setLoadingStaff(true)
+    dispatch({ type: 'OPEN' })
     const result = await getAvailableStaffAction(rotationId)
-    setLoadingStaff(false)
 
     if (result.success && result.data)
-      setStaff(result.data)
-    else
+      dispatch({ type: 'SET_STAFF', staff: result.data })
+    else {
+      dispatch({ type: 'SET_STAFF', staff: [] })
       toast.error(result.error ?? t('loadError'))
-  }
-
-  const toggleMember = (userId: string) => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev)
-      if (next.has(userId))
-        next.delete(userId)
-      else
-        next.add(userId)
-      return next
-    })
+    }
   }
 
   const handleConfirm = () => {
-    if (selectedIds.size === 0) return
+    if (state.selectedIds.size === 0) return
 
     startTransition(async () => {
       const result = await addMembersBulkAction({
         rotationGroupId: groupId,
-        userIds: Array.from(selectedIds),
+        userIds: Array.from(state.selectedIds),
       })
 
       if (result.success) {
         toast.success(result.message ?? t('groups.addMember'))
-        setOpen(false)
+        dispatch({ type: 'CLOSE' })
         onAdded()
       } else
         toast.error(result.error ?? t('loadError'))
@@ -117,7 +147,7 @@ function AddMemberPopover({ groupId, rotationId, onAdded }: AddMemberPopoverProp
   }
 
   return (
-    <Popover open={open} onOpenChange={handleOpen}>
+    <Popover open={state.open} onOpenChange={handleOpen}>
       <PopoverTrigger asChild>
         <Button variant="outline" size="sm" className="mt-2 w-full">
           <Plus className="mr-1.5 h-3.5 w-3.5" aria-hidden />
@@ -125,13 +155,13 @@ function AddMemberPopover({ groupId, rotationId, onAdded }: AddMemberPopoverProp
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-72 p-3" align="start">
-        {loadingStaff ? (
+        {state.loadingStaff ? (
           <div className="space-y-2">
             <Skeleton className="h-8 w-full" />
             <Skeleton className="h-8 w-full" />
             <Skeleton className="h-8 w-full" />
           </div>
-        ) : staff.length === 0 ? (
+        ) : state.staff.length === 0 ? (
           <p className="text-muted-foreground py-4 text-center text-sm">
             {t('groups.noAvailableUsers')}
           </p>
@@ -144,8 +174,8 @@ function AddMemberPopover({ groupId, rotationId, onAdded }: AddMemberPopoverProp
               />
               <Input
                 type="search"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                value={state.search}
+                onChange={(e) => dispatch({ type: 'SET_SEARCH', search: e.target.value })}
                 placeholder={t('groups.searchMember')}
                 className="h-8 pl-8 text-sm"
               />
@@ -158,14 +188,14 @@ function AddMemberPopover({ groupId, rotationId, onAdded }: AddMemberPopoverProp
               ) : (
                 <ul role="listbox" aria-label={t('groups.selectUser')} aria-multiselectable className="space-y-0.5">
                   {filteredStaff.map((member) => {
-                    const isSelected = selectedIds.has(member.id)
+                    const isSelected = state.selectedIds.has(member.id)
                     return (
                       <li key={member.id} role="option" aria-selected={isSelected}>
                         <button
                           type="button"
                           className={`focus-visible:ring-ring flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm transition-colors focus-visible:outline-none focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50 ${isSelected ? 'bg-accent' : 'hover:bg-accent/50'}`}
                           disabled={isPending}
-                          onClick={() => toggleMember(member.id)}
+                          onClick={() => dispatch({ type: 'TOGGLE_MEMBER', userId: member.id })}
                         >
                           <div className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border ${isSelected ? 'border-primary bg-primary text-primary-foreground' : 'border-muted-foreground/40'}`}>
                             {isSelected && <Check className="h-3 w-3" aria-hidden />}
@@ -184,7 +214,7 @@ function AddMemberPopover({ groupId, rotationId, onAdded }: AddMemberPopoverProp
                 </ul>
               )}
             </div>
-            {selectedIds.size > 0 && (
+            {state.selectedIds.size > 0 && (
               <Button
                 size="sm"
                 className="w-full gap-2"
@@ -196,7 +226,7 @@ function AddMemberPopover({ groupId, rotationId, onAdded }: AddMemberPopoverProp
                 ) : (
                   <Plus className="h-3.5 w-3.5" aria-hidden />
                 )}
-                {t('groups.addSelected', { count: selectedIds.size })}
+                {t('groups.addSelected', { count: state.selectedIds.size })}
               </Button>
             )}
           </div>

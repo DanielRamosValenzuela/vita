@@ -2,7 +2,7 @@ export type ShiftClassificationType = 'DAY' | 'NIGHT' | 'MIXED'
 
 type ExtraTierType = 'TIER_1' | 'TIER_2' | 'TIER_3' | 'NEVER_RECOMMEND'
 
-export type CandidateWarningType = {
+type CandidateWarningType = {
   type: 'max_consecutive_hours' | 'min_rest_hours' | 'noche_to_largo' | 'came_from_noche'
   message: string
   severity: 'warning' | 'error'

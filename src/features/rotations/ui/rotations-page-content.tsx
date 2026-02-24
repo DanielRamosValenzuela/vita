@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, useTransition } from 'react'
+import { useEffect, useReducer, useRef, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 import { AlertTriangle, Pencil, Plus, RefreshCw, Search, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
@@ -55,25 +55,206 @@ function getStatusVariant(status: string): 'default' | 'secondary' | 'outline' {
   return 'outline'
 }
 
+interface PageState {
+  rotations: RotationListItem[]
+  total: number
+  searchTerm: string
+  areaFilter: string
+  statusFilter: string
+  rotationToDelete: RotationListItem | null
+  createOpen: boolean
+  coverageAlerts: Array<{ rotationId: string; rotationName: string; alerts: CoverageAlert[] }>
+}
+
+type PageAction =
+  | { type: 'SET_DATA'; rotations: RotationListItem[]; total: number }
+  | { type: 'SET_SEARCH'; searchTerm: string }
+  | { type: 'SET_AREA_FILTER'; areaFilter: string }
+  | { type: 'SET_STATUS_FILTER'; statusFilter: string }
+  | { type: 'SET_DELETE'; rotation: RotationListItem | null }
+  | { type: 'SET_CREATE_OPEN'; open: boolean }
+  | { type: 'SET_ALERTS'; alerts: PageState['coverageAlerts'] }
+
+function pageReducer(state: PageState, action: PageAction): PageState {
+  switch (action.type) {
+    case 'SET_DATA':
+      return { ...state, rotations: action.rotations, total: action.total }
+    case 'SET_SEARCH':
+      return { ...state, searchTerm: action.searchTerm }
+    case 'SET_AREA_FILTER':
+      return { ...state, areaFilter: action.areaFilter }
+    case 'SET_STATUS_FILTER':
+      return { ...state, statusFilter: action.statusFilter }
+    case 'SET_DELETE':
+      return { ...state, rotationToDelete: action.rotation }
+    case 'SET_CREATE_OPEN':
+      return { ...state, createOpen: action.open }
+    case 'SET_ALERTS':
+      return { ...state, coverageAlerts: action.alerts }
+    default:
+      return state
+  }
+}
+
+type PageInit = { initialRotations: RotationListItem[]; initialTotal: number }
+
+function initPage(init: PageInit): PageState {
+  return {
+    rotations: init.initialRotations,
+    total: init.initialTotal,
+    searchTerm: '',
+    areaFilter: '',
+    statusFilter: '',
+    rotationToDelete: null,
+    createOpen: false,
+    coverageAlerts: [],
+  }
+}
+
+interface RotationsTableProps {
+  rotations: RotationListItem[]
+  total: number
+  onDelete: (rotation: RotationListItem) => void
+  onCreate: () => void
+  t: ReturnType<typeof useTranslations<'rotations'>>
+}
+
+function RotationsTable({ rotations, total, onDelete, onCreate, t }: RotationsTableProps) {
+  if (rotations.length === 0)
+    return (
+      <div className="flex flex-col items-center justify-center py-16 text-center">
+        <RefreshCw className="text-muted-foreground mb-4 h-12 w-12" aria-hidden />
+        <h3 className="text-lg font-medium">{t('empty')}</h3>
+        <p className="text-muted-foreground mt-2 max-w-sm">{t('emptyDescription')}</p>
+        <Button onClick={onCreate} className="mt-6">
+          <Plus className="mr-2 h-4 w-4" aria-hidden />
+          {t('createButton')}
+        </Button>
+      </div>
+    )
+
+  return (
+    <>
+      <div className="overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>{t('list.columns.name')}</TableHead>
+              <TableHead>{t('list.columns.area')}</TableHead>
+              <TableHead>{t('list.columns.pattern')}</TableHead>
+              <TableHead className="text-center">{t('list.columns.groups')}</TableHead>
+              <TableHead className="text-center">{t('list.columns.members')}</TableHead>
+              <TableHead className="text-center">{t('list.columns.shifts')}</TableHead>
+              <TableHead>{t('list.columns.status')}</TableHead>
+              <TableHead className="w-24 text-right">{t('list.columns.actions')}</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {rotations.map((rotation) => (
+              <TableRow key={rotation.id} className="hover:bg-transparent">
+                <TableCell className="font-medium">{rotation.name}</TableCell>
+                <TableCell className="text-muted-foreground">{rotation.area.name}</TableCell>
+                <TableCell className="text-muted-foreground max-w-40 truncate">
+                  {rotation.patternSummary}
+                </TableCell>
+                <TableCell className="text-center">{rotation._count.groups}</TableCell>
+                <TableCell className="text-center">{rotation.totalMembers}</TableCell>
+                <TableCell className="text-center">{rotation._count.shifts}</TableCell>
+                <TableCell>
+                  <Badge variant={getStatusVariant(rotation.status)}>
+                    {t(`status.${rotation.status}`)}
+                  </Badge>
+                </TableCell>
+                <TableCell className="text-right">
+                  <div className="flex items-center justify-end gap-1">
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Link href={`/dashboard/rotations/${rotation.id}`}>
+                          <Button variant="ghost" size="icon" aria-label={t('detail.view')}>
+                            <Pencil className="h-4 w-4" aria-hidden />
+                          </Button>
+                        </Link>
+                      </TooltipTrigger>
+                      <TooltipContent>{t('detail.view')}</TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => onDelete(rotation)}
+                          aria-label={t('detail.delete')}
+                        >
+                          <Trash2 className="h-4 w-4" aria-hidden />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>{t('detail.delete')}</TooltipContent>
+                    </Tooltip>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+      <p className="text-muted-foreground mt-4 text-sm">
+        {t('list.showing', { count: rotations.length, total })}
+      </p>
+    </>
+  )
+}
+
+interface DeleteRotationDialogProps {
+  rotation: RotationListItem | null
+  isPending: boolean
+  onClose: () => void
+  onDelete: (deleteLinkedShifts: boolean) => void
+  t: ReturnType<typeof useTranslations<'rotations'>>
+}
+
+function DeleteRotationDialog({ rotation, isPending, onClose, onDelete, t }: DeleteRotationDialogProps) {
+  return (
+    <AlertDialog
+      open={rotation !== null}
+      onOpenChange={(open) => {
+        if (!open) onClose()
+      }}
+    >
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{t('detail.deleteConfirm')}</AlertDialogTitle>
+          <AlertDialogDescription>{t('detail.deleteDescription')}</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter className="flex-col gap-2 sm:flex-row">
+          <AlertDialogCancel disabled={isPending}>{t('form.cancel')}</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={() => onDelete(false)}
+            disabled={isPending}
+            className="bg-secondary text-secondary-foreground hover:bg-secondary/80"
+          >
+            {t('detail.unlinkShifts')}
+          </AlertDialogAction>
+          <AlertDialogAction
+            onClick={() => onDelete(true)}
+            disabled={isPending}
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+          >
+            {t('detail.deleteShifts')}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  )
+}
+
 export function RotationsPageContent({
   initialRotations,
   initialTotal,
   areas,
 }: RotationsPageContentProps) {
   const t = useTranslations('rotations')
-
-  const [rotations, setRotations] = useState<RotationListItem[]>(initialRotations)
-  const [total, setTotal] = useState(initialTotal)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [areaFilter, setAreaFilter] = useState<string>('')
-  const [statusFilter, setStatusFilter] = useState<string>('')
-  const [rotationToDelete, setRotationToDelete] = useState<RotationListItem | null>(null)
-  const [createOpen, setCreateOpen] = useState(false)
+  const [state, dispatch] = useReducer(pageReducer, { initialRotations, initialTotal }, initPage)
   const [isPending, startTransition] = useTransition()
-  const [coverageAlerts, setCoverageAlerts] = useState<
-    Array<{ rotationId: string; rotationName: string; alerts: CoverageAlert[] }>
-  >([])
-
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const fetchRotations = (search: string, area: string, status: string) => {
@@ -84,35 +265,34 @@ export function RotationsPageContent({
         status: (status as 'DRAFT' | 'ACTIVE' | 'INACTIVE') || undefined,
       })
 
-      if (result.success && result.data) {
-        setRotations(result.data.rotations)
-        setTotal(result.data.total)
-      } else
+      if (result.success && result.data)
+        dispatch({ type: 'SET_DATA', rotations: result.data.rotations, total: result.data.total })
+      else
         toast.error(result.error ?? t('loadError'))
     })
   }
 
   const handleSearchChange = (value: string) => {
-    setSearchTerm(value)
+    dispatch({ type: 'SET_SEARCH', searchTerm: value })
 
     if (debounceRef.current)
       clearTimeout(debounceRef.current)
 
     debounceRef.current = setTimeout(() => {
-      fetchRotations(value, areaFilter, statusFilter)
+      fetchRotations(value, state.areaFilter, state.statusFilter)
     }, 300)
   }
 
   const handleAreaChange = (value: string) => {
     const next = value === 'all' ? '' : value
-    setAreaFilter(next)
-    fetchRotations(searchTerm, next, statusFilter)
+    dispatch({ type: 'SET_AREA_FILTER', areaFilter: next })
+    fetchRotations(state.searchTerm, next, state.statusFilter)
   }
 
   const handleStatusChange = (value: string) => {
     const next = value === 'all' ? '' : value
-    setStatusFilter(next)
-    fetchRotations(searchTerm, areaFilter, next)
+    dispatch({ type: 'SET_STATUS_FILTER', statusFilter: next })
+    fetchRotations(state.searchTerm, state.areaFilter, next)
   }
 
   useEffect(() => {
@@ -125,27 +305,24 @@ export function RotationsPageContent({
   useEffect(() => {
     checkCoverageAlertsAction().then((result) => {
       if (result.success && result.data)
-        setCoverageAlerts(result.data)
+        dispatch({ type: 'SET_ALERTS', alerts: result.data })
     })
   }, [])
 
   const handleDelete = (deleteLinkedShifts: boolean) => {
-    if (!rotationToDelete) return
+    const toDelete = state.rotationToDelete
+    if (!toDelete) return
 
     startTransition(async () => {
-      const result = await deleteRotationAction(rotationToDelete.id, deleteLinkedShifts)
+      const result = await deleteRotationAction(toDelete.id, deleteLinkedShifts)
 
       if (result.success) {
         toast.success(t('detail.deleteSuccess'))
-        setRotationToDelete(null)
-        fetchRotations(searchTerm, areaFilter, statusFilter)
+        dispatch({ type: 'SET_DELETE', rotation: null })
+        fetchRotations(state.searchTerm, state.areaFilter, state.statusFilter)
       } else
         toast.error(result.error ?? t('loadError'))
     })
-  }
-
-  const handleCreate = () => {
-    setCreateOpen(true)
   }
 
   return (
@@ -157,15 +334,15 @@ export function RotationsPageContent({
           </h2>
           <p className="text-muted-foreground mt-1">{t('description')}</p>
         </div>
-        <Button onClick={handleCreate}>
+        <Button onClick={() => dispatch({ type: 'SET_CREATE_OPEN', open: true })}>
           <Plus className="mr-2 h-4 w-4" aria-hidden />
           {t('createButton')}
         </Button>
       </header>
 
-      {coverageAlerts.length > 0 && (
+      {state.coverageAlerts.length > 0 && (
         <div className="space-y-2" role="region" aria-label={t('coverage.alertsTitle')}>
-          {coverageAlerts.map((item) => (
+          {state.coverageAlerts.map((item) => (
             <Alert
               key={item.rotationId}
               variant={item.alerts.some((a) => a.severity === 'error') ? 'destructive' : 'default'}
@@ -193,12 +370,12 @@ export function RotationsPageContent({
               />
               <Input
                 className="pl-9"
-                value={searchTerm}
+                value={state.searchTerm}
                 onChange={(e) => handleSearchChange(e.target.value)}
                 placeholder={t('list.searchPlaceholder')}
               />
             </div>
-            <Select value={areaFilter || 'all'} onValueChange={handleAreaChange}>
+            <Select value={state.areaFilter || 'all'} onValueChange={handleAreaChange}>
               <SelectTrigger className="w-44">
                 <SelectValue placeholder={t('list.allAreas')} />
               </SelectTrigger>
@@ -211,7 +388,7 @@ export function RotationsPageContent({
                 ))}
               </SelectContent>
             </Select>
-            <Select value={statusFilter || 'all'} onValueChange={handleStatusChange}>
+            <Select value={state.statusFilter || 'all'} onValueChange={handleStatusChange}>
               <SelectTrigger className="w-44">
                 <SelectValue placeholder={t('list.allStatuses')} />
               </SelectTrigger>
@@ -229,142 +406,33 @@ export function RotationsPageContent({
         </CardHeader>
 
         <CardContent>
-          {rotations.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-center">
-              <RefreshCw className="text-muted-foreground mb-4 h-12 w-12" aria-hidden />
-              <h3 className="text-lg font-medium">{t('empty')}</h3>
-              <p className="text-muted-foreground mt-2 max-w-sm">{t('emptyDescription')}</p>
-              <Button onClick={handleCreate} className="mt-6">
-                <Plus className="mr-2 h-4 w-4" aria-hidden />
-                {t('createButton')}
-              </Button>
-            </div>
-          ) : (
-            <>
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>{t('list.columns.name')}</TableHead>
-                      <TableHead>{t('list.columns.area')}</TableHead>
-                      <TableHead>{t('list.columns.pattern')}</TableHead>
-                      <TableHead className="text-center">
-                        {t('list.columns.groups')}
-                      </TableHead>
-                      <TableHead className="text-center">
-                        {t('list.columns.members')}
-                      </TableHead>
-                      <TableHead className="text-center">
-                        {t('list.columns.shifts')}
-                      </TableHead>
-                      <TableHead>{t('list.columns.status')}</TableHead>
-                      <TableHead className="w-24 text-right">
-                        {t('list.columns.actions')}
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {rotations.map((rotation) => (
-                      <TableRow key={rotation.id} className="hover:bg-transparent">
-                        <TableCell className="font-medium">{rotation.name}</TableCell>
-                        <TableCell className="text-muted-foreground">
-                          {rotation.area.name}
-                        </TableCell>
-                        <TableCell className="text-muted-foreground max-w-40 truncate">
-                          {rotation.patternSummary}
-                        </TableCell>
-                        <TableCell className="text-center">{rotation._count.groups}</TableCell>
-                        <TableCell className="text-center">{rotation.totalMembers}</TableCell>
-                        <TableCell className="text-center">{rotation._count.shifts}</TableCell>
-                        <TableCell>
-                          <Badge variant={getStatusVariant(rotation.status)}>
-                            {t(`status.${rotation.status}`)}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex items-center justify-end gap-1">
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Link href={`/dashboard/rotations/${rotation.id}`}>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    aria-label={t('detail.view')}
-                                  >
-                                    <Pencil className="h-4 w-4" aria-hidden />
-                                  </Button>
-                                </Link>
-                              </TooltipTrigger>
-                              <TooltipContent>{t('detail.view')}</TooltipContent>
-                            </Tooltip>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => setRotationToDelete(rotation)}
-                                  aria-label={t('detail.delete')}
-                                >
-                                  <Trash2 className="h-4 w-4" aria-hidden />
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>{t('detail.delete')}</TooltipContent>
-                            </Tooltip>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-              <p className="text-muted-foreground mt-4 text-sm">
-                {t('list.showing', { count: rotations.length, total })}
-              </p>
-            </>
-          )}
+          <RotationsTable
+            rotations={state.rotations}
+            total={state.total}
+            onDelete={(rotation) => dispatch({ type: 'SET_DELETE', rotation })}
+            onCreate={() => dispatch({ type: 'SET_CREATE_OPEN', open: true })}
+            t={t}
+          />
         </CardContent>
       </Card>
 
       <RotationFormDialog
-        open={createOpen}
-        onOpenChange={setCreateOpen}
+        open={state.createOpen}
+        onOpenChange={(open) => dispatch({ type: 'SET_CREATE_OPEN', open })}
         areas={areas}
         onCreated={() => {
-          setCreateOpen(false)
-          fetchRotations(searchTerm, areaFilter, statusFilter)
+          dispatch({ type: 'SET_CREATE_OPEN', open: false })
+          fetchRotations(state.searchTerm, state.areaFilter, state.statusFilter)
         }}
       />
 
-      <AlertDialog
-        open={rotationToDelete !== null}
-        onOpenChange={(open) => {
-          if (!open) setRotationToDelete(null)
-        }}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{t('detail.deleteConfirm')}</AlertDialogTitle>
-            <AlertDialogDescription>{t('detail.deleteDescription')}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="flex-col gap-2 sm:flex-row">
-            <AlertDialogCancel disabled={isPending}>{t('form.cancel')}</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => handleDelete(false)}
-              disabled={isPending}
-              className="bg-secondary text-secondary-foreground hover:bg-secondary/80"
-            >
-              {t('detail.unlinkShifts')}
-            </AlertDialogAction>
-            <AlertDialogAction
-              onClick={() => handleDelete(true)}
-              disabled={isPending}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              {t('detail.deleteShifts')}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <DeleteRotationDialog
+        rotation={state.rotationToDelete}
+        isPending={isPending}
+        onClose={() => dispatch({ type: 'SET_DELETE', rotation: null })}
+        onDelete={handleDelete}
+        t={t}
+      />
     </section>
   )
 }

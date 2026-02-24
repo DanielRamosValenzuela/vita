@@ -9,7 +9,7 @@ type RotationStepInput = {
   minStaffRequired: number;
 };
 
-export type RotationGroupInput = {
+type RotationGroupInput = {
   id: string;
   name: string;
   cycleOffset: number;
@@ -24,7 +24,7 @@ export type RotationInput = {
   groups: RotationGroupInput[];
 };
 
-export type CoverageDayResult = {
+type CoverageDayResult = {
   date: Date;
   groups: Array<{
     groupId: string;

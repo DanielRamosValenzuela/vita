@@ -145,6 +145,137 @@ function ActiveFiltersBadges({
   )
 }
 
+interface DateRangeFiltersProps {
+  filters: FilterState
+  quickRange: '' | 'today' | 'week' | 'month'
+  locale: 'es' | 'en'
+  updateFilters: (newFilters: Partial<FilterState>) => void
+  setQuickRange: (range: '' | 'today' | 'week' | 'month') => void
+  t: ReturnType<typeof useTranslations<'shifts.filters'>>
+}
+
+function DateRangeFilters({ filters, quickRange, locale, updateFilters, setQuickRange, t }: DateRangeFiltersProps) {
+  return (
+    <div className="col-span-2 grid grid-cols-1 gap-4 border-t border-border/60 pt-4 lg:col-span-4 lg:grid-cols-3">
+      <div className="space-y-1.5">
+        <label className="text-xs font-medium text-muted-foreground">{t('startDatePlaceholder')}</label>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" className="h-9 w-full justify-start bg-background text-left font-normal">
+              <CalendarIcon className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" />
+              <span className="truncate">
+                {filters.startDate ? formatDateLong(filters.startDate, locale) : t('startDatePlaceholder')}
+              </span>
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <DatePicker
+              mode="single"
+              selected={filters.startDate}
+              onSelect={(date) => date && updateFilters({ startDate: date })}
+              initialFocus
+            />
+          </PopoverContent>
+        </Popover>
+      </div>
+
+      <div className="space-y-1.5">
+        <label className="text-xs font-medium text-muted-foreground">{t('endDatePlaceholder')}</label>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" className="h-9 w-full justify-start bg-background text-left font-normal">
+              <CalendarIcon className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" />
+              <span className="truncate">
+                {filters.endDate ? formatDateLong(filters.endDate, locale) : t('endDatePlaceholder')}
+              </span>
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <DatePicker
+              mode="single"
+              selected={filters.endDate}
+              onSelect={(date) => date && updateFilters({ endDate: date })}
+              initialFocus
+            />
+          </PopoverContent>
+        </Popover>
+      </div>
+
+      <div className="space-y-1.5">
+        <label className="text-xs font-medium text-muted-foreground">{t('quickDatePlaceholder')}</label>
+        <Select
+          value={quickRange || FILTER_CUSTOM}
+          onValueChange={(value) => {
+            const now = new Date()
+            let startDate: Date | undefined
+            let endDate: Date | undefined
+            let range: '' | 'today' | 'week' | 'month' = ''
+
+            if (value === FILTER_CUSTOM) {
+              setQuickRange('')
+              updateFilters({ startDate: undefined, endDate: undefined })
+              return
+            }
+
+            switch (value) {
+              case 'today':
+                startDate = startOfDay(now)
+                endDate = endOfDay(now)
+                range = 'today'
+                break
+              case 'week':
+                startDate = new Date(
+                  now.getFullYear(),
+                  now.getMonth(),
+                  now.getDate() - now.getDay()
+                )
+                endDate = new Date(startDate.getTime() + 6 * 24 * 60 * 60 * 1000)
+                range = 'week'
+                break
+              case 'month':
+                startDate = new Date(now.getFullYear(), now.getMonth(), 1)
+                endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0)
+                range = 'month'
+                break
+              default:
+                startDate = undefined
+                endDate = undefined
+            }
+
+            setQuickRange(range)
+            updateFilters({ startDate, endDate })
+          }}
+        >
+          <SelectTrigger className="h-9 bg-background">
+            <SelectValue placeholder={t('quickDatePlaceholder')} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value={FILTER_CUSTOM}>{t('customDates')}</SelectItem>
+            <SelectItem value="today">
+              <div className="flex items-center gap-2">
+                <Clock className="h-4 w-4" />
+                {t('today')}
+              </div>
+            </SelectItem>
+            <SelectItem value="week">
+              <div className="flex items-center gap-2">
+                <CalendarIcon className="h-4 w-4" />
+                {t('thisWeek')}
+              </div>
+            </SelectItem>
+            <SelectItem value="month">
+              <div className="flex items-center gap-2">
+                <CalendarIcon className="h-4 w-4" />
+                {t('thisMonth')}
+              </div>
+            </SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+    </div>
+  )
+}
+
 export function ShiftFilters({
   users,
   areas,
@@ -322,123 +453,14 @@ export function ShiftFilters({
             </Select>
           </div>
 
-          <div className="col-span-2 grid grid-cols-1 gap-4 border-t border-border/60 pt-4 lg:col-span-4 lg:grid-cols-3">
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">{t('startDatePlaceholder')}</label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="h-9 w-full justify-start bg-background text-left font-normal">
-                    <CalendarIcon className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" />
-                    <span className="truncate">
-                      {filters.startDate ? formatDateLong(filters.startDate, locale) : t('startDatePlaceholder')}
-                    </span>
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <DatePicker
-                    mode="single"
-                    selected={filters.startDate}
-                    onSelect={(date) => date && updateFilters({ startDate: date })}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">{t('endDatePlaceholder')}</label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="h-9 w-full justify-start bg-background text-left font-normal">
-                    <CalendarIcon className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" />
-                    <span className="truncate">
-                      {filters.endDate ? formatDateLong(filters.endDate, locale) : t('endDatePlaceholder')}
-                    </span>
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <DatePicker
-                    mode="single"
-                    selected={filters.endDate}
-                    onSelect={(date) => date && updateFilters({ endDate: date })}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">{t('quickDatePlaceholder')}</label>
-              <Select
-                value={quickRange || FILTER_CUSTOM}
-                onValueChange={(value) => {
-                  const now = new Date()
-                  let startDate: Date | undefined
-                  let endDate: Date | undefined
-                  let range: '' | 'today' | 'week' | 'month' = ''
-
-                  if (value === FILTER_CUSTOM) {
-                    setQuickRange('')
-                    updateFilters({ startDate: undefined, endDate: undefined })
-                    return
-                  }
-
-                  switch (value) {
-                    case 'today':
-                      startDate = startOfDay(now)
-                      endDate = endOfDay(now)
-                      range = 'today'
-                      break
-                    case 'week':
-                      startDate = new Date(
-                        now.getFullYear(),
-                        now.getMonth(),
-                        now.getDate() - now.getDay()
-                      )
-                      endDate = new Date(startDate.getTime() + 6 * 24 * 60 * 60 * 1000)
-                      range = 'week'
-                      break
-                    case 'month':
-                      startDate = new Date(now.getFullYear(), now.getMonth(), 1)
-                      endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0)
-                      range = 'month'
-                      break
-                    default:
-                      startDate = undefined
-                      endDate = undefined
-                  }
-
-                  setQuickRange(range)
-                  updateFilters({ startDate, endDate })
-                }}
-              >
-                <SelectTrigger className="h-9 bg-background">
-                  <SelectValue placeholder={t('quickDatePlaceholder')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={FILTER_CUSTOM}>{t('customDates')}</SelectItem>
-                  <SelectItem value="today">
-                    <div className="flex items-center gap-2">
-                      <Clock className="h-4 w-4" />
-                      {t('today')}
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="week">
-                    <div className="flex items-center gap-2">
-                      <CalendarIcon className="h-4 w-4" />
-                      {t('thisWeek')}
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="month">
-                    <div className="flex items-center gap-2">
-                      <CalendarIcon className="h-4 w-4" />
-                      {t('thisMonth')}
-                    </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+          <DateRangeFilters
+            filters={filters}
+            quickRange={quickRange}
+            locale={locale}
+            updateFilters={updateFilters}
+            setQuickRange={setQuickRange}
+            t={t}
+          />
         </div>
       </div>
 
