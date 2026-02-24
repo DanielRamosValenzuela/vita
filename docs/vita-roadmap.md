@@ -18,6 +18,7 @@
 | 11   | Calendario Visual                 | Completado |
 | 12   | Perfiles de Usuario Avanzados     | Completado |
 | 13   | Sistema de Notificaciones         | Parcial    |
+| 13.5 | Rotativas de Turno                | Completado |
 | 14   | Testing y Pulido                  | Pendiente  |
 
 ## Próximos Pasos Inmediatos (Feb 2026)
@@ -27,9 +28,10 @@
 3. ~~**Asignar jefes a áreas**~~ ✅ UI completa desde tabla de jefes (ChiefAreaSelector)
 4. ~~**Sistema de Tarifas Flexibles**~~ ✅ Schema, backend API, UI completo con presets
 5. ~~**Sistema de Perfiles Avanzados**~~ ✅ Validación documentos únicos, múltiples emails, imágenes personalizadas
-6. **UI para gestión del calendario organizacional** (marcar feriados)
-7. **Implementar cálculo de pagos** (usar RateComponent en Shift)
-8. **Testing manual** de flujos CRUD de tarifas y contratos
+6. ~~**Rotativas de Turno**~~ ✅ Creación de rotativas, grupos, miembros, generación masiva de turnos, cobertura, asignación de extras con tiers
+7. **UI para gestión del calendario organizacional** (marcar feriados)
+8. **Implementar cálculo de pagos** (usar RateComponent en Shift)
+9. **Testing manual** de flujos CRUD de tarifas, contratos y rotativas
 
 ## Prioridad 1: Completar Dashboard ADMIN_HR ✅
 
@@ -68,7 +70,8 @@
 
 - Layout y Sidebar ✅
 - Historial de pagos
-- Sistema de notificaciones ✅ (Bandeja de entrada para ADMIN_HR, CHIEF_AREA, STAFF_HEALTH; pendiente SUPER_ADMIN, tiempo real, email)
+- Sistema de notificaciones ✅ (Bandeja de entrada para ADMIN_HR, CHIEF_AREA, STAFF_HEALTH; incluye notificaciones de rotativas; pendiente SUPER_ADMIN, tiempo real, email)
+- Rotativas de turno ✅ (CRUD, grupos, miembros, generación de turnos, cobertura, asignación de extras)
 - Export a Excel/PDF
 
 ## Prioridad 3: Auth y Testing

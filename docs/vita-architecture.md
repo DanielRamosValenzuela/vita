@@ -33,8 +33,8 @@ src/
 ├── shared/          # Utilidades, UI primitivos, constantes
 │   ├── lib/         # utils, auth, constants, types
 │   └── ui/          # Componentes Shadcn + molecules
-├── entities/        # Lógica de dominio (area, invitation, organization, shift, user)
-├── features/        # Features por dominio (admin-hr, auth, shifts, profile, super-admin)
+├── entities/        # Lógica de dominio (area, invitation, organization, rotation, shift, user)
+├── features/        # Features por dominio (admin-hr, auth, rotations, shifts, profile, super-admin)
 └── widgets/         # Bloques UI compuestos
 ```
 
@@ -48,6 +48,8 @@ src/
 - `app/[locale]/dashboard/shifts` - Turnos
 - `app/[locale]/dashboard/shift-types` - Tipos de turno
 - `app/[locale]/dashboard/rates` - Tarifas y contratos
+- `app/[locale]/dashboard/rotations` - Rotativas de turno (lista)
+- `app/[locale]/dashboard/rotations/[id]` - Detalle de rotativa
 - `app/[locale]/dashboard/admin-hr/organization` - Mi Organización
 - `app/[locale]/dashboard/organizations` - Organizaciones (SUPER_ADMIN)
 

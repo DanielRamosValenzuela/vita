@@ -20,13 +20,18 @@
 10. [Tipo de Turno](#tipo-de-turno)
 11. [Relación Área-Tipo de Turno](#relación-área-tipo-de-turno)
 12. [Turno Programado](#turno-programado)
-13. [Plantilla de Tarifa](#plantilla-de-tarifa)
-14. [Componente de Tarifa](#componente-de-tarifa)
-15. [Vinculación Componente-Tipo de Turno](#vinculación-componente-tipo-de-turno)
-16. [Contrato Laboral](#contrato-laboral)
-17. [Calendario Organizacional](#calendario-organizacional)
-18. [Pago de Turno](#pago-de-turno)
-19. [Desglose de Pago](#desglose-de-pago)
+13. [Rotativa de Turno](#rotativa-de-turno)
+14. [Paso de Rotativa](#paso-de-rotativa)
+15. [Configuración de Turno en Rotativa](#configuración-de-turno-en-rotativa)
+16. [Grupo de Rotativa](#grupo-de-rotativa)
+17. [Miembro de Grupo de Rotativa](#miembro-de-grupo-de-rotativa)
+18. [Plantilla de Tarifa](#plantilla-de-tarifa)
+19. [Componente de Tarifa](#componente-de-tarifa)
+20. [Vinculación Componente-Tipo de Turno](#vinculación-componente-tipo-de-turno)
+21. [Contrato Laboral](#contrato-laboral)
+22. [Calendario Organizacional](#calendario-organizacional)
+23. [Pago de Turno](#pago-de-turno)
+24. [Desglose de Pago](#desglose-de-pago)
 
 ---
 
@@ -364,9 +369,12 @@ Cada turno específico asignado a una persona en una fecha/hora concreta.
 | **Área**                | En qué área se trabaja                                           |
 | **Tipo de turno**       | Qué tipo de turno es                                             |
 | **Organización**        | A qué hospital pertenece                                         |
-| **Contrato**            | Qué contrato laboral aplica para este turno (para calcular pago) |
-| **Fecha de creación**   | Cuándo se programó el turno                                      |
-| **Última modificación** | Última vez que se modificó                                       |
+| **Contrato**              | Qué contrato laboral aplica para este turno (para calcular pago)                 |
+| **Rotativa**              | De qué rotativa se generó este turno (vacío si fue creado manualmente)           |
+| **Grupo de rotativa**     | A qué grupo de rotativa pertenece (vacío si fue creado manualmente)              |
+| **Modificado manualmente**| Si el turno fue editado después de generarse automáticamente                     |
+| **Fecha de creación**     | Cuándo se programó el turno                                                      |
+| **Última modificación**   | Última vez que se modificó                                                       |
 
 **¿Para qué sirve?**  
 Es el registro concreto de "Juan trabaja en UCI el 15/02/2026 de 8:00 a 20:00".
@@ -384,7 +392,155 @@ Es el registro concreto de "Juan trabaja en UCI el 15/02/2026 de 8:00 a 20:00".
 
 ---
 
-## 13. Plantilla de Tarifa
+## 13. Rotativa de Turno
+
+**Nombre técnico:** `Rotation`
+
+**¿Qué guarda?**
+Definición de una rotativa: un patrón cíclico de turnos que se repite automáticamente para grupos de personal.
+
+### Campos:
+
+| Campo                   | ¿Qué significa?                                                              |
+| ----------------------- | ---------------------------------------------------------------------------- |
+| **Nombre**              | Nombre de la rotativa (ej: "Rotativa UCI Enero")                             |
+| **Descripción**         | Información adicional sobre la rotativa                                      |
+| **Estado**              | DRAFT (borrador), ACTIVE (activa) o INACTIVE (inactiva)                      |
+| **Área**                | En qué área funciona esta rotativa                                           |
+| **Organización**        | A qué hospital pertenece                                                     |
+| **Fecha de inicio**     | Desde cuándo comienza el ciclo (origen del patrón)                           |
+| **Fecha de creación**   | Cuándo se creó la rotativa                                                   |
+| **Última modificación** | Última actualización                                                         |
+
+**¿Para qué sirve?**
+Automatiza la generación de turnos. En vez de crear cada turno manualmente, se define un patrón y el sistema genera cientos de turnos automáticamente para un rango de fechas.
+
+**Ejemplo:**
+
+- Rotativa: "UCI Guardia Largo-Noche-Libre"
+- Patrón: 3 pasos (Turno Largo → Turno Noche → Descanso)
+- Área: UCI Adultos
+- 4 grupos rotando con desfase de 1 día entre ellos
+- Estado: ACTIVE → se pueden generar turnos
+
+---
+
+## 14. Paso de Rotativa
+
+**Nombre técnico:** `RotationStep`
+
+**¿Qué guarda?**
+Cada paso individual del patrón cíclico de una rotativa.
+
+### Campos:
+
+| Campo              | ¿Qué significa?                                                     |
+| ------------------ | ------------------------------------------------------------------- |
+| **Rotativa**       | A qué rotativa pertenece este paso                                  |
+| **Orden**          | Posición del paso en el ciclo (0, 1, 2...)                          |
+| **Es día de descanso** | Si este paso es un día libre (no se genera turno)               |
+| **Tipo de turno**  | Qué tipo de turno aplica (vacío si es día de descanso)              |
+
+**¿Para qué sirve?**
+Define la secuencia del patrón. El sistema recorre estos pasos en orden cíclico para saber qué tipo de turno asignar cada día.
+
+**Ejemplo (patrón de 3 pasos):**
+
+1. Paso 0: Turno Largo (12h diurno)
+2. Paso 1: Turno Noche (12h nocturno)
+3. Paso 2: Descanso (día libre)
+4. → Vuelve al paso 0...
+
+---
+
+## 15. Configuración de Turno en Rotativa
+
+**Nombre técnico:** `RotationShiftConfig`
+
+**¿Qué guarda?**
+La hora de inicio para cada tipo de turno dentro de una rotativa específica.
+
+### Campos:
+
+| Campo             | ¿Qué significa?                                         |
+| ----------------- | ------------------------------------------------------- |
+| **Rotativa**      | A qué rotativa pertenece                                |
+| **Tipo de turno** | Qué tipo de turno se configura                          |
+| **Hora de inicio**| A qué hora comienza el turno (formato HH:MM, ej: "08:00") |
+
+**¿Para qué sirve?**
+Permite que la misma rotativa use diferentes horas de inicio para distintos tipos de turno. El sistema combina esta hora con la fecha para generar el turno completo.
+
+**Ejemplo:**
+
+- Turno Largo → inicia a las 08:00
+- Turno Noche → inicia a las 20:00
+
+---
+
+## 16. Grupo de Rotativa
+
+**Nombre técnico:** `RotationGroup`
+
+**¿Qué guarda?**
+Sub-equipos dentro de una rotativa. Cada grupo rota por el mismo patrón pero con un desfase diferente.
+
+### Campos:
+
+| Campo                  | ¿Qué significa?                                                          |
+| ---------------------- | ------------------------------------------------------------------------ |
+| **Rotativa**           | A qué rotativa pertenece                                                 |
+| **Nombre**             | Nombre del grupo (ej: "Grupo A", "Equipo Rojo")                         |
+| **Color**              | Color visual para identificar el grupo (hexadecimal)                     |
+| **Icono**              | Icono visual del grupo (nombre de icono lucide-react)                    |
+| **Desfase del ciclo**  | Cuántos días de desfase tiene este grupo respecto al inicio del patrón   |
+
+**¿Para qué sirve?**
+Permite que varios equipos roten por el mismo patrón sin trabajar todos el mismo día. El desfase (offset) asegura que cuando un grupo descansa, otro trabaja.
+
+**Ejemplo (4 grupos, patrón de 3 pasos):**
+
+| Día       | Grupo A (offset 0) | Grupo B (offset 1) | Grupo C (offset 2) |
+| --------- | ------------------- | ------------------- | ------------------- |
+| Lunes     | Largo               | Descanso            | Noche               |
+| Martes    | Noche               | Largo               | Descanso            |
+| Miércoles | Descanso            | Noche               | Largo               |
+
+---
+
+## 17. Miembro de Grupo de Rotativa
+
+**Nombre técnico:** `RotationMember`
+
+**¿Qué guarda?**
+Qué personas están asignadas a cada grupo de rotativa.
+
+### Campos:
+
+| Campo                | ¿Qué significa?                                                         |
+| -------------------- | ----------------------------------------------------------------------- |
+| **Grupo de rotativa**| A qué grupo pertenece                                                   |
+| **Usuario**          | Qué persona está asignada                                               |
+| **Fecha de ingreso** | Cuándo se unió al grupo                                                 |
+| **Fecha de salida**  | Cuándo dejó el grupo (vacío si sigue activo)                            |
+
+**¿Para qué sirve?**
+Vincula personal a grupos de rotativa. Cuando se generan turnos, el sistema crea un turno por cada miembro activo del grupo para cada día de trabajo del patrón.
+
+**Reglas importantes:**
+- Una persona solo puede estar en un grupo de rotativa a la vez (dentro de la misma organización)
+- Al remover un miembro, se puede elegir cancelar sus turnos futuros
+- Si se re-agrega un miembro que fue removido previamente, se reactiva (no se duplica)
+
+**Ejemplo:**
+
+- Grupo A tiene 3 miembros: María, Juan, Pedro
+- Al generar turnos para 30 días, se crean ~20 turnos por persona (10 días de descanso)
+- Total generado: ~60 turnos para este grupo
+
+---
+
+## 18. Plantilla de Tarifa
 
 **¿Qué guarda?**  
 Plantillas reutilizables que definen cómo se calcula el pago del personal.
@@ -414,7 +570,7 @@ Es un "contenedor" de componentes de tarifa. En lugar de calcular pagos manualme
 
 ---
 
-## 14. Componente de Tarifa
+## 19. Componente de Tarifa
 
 **¿Qué guarda?**  
 Cada parte individual que conforma el cálculo de pago (salario, bonos, multiplicadores).
@@ -460,7 +616,7 @@ Define cada "pieza" del cálculo de pago. Una plantilla puede tener muchos compo
 
 ---
 
-## 15. Contrato Laboral
+## 20. Contrato Laboral
 
 **¿Qué guarda?**  
 Asignación de una plantilla de tarifa a una persona específica.
@@ -495,7 +651,7 @@ Vincula una persona con su forma de pago. Cuando esa persona trabaja un turno, e
 
 ---
 
-## 16. Calendario Organizacional
+## 21. Calendario Organizacional
 
 **¿Qué guarda?**  
 Días especiales marcados por el hospital (feriados, eventos, días con multiplicadores).
@@ -689,6 +845,28 @@ Define qué días se pagan diferente. Los turnos en esos días aplican multiplic
 - Cada contrato usa una plantilla de tarifa
 - Una plantilla puede usarse en muchos contratos
 
+### **Rotativa ↔ Área**
+
+- Una rotativa pertenece a un área
+- Un área puede tener varias rotativas activas
+
+### **Rotativa ↔ Grupos**
+
+- Una rotativa tiene varios grupos (sub-equipos que rotan con desfase)
+- Cada grupo pertenece a una sola rotativa
+
+### **Grupo ↔ Miembros**
+
+- Un grupo tiene varios miembros (personal de salud)
+- Un miembro pertenece a un solo grupo
+- Un usuario puede ser miembro de múltiples grupos en distintas rotativas
+
+### **Rotativa ↔ Turnos**
+
+- Una rotativa genera muchos turnos programados
+- Cada turno generado referencia la rotativa y el grupo que lo originó
+- Los turnos generados pueden editarse individualmente (se marcan como "modificado manualmente")
+
 ### **Turno ↔ Contrato**
 
 - Un turno está asociado a un contrato específico
@@ -755,7 +933,7 @@ Define qué días se pagan diferente. Los turnos en esos días aplican multiplic
 
 ---
 
-## 15. Vinculación Componente-Tipo de Turno
+## 22. Vinculación Componente-Tipo de Turno
 
 **Nombre técnico:** `RateComponentApplicableType`
 
@@ -779,7 +957,7 @@ Vincula componentes de pago a tipos de turno específicos. Permite que un compon
 
 ---
 
-## 18. Pago de Turno
+## 23. Pago de Turno
 
 **Nombre técnico:** `ShiftPayment`
 
@@ -825,7 +1003,7 @@ Registra el cálculo automático del pago de cada turno trabajado. Cuando un emp
 
 ---
 
-## 19. Desglose de Pago
+## 24. Desglose de Pago
 
 **Nombre técnico:** `ShiftPaymentBreakdown`
 
@@ -892,7 +1070,7 @@ Turno 25-Dic Guardia Larga:
 
 ## 📝 Resumen Ejecutivo
 
-**¿Cuántas tablas hay?** 19 tablas principales
+**¿Cuántas tablas hay?** 24 tablas principales
 
 **¿Qué información se guarda?**
 
@@ -900,6 +1078,7 @@ Turno 25-Dic Guardia Larga:
 - 🏥 **Organizaciones:** Hospitales, clínicas, límites contratados
 - 📍 **Áreas:** Departamentos dentro de hospitales
 - ⏰ **Turnos:** Horarios programados y trabajados
+- 🔄 **Rotativas:** Patrones cíclicos de turnos, grupos rotativos, generación automática
 - 💰 **Tarifas:** Plantillas de pago completamente flexibles
 - 📄 **Contratos:** Asignaciones de tarifas a personal
 - 📅 **Calendario:** Días especiales con multiplicadores
@@ -910,13 +1089,12 @@ Turno 25-Dic Guardia Larga:
 
 - ❌ Pagos realizados por organizaciones a VITA
 - ❌ Historial de facturación de clientes
-- ❌ Notificaciones enviadas
 - ❌ Mensajes entre usuarios
 - ❌ Solicitudes de intercambio de turnos
 - ❌ Postulaciones a turnos abiertos
 
 ---
 
-**Documento creado para:** Gerentes, administradores de hospitales, auditores, personal de cumplimiento  
-**Última actualización:** Febrero 2026  
-**Versión del sistema:** 4.0.0 (Sistema de Pagos y Check-in/Check-out)
+**Documento creado para:** Gerentes, administradores de hospitales, auditores, personal de cumplimiento
+**Última actualización:** Febrero 2026
+**Versión del sistema:** 4.1.0 (Rotativas de Turno)

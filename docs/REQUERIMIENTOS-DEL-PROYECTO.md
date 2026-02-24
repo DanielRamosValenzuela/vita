@@ -1,8 +1,8 @@
 # Requerimientos del Proyecto VITA
 
-> **Fecha de actualización:** Febrero 2026  
-> **Versión:** 3.18.0  
-> **Estado general:** 15% completado (131 de 896 tareas)
+> **Fecha de actualización:** Febrero 2026
+> **Versión:** 4.1.0
+> **Estado general:** ~18% completado
 
 ---
 
@@ -199,6 +199,8 @@ VITA es una plataforma digital que permite a hospitales y clínicas:
 - Ver contratos y tarifas del personal a su cargo
 - Crear y gestionar turnos en sus áreas
 - Usar solo los tipos de turnos permitidos para sus áreas
+- Crear y gestionar rotativas de turno en sus áreas
+- Asignar turnos extra usando el motor de recomendación por tiers
 
 **¿Para quién?**
 
@@ -302,6 +304,94 @@ VITA es una plataforma digital que permite a hospitales y clínicas:
 
 ---
 
+### 9. Rotativas de Turno
+
+**¿Qué se logró?**
+
+#### 9.1. Creación y Configuración de Rotativas
+
+- Crear rotativas cíclicas con nombre, fecha de inicio y período de repetición
+- Definir pasos (patrón): cada paso indica un tipo de turno con horario específico o día libre
+- Configurar la duración del ciclo (ej: 7 días, 14 días, 28 días)
+- Asignar la rotativa a un área funcional específica
+- Activar/desactivar rotativas según necesidad
+
+#### 9.2. Grupos y Miembros
+
+- Crear múltiples grupos dentro de una rotativa (sub-equipos que rotan con desfase)
+- Asignar personal de salud a cada grupo
+- Configurar el desfase de cada grupo (ej: Grupo B empieza 7 días después que Grupo A)
+- Ver listado de miembros por grupo con estado y orden
+
+#### 9.3. Generación Automática de Turnos
+
+- Generar turnos masivamente para un rango de fechas (hasta 300+ turnos por rotativa)
+- El sistema aplica el patrón cíclico a cada grupo respetando el desfase
+- Los turnos generados aparecen en el calendario general
+- Posibilidad de regenerar turnos (elimina anteriores y crea nuevos)
+- Indicador visual de progreso durante la generación
+
+#### 9.4. Monitoreo de Cobertura
+
+- Visualizar qué porcentaje del período está cubierto por cada grupo
+- Detectar brechas de cobertura (días sin personal asignado)
+- Ver estadísticas: días cubiertos, descubiertos, y tipo de turnos
+
+#### 9.5. Asignación de Turnos Extra (Motor de Tiers)
+
+- Sistema inteligente que clasifica candidatos para turnos extra en niveles:
+  - **Tier 1:** Personas que no trabajan ese día ni los días contiguos (ideal)
+  - **Tier 2:** Personas que trabajan días contiguos pero no ese día
+  - **Tier 3:** Personas que trabajan ese día en otro horario (posible conflicto)
+  - **Nunca recomendar:** Personas que superan 48h de trabajo reciente
+- Respetar restricciones legales de horas máximas de trabajo
+- Asignar turnos extra directamente desde la recomendación
+
+#### 9.6. Edición Individual de Turnos Generados
+
+- Cada turno generado por rotativa puede editarse individualmente
+- Los turnos editados se marcan como "modificado manualmente"
+- La regeneración de rotativas respeta que los turnos modificados pueden perderse (confirmación al usuario)
+
+**¿Para quién?**
+
+- Recursos Humanos (ADMIN_HR) y Jefes de Área (CHIEF_AREA)
+
+**¿Qué falta?**
+
+- Intercambios de turnos dentro de rotativas
+- Notificaciones por email de cambios en rotativas
+- Vista de calendario con agrupación visual de turnos de rotativa
+- Clonar rotativas existentes para crear variantes
+
+---
+
+### 10. Sistema de Notificaciones (Parcial)
+
+**¿Qué se logró?**
+
+- Bandeja de entrada de notificaciones para ADMIN_HR, CHIEF_AREA y STAFF_HEALTH
+- Notificaciones in-app para eventos de rotativas:
+  - Asignación a rotativa
+  - Generación de turnos desde rotativa
+  - Asignación de turnos extra
+- Marcar notificaciones como leídas
+- Contador de notificaciones no leídas en la navegación
+
+**¿Para quién?**
+
+- Todo el personal (cada rol ve sus propias notificaciones)
+
+**¿Qué falta?**
+
+- Envío de notificaciones por email
+- Notificaciones en tiempo real (WebSocket/SSE)
+- Notificaciones para SUPER_ADMIN
+- Notificaciones push en móvil
+- Preferencias de notificación por usuario
+
+---
+
 ## ⏳ Requerimientos Pendientes
 
 ### 1. Sistema de Pagos y Facturación
@@ -347,9 +437,9 @@ VITA es una plataforma digital que permite a hospitales y clínicas:
 
 ---
 
-### 3. Sistema de Notificaciones
+### 3. Sistema de Notificaciones (completar)
 
-**¿Qué se necesita?**
+**¿Qué se necesita?** (parcialmente implementado — ver sección 10 en Completados)
 
 - Enviar correos electrónicos automáticos cuando:
   - Se les asigna un nuevo turno
@@ -357,8 +447,9 @@ VITA es una plataforma digital que permite a hospitales y clínicas:
   - Se cancela o modifica un turno
   - Se acerca la fecha de un turno (recordatorio)
   - Hay invitaciones pendientes por aceptar
-- Notificaciones dentro de la aplicación (campana con contador)
+- Notificaciones en tiempo real (WebSocket/SSE)
 - Notificaciones push en celulares (para la app móvil futura)
+- Preferencias de notificación por usuario
 
 **¿Por qué es importante?**
 
@@ -529,25 +620,26 @@ VITA es una plataforma digital que permite a hospitales y clínicas:
 | **Página de presentación** | ✅ 100% | Completada y funcional                                                                           |
 | **Acceso y seguridad**     | ✅ 100% | Registro, login con Google, recuperación de contraseña                                           |
 | **Panel SUPER_ADMIN**      | ✅ 85%  | Falta gestión de pagos                                                                           |
-| **Panel ADMIN_HR**         | ✅ 90%  | Completado: áreas, turnos, tarifas, personal. Falta: cálculo de pagos, calendario organizacional |
-| **Panel CHIEF_AREA**       | ⏳ 60%  | Funcional básico. Falta: vinculación directa, aprobaciones, asistencia                           |
+| **Panel ADMIN_HR**         | ✅ 95%  | Completado: áreas, turnos, tarifas, personal, rotativas. Falta: cálculo de pagos, calendario org |
+| **Panel CHIEF_AREA**       | ⏳ 65%  | Funcional: turnos, rotativas, personal. Falta: vinculación directa, aprobaciones, asistencia     |
 | **Panel STAFF_HEALTH**     | ⏳ 30%  | Solo vista básica. Falta todo el ecosistema de turnos                                            |
 | **Calendario visual**      | ✅ 75%  | Funcional. Falta: drag-and-drop, vistas múltiples, sincronización                                |
 | **Sistema de tarifas**     | ✅ 95%  | Completado: plantillas flexibles, contratos. Falta: cálculo automático de pagos                  |
 | **Perfiles avanzados**     | ✅ 90%  | Completado: documentos, emails, fotos. Falta: verificación de emails                             |
-| **Notificaciones**         | ❌ 0%   | Pendiente                                                                                        |
+| **Rotativas de turno**     | ✅ 95%  | Completado: CRUD, grupos, generación, cobertura, extras. Falta: vista agrupada en calendario     |
+| **Notificaciones**         | ⏳ 30%  | Bandeja in-app funcional. Falta: email, tiempo real, push                                        |
 | **Reportes**               | ❌ 0%   | Pendiente                                                                                        |
 | **App móvil**              | ❌ 0%   | Pendiente                                                                                        |
 | **Multi-organización**     | ⏳ 40%  | Backend listo. Falta: UI de calendario unificado                                                 |
 
 ### Por Rol de Usuario:
 
-| Rol              | Puede hacer hoy                                                                                   | Le falta                                                                                           |
-| ---------------- | ------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| **SUPER_ADMIN**  | Gestionar todas las organizaciones, crear usuarios ADMIN_HR, establecer límites                   | Registrar pagos, ver morosidad, notificaciones                                                     |
-| **ADMIN_HR**     | Crear áreas, tipos de turno, tarifas flexibles, invitar personal, asignar contratos, ver métricas | Calcular pagos automáticos, gestionar calendario organizacional, exportar reportes                 |
-| **CHIEF_AREA**   | Ver sus áreas, gestionar turnos, ver su personal                                                  | Vincular personal directamente, aprobar intercambios, marcar asistencia                            |
-| **STAFF_HEALTH** | Ver sus turnos en una organización                                                                | Ver calendario unificado multi-org, postular a turnos, intercambiar turnos, recibir notificaciones |
+| Rol              | Puede hacer hoy                                                                                                                | Le falta                                                                                           |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- |
+| **SUPER_ADMIN**  | Gestionar todas las organizaciones, crear usuarios ADMIN_HR, establecer límites                                                | Registrar pagos, ver morosidad, notificaciones                                                     |
+| **ADMIN_HR**     | Crear áreas, tipos de turno, tarifas flexibles, invitar personal, asignar contratos, ver métricas, crear y gestionar rotativas | Calcular pagos automáticos, gestionar calendario organizacional, exportar reportes                 |
+| **CHIEF_AREA**   | Ver sus áreas, gestionar turnos y rotativas, ver su personal, asignar extras con motor de tiers                                | Vincular personal directamente, aprobar intercambios, marcar asistencia                            |
+| **STAFF_HEALTH** | Ver sus turnos en una organización, recibir notificaciones in-app                                                              | Ver calendario unificado multi-org, postular a turnos, intercambiar turnos, notificaciones por email |
 
 ---
 
@@ -555,22 +647,23 @@ VITA es una plataforma digital que permite a hospitales y clínicas:
 
 **Para Febrero-Marzo 2026:**
 
-1. **Completar cálculo automático de pagos**
-   - Implementar lógica de cálculo por componentes de tarifa
-   - Mostrar preview de costo al crear turno
-   - Generar resumen de costos mensuales
+1. **Vista híbrida del calendario** (en progreso)
+   - Agrupar turnos de rotativa en bloques compactos en el calendario
+   - Turnos manuales se muestran individualmente
+   - Click en bloque → detalle con lista de personas
 
 2. **Gestión del calendario organizacional**
    - UI para marcar feriados y días especiales
    - Multiplicadores de pago por tipo de día
    - Importar feriados chilenos automáticamente
 
-3. **Sistema de notificaciones básico**
-   - Emails automáticos para eventos críticos
-   - Notificaciones in-app para alertas
+3. **Completar cálculo automático de pagos**
+   - Implementar lógica de cálculo por componentes de tarifa
+   - Mostrar preview de costo al crear turno
+   - Generar resumen de costos mensuales
 
 4. **Testing manual exhaustivo**
-   - Probar todos los flujos con datos reales
+   - Probar todos los flujos con datos reales (rotativas, tarifas, contratos)
    - Identificar y corregir errores
    - Optimizar rendimiento
 
@@ -598,20 +691,23 @@ Este documento refleja el estado del proyecto en **Febrero 2026**.
 
 - ✅ Base sólida de gestión de organizaciones, áreas y personal
 - ✅ Sistema de tarifas completamente flexible y profesional
+- ✅ Rotativas de turno con generación automática masiva
+- ✅ Motor de asignación de extras con clasificación por tiers (cumplimiento laboral)
 - ✅ Calendario visual funcional
 - ✅ Perfiles de usuario completos con múltiples emails y fotos
 - ✅ Validaciones de documentos únicos por organización
 - ✅ Sistema multi-tenant bien estructurado
+- ✅ Notificaciones in-app funcionales
 
 **Áreas de oportunidad:**
 
 - ⚠️ Cálculo automático de pagos (crítico para el valor del producto)
-- ⚠️ Sistema de notificaciones (clave para adopción del usuario)
+- ⚠️ Notificaciones por email y tiempo real (clave para adopción)
 - ⚠️ Experiencia móvil (el personal de salud trabaja en movimiento)
 - ⚠️ Multi-organización para staff (diferenciador clave vs competencia)
 
-**Competidor principal:** Rflex  
-**Ventaja competitiva de VITA:** Flexibilidad total en tarifas, soporte multi-organización para personal
+**Competidor principal:** Rflex
+**Ventaja competitiva de VITA:** Flexibilidad total en tarifas, rotativas inteligentes con motor de extras, soporte multi-organización para personal
 
 ---
 

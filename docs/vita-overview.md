@@ -23,8 +23,9 @@
 - Acreditación de asistencia manual + integración biométrica futura
 - App móvil para el personal de salud
 
-## Estado del Proyecto (Enero 2026)
+## Estado del Proyecto (Febrero 2026)
 
-- **Versión:** 3.18.0
-- **Progreso:** 131 tareas completadas de 896 totales (14.6%)
+- **Versión:** 4.1.0
+- **Progreso:** ~18% completado
 - **Competidor principal:** Rflex
+- **Última funcionalidad mayor:** Sistema de Rotativas de Turno (generación automática de turnos cíclicos)

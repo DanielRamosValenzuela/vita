@@ -91,6 +91,14 @@ Documento de referencia de **flujos funcionales** por rol. Resume qué pasos sig
     - Turnos activos del mes
   - Ve límites de organización (Admin HR, Jefes, Staff) con alertas visuales.
 
+- **Rotativas de Turno** (`/dashboard/rotations`)
+  - Crea rotativas con patrón cíclico (2-8 pasos) y grupos (2-6).
+  - Asigna miembros del personal a grupos de rotativa.
+  - Genera turnos masivos a partir del patrón para un rango de fechas.
+  - Monitorea cobertura y recibe alertas de insuficiencia.
+  - Asigna turnos extra a candidatos elegibles (sistema de tiers).
+  - Ver detalle completo en sección **Rotativas de Turno** más abajo.
+
 ### Workflows pendientes o parciales
 
 - **Métricas avanzadas de turnos**
@@ -118,6 +126,10 @@ Documento de referencia de **flujos funcionales** por rol. Resume qué pasos sig
 - **Crear y gestionar turnos en sus áreas**
   - Desde `/dashboard/shifts`, filtra por sus áreas.
   - Crea/edita turnos usando tipos globales o asignados a sus áreas.
+
+- **Gestionar rotativas de turno en sus áreas**
+  - Desde `/dashboard/rotations`, gestiona rotativas solo de áreas asignadas.
+  - Misma funcionalidad que ADMIN_HR: crear rotativas, asignar grupos, generar turnos, monitorear cobertura y asignar extras.
 
 - **Asignación de jefes a áreas (vista ADMIN_HR)**
   - ADMIN_HR asigna jefes a cada área; luego el CHIEF ve esa área y su personal.
@@ -287,6 +299,145 @@ El sistema de tarifas flexibles permite a ADMIN_HR crear tarifas completamente p
 
 ---
 
+## Rotativas de Turno ✅ (v4.1)
+
+### Concepto
+
+Las rotativas automatizan la creación de turnos cíclicos. En vez de crear turnos manualmente uno por uno, ADMIN_HR o CHIEF_AREA define un **patrón** (ej: Largo → Noche → Libre) y **grupos** de personal que rotan por ese patrón con desfases (offsets). El sistema genera cientos de turnos automáticamente para el rango de fechas deseado.
+
+### Arquitectura del Sistema
+
+- **Rotativa (Rotation):** Contenedor con nombre, área, estado (DRAFT/ACTIVE/INACTIVE) y fecha de inicio.
+- **Pasos (RotationStep):** Patrón cíclico de 2-8 pasos. Cada paso es un tipo de turno o día de descanso.
+- **Configuración de Turno (RotationShiftConfig):** Hora de inicio para cada tipo de turno dentro de la rotativa.
+- **Grupos (RotationGroup):** Sub-equipos (2-6) con nombre, color, icono y offset cíclico (desfase en días).
+- **Miembros (RotationMember):** Personal asignado a cada grupo. Soft-delete via `leftAt`.
+
+### Workflows implementados
+
+#### 1. **Crear Rotativa** (`/dashboard/rotations`)
+
+**Flujo:**
+
+1. ADMIN_HR o CHIEF_AREA accede al módulo de Rotativas
+2. Hace clic en **Nueva Rotativa**
+3. Selecciona un área y define nombre
+4. Configura el patrón de pasos (ej: 3 pasos → Largo, Noche, Libre)
+5. Configura la hora de inicio para cada tipo de turno usado
+6. Define los grupos (mínimo 2, máximo 6) con nombre, color e icono
+7. Guarda; la rotativa queda en estado **DRAFT**
+
+**Validaciones:**
+- El área debe estar activa
+- Los tipos de turno usados deben estar activos y asignados al área
+- Mínimo 2 pasos, máximo 8
+- Mínimo 2 grupos, máximo 6
+
+#### 2. **Gestionar Grupos y Miembros**
+
+**Flujo:**
+
+1. Desde la vista de detalle de una rotativa, ve los grupos como tarjetas
+2. Cada grupo muestra sus miembros actuales con avatar y email
+3. Para añadir miembros: clic en **Añadir miembro** → popover con personal disponible
+   - Solo aparece personal STAFF_HEALTH del área que **no** está ya en alguna rotativa de la organización
+   - Selección múltiple con checkbox
+4. Para eliminar miembro: clic en icono de eliminar → confirma con opción de cancelar turnos futuros
+5. Si un miembro fue removido previamente y se re-añade, se reactiva (soft undelete)
+
+**Notificaciones:** Al añadir miembros se envía notificación `ROTATION_ASSIGNED`.
+
+#### 3. **Activar Rotativa**
+
+**Flujo:**
+
+1. Desde el detalle, cambia estado de DRAFT a ACTIVE
+2. El sistema valida que al menos 2 grupos tengan miembros asignados
+3. Una vez activa, el patrón y la configuración se bloquean (solo se pueden editar nombre, descripción y fecha de inicio)
+
+#### 4. **Generar Turnos**
+
+**Flujo:**
+
+1. Desde la vista de detalle de una rotativa ACTIVE, abre **Generar Turnos**
+2. Selecciona rango de fechas (inicio y fin)
+3. El sistema muestra **preview**:
+   - Total de turnos a crear
+   - Conteo por grupo
+   - Conflictos detectados (superposición con turnos existentes)
+4. Opcionalmente marca **Sobrescribir conflictos**
+5. Confirma generación → procesamiento con overlay animado
+6. Resultado: cantidad creados, omitidos, conflictos, notificaciones enviadas
+
+**Lógica del patrón:**
+- Para cada día del rango: `stepIndex = (dayIndex + cycleOffset) % patternLength`
+- Cada grupo usa su `cycleOffset` para desfasarse en el patrón
+- Si el paso es descanso, no se genera turno
+- Se asigna contrato (área-específico o general) a cada turno generado
+
+**Notificaciones:** Se envía `ROTATION_SHIFTS_GENERATED` a todos los miembros afectados.
+
+#### 5. **Regenerar Turnos**
+
+**Flujo:**
+
+1. Desde el detalle, abre **Regenerar Turnos**
+2. Selecciona rango de fechas
+3. Opción: **Reemplazar existentes** (elimina turnos no modificados manualmente en ese rango)
+4. Genera nuevos turnos respetando el mismo patrón
+
+#### 6. **Monitorear Cobertura**
+
+**Flujo:**
+
+1. En la vista de detalle, la sección de **Cobertura** muestra calendario visual
+2. Cada día muestra qué grupos trabajan y cuáles descansan
+3. Alertas automáticas:
+   - **Gap de cobertura:** Todos los grupos descansan el mismo día
+   - **Insuficiencia:** Un grupo tiene menos miembros que el mínimo requerido por el tipo de turno
+   - **Cobertura por expirar:** Menos de 7 días de turnos generados restantes
+4. En la lista de rotativas (`/dashboard/rotations`), se muestran alertas de cobertura al cargar la página
+
+#### 7. **Asignar Turnos Extra**
+
+**Flujo:**
+
+1. Desde la vista de detalle, abre **Turnos Extra** para una fecha y tipo de turno
+2. El sistema analiza el historial de turnos (48h) de cada candidato disponible
+3. Clasifica candidatos en tiers según el **Motor de Tiers**:
+   - **TIER 1** (verde): En turno diurno actual, puede extender a nocturno
+   - **TIER 2** (azul): Descansado y disponible
+   - **TIER 3** (amarillo): Disponible, viene de turno nocturno
+   - **NUNCA RECOMENDAR** (rojo): Post-noche, no asignar turno diurno (violaría descanso legal)
+4. Cada candidato muestra advertencias:
+   - `max_consecutive_hours`: Excedería máximo de horas seguidas del área
+   - `min_rest_hours`: Descanso insuficiente desde último turno
+   - `noche_to_largo`: Violación noche→día
+   - `came_from_noche`: Viene de turno nocturno
+5. Selecciona candidato y asigna turno extra
+
+**Notificaciones:** Se envía `EXTRA_SHIFT_ASSIGNED` al candidato asignado.
+
+#### 8. **Eliminar Rotativa**
+
+**Flujo:**
+
+1. Desde la lista o el detalle, elige eliminar
+2. Dos opciones:
+   - **Desvincular turnos:** Los turnos generados permanecen pero se desvinculan de la rotativa
+   - **Eliminar turnos:** Se eliminan también todos los turnos generados por esta rotativa
+
+### Workflows pendientes
+
+- **Edición de patrón en rotativa activa**
+  - Actualmente se bloquea al activar; posible flujo futuro con migración de turnos existentes.
+- **Rotativas recurrentes automáticas**
+  - Generación automática al acercarse el fin de cobertura (sin intervención manual).
+- **Vista híbrida en calendario de turnos**
+  - Agrupar turnos de rotativa en bloques compactos en `/dashboard/shifts`.
+
+---
+
 ## Todos los Usuarios (Perfil Avanzado)
 
 ### Workflows implementados
@@ -399,7 +550,7 @@ Implementado para ADMIN_HR, CHIEF_AREA y STAFF_HEALTH. SUPER_ADMIN no recibe not
 
 **Funcionalidades implementadas:**
 - Bandeja de Entrada (`/dashboard/inbox`) accesible desde el sidebar con badge de no leídas.
-- Notificaciones generadas automáticamente por: invitaciones (INVITATION_PENDING), asignación a áreas (AREA_ASSIGNED), creación de turnos (SHIFT_CREATED), actualización de turnos (SHIFT_UPDATED), cancelación de turnos (SHIFT_CANCELLED).
+- Notificaciones generadas automáticamente por: invitaciones (INVITATION_PENDING), asignación a áreas (AREA_ASSIGNED), creación de turnos (SHIFT_CREATED), actualización de turnos (SHIFT_UPDATED), cancelación de turnos (SHIFT_CANCELLED), asignación a rotativa (ROTATION_ASSIGNED), generación de turnos de rotativa (ROTATION_SHIFTS_GENERATED), asignación de turno extra (EXTRA_SHIFT_ASSIGNED).
 - Cada notificación muestra: icono por tipo, título pre-renderizado con nombre del actor, descripción opcional, nombre de la organización, avatar del actor, fecha relativa con tooltip de fecha absoluta.
 - Click en notificación: marca como leída y navega al recurso (perfil para invitaciones, turnos, áreas).
 - "Marcar todas como leídas" en la bandeja.
