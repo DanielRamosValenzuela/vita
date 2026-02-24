@@ -4,7 +4,7 @@ import { useMemo, useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 import type { ShiftStatus } from '@prisma/client'
 import { endOfMonth, format, startOfMonth } from 'date-fns'
-import { CalendarDays } from 'lucide-react'
+import { CalendarDays, RefreshCw } from 'lucide-react'
 import { toast } from 'sonner'
 
 import {
@@ -20,6 +20,7 @@ import {
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/src/shared/ui/card'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/src/shared/ui/tooltip'
 import {
   Table,
   TableBody,
@@ -221,9 +222,9 @@ export function ShiftsPageContent({
         setShiftToDelete(null)
         router.refresh()
         fetchShifts({ ...currentFilters })
-      } else {
+      } else
         toast.error(result.error || tToast('toast.shifts.errorDeleting'))
-      }
+
     } catch {
       toast.error(tToast('toast.shifts.errorDeleting'))
     } finally {
@@ -416,10 +417,28 @@ export function ShiftsPageContent({
                   {shifts.slice(0, 10).map((shift) => (
                     <TableRow key={shift.id}>
                       <TableCell className="font-medium">{shift.user.name}</TableCell>
-                      <TableCell>{shift.title || t('table.noTitle')}</TableCell>
+                      <TableCell>
+                        <span className="inline-flex items-center gap-1">
+                          {shift.title || t('table.noTitle')}
+                          {shift.rotationId && (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <RefreshCw
+                                  className="h-3 w-3 text-blue-500 shrink-0"
+                                  aria-label={t('table.rotationGenerated')}
+                                />
+                              </TooltipTrigger>
+                              <TooltipContent>{t('table.rotationGenerated')}</TooltipContent>
+                            </Tooltip>
+                          )}
+                        </span>
+                      </TableCell>
                       <TableCell>{shift.user.role || t('table.noRole')}</TableCell>
                       <TableCell>
-                        {format(shift.startTime, 'HH:mm')} - {format(shift.endTime, 'HH:mm')}
+                        {t('table.timeRange', {
+                          start: format(shift.startTime, 'HH:mm'),
+                          end: format(shift.endTime, 'HH:mm'),
+                        })}
                       </TableCell>
                       <TableCell>
                         <Badge className={getStatusColor(shift.status)}>

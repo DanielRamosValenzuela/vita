@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/src/shared/ui/dialog'
@@ -71,9 +72,8 @@ export function ShiftFormDialog({
           onOpenChange(false)
           router.refresh()
           onSuccess?.()
-        } else {
+        } else
           toast.error(result.error || tToast('toast.shifts.errorCreating'))
-        }
       } else {
         const result = await createShiftAction(data)
         if (result.success) {
@@ -81,9 +81,8 @@ export function ShiftFormDialog({
           onOpenChange(false)
           router.refresh()
           onSuccess?.()
-        } else {
+        } else
           toast.error(result.error || tToast('toast.shifts.errorCreating'))
-        }
       }
     } catch (error) {
       toast.error(tToast('toast.shifts.errorCreating'))
@@ -110,6 +109,9 @@ export function ShiftFormDialog({
             <DialogTitle>
               {editingShift ? t('form.editTitle') : t('form.dialogTitle')}
             </DialogTitle>
+            <DialogDescription>
+              {editingShift ? t('form.editDescription') : t('form.dialogDescription')}
+            </DialogDescription>
           </DialogHeader>
           <ShiftForm
             _organizationId={organizationId}

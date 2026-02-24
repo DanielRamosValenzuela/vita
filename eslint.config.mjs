@@ -19,6 +19,8 @@ const eslintConfig = defineConfig([
     'prisma/migrations/**',
     'node_modules/**',
     'app/globals.css',
+    'specs/**',
+    '.specify/**',
   ]),
 
   {
