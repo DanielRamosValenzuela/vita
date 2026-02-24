@@ -321,6 +321,7 @@ export const updateShiftAction = async (
         endTime: validatedData.endTime,
         notes: validatedData.notes ?? null,
         contractId: activeContract?.id ?? undefined,
+        ...(existing.rotationId ? { isManuallyModified: true } : {}),
       },
       include: {
         user: {
@@ -496,7 +497,25 @@ export const getShiftsAction = async (
         skip,
         take: pageSize,
         orderBy: { startTime: 'asc' },
-        include: {
+        select: {
+          id: true,
+          title: true,
+          userId: true,
+          areaId: true,
+          shiftTypeId: true,
+          organizationId: true,
+          contractId: true,
+          rotationId: true,
+          rotationGroupId: true,
+          isManuallyModified: true,
+          startTime: true,
+          endTime: true,
+          actualStartTime: true,
+          actualEndTime: true,
+          status: true,
+          notes: true,
+          createdAt: true,
+          updatedAt: true,
           user: {
             select: {
               id: true,
@@ -517,6 +536,12 @@ export const getShiftsAction = async (
               id: true,
               name: true,
               color: true,
+            },
+          },
+          rotation: {
+            select: {
+              id: true,
+              name: true,
             },
           },
         },

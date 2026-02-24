@@ -18,6 +18,9 @@ const TOAST_METHOD: Record<NotificationType, 'info' | 'success' | 'warning'> = {
   SHIFT_UPDATED: 'info',
   SHIFT_CANCELLED: 'warning',
   GENERAL: 'info',
+  ROTATION_ASSIGNED: 'info',
+  ROTATION_SHIFTS_GENERATED: 'success',
+  EXTRA_SHIFT_ASSIGNED: 'info',
 }
 
 interface PendingNotificationsToasterProps {

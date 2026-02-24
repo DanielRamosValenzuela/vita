@@ -36,6 +36,7 @@ model Organization {
   contracts      Contract[]
   calendars      OrganizationCalendar[]
   notifications  Notification[]
+  rotations      Rotation[]
 
   @@index([taxId])
   @@index([country])
@@ -74,6 +75,7 @@ model User {
   documentHistory       UserDocumentHistory[]
   notificationsReceived Notification[]         @relation("NotificationRecipient")
   notificationsActed    Notification[]         @relation("NotificationActor")
+  rotationMemberships   RotationMember[]
 
   @@index([email])
   @@index([docNumber])
@@ -375,6 +377,7 @@ model Area {
   contracts           Contract[]
   shiftTypes          AreaShiftType[]
   userAreas           UserArea[]
+  rotations           Rotation[]
 
   @@index([organizationId])
   @@index([isActive])
@@ -444,6 +447,8 @@ model ShiftType {
   shifts                    Shift[]
   areaShiftTypes            AreaShiftType[]
   applicableRateComponents  RateComponentApplicableType[]
+  rotationSteps             RotationStep[]
+  rotationShiftConfigs      RotationShiftConfig[]
 
   @@index([organizationId])
   @@index([isActive])
@@ -462,27 +467,32 @@ model AreaShiftType {
 }
 
 model Shift {
-  id              String         @id @default(cuid())
-  title           String?
-  startTime       DateTime
-  endTime         DateTime
-  actualStartTime DateTime?
-  actualEndTime   DateTime?
-  status          ShiftStatus    @default(SCHEDULED)
-  notes           String?
-  userId          String
-  areaId          String
-  shiftTypeId     String
-  organizationId  String
-  contractId      String?
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
-  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  area            Area           @relation(fields: [areaId], references: [id], onDelete: Cascade)
-  shiftType       ShiftType      @relation(fields: [shiftTypeId], references: [id], onDelete: Cascade)
-  organization    Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  contract        Contract?      @relation(fields: [contractId], references: [id], onDelete: SetNull)
-  payment         ShiftPayment?
+  id                 String          @id @default(cuid())
+  title              String?
+  startTime          DateTime
+  endTime            DateTime
+  actualStartTime    DateTime?
+  actualEndTime      DateTime?
+  status             ShiftStatus     @default(SCHEDULED)
+  notes              String?
+  userId             String
+  areaId             String
+  shiftTypeId        String
+  organizationId     String
+  contractId         String?
+  rotationId         String?
+  rotationGroupId    String?
+  isManuallyModified Boolean         @default(false)
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  user               User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  area               Area            @relation(fields: [areaId], references: [id], onDelete: Cascade)
+  shiftType          ShiftType       @relation(fields: [shiftTypeId], references: [id], onDelete: Cascade)
+  organization       Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  contract           Contract?       @relation(fields: [contractId], references: [id], onDelete: SetNull)
+  rotation           Rotation?       @relation(fields: [rotationId], references: [id], onDelete: SetNull)
+  rotationGroup      RotationGroup?  @relation(fields: [rotationGroupId], references: [id], onDelete: SetNull)
+  payment            ShiftPayment?
 
   @@index([organizationId])
   @@index([userId])
@@ -494,6 +504,8 @@ model Shift {
   @@index([endTime])
   @@index([actualStartTime])
   @@index([actualEndTime])
+  @@index([rotationId])
+  @@index([rotationGroupId])
 }
 
 enum ShiftStatus {
@@ -576,7 +588,108 @@ enum NotificationType {
   SHIFT_CREATED
   SHIFT_UPDATED
   SHIFT_CANCELLED
+  ROTATION_ASSIGNED
+  ROTATION_SHIFTS_GENERATED
+  EXTRA_SHIFT_ASSIGNED
   GENERAL
+}
+
+enum RotationStatus {
+  DRAFT
+  ACTIVE
+  INACTIVE
+}
+
+model Rotation {
+  id             String         @id @default(cuid())
+  name           String
+  description    String?
+  status         RotationStatus @default(DRAFT)
+  areaId         String
+  organizationId String
+  startDate      DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  area           Area           @relation(fields: [areaId], references: [id], onDelete: Cascade)
+  organization   Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  steps          RotationStep[]
+  shiftConfigs   RotationShiftConfig[]
+  groups         RotationGroup[]
+  shifts         Shift[]
+
+  @@index([organizationId])
+  @@index([areaId])
+  @@index([status])
+  @@index([organizationId, areaId])
+}
+
+model RotationStep {
+  id          String     @id @default(cuid())
+  rotationId  String
+  order       Int
+  isRestDay   Boolean    @default(false)
+  shiftTypeId String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  rotation    Rotation   @relation(fields: [rotationId], references: [id], onDelete: Cascade)
+  shiftType   ShiftType? @relation(fields: [shiftTypeId], references: [id], onDelete: Restrict)
+
+  @@unique([rotationId, order])
+  @@index([rotationId])
+}
+
+model RotationShiftConfig {
+  id          String    @id @default(cuid())
+  rotationId  String
+  shiftTypeId String
+  startTime   String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  rotation    Rotation  @relation(fields: [rotationId], references: [id], onDelete: Cascade)
+  shiftType   ShiftType @relation(fields: [shiftTypeId], references: [id], onDelete: Restrict)
+
+  @@unique([rotationId, shiftTypeId])
+  @@index([rotationId])
+}
+
+model RotationGroup {
+  id          String           @id @default(cuid())
+  rotationId  String
+  name        String
+  color       String           @default("#3b82f6")
+  icon        String?          @default("Users")
+  cycleOffset Int
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  rotation    Rotation         @relation(fields: [rotationId], references: [id], onDelete: Cascade)
+  members     RotationMember[]
+  shifts      Shift[]
+
+  @@unique([rotationId, name])
+  @@unique([rotationId, cycleOffset])
+  @@index([rotationId])
+}
+
+model RotationMember {
+  id              String        @id @default(cuid())
+  rotationGroupId String
+  userId          String
+  joinedAt        DateTime      @default(now())
+  leftAt          DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  rotationGroup   RotationGroup @relation(fields: [rotationGroupId], references: [id], onDelete: Cascade)
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([rotationGroupId, userId])
+  @@index([rotationGroupId])
+  @@index([userId])
 }
 
 model Notification {

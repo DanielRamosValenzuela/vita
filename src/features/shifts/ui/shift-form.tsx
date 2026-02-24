@@ -347,11 +347,11 @@ export function ShiftForm({
             value={
               (() => {
                 const endDate = form.watch('endDate')
-                if (!endDate) {
+                if (!endDate)
                   return selectedShiftType
                     ? t('endDate.calculated')
                     : t('endDate.selectShiftType')
-                }
+
                 const [year, month, day] = endDate.split('-').map(Number)
                 const endDateObj = new Date(year, month - 1, day)
                 return formatDateLong(endDateObj, locale)

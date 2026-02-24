@@ -6,6 +6,7 @@ import {
   CalendarDays,
   Clock,
   CreditCard,
+  RefreshCw,
   DollarSign,
   Inbox,
   LayoutGrid,
@@ -89,6 +90,12 @@ export function getNavItems(t: (key: string) => string, userRole: Role): NavItem
       href: '/dashboard/shifts',
       label: t('shifts'),
       icon: Clock,
+      roles: [Role.ADMIN_HR, Role.CHIEF_AREA],
+    },
+    {
+      href: '/dashboard/rotations',
+      label: t('rotations'),
+      icon: RefreshCw,
       roles: [Role.ADMIN_HR, Role.CHIEF_AREA],
     },
     {

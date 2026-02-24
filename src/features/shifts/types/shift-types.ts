@@ -18,6 +18,10 @@ export interface ShiftWithRelations extends Shift {
     color: string
     icon?: string | null
   }
+  rotation?: {
+    id: string
+    name: string
+  } | null
 }
 
 export interface CreateShiftFormData {
