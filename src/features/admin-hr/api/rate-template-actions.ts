@@ -19,6 +19,7 @@ export interface RateComponentData {
   applyCondition: ApplyCondition
   conditionValue?: string | null
   description?: string | null
+  extraOnly?: boolean
   order?: number
   applicableShiftTypeIds?: string[]
 }
@@ -76,6 +77,7 @@ export const createRateTemplateAction = async (data: {
             applyCondition: comp.applyCondition,
             conditionValue: comp.conditionValue || null,
             description: comp.description || null,
+            extraOnly: comp.extraOnly ?? false,
             order: comp.order ?? index,
             applicableShiftTypes: comp.applicableShiftTypeIds
               ? {
@@ -188,6 +190,7 @@ export const updateRateTemplateAction = async (
                 applyCondition: comp.applyCondition,
                 conditionValue: comp.conditionValue || null,
                 description: comp.description || null,
+                extraOnly: comp.extraOnly ?? false,
                 order: comp.order ?? index,
                 applicableShiftTypes: comp.applicableShiftTypeIds
                   ? {
@@ -273,6 +276,7 @@ export const duplicateRateTemplateAction = async (
             applyCondition: comp.applyCondition,
             conditionValue: comp.conditionValue,
             description: comp.description,
+            extraOnly: comp.extraOnly,
             order: comp.order ?? index,
             applicableShiftTypes: comp.applicableShiftTypes.length > 0
               ? {

@@ -11,7 +11,7 @@ export function groupShiftsForCalendar(
   const rotationMap = new Map<string, { shifts: ShiftWithRelations[]; first: ShiftWithRelations }>()
 
   for (const shift of shifts)
-    if (!shift.rotationId)
+    if (!shift.rotationId || shift.isExtra)
       individual.push({
         kind: 'individual',
         id: shift.id,
@@ -23,6 +23,7 @@ export function groupShiftsForCalendar(
         areaName: shift.area.name,
         color: shift.shiftType.color,
         icon: shift.shiftType.icon ?? 'Clock',
+        isExtra: shift.isExtra,
       })
     else {
       const dateKey = format(shift.startTime, 'yyyy-MM-dd')

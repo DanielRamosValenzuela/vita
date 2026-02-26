@@ -23,6 +23,27 @@
     "languages": {
       "es": "Español",
       "en": "Inglés"
+    },
+    "pagination": {
+      "showing": "Mostrando {from} a {to} de {total}",
+      "page": "Página {current} de {total}",
+      "previous": "Anterior",
+      "next": "Siguiente",
+      "noResults": "No se encontraron resultados",
+      "searchPlaceholder": "Buscar..."
+    },
+    "filters": {
+      "all": "Todos",
+      "allStatuses": "Todos los estados",
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "withContract": "Con contrato",
+      "withoutContract": "Sin contrato",
+      "allRoles": "Todos los roles",
+      "chief": "Jefe de Área",
+      "staff": "Personal",
+      "allAreas": "Todas las áreas",
+      "allTemplates": "Todas las plantillas"
     }
   },
   "nav": {
@@ -313,12 +334,14 @@
       "rotationGenerated": "Turno generado por rotativa",
       "timeRange": "{start} - {end}"
     },
+    "extraBadge": "Extra",
     "more": "más",
     "legend": {
       "today": "Hoy",
       "weekend": "Fin de semana",
       "holiday": "Feriado",
-      "rotation": "Rotativa"
+      "rotation": "Rotativa",
+      "extra": "Turno Extra"
     },
     "rotationDetail": {
       "title": "Turnos de Rotativa",
@@ -507,6 +530,9 @@
         "DAY": "Día",
         "NIGHT": "Noche",
         "MIXED": "Mixto"
+      },
+      "filters": {
+        "allClassifications": "Todas las clasificaciones"
       },
       "delete": {
         "title": "Confirmar eliminación",
@@ -1582,6 +1608,8 @@
         "valueTooltip": "Ingresa el valor numérico. Para salarios y bonos usa la moneda de tu país. Para multiplicadores usa decimales (ej: 1.5 = 150%). Para porcentajes usa números (ej: 10 = 10%).",
         "applyCondition": "Cuándo Aplica",
         "applyConditionTooltip": "Define en qué situaciones se aplicará este componente. 'Siempre' lo incluye en todos los turnos. Otras opciones lo limitan a horarios nocturnos, fines de semana, feriados, etc.",
+        "extraOnly": "Solo aplica a turnos extra",
+        "extraOnlyTooltip": "Si se activa, este componente solo se aplicará cuando el turno sea extra (asignado fuera de la rotativa regular). Puedes combinarlo con cualquier otra condición.",
         "applicableShiftTypes": "Tipos de Turno Aplicables",
         "applicableShiftTypesTooltip": "Selecciona los tipos de turno a los que se aplicará este componente. Por ejemplo, si es un 'Bono Guardia Larga', selecciona solo el tipo de turno 'Guardia Larga'.",
         "noShiftTypes": "No hay tipos de turno disponibles. Crea tipos de turno primero.",
@@ -1636,6 +1664,7 @@
           "HOLIDAY_ONLY": "Solo Feriados",
           "IRRENUNCIABLE_ONLY": "Solo Feriados Irrenunciables",
           "OVERTIME_ONLY": "Solo Horas Extra",
+          "EXTRA_SHIFT_ONLY": "Solo Turnos Extra",
           "SPECIFIC_AREA": "Solo en Área Específica",
           "SPECIFIC_SHIFT_TYPE": "Solo para Tipo de Turno Específico",
           "CUSTOM_RULE": "Regla Personalizada"

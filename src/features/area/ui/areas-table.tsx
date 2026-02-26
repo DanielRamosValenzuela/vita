@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useCallback, useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { Eye, Plus, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 
+import { useClientPagination } from '@/src/shared/lib/hooks/use-client-pagination'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,6 +21,9 @@ import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
 import { IconDisplay } from '@/src/shared/ui/icon-picker'
+import { DataTablePagination } from '@/src/shared/ui/molecules/data-table-pagination'
+import { DataTableToolbar } from '@/src/shared/ui/molecules/data-table-toolbar'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/src/shared/ui/select'
 import {
   Table,
   TableBody,
@@ -53,9 +57,28 @@ interface AreasTableProps {
 
 export function AreasTable({ areas, canCreate = true, canDelete = true }: AreasTableProps) {
   const t = useTranslations('adminHR.areas')
+  const tFilters = useTranslations('common.filters')
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null)
+  const [statusFilter, setStatusFilter] = useState<string>('all')
+
+  const filterFn = useCallback(
+    (area: AreasTableProps['areas'][number]) => {
+      if (statusFilter === 'active') return area.isActive
+      if (statusFilter === 'inactive') return !area.isActive
+      return true
+    },
+    [statusFilter]
+  )
+
+  const { paginatedItems, page, totalPages, total, from, to, search, setSearch, setPage } =
+    useClientPagination({
+      items: areas,
+      pageSize: 10,
+      searchFn: (area, query) => area.name.toLowerCase().includes(query),
+      filterFn,
+    })
 
   const handleDelete = () => {
     if (!deleteTarget) return
@@ -100,20 +123,39 @@ export function AreasTable({ areas, canCreate = true, canDelete = true }: AreasT
             )}
           </div>
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>{t('table.name')}</TableHead>
-                <TableHead>{t('table.description')}</TableHead>
-                <TableHead>{t('table.shiftTypes')}</TableHead>
-                <TableHead>{t('table.chiefs')}</TableHead>
-                <TableHead>{t('table.staff')}</TableHead>
-                <TableHead>{t('table.status')}</TableHead>
-                <TableHead className="text-right">{t('table.actions')}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {areas.map((area) => (
+          <div className="space-y-4">
+            <DataTableToolbar
+              search={search}
+              onSearchChange={setSearch}
+              total={total}
+              from={from}
+              to={to}
+            >
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="min-w-40">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{tFilters('allStatuses')}</SelectItem>
+                  <SelectItem value="active">{tFilters('active')}</SelectItem>
+                  <SelectItem value="inactive">{tFilters('inactive')}</SelectItem>
+                </SelectContent>
+              </Select>
+            </DataTableToolbar>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>{t('table.name')}</TableHead>
+                  <TableHead>{t('table.description')}</TableHead>
+                  <TableHead>{t('table.shiftTypes')}</TableHead>
+                  <TableHead>{t('table.chiefs')}</TableHead>
+                  <TableHead>{t('table.staff')}</TableHead>
+                  <TableHead>{t('table.status')}</TableHead>
+                  <TableHead className="text-right">{t('table.actions')}</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {paginatedItems.map((area) => (
                 <TableRow key={area.id}>
                   <TableCell>
                     <span className="flex items-center gap-2">
@@ -166,8 +208,10 @@ export function AreasTable({ areas, canCreate = true, canDelete = true }: AreasT
                   </TableCell>
                 </TableRow>
               ))}
-            </TableBody>
-          </Table>
+              </TableBody>
+            </Table>
+            <DataTablePagination page={page} totalPages={totalPages} onPageChange={setPage} />
+          </div>
         )}
       </CardContent>
 

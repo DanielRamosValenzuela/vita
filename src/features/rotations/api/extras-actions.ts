@@ -285,6 +285,7 @@ export const assignExtraShiftAction = async (
         status: 'SCHEDULED',
         notes: validatedData.notes ?? null,
         rotationId: validatedData.rotationId ?? null,
+        isExtra: true,
       },
     })
 

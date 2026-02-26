@@ -13,7 +13,7 @@ import {
   subMonths,
 } from 'date-fns'
 import { enUS, es } from 'date-fns/locale'
-import { ChevronLeft, ChevronRight, Minus, RefreshCw } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Minus, RefreshCw, Star } from 'lucide-react'
 
 import holidaysClSample from '@/src/shared/lib/constants/holidays-cl-sample.json'
 import type { BoostrHolidaysResponse } from '@/src/shared/lib/types/holidays'
@@ -39,6 +39,7 @@ export interface IndividualCalendarEvent extends CalendarEventBase {
   status: string
   userName: string
   icon?: string
+  isExtra?: boolean
 }
 
 export interface RotationGroupCalendarEvent extends CalendarEventBase {
@@ -206,6 +207,9 @@ function ShiftCalendarDayCell({
                     }}
                   >
                     <span className="font-medium shrink-0">{format(shift.startTime, 'HH:mm')}</span>
+                    {shift.isExtra && (
+                      <Star className="h-2.5 w-2.5 shrink-0 fill-amber-500 text-amber-500" />
+                    )}
                     <span className="truncate">{shift.userName.split(' ')[0]}</span>
                   </button>
                 </TooltipTrigger>
@@ -216,6 +220,9 @@ function ShiftCalendarDayCell({
                   </p>
                   <p className="text-muted-foreground">{shift.areaName}</p>
                   {shift.title && <p className="text-muted-foreground">{shift.title}</p>}
+                  {shift.isExtra && (
+                    <p className="font-medium text-amber-600">{t('extraBadge')}</p>
+                  )}
                 </TooltipContent>
               </Tooltip>
             </div>
@@ -426,6 +433,10 @@ export function ShiftCalendar({
             <div className="flex items-center gap-1.5 text-xs">
               <RefreshCw className="h-2.5 w-2.5 shrink-0 text-blue-500" />
               <span className="text-muted-foreground">{t('legend.rotation')}</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-xs">
+              <Star className="h-2.5 w-2.5 shrink-0 fill-amber-500 text-amber-500" />
+              <span className="text-muted-foreground">{t('legend.extra')}</span>
             </div>
           </div>
         </CardContent>

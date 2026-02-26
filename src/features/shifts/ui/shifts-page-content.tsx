@@ -4,9 +4,10 @@ import { useMemo, useReducer, useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 import type { ShiftStatus } from '@prisma/client'
 import { endOfMonth, format, startOfMonth } from 'date-fns'
-import { CalendarDays, RefreshCw } from 'lucide-react'
+import { CalendarDays, RefreshCw, Star } from 'lucide-react'
 import { toast } from 'sonner'
 
+import { useClientPagination } from '@/src/shared/lib/hooks/use-client-pagination'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,6 +21,7 @@ import {
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/src/shared/ui/card'
+import { DataTablePagination } from '@/src/shared/ui/molecules/data-table-pagination'
 import { Skeleton } from '@/src/shared/ui/skeleton'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/src/shared/ui/tooltip'
 import {
@@ -223,6 +225,9 @@ function ShiftsTableSection({
   isPending: boolean
   t: ReturnType<typeof useTranslations<'shifts'>>
 }) {
+  const { paginatedItems, page, totalPages, setPage } =
+    useClientPagination({ items: shifts, pageSize: 10 })
+
   return (
     <Card>
       <CardHeader>
@@ -244,58 +249,65 @@ function ShiftsTableSection({
         ) : shifts.length === 0 ? (
           <p className="text-muted-foreground text-center py-8">{t('recent.noShifts')}</p>
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>{t('table.user')}</TableHead>
-                <TableHead>{t('table.title')}</TableHead>
-                <TableHead>{t('table.role')}</TableHead>
-                <TableHead>{t('table.time')}</TableHead>
-                <TableHead>{t('table.status')}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {shifts.slice(0, 10).map((shift) => (
-                <TableRow key={shift.id}>
-                  <TableCell className="font-medium">{shift.user.name}</TableCell>
-                  <TableCell>
-                    <span className="inline-flex items-center gap-1">
-                      {shift.title || shift.rotation?.name || t('table.noTitle')}
-                      {shift.rotationId && (
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <RefreshCw
-                              className="h-3 w-3 text-blue-500 shrink-0"
-                              aria-label={t('table.rotationGenerated')}
-                            />
-                          </TooltipTrigger>
-                          <TooltipContent>{t('table.rotationGenerated')}</TooltipContent>
-                        </Tooltip>
-                      )}
-                    </span>
-                  </TableCell>
-                  <TableCell>{shift.user.role || t('table.noRole')}</TableCell>
-                  <TableCell>
-                    {t('table.timeRange', {
-                      start: format(shift.startTime, 'HH:mm'),
-                      end: format(shift.endTime, 'HH:mm'),
-                    })}
-                  </TableCell>
-                  <TableCell>
-                    <Badge className={getStatusColor(shift.status)}>
-                      {getStatusLabel(shift.status, t)}
-                    </Badge>
-                  </TableCell>
+          <>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>{t('table.user')}</TableHead>
+                  <TableHead>{t('table.title')}</TableHead>
+                  <TableHead>{t('table.role')}</TableHead>
+                  <TableHead>{t('table.time')}</TableHead>
+                  <TableHead>{t('table.status')}</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-
-        {!isPending && shifts.length > 10 && (
-          <div className="mt-4 text-center">
-            <Button variant="outline">{t('recent.viewAll')}</Button>
-          </div>
+              </TableHeader>
+              <TableBody>
+                {paginatedItems.map((shift) => (
+                  <TableRow key={shift.id}>
+                    <TableCell className="font-medium">
+                      <span className="inline-flex items-center gap-1.5">
+                        {shift.user.name}
+                        {shift.isExtra && (
+                          <Badge variant="outline" className="text-[10px] px-1 py-0 border-amber-400 text-amber-600">
+                            <Star className="h-2.5 w-2.5 mr-0.5 fill-amber-500 text-amber-500" />
+                            {t('extraBadge')}
+                          </Badge>
+                        )}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <span className="inline-flex items-center gap-1">
+                        {shift.title || shift.rotation?.name || t('table.noTitle')}
+                        {shift.rotationId && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <RefreshCw
+                                className="h-3 w-3 text-blue-500 shrink-0"
+                                aria-label={t('table.rotationGenerated')}
+                              />
+                            </TooltipTrigger>
+                            <TooltipContent>{t('table.rotationGenerated')}</TooltipContent>
+                          </Tooltip>
+                        )}
+                      </span>
+                    </TableCell>
+                    <TableCell>{shift.user.role || t('table.noRole')}</TableCell>
+                    <TableCell>
+                      {t('table.timeRange', {
+                        start: format(shift.startTime, 'HH:mm'),
+                        end: format(shift.endTime, 'HH:mm'),
+                      })}
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={getStatusColor(shift.status)}>
+                        {getStatusLabel(shift.status, t)}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+            <DataTablePagination page={page} totalPages={totalPages} onPageChange={setPage} />
+          </>
         )}
       </CardContent>
     </Card>

@@ -1,14 +1,19 @@
 'use client'
 
+import { useCallback, useState } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
 import type { InvitationStatus, Role } from '@prisma/client'
 import { Ban } from 'lucide-react'
 
 import { INVITATION_STATUS, INVITATION_STATUS_BADGE_VARIANTS } from '@/src/shared/lib/constants'
+import { useClientPagination } from '@/src/shared/lib/hooks/use-client-pagination'
 import { formatDate } from '@/src/shared/lib/utils/format'
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
+import { DataTablePagination } from '@/src/shared/ui/molecules/data-table-pagination'
+import { DataTableToolbar } from '@/src/shared/ui/molecules/data-table-toolbar'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/src/shared/ui/select'
 import {
   Table,
   TableBody,
@@ -50,7 +55,27 @@ export function InvitationsTableBase({
   isPending = false,
 }: InvitationsTableBaseProps) {
   const t = useTranslations(translationNamespace)
+  const tFilters = useTranslations('common.filters')
   const locale = useLocale() as 'es' | 'en'
+  const [statusFilter, setStatusFilter] = useState<string>('all')
+
+  const filterFn = useCallback(
+    (inv: InvitationWithUser) => {
+      if (statusFilter !== 'all' && inv.status !== statusFilter) return false
+      return true
+    },
+    [statusFilter]
+  )
+
+  const { paginatedItems, page, totalPages, total, from, to, search, setSearch, setPage } =
+    useClientPagination({
+      items: invitations,
+      pageSize: 10,
+      searchFn: (inv, query) =>
+        (inv.user?.name?.toLowerCase().includes(query) ?? false) ||
+        (inv.user?.email?.toLowerCase().includes(query) ?? false),
+      filterFn,
+    })
 
   const getStatusBadge = (status: InvitationStatus) => (
     <Badge variant={INVITATION_STATUS_BADGE_VARIANTS[status] ?? 'outline'}>
@@ -85,7 +110,35 @@ export function InvitationsTableBase({
           {t('description')} ({invitations.length})
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
+        <DataTableToolbar
+          search={search}
+          onSearchChange={setSearch}
+          total={total}
+          from={from}
+          to={to}
+        >
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="min-w-40">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{tFilters('allStatuses')}</SelectItem>
+              <SelectItem value="PENDING">
+                {t('statuses.PENDING')}
+              </SelectItem>
+              <SelectItem value="ACCEPTED">
+                {t('statuses.ACCEPTED')}
+              </SelectItem>
+              <SelectItem value="REJECTED">
+                {t('statuses.REJECTED')}
+              </SelectItem>
+              <SelectItem value="EXPIRED">
+                {t('statuses.EXPIRED')}
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </DataTableToolbar>
         <Table>
           <TableHeader>
             <TableRow>
@@ -99,7 +152,7 @@ export function InvitationsTableBase({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {invitations.map((invitation) => (
+            {paginatedItems.map((invitation) => (
               <TableRow key={invitation.id}>
                 <TableCell className="font-medium">{invitation.user?.name || '-'}</TableCell>
                 <TableCell>{invitation.user?.email || '-'}</TableCell>
@@ -143,6 +196,7 @@ export function InvitationsTableBase({
             ))}
           </TableBody>
         </Table>
+        <DataTablePagination page={page} totalPages={totalPages} onPageChange={setPage} />
       </CardContent>
     </Card>
   )

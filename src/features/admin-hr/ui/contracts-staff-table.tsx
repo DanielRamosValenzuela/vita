@@ -1,11 +1,16 @@
 'use client'
 
+import { useCallback, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Edit, XCircle } from 'lucide-react'
 
+import { useClientPagination } from '@/src/shared/lib/hooks/use-client-pagination'
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
+import { DataTablePagination } from '@/src/shared/ui/molecules/data-table-pagination'
+import { DataTableToolbar } from '@/src/shared/ui/molecules/data-table-toolbar'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/src/shared/ui/select'
 import {
   Table,
   TableBody,
@@ -30,6 +35,8 @@ type CreateContractTarget = {
 
 interface ContractsStaffTableProps {
   staff: ContractsPageData['staff']
+  areas: Array<{ id: string; name: string }>
+  rateTemplateOptions: Array<{ id: string; name: string }>
   hasRateTemplates: boolean
   isPending: boolean
   onEditContract: (target: CreateContractTarget) => void
@@ -49,6 +56,8 @@ interface ContractsStaffTableProps {
 
 export function ContractsStaffTable({
   staff,
+  areas,
+  rateTemplateOptions,
   hasRateTemplates,
   isPending,
   onEditContract,
@@ -58,6 +67,37 @@ export function ContractsStaffTable({
   onViewContracts,
 }: ContractsStaffTableProps) {
   const t = useTranslations('adminHR.rates')
+  const tFilters = useTranslations('common.filters')
+  const [contractFilter, setContractFilter] = useState<string>('all')
+  const [areaFilter, setAreaFilter] = useState<string>('all')
+  const [templateFilter, setTemplateFilter] = useState<string>('all')
+
+  const filterFn = useCallback(
+    (person: ContractsPageData['staff'][number]) => {
+      if (contractFilter === 'withContract' && person.contracts.length === 0) return false
+      if (contractFilter === 'withoutContract' && person.contracts.length > 0) return false
+      if (areaFilter !== 'all') {
+        const personAreaId = person.contracts[0]?.areaId ?? person.primaryAreaId
+        if (personAreaId !== areaFilter) return false
+      }
+      if (templateFilter !== 'all') {
+        const hasTemplate = person.contracts.some((c) => c.rateTemplateId === templateFilter)
+        if (!hasTemplate) return false
+      }
+      return true
+    },
+    [contractFilter, areaFilter, templateFilter]
+  )
+
+  const { paginatedItems, page, totalPages, total, from, to, search, setSearch, setPage } =
+    useClientPagination({
+      items: staff,
+      pageSize: 10,
+      searchFn: (person, query) =>
+        person.name.toLowerCase().includes(query) ||
+        person.email.toLowerCase().includes(query),
+      filterFn,
+    })
 
   return (
     <Card>
@@ -69,19 +109,68 @@ export function ContractsStaffTable({
         {staff.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">{t('empty.noStaff')}</div>
         ) : (
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{t('staffTable.person')}</TableHead>
-                  <TableHead>{t('staffTable.area')}</TableHead>
-                  <TableHead>{t('staffTable.rateTemplate')}</TableHead>
-                  <TableHead>{t('staffTable.status')}</TableHead>
-                  <TableHead className="w-[100px]">{t('staffTable.actions')}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {staff.map((person) => {
+          <div className="space-y-4">
+            <DataTableToolbar
+              search={search}
+              onSearchChange={setSearch}
+              total={total}
+              from={from}
+              to={to}
+            >
+              <Select value={contractFilter} onValueChange={setContractFilter}>
+                <SelectTrigger className="min-w-40">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{tFilters('allStatuses')}</SelectItem>
+                  <SelectItem value="withContract">{tFilters('withContract')}</SelectItem>
+                  <SelectItem value="withoutContract">{tFilters('withoutContract')}</SelectItem>
+                </SelectContent>
+              </Select>
+              {areas.length > 0 && (
+                <Select value={areaFilter} onValueChange={setAreaFilter}>
+                  <SelectTrigger className="min-w-40">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{tFilters('allAreas')}</SelectItem>
+                    {areas.map((area) => (
+                      <SelectItem key={area.id} value={area.id}>
+                        {area.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+              {rateTemplateOptions.length > 0 && (
+                <Select value={templateFilter} onValueChange={setTemplateFilter}>
+                  <SelectTrigger className="min-w-40">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{tFilters('allTemplates')}</SelectItem>
+                    {rateTemplateOptions.map((tpl) => (
+                      <SelectItem key={tpl.id} value={tpl.id}>
+                        {tpl.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            </DataTableToolbar>
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>{t('staffTable.person')}</TableHead>
+                    <TableHead>{t('staffTable.area')}</TableHead>
+                    <TableHead>{t('staffTable.rateTemplate')}</TableHead>
+                    <TableHead>{t('staffTable.status')}</TableHead>
+                    <TableHead className="w-[100px]">{t('staffTable.actions')}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {paginatedItems.map((person) => {
                   const primaryContract = person.contracts[0] ?? null
                   const hasContract = !!primaryContract
                   const hasMultipleContracts = person.contracts.length > 1
@@ -232,8 +321,10 @@ export function ContractsStaffTable({
                     </TableRow>
                   )
                 })}
-              </TableBody>
-            </Table>
+                </TableBody>
+              </Table>
+            </div>
+            <DataTablePagination page={page} totalPages={totalPages} onPageChange={setPage} />
           </div>
         )}
       </CardContent>

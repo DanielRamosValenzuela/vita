@@ -150,7 +150,15 @@ export function RateComponentForm({
             </div>
             <Select
               value={component.unit}
-              onValueChange={(value) => onUpdate(index, { unit: value as ComponentUnit })}
+              onValueChange={(value) => {
+                const unit = value as ComponentUnit
+                const isPeriodic =
+                  unit === COMPONENT_UNITS.MONTHLY ||
+                  unit === COMPONENT_UNITS.BIWEEKLY ||
+                  unit === COMPONENT_UNITS.WEEKLY ||
+                  unit === COMPONENT_UNITS.DAILY
+                onUpdate(index, { unit, ...(isPeriodic && { extraOnly: false }) })
+              }}
             >
               <SelectTrigger>
                 <SelectValue />
@@ -234,6 +242,34 @@ export function RateComponentForm({
             </Select>
           </div>
         </div>
+
+        {component.unit !== COMPONENT_UNITS.MONTHLY &&
+          component.unit !== COMPONENT_UNITS.BIWEEKLY &&
+          component.unit !== COMPONENT_UNITS.WEEKLY &&
+          component.unit !== COMPONENT_UNITS.DAILY && (
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id={`extra-only-${index}`}
+              checked={component.extraOnly ?? false}
+              onCheckedChange={(checked) =>
+                onUpdate(index, { extraOnly: checked === true })
+              }
+            />
+            <Label htmlFor={`extra-only-${index}`} className="cursor-pointer text-sm">
+              {t('extraOnly')}
+            </Label>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                  <p>{t('extraOnlyTooltip')}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+        )}
 
         {component.type === COMPONENT_TYPES.CUSTOM && (
           <div>

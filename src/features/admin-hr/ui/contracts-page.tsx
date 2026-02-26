@@ -213,6 +213,8 @@ export function ContractsPage({ data, currency }: ContractsPageProps) {
 
       <ContractsStaffTable
         staff={data.staff}
+        areas={data.areas}
+        rateTemplateOptions={data.rateTemplates.map((tpl) => ({ id: tpl.id, name: tpl.name }))}
         hasRateTemplates={data.rateTemplates.length > 0}
         isPending={isPending}
         onEditContract={(target) => dispatch({ type: 'SET_CREATE_CONTRACT_TARGET', payload: target })}

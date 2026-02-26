@@ -508,6 +508,7 @@ export const getShiftsAction = async (
           rotationId: true,
           rotationGroupId: true,
           isManuallyModified: true,
+          isExtra: true,
           startTime: true,
           endTime: true,
           actualStartTime: true,

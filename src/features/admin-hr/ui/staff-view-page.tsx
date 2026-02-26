@@ -1,11 +1,16 @@
 'use client'
 
+import { useCallback, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { CheckCircle2, ExternalLink, XCircle } from 'lucide-react'
 
+import { useClientPagination } from '@/src/shared/lib/hooks/use-client-pagination'
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
+import { DataTablePagination } from '@/src/shared/ui/molecules/data-table-pagination'
+import { DataTableToolbar } from '@/src/shared/ui/molecules/data-table-toolbar'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/src/shared/ui/select'
 import {
   Table,
   TableBody,
@@ -26,9 +31,33 @@ interface StaffViewPageProps {
 
 export function StaffViewPage({ staff, canManageRates = false }: StaffViewPageProps) {
   const t = useTranslations('staff')
+  const tFilters = useTranslations('common.filters')
+  const [contractFilter, setContractFilter] = useState<string>('all')
+  const [roleFilter, setRoleFilter] = useState<string>('all')
 
   const staffWithContract = staff.filter((s) => s.contracts.length > 0)
   const staffWithoutContract = staff.filter((s) => s.contracts.length === 0)
+
+  const filterFn = useCallback(
+    (person: StaffWithContract) => {
+      if (contractFilter === 'withContract' && person.contracts.length === 0) return false
+      if (contractFilter === 'withoutContract' && person.contracts.length > 0) return false
+      if (roleFilter === 'CHIEF_AREA' && person.role !== 'CHIEF_AREA') return false
+      if (roleFilter === 'STAFF_HEALTH' && person.role !== 'STAFF_HEALTH') return false
+      return true
+    },
+    [contractFilter, roleFilter]
+  )
+
+  const { paginatedItems, page, totalPages, total, from, to, search, setSearch, setPage } =
+    useClientPagination({
+      items: staff,
+      pageSize: 10,
+      searchFn: (person, query) =>
+        person.name.toLowerCase().includes(query) ||
+        person.email.toLowerCase().includes(query),
+      filterFn,
+    })
 
   return (
     <div className="space-y-6">
@@ -58,19 +87,48 @@ export function StaffViewPage({ staff, canManageRates = false }: StaffViewPagePr
           {staff.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">{t('empty')}</div>
           ) : (
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>{t('table.name')}</TableHead>
-                    <TableHead>{t('table.role')}</TableHead>
-                    <TableHead>{t('table.area')}</TableHead>
-                    <TableHead>{t('table.contract')}</TableHead>
-                    <TableHead>{t('table.status')}</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {staff.map((person) => {
+            <div className="space-y-4">
+              <DataTableToolbar
+                search={search}
+                onSearchChange={setSearch}
+                total={total}
+                from={from}
+                to={to}
+              >
+                <Select value={contractFilter} onValueChange={setContractFilter}>
+                  <SelectTrigger className="min-w-40">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{tFilters('allStatuses')}</SelectItem>
+                    <SelectItem value="withContract">{tFilters('withContract')}</SelectItem>
+                    <SelectItem value="withoutContract">{tFilters('withoutContract')}</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={roleFilter} onValueChange={setRoleFilter}>
+                  <SelectTrigger className="min-w-40">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{tFilters('allRoles')}</SelectItem>
+                    <SelectItem value="CHIEF_AREA">{tFilters('chief')}</SelectItem>
+                    <SelectItem value="STAFF_HEALTH">{tFilters('staff')}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </DataTableToolbar>
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>{t('table.name')}</TableHead>
+                      <TableHead>{t('table.role')}</TableHead>
+                      <TableHead>{t('table.area')}</TableHead>
+                      <TableHead>{t('table.contract')}</TableHead>
+                      <TableHead>{t('table.status')}</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {paginatedItems.map((person) => {
                     const currentContract = person.contracts[0] ?? null
                     const areaName = currentContract?.areaName || person.primaryAreaName
 
@@ -126,8 +184,10 @@ export function StaffViewPage({ staff, canManageRates = false }: StaffViewPagePr
                       </TableRow>
                     )
                   })}
-                </TableBody>
-              </Table>
+                  </TableBody>
+                </Table>
+              </div>
+              <DataTablePagination page={page} totalPages={totalPages} onPageChange={setPage} />
             </div>
           )}
         </CardContent>

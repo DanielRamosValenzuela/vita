@@ -3,9 +3,12 @@
 import { useTranslations } from 'next-intl'
 import { Copy, Edit, Plus, Trash2 } from 'lucide-react'
 
+import { useClientPagination } from '@/src/shared/lib/hooks/use-client-pagination'
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
+import { DataTablePagination } from '@/src/shared/ui/molecules/data-table-pagination'
+import { DataTableToolbar } from '@/src/shared/ui/molecules/data-table-toolbar'
 import {
   Table,
   TableBody,
@@ -36,6 +39,13 @@ export function ContractsRateTemplatesCard({
 }: ContractsRateTemplatesCardProps) {
   const t = useTranslations('adminHR.rates')
 
+  const { paginatedItems, page, totalPages, total, from, to, search, setSearch, setPage } =
+    useClientPagination({
+      items: rateTemplates,
+      pageSize: 10,
+      searchFn: (template, query) => template.name.toLowerCase().includes(query),
+    })
+
   return (
     <Card>
       <CardHeader>
@@ -60,18 +70,26 @@ export function ContractsRateTemplatesCard({
             </Button>
           </div>
         ) : (
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{t('rateTemplates.table.name')}</TableHead>
-                  <TableHead>{t('rateTemplates.table.components')}</TableHead>
-                  <TableHead>{t('rateTemplates.table.contracts')}</TableHead>
-                  <TableHead className="w-[200px]">{t('rateTemplates.table.actions')}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {rateTemplates.map((template) => (
+          <div className="space-y-4">
+            <DataTableToolbar
+              search={search}
+              onSearchChange={setSearch}
+              total={total}
+              from={from}
+              to={to}
+            />
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>{t('rateTemplates.table.name')}</TableHead>
+                    <TableHead>{t('rateTemplates.table.components')}</TableHead>
+                    <TableHead>{t('rateTemplates.table.contracts')}</TableHead>
+                    <TableHead className="w-[200px]">{t('rateTemplates.table.actions')}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {paginatedItems.map((template) => (
                   <TableRow key={template.id}>
                     <TableCell>
                       <div>
@@ -133,8 +151,10 @@ export function ContractsRateTemplatesCard({
                     </TableCell>
                   </TableRow>
                 ))}
-              </TableBody>
-            </Table>
+                </TableBody>
+              </Table>
+            </div>
+            <DataTablePagination page={page} totalPages={totalPages} onPageChange={setPage} />
           </div>
         )}
       </CardContent>

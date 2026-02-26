@@ -7,6 +7,9 @@ import { toast } from 'sonner'
 
 import { Link } from '@/i18n/navigation'
 
+import { useClientPagination } from '@/src/shared/lib/hooks/use-client-pagination'
+import { DataTablePagination } from '@/src/shared/ui/molecules/data-table-pagination'
+
 import { Alert, AlertDescription } from '@/src/shared/ui/alert'
 import {
   AlertDialog,
@@ -113,13 +116,15 @@ function initPage(init: PageInit): PageState {
 
 interface RotationsTableProps {
   rotations: RotationListItem[]
-  total: number
   onDelete: (rotation: RotationListItem) => void
   onCreate: () => void
   t: ReturnType<typeof useTranslations<'rotations'>>
 }
 
-function RotationsTable({ rotations, total, onDelete, onCreate, t }: RotationsTableProps) {
+function RotationsTable({ rotations, onDelete, onCreate, t }: RotationsTableProps) {
+  const { paginatedItems, page, totalPages, setPage } =
+    useClientPagination({ items: rotations, pageSize: 10 })
+
   if (rotations.length === 0)
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
@@ -150,7 +155,7 @@ function RotationsTable({ rotations, total, onDelete, onCreate, t }: RotationsTa
             </TableRow>
           </TableHeader>
           <TableBody>
-            {rotations.map((rotation) => (
+            {paginatedItems.map((rotation) => (
               <TableRow key={rotation.id} className="hover:bg-transparent">
                 <TableCell className="font-medium">{rotation.name}</TableCell>
                 <TableCell className="text-muted-foreground">{rotation.area.name}</TableCell>
@@ -197,9 +202,7 @@ function RotationsTable({ rotations, total, onDelete, onCreate, t }: RotationsTa
           </TableBody>
         </Table>
       </div>
-      <p className="text-muted-foreground mt-4 text-sm">
-        {t('list.showing', { count: rotations.length, total })}
-      </p>
+      <DataTablePagination page={page} totalPages={totalPages} onPageChange={setPage} />
     </>
   )
 }
@@ -408,7 +411,6 @@ export function RotationsPageContent({
         <CardContent>
           <RotationsTable
             rotations={state.rotations}
-            total={state.total}
             onDelete={(rotation) => dispatch({ type: 'SET_DELETE', rotation })}
             onCreate={() => dispatch({ type: 'SET_CREATE_OPEN', open: true })}
             t={t}

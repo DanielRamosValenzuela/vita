@@ -44,8 +44,12 @@ export const APPLY_CONDITIONS = {
   HOLIDAY_ONLY: 'HOLIDAY_ONLY' as ApplyCondition,
   IRRENUNCIABLE_ONLY: 'IRRENUNCIABLE_ONLY' as ApplyCondition,
   OVERTIME_ONLY: 'OVERTIME_ONLY' as ApplyCondition,
-  SPECIFIC_AREA: 'SPECIFIC_AREA' as ApplyCondition,
   SPECIFIC_SHIFT_TYPE: 'SPECIFIC_SHIFT_TYPE' as ApplyCondition,
+} as const
+
+export const APPLY_CONDITIONS_HIDDEN = {
+  EXTRA_SHIFT_ONLY: 'EXTRA_SHIFT_ONLY' as ApplyCondition,
+  SPECIFIC_AREA: 'SPECIFIC_AREA' as ApplyCondition,
   CUSTOM_RULE: 'CUSTOM_RULE' as ApplyCondition,
 } as const
 
