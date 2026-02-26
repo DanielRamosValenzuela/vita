@@ -1,0 +1,6 @@
+export { SectorsTable } from './sectors-table'
+export { CreateSectorForm } from './create-sector-form'
+export { SectorBasicInfoCard } from './sector-basic-info-card'
+export { SectorAreasCard } from './sector-areas-card'
+export { SectorChiefsCard } from './sector-chiefs-card'
+export { SectorStaffQuery } from './sector-staff-query'

@@ -37,6 +37,7 @@ model Organization {
   calendars      OrganizationCalendar[]
   notifications  Notification[]
   rotations      Rotation[]
+  sectors        Sector[]
 
   @@index([taxId])
   @@index([country])
@@ -76,6 +77,7 @@ model User {
   notificationsReceived Notification[]         @relation("NotificationRecipient")
   notificationsActed    Notification[]         @relation("NotificationActor")
   rotationMemberships   RotationMember[]
+  userSectors           UserSector[]
 
   @@index([email])
   @@index([docNumber])
@@ -380,6 +382,7 @@ model Area {
   shiftTypes          AreaShiftType[]
   userAreas           UserArea[]
   rotations           Rotation[]
+  sectorAreas         SectorArea[]
 
   @@index([organizationId])
   @@index([isActive])
@@ -394,6 +397,47 @@ model UserArea {
   @@id([userId, areaId])
   @@index([userId])
   @@index([areaId])
+}
+
+model Sector {
+  id             String       @id @default(cuid())
+  name           String
+  description    String?
+  icon           String?      @default("Layers")
+  color          String       @default("#3b82f6")
+  organizationId String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  sectorAreas    SectorArea[]
+  userSectors    UserSector[]
+
+  @@unique([organizationId, name])
+  @@index([organizationId])
+}
+
+model SectorArea {
+  sectorId String
+  areaId   String
+
+  sector   Sector @relation(fields: [sectorId], references: [id], onDelete: Cascade)
+  area     Area   @relation(fields: [areaId], references: [id], onDelete: Cascade)
+
+  @@id([sectorId, areaId])
+  @@index([sectorId])
+  @@index([areaId])
+}
+
+model UserSector {
+  userId   String
+  sectorId String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sector   Sector @relation(fields: [sectorId], references: [id], onDelete: Cascade)
+
+  @@id([userId, sectorId])
+  @@index([userId])
+  @@index([sectorId])
 }
 
 model OrganizationInvitation {

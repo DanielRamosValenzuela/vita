@@ -9,6 +9,7 @@ import {
   RefreshCw,
   DollarSign,
   Inbox,
+  Layers,
   LayoutGrid,
   User,
   Users,
@@ -55,6 +56,12 @@ export function getNavItems(t: (key: string) => string, userRole: Role): NavItem
       label: t('areas'),
       icon: LayoutGrid,
       roles: [Role.ADMIN_HR, Role.CHIEF_AREA],
+    },
+    {
+      href: '/dashboard/sectors',
+      label: t('sectors'),
+      icon: Layers,
+      roles: [Role.ADMIN_HR, Role.CHIEF_AREA, Role.STAFF_HEALTH],
     },
     {
       href: '/dashboard/shift-types',

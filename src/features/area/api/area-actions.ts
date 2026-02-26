@@ -164,7 +164,33 @@ export async function getChiefsForAreaAction(areaId: string) {
       select: { userId: true },
     })
     const rawAssignedChiefIds = assignedUserAreas.map((ua) => ua.userId)
+
     if (isChiefArea(user)) {
+      const isSectorChiefForArea = await prisma.userSector.findFirst({
+        where: {
+          userId: user.id,
+          sector: { sectorAreas: { some: { areaId } } },
+        },
+      })
+
+      if (isSectorChiefForArea) {
+        const orgChiefs = await prisma.user.findMany({
+          where: {
+            organizationId: area.organizationId,
+            role: ROLES.CHIEF_AREA,
+          },
+          select: { id: true, name: true, email: true, docNumber: true },
+          orderBy: { name: 'asc' },
+        })
+        const assignedChiefIds = rawAssignedChiefIds.filter((id) =>
+          orgChiefs.some((chief) => chief.id === id)
+        )
+        return {
+          success: true,
+          data: { chiefs: orgChiefs, assignedChiefIds },
+        }
+      }
+
       const chiefs = await prisma.user.findMany({
         where: {
           id: { in: rawAssignedChiefIds },
@@ -201,15 +227,38 @@ export async function getChiefsForAreaAction(areaId: string) {
 
 export async function assignChiefsToAreaAction(areaId: string, chiefUserIds: string[]) {
   try {
-    const user = await requireAdminHRWithOrg()
+    const user = await requireAdminHROrChiefArea()
+    let orgId: string | null = user.organizationId ?? null
+
+    if (isChiefArea(user)) {
+      if (!orgId) {
+        const firstArea = await prisma.userArea.findFirst({
+          where: { userId: user.id },
+          select: { area: { select: { organizationId: true } } },
+        })
+        orgId = firstArea?.area?.organizationId ?? null
+      }
+      if (!orgId) return { success: false, error: 'No tienes una organización asignada' }
+
+      const isSectorChiefForArea = await prisma.userSector.findFirst({
+        where: {
+          userId: user.id,
+          sector: { sectorAreas: { some: { areaId } } },
+        },
+      })
+      if (!isSectorChiefForArea)
+        return { success: false, error: 'No tienes permiso para asignar jefes a esta área' }
+    } else if (!orgId)
+      throw new Error('No estás vinculado a una organización')
+
     const area = await prisma.area.findFirst({
-      where: { id: areaId, organizationId: user.organizationId },
+      where: { id: areaId, organizationId: orgId },
     })
     if (!area) return { success: false, error: 'Área no encontrada' }
     const validChiefs = await prisma.user.findMany({
       where: {
         id: { in: chiefUserIds },
-        organizationId: user.organizationId,
+        organizationId: orgId,
         role: ROLES.CHIEF_AREA,
       },
       select: { id: true },
@@ -237,7 +286,7 @@ export async function assignChiefsToAreaAction(areaId: string, chiefUserIds: str
           createNotification({
             userId: chiefId,
             actorId: user.id,
-            organizationId: user.organizationId,
+            organizationId: orgId,
             type: 'AREA_ASSIGNED',
             title: tNotif('types.AREA_ASSIGNED', { actor: user.name, area: area.name }),
             actionUrl: '/dashboard/areas',
