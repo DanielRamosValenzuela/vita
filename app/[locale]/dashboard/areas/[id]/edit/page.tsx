@@ -52,19 +52,30 @@ export default async function AreaEditPage({ params }: AreaEditPageProps) {
 
   const effectiveOrgId = organizationId
 
-  const [area, shiftTypesResult, chiefAreaCheck, chiefsResult, staffResult] = await Promise.all([
-    getAreaById(id, effectiveOrgId),
-    getShiftTypesAction(),
-    isChiefArea(user)
-      ? prisma.userArea.findFirst({ where: { userId: user.id, areaId: id } })
-      : Promise.resolve(true),
-    getChiefsForAreaAction(id),
-    getStaffForAreaAction(id),
-  ])
+  const [area, shiftTypesResult, chiefAreaCheck, sectorChiefCheck, chiefsResult, staffResult] =
+    await Promise.all([
+      getAreaById(id, effectiveOrgId),
+      getShiftTypesAction(),
+      isChiefArea(user)
+        ? prisma.userArea.findFirst({ where: { userId: user.id, areaId: id } })
+        : Promise.resolve(true),
+      isChiefArea(user)
+        ? prisma.userSector.findFirst({
+            where: {
+              userId: user.id,
+              sector: { sectorAreas: { some: { areaId: id } } },
+            },
+          })
+        : Promise.resolve(null),
+      getChiefsForAreaAction(id),
+      getStaffForAreaAction(id),
+    ])
 
   if (!area) notFound()
 
   if (isChiefArea(user) && !chiefAreaCheck) notFound()
+
+  const isSectorChiefForArea = !!sectorChiefCheck
 
   const allShiftTypes =
     shiftTypesResult.success && shiftTypesResult.data ? shiftTypesResult.data : []
@@ -116,7 +127,7 @@ export default async function AreaEditPage({ params }: AreaEditPageProps) {
       <AreaEditForm
         area={area}
         shiftTypes={shiftTypes}
-        canAssignChiefs={!isChiefArea(user)}
+        canAssignChiefs={!isChiefArea(user) || isSectorChiefForArea}
         chiefs={chiefs}
         initialAssignedChiefIds={assignedChiefIds}
         staff={staff}

@@ -5,5 +5,6 @@ export {
   requireAdminHR,
   requireAdminHRWithOrg,
   requireAdminHROrChiefArea,
+  requireDashboardUser,
 } from './session'
-export { isAdminHR } from './rbac'
+export { isAdminHR, isChiefArea, isStaffHealth } from './rbac'

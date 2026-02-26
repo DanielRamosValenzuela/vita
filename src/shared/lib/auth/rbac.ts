@@ -14,3 +14,7 @@ export function isAdminHR(user: CurrentUser | null): boolean {
 export function isChiefArea(user: CurrentUser | null): boolean {
   return hasRole(user, Role.CHIEF_AREA)
 }
+
+export function isStaffHealth(user: CurrentUser | null): boolean {
+  return hasRole(user, Role.STAFF_HEALTH)
+}
