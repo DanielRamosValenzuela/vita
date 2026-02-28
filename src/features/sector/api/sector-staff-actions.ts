@@ -1,6 +1,6 @@
 'use server'
 
-import { requireDashboardUser, isChiefArea, isStaffHealth } from '@/src/shared/lib/auth'
+import { requireDashboardUser, isChiefArea, isStaff } from '@/src/shared/lib/auth'
 import { prisma } from '@/src/shared/lib/db'
 import { handleActionError } from '@/src/shared/lib/utils'
 
@@ -39,7 +39,7 @@ export async function getSectorStaffAction(input: SectorStaffInput) {
     const user = await requireDashboardUser()
     let orgId: string | null = user.organizationId ?? null
 
-    if ((isChiefArea(user) || isStaffHealth(user)) && !orgId) {
+    if ((isChiefArea(user) || isStaff(user)) && !orgId) {
       const firstArea = await prisma.userArea.findFirst({
         where: { userId: user.id },
         select: { area: { select: { organizationId: true } } },
@@ -68,7 +68,7 @@ export async function getSectorStaffAction(input: SectorStaffInput) {
       return { success: false as const, error: 'Sector no encontrado' }
     
 
-    if (isChiefArea(user) || isStaffHealth(user)) {
+    if (isChiefArea(user) || isStaff(user)) {
       const userAreas = await prisma.userArea.findMany({
         where: { userId: user.id },
         select: { areaId: true },

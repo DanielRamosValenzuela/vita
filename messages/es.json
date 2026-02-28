@@ -20,6 +20,13 @@
     "logoLabel": "VITA - Inicio",
     "profile": "Perfil",
     "settings": "Configuración",
+    "roles": {
+      "SUPER_ADMIN": "Super Administrador",
+      "ADMIN_HR": "Administrador",
+      "CHIEF_AREA": "Jefe de Área",
+      "CHIEF_SECTOR": "Jefe de Sector",
+      "STAFF": "Personal"
+    },
     "languages": {
       "es": "Español",
       "en": "Inglés"
@@ -40,7 +47,8 @@
       "withContract": "Con contrato",
       "withoutContract": "Sin contrato",
       "allRoles": "Todos los roles",
-      "chief": "Jefe de Área",
+      "chiefArea": "Jefe de Área",
+      "chiefSector": "Jefe de Sector",
       "staff": "Personal",
       "allAreas": "Todas las áreas",
       "allTemplates": "Todas las plantillas"
@@ -187,9 +195,10 @@
     "criticalsMessage": "Algunos roles han alcanzado o superado sus límites",
     "warningsMessage": "Algunos roles están cerca de alcanzar sus límites",
     "roles": {
-      "ADMIN_HR": "Administradores RRHH",
+      "ADMIN_HR": "Administradores",
       "CHIEF_AREA": "Jefes de Área",
-      "STAFF_HEALTH": "Personal de Salud",
+      "CHIEF_SECTOR": "Jefes de Sector",
+      "STAFF": "Personal",
       "unknown": "Desconocido"
     },
     "badgeExceeded": "Excedido",
@@ -786,9 +795,10 @@
       },
       "roles": {
         "SUPER_ADMIN": "Super Administrador",
-        "ADMIN_HR": "Administrador RRHH",
+        "ADMIN_HR": "Administrador",
         "CHIEF_AREA": "Jefe de Área",
-        "STAFF_HEALTH": "Personal de Salud"
+        "CHIEF_SECTOR": "Jefe de Sector",
+        "STAFF": "Personal"
       },
       "actions": "Acciones",
       "confirmSuspend": "¿Estás seguro de que deseas suspender la organización {name}?",
@@ -1305,7 +1315,8 @@
         "description": "Busca un usuario por email o documento para invitarlo a tu equipo.",
         "roleLabel": "Rol a Invitar",
         "roleChief": "Jefe de Área",
-        "roleStaff": "Personal de Salud",
+        "roleChiefSector": "Jefe de Sector",
+        "roleStaff": "Personal",
         "emailLabel": "Email",
         "emailPlaceholder": "ejemplo@email.com",
         "emailInvalid": "Email inválido",
@@ -1339,7 +1350,8 @@
         "cancelSuccess": "Invitación cancelada exitosamente",
         "cancelError": "Error al cancelar la invitación",
         "roleChief": "Jefe de Área",
-        "roleStaff": "Personal de Salud",
+        "roleChiefSector": "Jefe de Sector",
+        "roleStaff": "Personal",
         "columns": {
           "user": "Usuario",
           "email": "Email",
@@ -1910,8 +1922,9 @@
       "multiplierBadge": "{value}x"
     },
     "roles": {
-      "chief": "Jefe de Área",
-      "staff": "Personal de Salud"
+      "chiefArea": "Jefe de Área",
+      "chiefSector": "Jefe de Sector",
+      "staff": "Personal"
     },
     "goToRates": "Gestionar Tarifas",
     "empty": "No hay personal en la organización",
@@ -2277,7 +2290,14 @@
       "processingGenerateMsg1": "Creando turnos en la base de datos",
       "processingGenerateMsg2": "Verificando conflictos de horario",
       "processingGenerateMsg3": "Asignando contratos vigentes",
-      "processingGenerateMsg4": "Enviando notificaciones al personal"
+      "processingGenerateMsg4": "Enviando notificaciones al personal",
+      "endDateDisabledHint": "Selecciona primero la fecha de inicio",
+      "startingGroup": "Grupo que inicia primero",
+      "startingGroupHint": "El grupo seleccionado comenzará desde el paso 1 del patrón",
+      "lastGenerationInfo": "Última generación: {date} — {group} ({shiftType})",
+      "totalGeneratedShifts": "{count} turnos generados",
+      "noExistingShifts": "Sin turnos previos generados",
+      "defaultGroupOrder": "Orden predeterminado"
     },
     "coverage": {
       "title": "Cobertura",

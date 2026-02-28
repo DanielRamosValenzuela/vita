@@ -1,6 +1,6 @@
 'use server'
 
-import { requireAdminHROrChiefArea } from '@/src/shared/lib/auth'
+import { requireAdminHROrChief } from '@/src/shared/lib/auth'
 import { isChiefArea } from '@/src/shared/lib/auth/rbac'
 import { prisma } from '@/src/shared/lib/db'
 import type { ActionResult } from '@/src/shared/lib/types'
@@ -12,7 +12,7 @@ const AREA_PATHS = ['/dashboard/areas', '/dashboard/admin-hr'] as const
 async function resolveOrgIdAndCheckArea(
   areaId: string
 ): Promise<{ success: false; error: string } | { success: true; organizationId: string }> {
-  const user = await requireAdminHROrChiefArea()
+  const user = await requireAdminHROrChief()
   let orgId: string | null = user.organizationId ?? null
   if (isChiefArea(user) && !orgId) {
     const firstArea = await prisma.userArea.findFirst({

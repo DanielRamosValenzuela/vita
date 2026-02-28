@@ -56,7 +56,7 @@ model User {
   image           String?
   customImage     String?
   imageProvider   ImageProvider?
-  role            Role                     @default(STAFF_HEALTH)
+  role            Role                     @default(STAFF)
   organizationId  String?
   linkingCode     String                   @unique @default(cuid())
   phone           String?
@@ -155,7 +155,8 @@ enum Role {
   SUPER_ADMIN
   ADMIN_HR
   CHIEF_AREA
-  STAFF_HEALTH
+  CHIEF_SECTOR
+  STAFF
 }
 
 enum Country {

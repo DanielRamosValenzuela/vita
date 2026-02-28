@@ -74,12 +74,14 @@ export const generateShiftsSchema = z.object({
   startDate: z.coerce.date(),
   endDate: z.coerce.date(),
   overrideConflicts: z.boolean().default(false),
+  startingGroupId: z.string().optional(),
 });
 
 export const previewGenerationSchema = z.object({
   rotationId: z.string().min(1),
   startDate: z.coerce.date(),
   endDate: z.coerce.date(),
+  startingGroupId: z.string().optional(),
 });
 
 export const regenerateShiftsSchema = z.object({
@@ -87,6 +89,7 @@ export const regenerateShiftsSchema = z.object({
   startDate: z.coerce.date(),
   endDate: z.coerce.date(),
   replaceExisting: z.boolean().default(false),
+  startingGroupId: z.string().optional(),
 });
 
 export const getExtraCandidatesSchema = z.object({

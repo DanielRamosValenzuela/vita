@@ -53,7 +53,7 @@ export function EditOrganizationForm({ organization }: EditOrganizationFormProps
 
   const currentAdminHR = organization.users.filter((u) => u.role === ROLES.ADMIN_HR).length
   const currentChiefs = organization.users.filter((u) => u.role === ROLES.CHIEF_AREA).length
-  const currentStaff = organization.users.filter((u) => u.role === ROLES.STAFF_HEALTH).length
+  const currentStaff = organization.users.filter((u) => u.role === ROLES.STAFF).length
 
   const form = useForm<UpdateOrganizationInput>({
     resolver: zodResolver(updateOrganizationSchema),

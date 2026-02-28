@@ -1,6 +1,7 @@
 'use server'
 
-import { requireAdminHROrChiefArea } from '@/src/shared/lib/auth'
+import { requireAdminHROrChief } from '@/src/shared/lib/auth'
+import { getChiefAccessibleAreaIds, resolveChiefOrganizationId } from '@/src/shared/lib/auth/chief-access'
 import { isChiefArea } from '@/src/shared/lib/auth/rbac'
 import { prisma } from '@/src/shared/lib/db'
 import type { ActionResult } from '@/src/shared/lib/types'
@@ -40,16 +41,10 @@ interface ShiftType {
 
 export const getShiftTypesAction = async (): Promise<ActionResult<ShiftType[]>> => {
   try {
-    const session = await requireAdminHROrChiefArea()
-    let orgId: string | null = session.organizationId ?? null
-    if (isChiefArea(session) && !orgId) {
-      const firstArea = await prisma.userArea.findFirst({
-        where: { userId: session.id },
-        select: { area: { select: { organizationId: true } } },
-      })
-      const derived: string | null = firstArea?.area?.organizationId ?? null
-      orgId = derived
-    }
+    const session = await requireAdminHROrChief()
+    const orgId = isChiefArea(session)
+      ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
+      : session.organizationId ?? null
     if (!orgId)
       return {
         success: false,
@@ -65,11 +60,7 @@ export const getShiftTypesAction = async (): Promise<ActionResult<ShiftType[]>> 
     }
 
     if (isChiefArea(session)) {
-      const chiefAreas = await prisma.userArea.findMany({
-        where: { userId: session.id },
-        select: { areaId: true },
-      })
-      const chiefAreaIds = chiefAreas.map((a) => a.areaId)
+      const chiefAreaIds = await getChiefAccessibleAreaIds(session.id)
       if (chiefAreaIds.length === 0) return { success: true, data: [] }
       where.OR = [
         { isGlobal: true },
@@ -124,16 +115,11 @@ export const createShiftTypeAction = async (data: {
   areaConfigs?: Array<{ areaId: string; isActive: boolean }>
 }): Promise<ActionResult<ShiftType>> => {
   try {
-    const session = await requireAdminHROrChiefArea()
+    const session = await requireAdminHROrChief()
     const isChief = isChiefArea(session)
-    let orgId: string | null = session.organizationId ?? null
-    if (isChief && !orgId) {
-      const firstArea = await prisma.userArea.findFirst({
-        where: { userId: session.id },
-        select: { area: { select: { organizationId: true } } },
-      })
-      orgId = firstArea?.area?.organizationId ?? null
-    }
+    const orgId = isChief
+      ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
+      : session.organizationId ?? null
     if (!orgId)
       return { success: false, error: 'No tienes una organización asignada' }
     const organizationId = orgId
@@ -160,11 +146,8 @@ export const createShiftTypeAction = async (data: {
           success: false,
           error: 'Debes seleccionar al menos un área asignada a ti',
         }
-      const chiefAreas = await prisma.userArea.findMany({
-        where: { userId: session.id },
-        select: { areaId: true },
-      })
-      const chiefAreaIds = new Set(chiefAreas.map((a) => a.areaId))
+      const chiefAreaIdsList = await getChiefAccessibleAreaIds(session.id)
+      const chiefAreaIds = new Set(chiefAreaIdsList)
       const invalidArea = areaConfigs.find((c) => !chiefAreaIds.has(c.areaId))
       if (invalidArea)
         return {
@@ -283,16 +266,11 @@ export const updateShiftTypeAction = async (
   }
 ): Promise<ActionResult<ShiftType>> => {
   try {
-    const session = await requireAdminHROrChiefArea()
+    const session = await requireAdminHROrChief()
     const isChief = isChiefArea(session)
-    let orgId: string | null = session.organizationId ?? null
-    if (isChief && !orgId) {
-      const firstArea = await prisma.userArea.findFirst({
-        where: { userId: session.id },
-        select: { area: { select: { organizationId: true } } },
-      })
-      orgId = firstArea?.area?.organizationId ?? null
-    }
+    const orgId = isChief
+      ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
+      : session.organizationId ?? null
     if (!orgId)
       return { success: false, error: 'No tienes una organización asignada' }
     const organizationId = orgId
@@ -340,11 +318,8 @@ export const updateShiftTypeAction = async (
           success: false,
           error: 'No puedes editar un tipo de turno global',
         }
-      const chiefAreas = await prisma.userArea.findMany({
-        where: { userId: session.id },
-        select: { areaId: true },
-      })
-      const chiefAreaIds = new Set(chiefAreas.map((a) => a.areaId))
+      const chiefAreaIdsList = await getChiefAccessibleAreaIds(session.id)
+      const chiefAreaIds = new Set(chiefAreaIdsList)
       const areaConfigs = data.areaConfigs ?? existingType.areaShiftTypes?.map((a) => ({ areaId: a.areaId, isActive: true })) ?? []
       if (areaConfigs.length === 0)
         return {
@@ -444,16 +419,11 @@ export const updateShiftTypeAction = async (
 
 export const deleteShiftTypeAction = async (id: string): Promise<ActionResult<null>> => {
   try {
-    const session = await requireAdminHROrChiefArea()
+    const session = await requireAdminHROrChief()
     const isChief = isChiefArea(session)
-    let orgId: string | null = session.organizationId ?? null
-    if (isChief && !orgId) {
-      const firstArea = await prisma.userArea.findFirst({
-        where: { userId: session.id },
-        select: { area: { select: { organizationId: true } } },
-      })
-      orgId = firstArea?.area?.organizationId ?? null
-    }
+    const orgId = isChief
+      ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
+      : session.organizationId ?? null
     if (!orgId)
       return { success: false, error: 'No tienes una organización asignada' }
 
@@ -483,11 +453,8 @@ export const deleteShiftTypeAction = async (id: string): Promise<ActionResult<nu
           success: false,
           error: 'No puedes eliminar un tipo de turno global',
         }
-      const chiefAreas = await prisma.userArea.findMany({
-        where: { userId: session.id },
-        select: { areaId: true },
-      })
-      const chiefAreaIds = new Set(chiefAreas.map((a) => a.areaId))
+      const chiefAreaIdsList = await getChiefAccessibleAreaIds(session.id)
+      const chiefAreaIds = new Set(chiefAreaIdsList)
       const typeAreaIds = existingType.areaShiftTypes?.map((a) => a.areaId) ?? []
       const hasAreaOutsideChief = typeAreaIds.some((areaId) => !chiefAreaIds.has(areaId))
       if (hasAreaOutsideChief)

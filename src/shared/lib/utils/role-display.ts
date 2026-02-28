@@ -14,8 +14,10 @@ export function getRoleDisplayMeta(role: Role): RoleDisplayMeta {
       return { icon: '👔', color: 'blue', translationKey: 'roles.ADMIN_HR' }
     case ROLES.CHIEF_AREA:
       return { icon: '🏥', color: 'green', translationKey: 'roles.CHIEF_AREA' }
-    case ROLES.STAFF_HEALTH:
-      return { icon: '⚕️', color: 'purple', translationKey: 'roles.STAFF_HEALTH' }
+    case ROLES.CHIEF_SECTOR:
+      return { icon: '🏥', color: 'teal', translationKey: 'roles.CHIEF_SECTOR' }
+    case ROLES.STAFF:
+      return { icon: '⚕️', color: 'purple', translationKey: 'roles.STAFF' }
     default:
       return { icon: '❓', color: 'gray', translationKey: 'roles.unknown' }
   }

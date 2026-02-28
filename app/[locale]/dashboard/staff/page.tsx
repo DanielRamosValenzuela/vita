@@ -1,6 +1,6 @@
 import { getTranslations } from 'next-intl/server'
 
-import { isAdminHR, requireAdminHROrChiefArea } from '@/src/shared/lib/auth'
+import { isAdminHR, requireAdminHROrChief } from '@/src/shared/lib/auth'
 import { Alert, AlertDescription, AlertTitle } from '@/src/shared/ui/alert'
 import { getStaffPageDataAction } from '@/src/features/admin-hr/api'
 import { StaffViewPage } from '@/src/features/admin-hr/ui'
@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: StaffPageProps) {
 export default async function StaffPage({ params }: StaffPageProps) {
   const { locale } = await params
   const [session, t, result] = await Promise.all([
-    requireAdminHROrChiefArea(locale),
+    requireAdminHROrChief(locale),
     getTranslations('dashboard'),
     getStaffPageDataAction(),
   ])

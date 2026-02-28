@@ -3,8 +3,9 @@
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
+import { chiefHasAreaAccess, getChiefAccessibleAreaIds, resolveChiefOrganizationId } from '@/src/shared/lib/auth/chief-access'
 import { isChiefArea } from '@/src/shared/lib/auth/rbac'
-import { requireAdminHROrChiefArea } from '@/src/shared/lib/auth/session'
+import { requireAdminHROrChief } from '@/src/shared/lib/auth/session'
 import { prisma } from '@/src/shared/lib/db'
 import type { ActionResult } from '@/src/shared/lib/types'
 
@@ -25,23 +26,42 @@ import type {
   CoverageOverview,
   GenerationPreview,
   GenerationResult,
+  LastGenerationInfo,
   ShiftConflict,
 } from '../types/rotation-types'
+
+function adjustOriginForStartingGroup(
+  origin: Date,
+  startDate: Date,
+  startingGroupId: string | undefined,
+  groups: Array<{ id: string; cycleOffset: number }>,
+  patternLength: number,
+): Date {
+  if (!startingGroupId) return origin
+  const targetGroup = groups.find((g) => g.id === startingGroupId)
+  if (!targetGroup) return origin
+  const di = daysBetween(origin, startDate)
+  const currentStep = (di + targetGroup.cycleOffset) % patternLength
+  const adjustment = (patternLength - currentStep) % patternLength
+  if (adjustment === 0) return origin
+  return new Date(
+    Date.UTC(
+      origin.getUTCFullYear(),
+      origin.getUTCMonth(),
+      origin.getUTCDate() - adjustment,
+    )
+  )
+}
 
 export const previewGenerationAction = async (
   data: z.infer<typeof previewGenerationSchema>
 ): Promise<ActionResult<GenerationPreview>> => {
   try {
-    const session = await requireAdminHROrChiefArea()
+    const session = await requireAdminHROrChief()
 
-    let derivedOrgId: string | null = session.organizationId ?? null
-    if (isChiefArea(session) && !derivedOrgId) {
-      const firstArea = await prisma.userArea.findFirst({
-        where: { userId: session.id },
-        select: { area: { select: { organizationId: true } } },
-      })
-      derivedOrgId = firstArea?.area?.organizationId ?? null
-    }
+    const derivedOrgId = isChiefArea(session)
+      ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
+      : session.organizationId ?? null
     if (!derivedOrgId)
       return { success: false, error: 'No tienes una organización asignada' }
     const organizationId = derivedOrgId
@@ -102,10 +122,8 @@ export const previewGenerationAction = async (
       return { success: false, error: 'Rotativa no encontrada' }
 
     if (isChiefArea(session)) {
-      const chiefArea = await prisma.userArea.findFirst({
-        where: { userId: session.id, areaId: rotation.areaId },
-      })
-      if (!chiefArea)
+      const hasAccess = await chiefHasAreaAccess(session.id, rotation.areaId)
+      if (!hasAccess)
         return { success: false, error: 'Solo puedes gestionar rotativas en las áreas que tienes asignadas' }
     }
 
@@ -117,7 +135,13 @@ export const previewGenerationAction = async (
     for (const cfg of rotation.shiftConfigs)
       configMap.set(cfg.shiftTypeId, cfg.startTime)
 
-    const effectiveOrigin = rotation.startDate ?? validatedData.startDate
+    const effectiveOrigin = adjustOriginForStartingGroup(
+      rotation.startDate ?? validatedData.startDate,
+      validatedData.startDate,
+      validatedData.startingGroupId,
+      rotation.groups,
+      patternLength,
+    )
     const daysInRange = daysBetween(validatedData.startDate, validatedData.endDate) + 1
 
     const conflicts: ShiftConflict[] = []
@@ -226,16 +250,11 @@ export const generateShiftsAction = async (
   data: z.infer<typeof generateShiftsSchema>
 ): Promise<ActionResult<GenerationResult>> => {
   try {
-    const session = await requireAdminHROrChiefArea()
+    const session = await requireAdminHROrChief()
 
-    let derivedOrgId: string | null = session.organizationId ?? null
-    if (isChiefArea(session) && !derivedOrgId) {
-      const firstArea = await prisma.userArea.findFirst({
-        where: { userId: session.id },
-        select: { area: { select: { organizationId: true } } },
-      })
-      derivedOrgId = firstArea?.area?.organizationId ?? null
-    }
+    const derivedOrgId = isChiefArea(session)
+      ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
+      : session.organizationId ?? null
     if (!derivedOrgId)
       return { success: false, error: 'No tienes una organización asignada' }
     const organizationId = derivedOrgId
@@ -289,10 +308,8 @@ export const generateShiftsAction = async (
       return { success: false, error: 'Rotativa no encontrada' }
 
     if (isChiefArea(session)) {
-      const chiefArea = await prisma.userArea.findFirst({
-        where: { userId: session.id, areaId: rotation.areaId },
-      })
-      if (!chiefArea)
+      const hasAccess = await chiefHasAreaAccess(session.id, rotation.areaId)
+      if (!hasAccess)
         return { success: false, error: 'Solo puedes gestionar rotativas en las áreas que tienes asignadas' }
     }
 
@@ -321,7 +338,13 @@ export const generateShiftsAction = async (
     for (const st of shiftTypes)
       shiftTypeMap.set(st.id, { durationMinutes: st.durationMinutes, name: st.name })
 
-    const effectiveOrigin = rotation.startDate ?? validatedData.startDate
+    const effectiveOrigin = adjustOriginForStartingGroup(
+      rotation.startDate ?? validatedData.startDate,
+      validatedData.startDate,
+      validatedData.startingGroupId,
+      rotation.groups,
+      patternLength,
+    )
     const daysInRange = daysBetween(validatedData.startDate, validatedData.endDate) + 1
 
     type ShiftCreateData = {
@@ -461,16 +484,11 @@ export const getCoverageOverviewAction = async (
   endDate: Date
 ): Promise<ActionResult<CoverageOverview>> => {
   try {
-    const session = await requireAdminHROrChiefArea()
+    const session = await requireAdminHROrChief()
 
-    let derivedOrgId: string | null = session.organizationId ?? null
-    if (isChiefArea(session) && !derivedOrgId) {
-      const firstArea = await prisma.userArea.findFirst({
-        where: { userId: session.id },
-        select: { area: { select: { organizationId: true } } },
-      })
-      derivedOrgId = firstArea?.area?.organizationId ?? null
-    }
+    const derivedOrgId = isChiefArea(session)
+      ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
+      : session.organizationId ?? null
     if (!derivedOrgId)
       return { success: false, error: 'No tienes una organización asignada' }
     const organizationId = derivedOrgId
@@ -520,10 +538,8 @@ export const getCoverageOverviewAction = async (
       return { success: false, error: 'Rotativa no encontrada' }
 
     if (isChiefArea(session)) {
-      const chiefArea = await prisma.userArea.findFirst({
-        where: { userId: session.id, areaId: rotation.areaId },
-      })
-      if (!chiefArea)
+      const hasAccess = await chiefHasAreaAccess(session.id, rotation.areaId)
+      if (!hasAccess)
         return { success: false, error: 'Solo puedes gestionar rotativas en las áreas que tienes asignadas' }
     }
 
@@ -648,16 +664,11 @@ export const regenerateShiftsAction = async (
   data: z.infer<typeof regenerateShiftsSchema>
 ): Promise<ActionResult<GenerationResult>> => {
   try {
-    const session = await requireAdminHROrChiefArea()
+    const session = await requireAdminHROrChief()
 
-    let derivedOrgId: string | null = session.organizationId ?? null
-    if (isChiefArea(session) && !derivedOrgId) {
-      const firstArea = await prisma.userArea.findFirst({
-        where: { userId: session.id },
-        select: { area: { select: { organizationId: true } } },
-      })
-      derivedOrgId = firstArea?.area?.organizationId ?? null
-    }
+    const derivedOrgId = isChiefArea(session)
+      ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
+      : session.organizationId ?? null
     if (!derivedOrgId)
       return { success: false, error: 'No tienes una organización asignada' }
     const organizationId = derivedOrgId
@@ -718,10 +729,8 @@ export const regenerateShiftsAction = async (
       return { success: false, error: 'Rotativa no encontrada' }
 
     if (isChiefArea(session)) {
-      const chiefArea = await prisma.userArea.findFirst({
-        where: { userId: session.id, areaId: rotation.areaId },
-      })
-      if (!chiefArea)
+      const hasAccess = await chiefHasAreaAccess(session.id, rotation.areaId)
+      if (!hasAccess)
         return { success: false, error: 'Solo puedes gestionar rotativas en las áreas que tienes asignadas' }
     }
 
@@ -759,7 +768,13 @@ export const regenerateShiftsAction = async (
     for (const st of shiftTypes)
       shiftTypeMap.set(st.id, { durationMinutes: st.durationMinutes, name: st.name })
 
-    const effectiveOrigin = rotation.startDate ?? validatedData.startDate
+    const effectiveOrigin = adjustOriginForStartingGroup(
+      rotation.startDate ?? validatedData.startDate,
+      validatedData.startDate,
+      validatedData.startingGroupId,
+      rotation.groups,
+      patternLength,
+    )
     const daysInRange = daysBetween(validatedData.startDate, validatedData.endDate) + 1
 
     type ShiftCreateData = {
@@ -895,29 +910,20 @@ export const checkCoverageAlertsAction = async (): Promise<
   ActionResult<Array<{ rotationId: string; rotationName: string; alerts: CoverageAlert[] }>>
 > => {
   try {
-    const session = await requireAdminHROrChiefArea()
+    const session = await requireAdminHROrChief()
 
-    let derivedOrgId: string | null = session.organizationId ?? null
-    if (isChiefArea(session) && !derivedOrgId) {
-      const firstArea = await prisma.userArea.findFirst({
-        where: { userId: session.id },
-        select: { area: { select: { organizationId: true } } },
-      })
-      derivedOrgId = firstArea?.area?.organizationId ?? null
-    }
+    const derivedOrgId = isChiefArea(session)
+      ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
+      : session.organizationId ?? null
     if (!derivedOrgId)
       return { success: false, error: 'No tienes una organización asignada' }
     const organizationId = derivedOrgId
 
     let areaIds: string[]
 
-    if (isChiefArea(session)) {
-      const userAreas = await prisma.userArea.findMany({
-        where: { userId: session.id },
-        select: { areaId: true },
-      })
-      areaIds = userAreas.map((ua) => ua.areaId)
-    } else {
+    if (isChiefArea(session))
+      areaIds = await getChiefAccessibleAreaIds(session.id)
+    else {
       const areas = await prisma.area.findMany({
         where: { organizationId },
         select: { id: true },
@@ -984,6 +990,67 @@ export const checkCoverageAlertsAction = async (): Promise<
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Error al verificar alertas de cobertura',
+    }
+  }
+}
+
+export const getLastGenerationInfoAction = async (
+  rotationId: string
+): Promise<ActionResult<LastGenerationInfo | null>> => {
+  try {
+    const session = await requireAdminHROrChief()
+
+    const derivedOrgId = isChiefArea(session)
+      ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
+      : session.organizationId ?? null
+    if (!derivedOrgId)
+      return { success: false, error: 'No tienes una organización asignada' }
+
+    const rotation = await prisma.rotation.findFirst({
+      where: { id: rotationId, organizationId: derivedOrgId },
+      select: { id: true, areaId: true },
+    })
+
+    if (!rotation)
+      return { success: false, error: 'Rotativa no encontrada' }
+
+    if (isChiefArea(session)) {
+      const hasAccess = await chiefHasAreaAccess(session.id, rotation.areaId)
+      if (!hasAccess)
+        return { success: false, error: 'No tienes acceso a esta rotativa' }
+    }
+
+    const [lastShift, totalShifts] = await Promise.all([
+      prisma.shift.findFirst({
+        where: { rotationId },
+        orderBy: { startTime: 'desc' },
+        select: {
+          startTime: true,
+          shiftType: { select: { name: true } },
+          rotationGroup: { select: { id: true, name: true } },
+        },
+      }),
+      prisma.shift.count({ where: { rotationId } }),
+    ])
+
+    if (!lastShift || !lastShift.rotationGroup)
+      return { success: true, data: null }
+
+    return {
+      success: true,
+      data: {
+        lastDate: lastShift.startTime,
+        lastGroupId: lastShift.rotationGroup.id,
+        lastGroupName: lastShift.rotationGroup.name,
+        lastShiftTypeName: lastShift.shiftType.name,
+        totalShifts,
+      },
+    }
+  } catch (error) {
+    console.error('[getLastGenerationInfoAction] Error:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Error al obtener información de generación',
     }
   }
 }

@@ -2,7 +2,7 @@
 
 import { getTranslations } from 'next-intl/server'
 
-import { requireAdminHROrChiefArea, requireAdminHRWithOrg } from '@/src/shared/lib/auth'
+import { requireAdminHROrChief, requireAdminHRWithOrg } from '@/src/shared/lib/auth'
 import { isChiefArea } from '@/src/shared/lib/auth/rbac'
 import { ROLES } from '@/src/shared/lib/constants'
 import { prisma } from '@/src/shared/lib/db'
@@ -29,7 +29,7 @@ async function enrichAreasWithChiefsAndStaffCount(areaIds: string[]) {
     }),
     prisma.userArea.groupBy({
       by: ['areaId'],
-      where: { areaId: { in: areaIds }, user: { role: ROLES.STAFF_HEALTH } },
+      where: { areaId: { in: areaIds }, user: { role: ROLES.STAFF } },
       _count: { userId: true },
     }),
   ])
@@ -54,7 +54,7 @@ export async function createAreaAction(data: CreateAreaInput) {
 
 export async function updateAreaAction(id: string, data: UpdateAreaInput) {
   try {
-    const user = await requireAdminHROrChiefArea()
+    const user = await requireAdminHROrChief()
     let orgId: string | null = user.organizationId ?? null
     if (isChiefArea(user) && !orgId) {
       const firstArea = await prisma.userArea.findFirst({
@@ -106,7 +106,7 @@ export async function deleteAreaAction(id: string) {
 
 export async function getAreasAction() {
   try {
-    const user = await requireAdminHROrChiefArea()
+    const user = await requireAdminHROrChief()
     let orgId: string | null = user.organizationId ?? null
     if (isChiefArea(user) && !orgId) {
       const firstArea = await prisma.userArea.findFirst({
@@ -182,7 +182,7 @@ export interface ChiefOption {
 
 export async function getChiefsForAreaAction(areaId: string) {
   try {
-    const user = await requireAdminHROrChiefArea()
+    const user = await requireAdminHROrChief()
     const area = await prisma.area.findFirst({
       where: { id: areaId },
       select: { id: true, organizationId: true },
@@ -267,7 +267,7 @@ export async function getChiefsForAreaAction(areaId: string) {
 
 export async function assignChiefsToAreaAction(areaId: string, chiefUserIds: string[]) {
   try {
-    const user = await requireAdminHROrChiefArea()
+    const user = await requireAdminHROrChief()
     let orgId: string | null = user.organizationId ?? null
 
     if (isChiefArea(user)) {
@@ -420,7 +420,7 @@ export interface StaffOption {
 
 export async function getStaffForAreaAction(areaId: string) {
   try {
-    const user = await requireAdminHROrChiefArea()
+    const user = await requireAdminHROrChief()
     let orgId: string | null = user.organizationId ?? null
     if (isChiefArea(user) && !orgId) {
       const firstArea = await prisma.userArea.findFirst({
@@ -459,13 +459,13 @@ export async function getStaffForAreaAction(areaId: string) {
       prisma.user.findMany({
         where: {
           organizationId: orgId,
-          role: ROLES.STAFF_HEALTH,
+          role: ROLES.STAFF,
         },
         select: { id: true, name: true, email: true, docNumber: true },
         orderBy: { name: 'asc' },
       }),
       prisma.userArea.findMany({
-        where: { areaId, user: { role: ROLES.STAFF_HEALTH } },
+        where: { areaId, user: { role: ROLES.STAFF } },
         select: { userId: true },
       }),
     ])
@@ -483,7 +483,7 @@ export async function getStaffForAreaAction(areaId: string) {
 
 export async function assignStaffToAreaAction(areaId: string, staffUserIds: string[]) {
   try {
-    const user = await requireAdminHROrChiefArea()
+    const user = await requireAdminHROrChief()
     let orgId: string | null = user.organizationId ?? null
     if (isChiefArea(user) && !orgId) {
       const firstArea = await prisma.userArea.findFirst({
@@ -522,21 +522,21 @@ export async function assignStaffToAreaAction(areaId: string, staffUserIds: stri
       where: {
         id: { in: staffUserIds },
         organizationId: orgId,
-        role: ROLES.STAFF_HEALTH,
+        role: ROLES.STAFF,
       },
       select: { id: true },
     })
     const validIds = validStaff.map((u) => u.id)
 
     const previousAssignments = await prisma.userArea.findMany({
-      where: { areaId, user: { role: ROLES.STAFF_HEALTH } },
+      where: { areaId, user: { role: ROLES.STAFF } },
       select: { userId: true },
     })
     const previousIds = new Set(previousAssignments.map((ua) => ua.userId))
 
     await prisma.$transaction([
       prisma.userArea.deleteMany({
-        where: { areaId, user: { role: ROLES.STAFF_HEALTH } },
+        where: { areaId, user: { role: ROLES.STAFF } },
       }),
       ...(validIds.length > 0
         ? [prisma.userArea.createMany({ data: validIds.map((userId) => ({ areaId, userId })) })]

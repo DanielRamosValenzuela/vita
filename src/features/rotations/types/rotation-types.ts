@@ -132,6 +132,14 @@ export type GenerationResult = {
   notificationsSent: number
 }
 
+export type LastGenerationInfo = {
+  lastDate: Date
+  lastGroupId: string
+  lastGroupName: string
+  lastShiftTypeName: string
+  totalShifts: number
+}
+
 export type CoverageDay = {
   date: Date
   groups: Array<{

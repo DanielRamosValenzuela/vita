@@ -4,7 +4,7 @@ import { getTranslations } from 'next-intl/server'
 import { getAreasAction } from '@/src/features/area/api'
 import { getShiftTypesAction } from '@/src/features/shifts/api'
 import { ShiftTypesPage } from '@/src/features/shifts/ui'
-import { requireAdminHROrChiefArea } from '@/src/shared/lib/auth/session'
+import { requireAdminHROrChief } from '@/src/shared/lib/auth/session'
 import {
   Card,
   CardContent,
@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: ShiftTypesProps) {
 export default async function ShiftTypes({ params }: ShiftTypesProps) {
   const { locale } = await params
   const [session, t] = await Promise.all([
-    requireAdminHROrChiefArea(locale),
+    requireAdminHROrChief(locale),
     getTranslations('shifts.shiftTypes'),
   ])
 

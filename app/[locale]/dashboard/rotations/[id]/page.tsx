@@ -1,9 +1,9 @@
 import { notFound } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
 
+import { resolveChiefOrganizationId } from '@/src/shared/lib/auth/chief-access'
 import { isChiefArea } from '@/src/shared/lib/auth/rbac'
-import { requireAdminHROrChiefArea } from '@/src/shared/lib/auth/session'
-import { prisma } from '@/src/shared/lib/db'
+import { requireAdminHROrChief } from '@/src/shared/lib/auth/session'
 import { getRotationAction } from '@/src/features/rotations/api'
 import { RotationDetailContent } from '@/src/features/rotations/ui'
 
@@ -30,17 +30,12 @@ export async function generateMetadata({ params }: RotationDetailPageProps) {
 export default async function RotationDetailPage({ params }: RotationDetailPageProps) {
   const { locale, id } = await params
   const [session] = await Promise.all([
-    requireAdminHROrChiefArea(locale),
+    requireAdminHROrChief(locale),
   ])
 
-  let organizationId: string | null = session.organizationId ?? null
-  if (isChiefArea(session) && !organizationId) {
-    const firstArea = await prisma.userArea.findFirst({
-      where: { userId: session.id },
-      select: { area: { select: { organizationId: true } } },
-    })
-    organizationId = firstArea?.area?.organizationId ?? null
-  }
+  const organizationId = isChiefArea(session)
+    ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
+    : session.organizationId ?? null
 
   if (!organizationId) notFound()
 

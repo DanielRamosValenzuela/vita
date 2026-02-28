@@ -1,7 +1,8 @@
 'use server'
 
+import { resolveChiefOrganizationId } from '@/src/shared/lib/auth/chief-access'
 import { isChiefArea } from '@/src/shared/lib/auth/rbac'
-import { requireAdminHROrChiefArea } from '@/src/shared/lib/auth/session'
+import { requireAdminHROrChief } from '@/src/shared/lib/auth/session'
 import { prisma } from '@/src/shared/lib/db'
 import type { ActionResult } from '@/src/shared/lib/types'
 
@@ -15,15 +16,10 @@ interface ShiftUser {
 
 export const getUsersForShiftsAction = async (): Promise<ActionResult<ShiftUser[]>> => {
   try {
-    const session = await requireAdminHROrChiefArea()
-    let organizationId: string | null = session.organizationId ?? null
-    if (isChiefArea(session) && !organizationId) {
-      const firstArea = await prisma.userArea.findFirst({
-        where: { userId: session.id },
-        select: { area: { select: { organizationId: true } } },
-      })
-      organizationId = firstArea?.area?.organizationId ?? null
-    }
+    const session = await requireAdminHROrChief()
+    const organizationId = isChiefArea(session)
+      ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
+      : session.organizationId ?? null
     if (!organizationId)
       return {
         success: false,
@@ -34,7 +30,7 @@ export const getUsersForShiftsAction = async (): Promise<ActionResult<ShiftUser[
       where: {
         organizationId,
         role: {
-          in: ['ADMIN_HR', 'CHIEF_AREA', 'STAFF_HEALTH'],
+          in: ['ADMIN_HR', 'CHIEF_AREA', 'STAFF'],
         },
       },
       select: {
@@ -52,7 +48,7 @@ export const getUsersForShiftsAction = async (): Promise<ActionResult<ShiftUser[
       name: u.name,
       email: u.email,
       role: u.role,
-      ...(u.role === 'STAFF_HEALTH' && {
+      ...(u.role === 'STAFF' && {
         areaIds: u.userAreas.map((ua) => ua.areaId),
       }),
     }))

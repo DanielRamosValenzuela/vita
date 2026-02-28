@@ -20,6 +20,13 @@
     "logoLabel": "VITA - Home",
     "profile": "Profile",
     "settings": "Settings",
+    "roles": {
+      "SUPER_ADMIN": "Super Administrator",
+      "ADMIN_HR": "Administrator",
+      "CHIEF_AREA": "Area Chief",
+      "CHIEF_SECTOR": "Sector Chief",
+      "STAFF": "Staff"
+    },
     "languages": {
       "es": "Spanish",
       "en": "English"
@@ -40,7 +47,8 @@
       "withContract": "With contract",
       "withoutContract": "Without contract",
       "allRoles": "All roles",
-      "chief": "Area Chief",
+      "chiefArea": "Area Chief",
+      "chiefSector": "Sector Chief",
       "staff": "Staff",
       "allAreas": "All areas",
       "allTemplates": "All templates"
@@ -187,9 +195,10 @@
     "criticalsMessage": "Some roles have reached or exceeded their limits",
     "warningsMessage": "Some roles are close to reaching their limits",
     "roles": {
-      "ADMIN_HR": "Admin HR",
+      "ADMIN_HR": "Administrators",
       "CHIEF_AREA": "Area Chiefs",
-      "STAFF_HEALTH": "Health Staff",
+      "CHIEF_SECTOR": "Sector Chiefs",
+      "STAFF": "Staff",
       "unknown": "Unknown"
     },
     "badgeExceeded": "Exceeded",
@@ -806,9 +815,10 @@
       },
       "roles": {
         "SUPER_ADMIN": "Super Administrator",
-        "ADMIN_HR": "HR Administrator",
+        "ADMIN_HR": "Administrator",
         "CHIEF_AREA": "Area Chief",
-        "STAFF_HEALTH": "Health Staff"
+        "CHIEF_SECTOR": "Sector Chief",
+        "STAFF": "Staff"
       },
       "actions": {
         "view": "View details",
@@ -1332,7 +1342,8 @@
         "description": "Search for a user by email or document to invite them to your team.",
         "roleLabel": "Role to Invite",
         "roleChief": "Area Chief",
-        "roleStaff": "Health Staff",
+        "roleChiefSector": "Sector Chief",
+        "roleStaff": "Staff",
         "emailLabel": "Email",
         "emailPlaceholder": "example@email.com",
         "emailInvalid": "Invalid email",
@@ -1366,7 +1377,8 @@
         "cancelSuccess": "Invitation cancelled successfully",
         "cancelError": "Error cancelling invitation",
         "roleChief": "Area Chief",
-        "roleStaff": "Health Staff",
+        "roleChiefSector": "Sector Chief",
+        "roleStaff": "Staff",
         "columns": {
           "user": "User",
           "email": "Email",
@@ -1937,8 +1949,9 @@
       "multiplierBadge": "{value}x"
     },
     "roles": {
-      "chief": "Area Chief",
-      "staff": "Health Staff"
+      "chiefArea": "Area Chief",
+      "chiefSector": "Sector Chief",
+      "staff": "Staff"
     },
     "goToRates": "Manage Rates",
     "empty": "No staff in the organization",
@@ -2304,7 +2317,14 @@
       "processingGenerateMsg1": "Creating shifts in database",
       "processingGenerateMsg2": "Checking schedule conflicts",
       "processingGenerateMsg3": "Assigning active contracts",
-      "processingGenerateMsg4": "Sending staff notifications"
+      "processingGenerateMsg4": "Sending staff notifications",
+      "endDateDisabledHint": "Select start date first",
+      "startingGroup": "Starting group",
+      "startingGroupHint": "The selected group will start from step 1 of the pattern",
+      "lastGenerationInfo": "Last generation: {date} — {group} ({shiftType})",
+      "totalGeneratedShifts": "{count} shifts generated",
+      "noExistingShifts": "No previously generated shifts",
+      "defaultGroupOrder": "Default order"
     },
     "coverage": {
       "title": "Coverage",

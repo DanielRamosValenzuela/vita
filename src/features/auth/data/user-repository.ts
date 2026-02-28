@@ -24,7 +24,7 @@ export async function createUserWithAccount(data: RegisterInput) {
       country: data.country as Country,
       docType: data.docType as DocType,
       docNumber: cleanDocNumber,
-      role: ROLES.STAFF_HEALTH,
+      role: ROLES.STAFF,
     },
   })
 

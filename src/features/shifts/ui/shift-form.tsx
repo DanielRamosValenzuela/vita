@@ -274,7 +274,7 @@ export function ShiftForm({
   const availableUsers = useMemo(() => {
     if (!areaId) return []
     return users.filter(
-      (u) => u.role !== 'STAFF_HEALTH' || (Array.isArray(u.areaIds) && u.areaIds.includes(areaId))
+      (u) => u.role !== 'STAFF' || (Array.isArray(u.areaIds) && u.areaIds.includes(areaId))
     )
   }, [users, areaId])
 

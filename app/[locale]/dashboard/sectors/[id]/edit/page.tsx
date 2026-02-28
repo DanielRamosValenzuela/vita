@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
 
 import {
-  requireAdminHROrChiefArea,
+  requireAdminHROrChief,
   isAdminHR,
   isChiefArea,
 } from '@/src/shared/lib/auth'
@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: EditSectorPageProps) {
 export default async function EditSectorPage({ params }: EditSectorPageProps) {
   const { locale, id } = await params
   const [user, t] = await Promise.all([
-    requireAdminHROrChiefArea(locale),
+    requireAdminHROrChief(locale),
     getTranslations('adminHR.sectors'),
   ])
 

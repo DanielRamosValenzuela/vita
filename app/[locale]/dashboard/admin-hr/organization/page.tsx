@@ -86,8 +86,8 @@ export default async function AdminHROrganizationPage({ params }: AdminHROrganiz
         currentCount={organization.currentStaff}
         maxLimit={organization.maxStaff}
         translationNamespace="adminHR.organization.staff"
-        allowedRoles={[{ value: ROLES.STAFF_HEALTH, label: tInvitations('inviteForm.roleStaff') }]}
-        defaultRole={ROLES.STAFF_HEALTH}
+        allowedRoles={[{ value: ROLES.STAFF, label: tInvitations('inviteForm.roleStaff') }]}
+        defaultRole={ROLES.STAFF}
         showUnlinkButton
       />
 
@@ -97,7 +97,8 @@ export default async function AdminHROrganizationPage({ params }: AdminHROrganiz
         showRoleColumn={true}
         roleLabels={{
           [ROLES.CHIEF_AREA]: tInvitations('table.roleChief'),
-          [ROLES.STAFF_HEALTH]: tInvitations('table.roleStaff'),
+          [ROLES.CHIEF_SECTOR]: tInvitations('table.roleChiefSector'),
+          [ROLES.STAFF]: tInvitations('table.roleStaff'),
         }}
       />
     </div>

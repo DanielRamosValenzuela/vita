@@ -87,7 +87,7 @@ export async function getAdminHROrganization(
     prisma.user.count({
       where: {
         organizationId,
-        role: ROLES.STAFF_HEALTH,
+        role: ROLES.STAFF,
       },
     }),
     prisma.organizationInvitation.count({
@@ -100,7 +100,7 @@ export async function getAdminHROrganization(
     prisma.organizationInvitation.count({
       where: {
         organizationId,
-        role: ROLES.STAFF_HEALTH,
+        role: ROLES.STAFF,
         status: INVITATION_STATUS.PENDING,
       },
     }),
@@ -108,7 +108,7 @@ export async function getAdminHROrganization(
       where: {
         organizationId,
         role: {
-          in: [ROLES.CHIEF_AREA, ROLES.STAFF_HEALTH],
+          in: [ROLES.CHIEF_AREA, ROLES.STAFF],
         },
       },
       include: {
@@ -143,7 +143,7 @@ export async function getAdminHROrganization(
     prisma.user.findMany({
       where: {
         organizationId,
-        role: ROLES.STAFF_HEALTH,
+        role: ROLES.STAFF,
       },
       select: {
         id: true,

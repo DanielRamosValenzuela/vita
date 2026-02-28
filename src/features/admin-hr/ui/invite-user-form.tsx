@@ -122,9 +122,9 @@ export function InviteUserForm({
 
     startTransition(async () => {
       let result
-      if (role === ROLES.CHIEF_AREA)
+      if (role === ROLES.CHIEF_AREA || role === ROLES.CHIEF_SECTOR)
         result = await inviteChiefAction(organizationId, state.foundUser!.id)
-      else if (role === ROLES.STAFF_HEALTH)
+      else if (role === ROLES.STAFF)
         result = await inviteStaffAction(organizationId, state.foundUser!.id)
       else {
         dispatch({ type: 'SET_ERROR', payload: 'Rol no válido' })

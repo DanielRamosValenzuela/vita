@@ -41,9 +41,10 @@ export async function checkOrganizationRoleLimit(
       maxLimit = organization.maxAdminHR
       break
     case ROLES.CHIEF_AREA:
+    case ROLES.CHIEF_SECTOR:
       maxLimit = organization.maxChiefs
       break
-    case ROLES.STAFF_HEALTH:
+    case ROLES.STAFF:
       maxLimit = organization.maxStaff
       break
     default:
