@@ -55,18 +55,37 @@ export async function createAreaAction(data: CreateAreaInput) {
 export async function updateAreaAction(id: string, data: UpdateAreaInput) {
   try {
     const user = await requireAdminHROrChiefArea()
-    const orgId = user.organizationId
+    let orgId: string | null = user.organizationId ?? null
+    if (isChiefArea(user) && !orgId) {
+      const firstArea = await prisma.userArea.findFirst({
+        where: { userId: user.id },
+        select: { area: { select: { organizationId: true } } },
+      })
+      orgId = firstArea?.area?.organizationId ?? null
+      if (!orgId) {
+        const firstSector = await prisma.userSector.findFirst({
+          where: { userId: user.id },
+          select: { sector: { select: { organizationId: true } } },
+        })
+        orgId = firstSector?.sector?.organizationId ?? null
+      }
+    }
     if (!orgId) return { success: false, error: 'No tienes una organización asignada' }
     if (isChiefArea(user)) {
       const chiefArea = await prisma.userArea.findFirst({
         where: { userId: user.id, areaId: id },
       })
-      if (!chiefArea) return { success: false, error: 'No tienes permiso para editar esta área' }
+      if (!chiefArea) {
+        const isSectorChief = await prisma.userSector.findFirst({
+          where: { userId: user.id, sector: { sectorAreas: { some: { areaId: id } } } },
+        })
+        if (!isSectorChief) return { success: false, error: 'No tienes permiso para editar esta área' }
+      }
     }
     const locale = await getLocaleFromHeaders()
     const updateAreaSchema = await getUpdateAreaSchema(locale)
     const validatedData = updateAreaSchema.parse(data)
-    const area = await updateArea(id, validatedData, orgId)
+    const area = await updateArea(id, validatedData, orgId as string)
     revalidatePaths(...AREA_PATHS)
     return { success: true, data: area, message: 'Área actualizada exitosamente' }
   } catch (error) {
@@ -95,15 +114,31 @@ export async function getAreasAction() {
         select: { area: { select: { organizationId: true } } },
       })
       orgId = firstArea?.area?.organizationId ?? null
+      if (!orgId) {
+        const firstSector = await prisma.userSector.findFirst({
+          where: { userId: user.id },
+          select: { sector: { select: { organizationId: true } } },
+        })
+        orgId = firstSector?.sector?.organizationId ?? null
+      }
     }
     if (!orgId) return { success: false, error: 'No tienes una organización asignada' }
     const effectiveOrgId = orgId as string
     if (isChiefArea(user)) {
-      const chiefAreas = await prisma.userArea.findMany({
-        where: { userId: user.id },
-        select: { areaId: true },
-      })
-      const areaIds = chiefAreas.map((a) => a.areaId)
+      const [chiefAreas, sectorAreas] = await Promise.all([
+        prisma.userArea.findMany({
+          where: { userId: user.id },
+          select: { areaId: true },
+        }),
+        prisma.sectorArea.findMany({
+          where: { sector: { userSectors: { some: { userId: user.id } } } },
+          select: { areaId: true },
+        }),
+      ])
+      const areaIds = [...new Set([
+        ...chiefAreas.map((a) => a.areaId),
+        ...sectorAreas.map((sa) => sa.areaId),
+      ])]
       if (areaIds.length === 0) return { success: true, data: [] }
       const areas = await prisma.area.findMany({
         where: { id: { in: areaIds }, organizationId: effectiveOrgId },
@@ -157,7 +192,12 @@ export async function getChiefsForAreaAction(areaId: string) {
       const chiefArea = await prisma.userArea.findFirst({
         where: { userId: user.id, areaId },
       })
-      if (!chiefArea) return { success: false, error: 'No tienes permiso para ver esta área' }
+      if (!chiefArea) {
+        const isSectorChief = await prisma.userSector.findFirst({
+          where: { userId: user.id, sector: { sectorAreas: { some: { areaId } } } },
+        })
+        if (!isSectorChief) return { success: false, error: 'No tienes permiso para ver esta área' }
+      }
     }
     const assignedUserAreas = await prisma.userArea.findMany({
       where: { areaId, user: { role: ROLES.CHIEF_AREA } },
@@ -237,6 +277,13 @@ export async function assignChiefsToAreaAction(areaId: string, chiefUserIds: str
           select: { area: { select: { organizationId: true } } },
         })
         orgId = firstArea?.area?.organizationId ?? null
+        if (!orgId) {
+          const firstSector = await prisma.userSector.findFirst({
+            where: { userId: user.id },
+            select: { sector: { select: { organizationId: true } } },
+          })
+          orgId = firstSector?.sector?.organizationId ?? null
+        }
       }
       if (!orgId) return { success: false, error: 'No tienes una organización asignada' }
 
@@ -275,7 +322,9 @@ export async function assignChiefsToAreaAction(areaId: string, chiefUserIds: str
       prisma.userArea.deleteMany({
         where: { areaId, user: { role: ROLES.CHIEF_AREA } },
       }),
-      ...validIds.map((userId) => prisma.userArea.create({ data: { areaId, userId } })),
+      ...(validIds.length > 0
+        ? [prisma.userArea.createMany({ data: validIds.map((userId) => ({ areaId, userId })) })]
+        : []),
     ])
 
     const newlyAssigned = validIds.filter((id) => !previousIds.has(id))
@@ -379,6 +428,13 @@ export async function getStaffForAreaAction(areaId: string) {
         select: { area: { select: { organizationId: true } } },
       })
       orgId = firstArea?.area?.organizationId ?? null
+      if (!orgId) {
+        const firstSector = await prisma.userSector.findFirst({
+          where: { userId: user.id },
+          select: { sector: { select: { organizationId: true } } },
+        })
+        orgId = firstSector?.sector?.organizationId ?? null
+      }
     }
     if (!orgId) return { success: false, error: 'No tienes una organización asignada' }
 
@@ -391,7 +447,12 @@ export async function getStaffForAreaAction(areaId: string) {
       const chiefArea = await prisma.userArea.findFirst({
         where: { userId: user.id, areaId },
       })
-      if (!chiefArea) return { success: false, error: 'No tienes permiso para editar esta área' }
+      if (!chiefArea) {
+        const isSectorChief = await prisma.userSector.findFirst({
+          where: { userId: user.id, sector: { sectorAreas: { some: { areaId } } } },
+        })
+        if (!isSectorChief) return { success: false, error: 'No tienes permiso para editar esta área' }
+      }
     }
 
     const [orgStaff, assignedUserAreas] = await Promise.all([
@@ -430,6 +491,13 @@ export async function assignStaffToAreaAction(areaId: string, staffUserIds: stri
         select: { area: { select: { organizationId: true } } },
       })
       orgId = firstArea?.area?.organizationId ?? null
+      if (!orgId) {
+        const firstSector = await prisma.userSector.findFirst({
+          where: { userId: user.id },
+          select: { sector: { select: { organizationId: true } } },
+        })
+        orgId = firstSector?.sector?.organizationId ?? null
+      }
     }
     if (!orgId) return { success: false, error: 'No tienes una organización asignada' }
 
@@ -442,7 +510,12 @@ export async function assignStaffToAreaAction(areaId: string, staffUserIds: stri
       const chiefArea = await prisma.userArea.findFirst({
         where: { userId: user.id, areaId },
       })
-      if (!chiefArea) return { success: false, error: 'No tienes permiso para editar esta área' }
+      if (!chiefArea) {
+        const isSectorChief = await prisma.userSector.findFirst({
+          where: { userId: user.id, sector: { sectorAreas: { some: { areaId } } } },
+        })
+        if (!isSectorChief) return { success: false, error: 'No tienes permiso para editar esta área' }
+      }
     }
 
     const validStaff = await prisma.user.findMany({
@@ -465,7 +538,9 @@ export async function assignStaffToAreaAction(areaId: string, staffUserIds: stri
       prisma.userArea.deleteMany({
         where: { areaId, user: { role: ROLES.STAFF_HEALTH } },
       }),
-      ...validIds.map((userId) => prisma.userArea.create({ data: { areaId, userId } })),
+      ...(validIds.length > 0
+        ? [prisma.userArea.createMany({ data: validIds.map((userId) => ({ areaId, userId })) })]
+        : []),
     ])
 
     const newlyAssigned = validIds.filter((id) => !previousIds.has(id))

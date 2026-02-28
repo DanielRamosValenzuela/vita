@@ -7,6 +7,8 @@ import { toast } from 'sonner'
 import { Spinner } from '@/src/shared/ui/atoms'
 import { AREA_ICONS } from '@/src/shared/lib/constants'
 import { Badge } from '@/src/shared/ui/badge'
+
+import { useRouter } from '@/i18n/navigation'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
 import { IconDisplay, IconPicker } from '@/src/shared/ui/icon-picker'
@@ -31,6 +33,7 @@ interface SectorBasicInfoCardProps {
 
 export function SectorBasicInfoCard({ sector, canEdit = true }: SectorBasicInfoCardProps) {
   const t = useTranslations('adminHR.sectors')
+  const router = useRouter()
   const [isPending, startTransition] = useTransition()
 
   const [name, setName] = useState(sector.name)
@@ -52,9 +55,10 @@ export function SectorBasicInfoCard({ sector, canEdit = true }: SectorBasicInfoC
         icon,
         color,
       })
-      if (result.success)
+      if (result.success) {
         toast.success(result.message)
-      else
+        router.push('/dashboard/sectors')
+      } else
         toast.error(result.error)
     })
   }

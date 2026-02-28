@@ -34,6 +34,13 @@ export default async function AreasPage({ params }: AreasPageProps) {
       select: { area: { select: { organizationId: true } } },
     })
     organizationId = firstArea?.area?.organizationId ?? null
+    if (!organizationId) {
+      const firstSector = await prisma.userSector.findFirst({
+        where: { userId: user.id },
+        select: { sector: { select: { organizationId: true } } },
+      })
+      organizationId = firstSector?.sector?.organizationId ?? null
+    }
   }
 
   if (!organizationId)

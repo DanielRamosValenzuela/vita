@@ -6,6 +6,8 @@ import { Check, X } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Spinner } from '@/src/shared/ui/atoms'
+
+import { useRouter } from '@/i18n/navigation'
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
@@ -37,6 +39,7 @@ export function SectorAreasCard({
   canAssignAreas = true,
 }: SectorAreasCardProps) {
   const t = useTranslations('adminHR.sectors')
+  const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [selectedIds, setSelectedIds] = useState<Set<string>>(
     new Set(assignedAreas.map((a) => a.id))
@@ -64,8 +67,10 @@ export function SectorAreasCard({
   const handleSave = () => {
     startTransition(async () => {
       const result = await assignAreasToSectorAction(sectorId, [...selectedIds])
-      if (result.success) toast.success(t('editSuccess'))
-      else toast.error(result.error)
+      if (result.success) {
+        toast.success(t('editSuccess'))
+        router.push('/dashboard/sectors')
+      } else toast.error(result.error)
     })
   }
 

@@ -5,6 +5,8 @@ import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 
 import { Spinner } from '@/src/shared/ui/atoms'
+
+import { useRouter } from '@/i18n/navigation'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
 import { SearchableAddableList } from '@/src/shared/ui/molecules'
@@ -26,6 +28,7 @@ export function SectorChiefsCard({
   assignedChiefIds,
 }: SectorChiefsCardProps) {
   const t = useTranslations('adminHR.sectors')
+  const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set(assignedChiefIds))
 
@@ -36,8 +39,10 @@ export function SectorChiefsCard({
   const handleSave = () => {
     startTransition(async () => {
       const result = await assignChiefToSectorAction(sectorId, [...selectedIds])
-      if (result.success) toast.success(t('editForm.chiefsSuccess'))
-      else toast.error(result.error)
+      if (result.success) {
+        toast.success(t('editForm.chiefsSuccess'))
+        router.push('/dashboard/sectors')
+      } else toast.error(result.error)
     })
   }
 
