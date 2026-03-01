@@ -3,7 +3,10 @@ import { redirect } from 'next/navigation'
 import { Role } from '@prisma/client'
 
 import { getCurrentUser } from '@/src/shared/lib/auth'
+import { resolveChiefOrganizationId } from '@/src/shared/lib/auth/chief-access'
+import { isChief } from '@/src/shared/lib/auth/rbac'
 import { requireSuperAdmin } from '@/src/shared/lib/auth/session'
+import { prisma } from '@/src/shared/lib/db'
 import { CalendarView } from '@/src/widgets/calendar-view'
 import {
   formatAlertsData,
@@ -11,6 +14,9 @@ import {
   getDashboardData,
 } from '@/src/features/super-admin/lib/helpers/server/dashboard-helpers'
 import { AlertsPanel, OrganizationsTable, StatsCards } from '@/src/features/super-admin/ui'
+import { getNotesForMonthAction } from '@/src/features/staff-dashboard/api/calendar-note-actions'
+import { getMyShiftsAction, getUpcomingShiftsAction } from '@/src/features/staff-dashboard/api/staff-shifts-actions'
+import { StaffDashboardContent } from '@/src/features/staff-dashboard/ui/staff-dashboard-content'
 
 interface DashboardPageProps {
   params: Promise<{ locale: string }>
@@ -68,13 +74,31 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
 
   if (user.role === Role.ADMIN_HR) redirect(`/${locale}/dashboard/admin-hr`)
 
+  const organizationId = isChief(user)
+    ? await resolveChiefOrganizationId(user.id, user.organizationId ?? null)
+    : user.organizationId ?? null
+
+  const now = new Date()
+  const startDate = new Date(now.getFullYear(), now.getMonth(), 1)
+  const endDate = new Date(now.getFullYear(), now.getMonth() + 1, 1)
+  const [shiftsResult, upcomingResult, notesResult, org] = await Promise.all([
+    getMyShiftsAction({ startDate, endDate }),
+    getUpcomingShiftsAction(),
+    getNotesForMonthAction(now.getMonth(), now.getFullYear()),
+    organizationId
+      ? prisma.organization.findUnique({ where: { id: organizationId }, select: { name: true } })
+      : null,
+  ])
+  const initialShifts = shiftsResult.success && shiftsResult.data ? shiftsResult.data.shifts : []
+  const initialUpcoming = upcomingResult.success && upcomingResult.data ? upcomingResult.data.shifts : []
+  const initialNotes = notesResult.success && notesResult.data ? notesResult.data.notes : []
+
   return (
-    <div className="p-6">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold">{t('calendarTitle')}</h1>
-        <p className="text-muted-foreground mt-2">{t('calendarWelcome', { name: user.name })}</p>
-      </div>
-      <CalendarView user={user} />
-    </div>
+    <StaffDashboardContent
+      initialShifts={initialShifts}
+      initialUpcoming={initialUpcoming}
+      initialNotes={initialNotes}
+      organizationName={org?.name}
+    />
   )
 }

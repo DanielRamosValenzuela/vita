@@ -20,6 +20,13 @@
     "logoLabel": "VITA - Inicio",
     "profile": "Perfil",
     "settings": "Configuración",
+    "roles": {
+      "SUPER_ADMIN": "Super Administrador",
+      "ADMIN_HR": "Administrador",
+      "CHIEF_AREA": "Jefe de Área",
+      "CHIEF_SECTOR": "Jefe de Sector",
+      "STAFF": "Personal"
+    },
     "languages": {
       "es": "Español",
       "en": "Inglés"
@@ -40,7 +47,8 @@
       "withContract": "Con contrato",
       "withoutContract": "Sin contrato",
       "allRoles": "Todos los roles",
-      "chief": "Jefe de Área",
+      "chiefArea": "Jefe de Área",
+      "chiefSector": "Jefe de Sector",
       "staff": "Personal",
       "allAreas": "Todas las áreas",
       "allTemplates": "Todas las plantillas"
@@ -51,19 +59,22 @@
     "register": "Registrarse",
     "logout": "Cerrar Sesión",
     "profile": "Mi Perfil",
+    "features": "Características",
+    "pricing": "Precios",
     "support": "Soporte",
     "contact": "Contáctanos",
     "toggleMenu": "Abrir menú"
   },
   "hero": {
+    "badge": "Plataforma de Gestión de Turnos",
     "title": {
-      "line1": "Gestiona tus turnos médicos",
-      "line2": "de forma inteligente"
+      "line1": "Automatiza la gestión",
+      "line2": "de turnos de tu equipo"
     },
-    "description": "Sistema completo de gestión de turnos y asistencia para instituciones de salud. Optimiza tu personal, reduce costos y mejora la eficiencia operativa.",
+    "description": "Calendario digital, cálculo automático de pagos y cumplimiento legal. Todo en una sola plataforma diseñada para equipos que trabajan por turnos.",
     "cta": {
-      "primary": "Comenzar Gratis",
-      "secondary": "Iniciar Sesión",
+      "primary": "Solicitar Demo Gratuita",
+      "secondary": "Ver cómo funciona",
       "dashboard": "Ir al Dashboard"
     },
     "features": {
@@ -187,9 +198,10 @@
     "criticalsMessage": "Algunos roles han alcanzado o superado sus límites",
     "warningsMessage": "Algunos roles están cerca de alcanzar sus límites",
     "roles": {
-      "ADMIN_HR": "Administradores RRHH",
+      "ADMIN_HR": "Administradores",
       "CHIEF_AREA": "Jefes de Área",
-      "STAFF_HEALTH": "Personal de Salud",
+      "CHIEF_SECTOR": "Jefes de Sector",
+      "STAFF": "Personal",
       "unknown": "Desconocido"
     },
     "badgeExceeded": "Excedido",
@@ -267,6 +279,85 @@
     "calendarViewComingSoon": "Calendario en desarrollo",
     "calendarViewComingSoonDescription": "El componente de calendario se implementará próximamente"
   },
+  "staffDashboard": {
+    "title": "Mi Calendario",
+    "description": "Visualiza tus turnos asignados",
+    "emptyState": "No tienes turnos asignados este mes",
+    "emptyStateDescription": "Cuando te asignen turnos, aparecerán aquí",
+    "loading": "Cargando turnos...",
+    "upcoming": {
+      "title": "Próximos Turnos",
+      "empty": "No tienes turnos programados próximamente",
+      "today": "Hoy",
+      "tomorrow": "Mañana"
+    },
+    "shiftDetail": {
+      "title": "Detalle del Turno",
+      "area": "Área",
+      "shiftType": "Tipo de Turno",
+      "schedule": "Horario",
+      "status": "Estado",
+      "rotation": "Rotación",
+      "extra": "Turno Extra",
+      "nightShift": "Turno nocturno (continúa al día siguiente)"
+    },
+    "personnel": {
+      "title": "Personal Activo del Sector",
+      "titleNoSector": "Personal Activo del Área",
+      "loading": "Cargando personal...",
+      "totalStaff": "{count} personas activas",
+      "relayIncoming": "Relevo de {name}",
+      "relayOutgoing": "Relevo por {name}",
+      "noPersonnel": "No hay personal activo en este horario"
+    },
+    "export": {
+      "button": "Exportar",
+      "downloadIcs": "Descargar .ics del mes",
+      "feedPerOrg": "Suscripción iCal (esta organización)",
+      "feedUnified": "Suscripción iCal (todas mis organizaciones)",
+      "manageFeeds": "Gestionar feeds",
+      "feedUrl": "URL del feed",
+      "copyUrl": "Copiar URL",
+      "urlCopied": "URL copiada al portapapeles",
+      "createFeed": "Crear feed",
+      "feedCreated": "Feed creado exitosamente",
+      "revokeFeed": "Revocar",
+      "feedRevoked": "Feed revocado",
+      "noFeeds": "No tienes feeds activos",
+      "perOrgLabel": "Organización",
+      "unifiedLabel": "Unificado (todas las organizaciones)",
+      "downloadSuccess": "Archivo .ics descargado",
+      "downloadError": "Error al generar el archivo"
+    },
+    "google": {
+      "connect": "Conectar Google Calendar",
+      "connected": "Google Calendar conectado",
+      "disconnect": "Desconectar",
+      "disconnectConfirm": "¿Desconectar Google Calendar?",
+      "disconnectDescription": "Los eventos importados dejarán de mostrarse en tu calendario.",
+      "connecting": "Conectando...",
+      "personalEvent": "Evento Personal",
+      "conflict": "Conflicto de horario"
+    },
+    "notes": {
+      "title": "Nota",
+      "placeholder": "Escribe una nota para este día...",
+      "save": "Guardar",
+      "delete": "Eliminar",
+      "saving": "Guardando...",
+      "saved": "Nota guardada",
+      "deleted": "Nota eliminada",
+      "error": "Error al guardar la nota",
+      "legendNote": "Nota personal"
+    },
+    "status": {
+      "SCHEDULED": "Programado",
+      "IN_PROGRESS": "En Progreso",
+      "COMPLETED": "Completado",
+      "CANCELLED": "Cancelado",
+      "NO_SHOW": "No Presentado"
+    }
+  },
   "shifts": {
     "title": "Gestión de Turnos",
     "description": "Administra los turnos de tu personal de forma eficiente",
@@ -342,7 +433,8 @@
       "weekend": "Fin de semana",
       "holiday": "Feriado",
       "rotation": "Rotativa",
-      "extra": "Turno Extra"
+      "extra": "Turno Extra",
+      "note": "Nota personal"
     },
     "rotationDetail": {
       "title": "Turnos de Rotativa",
@@ -786,9 +878,10 @@
       },
       "roles": {
         "SUPER_ADMIN": "Super Administrador",
-        "ADMIN_HR": "Administrador RRHH",
+        "ADMIN_HR": "Administrador",
         "CHIEF_AREA": "Jefe de Área",
-        "STAFF_HEALTH": "Personal de Salud"
+        "CHIEF_SECTOR": "Jefe de Sector",
+        "STAFF": "Personal"
       },
       "actions": "Acciones",
       "confirmSuspend": "¿Estás seguro de que deseas suspender la organización {name}?",
@@ -1305,7 +1398,8 @@
         "description": "Busca un usuario por email o documento para invitarlo a tu equipo.",
         "roleLabel": "Rol a Invitar",
         "roleChief": "Jefe de Área",
-        "roleStaff": "Personal de Salud",
+        "roleChiefSector": "Jefe de Sector",
+        "roleStaff": "Personal",
         "emailLabel": "Email",
         "emailPlaceholder": "ejemplo@email.com",
         "emailInvalid": "Email inválido",
@@ -1339,7 +1433,8 @@
         "cancelSuccess": "Invitación cancelada exitosamente",
         "cancelError": "Error al cancelar la invitación",
         "roleChief": "Jefe de Área",
-        "roleStaff": "Personal de Salud",
+        "roleChiefSector": "Jefe de Sector",
+        "roleStaff": "Personal",
         "columns": {
           "user": "Usuario",
           "email": "Email",
@@ -1584,6 +1679,7 @@
     "rates": {
       "title": "Tarifas y Contratos",
       "description": "Asigna tarifas al personal según lo negociado. Crea tipos globales o personaliza por persona.",
+      "guideLink": "Guía de tarifas",
       "noOrganization": "No tienes una organización asignada",
       "loadError": "Error al cargar",
       "staffTable": {
@@ -1808,6 +1904,138 @@
         "ratePerMinute": "Tarifa por minuto",
         "baseSalary": "Sueldo base (opcional)",
         "contractsCount": "{count} contrato(s)"
+      },
+      "guide": {
+        "title": "Guía del Sistema de Tarifas",
+        "subtitle": "Aprende cómo funciona el sistema de tarifas flexibles de VITA y cómo crear plantillas de tarifa con componentes personalizados.",
+        "backToRates": "Volver a Tarifas",
+        "overview": {
+          "title": "Visión General",
+          "description": "El sistema de tarifas de VITA te permite definir exactamente cómo se paga a tu personal. En lugar de una tarifa fija, puedes combinar múltiples componentes para reflejar la realidad de tu estructura salarial.",
+          "template": "Plantilla de Tarifa",
+          "templateDesc": "Un conjunto reutilizable de reglas de pago que defines una vez y asignas a múltiples personas.",
+          "component": "Componente",
+          "componentDesc": "Cada pieza individual que forma parte del cálculo: sueldo base, bonos, multiplicadores, etc.",
+          "contract": "Contrato",
+          "contractDesc": "La vinculación entre una persona y una plantilla de tarifa, con fecha de inicio y multiplicador opcional."
+        },
+        "flow": {
+          "title": "Flujo de Trabajo",
+          "step1": {
+            "title": "Crea una Plantilla",
+            "description": "Define el nombre y agrega componentes de pago según las necesidades del cargo."
+          },
+          "step2": {
+            "title": "Configura Componentes",
+            "description": "Para cada componente, elige el tipo, monto, unidad y cuándo se aplica."
+          },
+          "step3": {
+            "title": "Asigna al Personal",
+            "description": "Vincula la plantilla a cada persona creando un contrato con multiplicador opcional."
+          },
+          "step4": {
+            "title": "Cálculo Automático",
+            "description": "VITA calcula el pago de cada turno basándose en los componentes aplicables."
+          }
+        },
+        "componentTypes": {
+          "title": "Tipos de Componentes",
+          "description": "VITA incluye 19 tipos de componentes predefinidos agrupados en 4 categorías principales.",
+          "fixed": {
+            "title": "Pagos Fijos",
+            "description": "Montos que se pagan de forma regular, independiente de los turnos.",
+            "baseSalary": "Sueldo fijo mensual, quincenal o semanal",
+            "perShift": "Monto fijo por cada turno completado",
+            "completionBonus": "Bono extra por completar el turno completo"
+          },
+          "timeBased": {
+            "title": "Pagos por Tiempo",
+            "description": "Se calculan según el tiempo efectivamente trabajado.",
+            "perMinute": "Pago por cada minuto trabajado",
+            "perHour": "Pago por cada hora trabajada"
+          },
+          "bonuses": {
+            "title": "Bonos Condicionales",
+            "description": "Montos adicionales que se aplican bajo condiciones específicas.",
+            "night": "Extra por trabajar en horario nocturno",
+            "weekend": "Extra por trabajar sábado o domingo",
+            "holiday": "Extra por trabajar en feriados",
+            "seniority": "Bono por años de antigüedad",
+            "performance": "Bono por cumplimiento de metas",
+            "area": "Extra por trabajar en áreas específicas",
+            "emergency": "Bono por cobertura de emergencia",
+            "onCall": "Bono por estar disponible/de turno"
+          },
+          "multipliers": {
+            "title": "Multiplicadores",
+            "description": "Factores que multiplican el monto base según el contexto del turno.",
+            "weekend": "Multiplica el pago base en fin de semana",
+            "holiday": "Multiplica el pago base en feriados",
+            "irrenunciable": "Multiplicador legal para feriados irrenunciables",
+            "night": "Multiplica el pago base en horario nocturno",
+            "overtime": "Multiplica el pago por horas extra trabajadas"
+          },
+          "custom": {
+            "title": "Personalizado",
+            "description": "Crea componentes a medida con nombre y reglas propias para casos únicos de tu organización."
+          }
+        },
+        "units": {
+          "title": "Unidades de Pago",
+          "description": "Cada componente tiene una unidad que define cómo se calcula su valor.",
+          "periodic": "Periódicos",
+          "periodicDesc": "Mensual, Quincenal, Semanal, Diario — pagos regulares independientes de turnos.",
+          "eventBased": "Por Evento",
+          "eventBasedDesc": "Por Turno, Por Minuto, Por Hora — se calculan cuando la persona trabaja.",
+          "calculated": "Calculados",
+          "calculatedDesc": "Porcentaje, Multiplicador, Monto Fijo — se aplican sobre otros valores base."
+        },
+        "conditions": {
+          "title": "Condiciones de Aplicación",
+          "description": "Cada componente puede tener una condición que determina cuándo se aplica.",
+          "always": "Se incluye siempre en el cálculo",
+          "weekday": "Solo se aplica de lunes a viernes",
+          "weekend": "Solo se aplica sábado y domingo",
+          "holiday": "Solo se aplica en feriados marcados en el calendario",
+          "irrenunciable": "Solo en feriados irrenunciables (Navidad, Año Nuevo, etc.)",
+          "overtime": "Solo se aplica a horas extra más allá del turno programado",
+          "shiftType": "Solo se aplica a tipos de turno específicos que tú eliges"
+        },
+        "example": {
+          "title": "Ejemplo Práctico",
+          "description": "Así se ve una plantilla de tarifa completa para una enfermera de UCI:",
+          "templateName": "Tarifa Enfermería UCI",
+          "component1": "Sueldo Base — $500.000 mensual — Siempre",
+          "component2": "Por Turno — $50.000 por turno — Solo Guardia Larga",
+          "component3": "Bono Nocturno — $15.000 fijo — Solo horario nocturno",
+          "component4": "Horas Extra — $500/minuto — Solo horas extra",
+          "component5": "Mult. Feriado — 2.5x — Solo feriados",
+          "resultTitle": "Resultado para un turno de Guardia Larga nocturna en feriado:",
+          "resultLine1": "Sueldo base proporcional al día",
+          "resultLine2": "$50.000 por completar guardia",
+          "resultLine3": "$15.000 bono nocturno",
+          "resultLine4": "Todo multiplicado por 2.5x (feriado)",
+          "resultLine5": "Horas extra a $500/min si corresponde"
+        },
+        "tips": {
+          "title": "Consejos y Buenas Prácticas",
+          "tip1": {
+            "title": "Empieza simple",
+            "description": "Crea plantillas con 2-3 componentes primero. Siempre puedes agregar más después."
+          },
+          "tip2": {
+            "title": "Reutiliza plantillas",
+            "description": "Una misma plantilla puede asignarse a muchas personas. Usa el multiplicador del contrato para ajustar individualmente."
+          },
+          "tip3": {
+            "title": "Usa el duplicado",
+            "description": "Si necesitas una variante de una plantilla existente, duplícala y modifica solo lo necesario."
+          },
+          "tip4": {
+            "title": "Documenta tus componentes",
+            "description": "Usa el campo de descripción para explicar por qué existe cada componente. Tu futuro yo te lo agradecerá."
+          }
+        }
       }
     },
     "calendar": {
@@ -1910,8 +2138,9 @@
       "multiplierBadge": "{value}x"
     },
     "roles": {
-      "chief": "Jefe de Área",
-      "staff": "Personal de Salud"
+      "chiefArea": "Jefe de Área",
+      "chiefSector": "Jefe de Sector",
+      "staff": "Personal"
     },
     "goToRates": "Gestionar Tarifas",
     "empty": "No hay personal en la organización",
@@ -2277,7 +2506,14 @@
       "processingGenerateMsg1": "Creando turnos en la base de datos",
       "processingGenerateMsg2": "Verificando conflictos de horario",
       "processingGenerateMsg3": "Asignando contratos vigentes",
-      "processingGenerateMsg4": "Enviando notificaciones al personal"
+      "processingGenerateMsg4": "Enviando notificaciones al personal",
+      "endDateDisabledHint": "Selecciona primero la fecha de inicio",
+      "startingGroup": "Grupo que inicia primero",
+      "startingGroupHint": "El grupo seleccionado comenzará desde el paso 1 del patrón",
+      "lastGenerationInfo": "Última generación: {date} — {group} ({shiftType})",
+      "totalGeneratedShifts": "{count} turnos generados",
+      "noExistingShifts": "Sin turnos previos generados",
+      "defaultGroupOrder": "Orden predeterminado"
     },
     "coverage": {
       "title": "Cobertura",
@@ -2405,6 +2641,454 @@
       "rotationGenerated": "Generado por rotativa",
       "manualShift": "Turno manual",
       "noRotation": "No estás asignado a ninguna rotativa"
+    }
+  },
+  "landing": {
+    "socialProof": {
+      "metric1": "+500",
+      "metric1Label": "Profesionales gestionados",
+      "metric2": "99.9%",
+      "metric2Label": "Disponibilidad",
+      "metric3": "-70%",
+      "metric3Label": "Tiempo en planificación",
+      "metric4": "24/7",
+      "metric4Label": "Soporte técnico",
+      "trustedBy": "Utilizado por equipos de salud en Chile"
+    },
+    "problem": {
+      "tag": "El Problema",
+      "title": "El Excel no fue diseñado para gestionar turnos",
+      "description": "Si todavía usas planillas, sistemas legacy o WhatsApp para coordinar turnos, estás perdiendo tiempo, dinero y tranquilidad.",
+      "pain1": {
+        "title": "Errores manuales constantes",
+        "description": "Copiar y pegar turnos entre celdas genera conflictos, duplicaciones y personal sin cobertura."
+      },
+      "pain2": {
+        "title": "Sin visibilidad en tiempo real",
+        "description": "Nadie sabe quién está trabajando ahora. Los cambios se pierden entre versiones del archivo."
+      },
+      "pain3": {
+        "title": "Cálculos de pago complejos",
+        "description": "Horas extra, nocturnos, festivos, bonos... calcular cada componente a mano es un dolor de cabeza."
+      },
+      "pain4": {
+        "title": "Riesgo de incumplimiento legal",
+        "description": "El Código del Trabajo exige descansos mínimos y límites de horas. Sin sistema, cumplir es una apuesta."
+      }
+    },
+    "features": {
+      "tag": "Características",
+      "title": "Todo lo que necesitas para gestionar turnos",
+      "description": "Una plataforma completa que reemplaza las planillas, los sistemas legacy y los grupos de WhatsApp.",
+      "feature1": {
+        "title": "Calendario Digital",
+        "description": "Visualiza y gestiona todos los turnos de tu organización en un calendario interactivo con vista diaria, semanal y mensual."
+      },
+      "feature2": {
+        "title": "Cálculo Automático de Pagos",
+        "description": "Define componentes de tarifa flexibles y deja que VITA calcule automáticamente el pago de cada turno."
+      },
+      "feature3": {
+        "title": "Cumplimiento Legal",
+        "description": "Validaciones automáticas basadas en el Código del Trabajo chileno: descansos, límites de horas y restricciones."
+      },
+      "feature4": {
+        "title": "Rotativas Inteligentes",
+        "description": "Crea patrones de rotación y asígnalos a grupos. El sistema genera los turnos automáticamente."
+      },
+      "feature5": {
+        "title": "Gestión Multi-Área",
+        "description": "Organiza tu equipo por áreas y sectores. Cada jefe gestiona solo lo que le corresponde."
+      },
+      "feature6": {
+        "title": "Sin Hardware Costoso",
+        "description": "100% basado en la nube. Sin servidores, sin instalaciones, sin biometría costosa. Solo un navegador."
+      }
+    },
+    "howItWorks": {
+      "tag": "Cómo Funciona",
+      "title": "Operativo en 3 simples pasos",
+      "description": "Desde la configuración hasta la gestión diaria, VITA se adapta a tu organización.",
+      "step1": {
+        "number": "1",
+        "title": "Configura tu organización",
+        "description": "Crea áreas, define tipos de turno y establece las tarifas de pago. Todo desde un panel intuitivo."
+      },
+      "step2": {
+        "number": "2",
+        "title": "Invita a tu equipo",
+        "description": "Envía invitaciones por email. Cada persona se registra y queda vinculada a su área y contrato."
+      },
+      "step3": {
+        "number": "3",
+        "title": "Gestiona con inteligencia",
+        "description": "Asigna turnos, revisa pagos calculados y mantén el cumplimiento legal de forma automática."
+      }
+    },
+    "benefits": {
+      "tag": "Beneficios por Rol",
+      "title": "Diseñado para cada rol de tu organización",
+      "description": "Cada usuario ve exactamente lo que necesita, nada más.",
+      "hr": {
+        "tab": "RRHH / Admin",
+        "title": "Para el equipo de Recursos Humanos",
+        "description": "Control total sobre la organización, el personal y los pagos.",
+        "benefit1": "Visibilidad completa de todos los turnos y áreas",
+        "benefit2": "Cálculo automático de pagos con tarifas flexibles",
+        "benefit3": "Gestión de contratos y vinculación de personal",
+        "benefit4": "Reportes y exportación de datos",
+        "benefit5": "Invitaciones y onboarding automatizado"
+      },
+      "chief": {
+        "tab": "Jefes de Área",
+        "title": "Para los Jefes de Área",
+        "description": "Gestiona tu equipo sin depender de RRHH para cada cambio.",
+        "benefit1": "Calendario de tu área en tiempo real",
+        "benefit2": "Asignación directa de turnos a tu personal",
+        "benefit3": "Alertas de conflictos y descansos insuficientes",
+        "benefit4": "Vista de disponibilidad del equipo",
+        "benefit5": "Gestión de rotativas y patrones"
+      },
+      "staff": {
+        "tab": "Personal",
+        "title": "Para el Personal de Salud",
+        "description": "Tus turnos siempre claros, accesibles y actualizados.",
+        "benefit1": "Calendario personal con todos tus turnos",
+        "benefit2": "Notificaciones de cambios y asignaciones",
+        "benefit3": "Perfil profesional con múltiples organizaciones",
+        "benefit4": "Historial de turnos y pagos",
+        "benefit5": "Acceso desde cualquier dispositivo"
+      }
+    },
+    "testimonials": {
+      "tag": "Testimonios",
+      "title": "Lo que dicen nuestros usuarios",
+      "description": "Equipos reales que transformaron su gestión de turnos con VITA.",
+      "testimonial1": {
+        "quote": "Pasamos de perder 2 días al mes haciendo turnos en Excel a tenerlos listos en minutos. VITA cambió completamente nuestra operación.",
+        "name": "Dra. María González",
+        "role": "Jefa de Enfermería",
+        "org": "Hospital Regional"
+      },
+      "testimonial2": {
+        "quote": "El cálculo automático de pagos nos ahorró innumerables horas de trabajo manual y eliminó los errores que generaban reclamos.",
+        "name": "Carlos Muñoz",
+        "role": "Director de RRHH",
+        "org": "Clínica Santa María"
+      },
+      "testimonial3": {
+        "quote": "Por fin puedo ver mis turnos desde el celular sin tener que llamar a la oficina. Simple, rápido y siempre actualizado.",
+        "name": "Enf. Sofía Ramírez",
+        "role": "Enfermera de Turno",
+        "org": "Centro Médico Integral"
+      }
+    },
+    "pricing": {
+      "tag": "Precios",
+      "title": "Planes adaptados a tu organización",
+      "description": "Precios transparentes basados en el tamaño de tu equipo. Sin costos ocultos.",
+      "monthly": "/mes",
+      "cta": "Solicitar Cotización",
+      "popular": "Más Popular",
+      "plan1": {
+        "name": "Clínica Pequeña",
+        "price": "$770",
+        "currency": "USD",
+        "staff": "Hasta 30 profesionales",
+        "feature1": "Calendario digital completo",
+        "feature2": "Cálculo automático de pagos",
+        "feature3": "Gestión de áreas y sectores",
+        "feature4": "Soporte por email"
+      },
+      "plan2": {
+        "name": "Hospital Mediano",
+        "price": "$1,800",
+        "currency": "USD",
+        "staff": "Hasta 80 profesionales",
+        "feature1": "Todo del plan anterior",
+        "feature2": "Rotativas inteligentes",
+        "feature3": "Validaciones legales avanzadas",
+        "feature4": "Soporte prioritario"
+      },
+      "plan3": {
+        "name": "Hospital Grande",
+        "price": "$4,200",
+        "currency": "USD",
+        "staff": "Hasta 200 profesionales",
+        "feature1": "Todo del plan anterior",
+        "feature2": "Multi-sede",
+        "feature3": "API e integraciones",
+        "feature4": "Soporte dedicado 24/7"
+      }
+    },
+    "faq": {
+      "tag": "Preguntas Frecuentes",
+      "title": "¿Tienes dudas? Te las respondemos",
+      "q1": "¿Qué tipo de organizaciones pueden usar VITA?",
+      "a1": "VITA está diseñado para cualquier organización que trabaje con turnos: hospitales, clínicas, centros médicos, empresas de seguridad, retail y más. Nuestro énfasis está en salud, pero la plataforma es flexible.",
+      "q2": "¿Necesito instalar algo en mis computadores?",
+      "a2": "No. VITA es 100% basado en la nube. Solo necesitas un navegador web actualizado. No requiere instalación, servidores propios ni hardware especial.",
+      "q3": "¿Cómo funciona el cálculo de pagos?",
+      "a3": "Defines componentes de tarifa (base, nocturnos, festivos, horas extra, bonos, etc.) y VITA calcula automáticamente el pago de cada turno según las reglas que configures.",
+      "q4": "¿VITA cumple con la legislación laboral chilena?",
+      "a4": "Sí. VITA incluye validaciones basadas en el Código del Trabajo de Chile: descansos mínimos entre turnos, límites semanales de horas, restricciones de turnos nocturnos y más.",
+      "q5": "¿Puedo migrar mis datos desde Excel?",
+      "a5": "Sí. Ofrecemos asistencia para migrar tu información de planillas existentes a VITA. Nuestro equipo te acompaña en todo el proceso.",
+      "q6": "¿Cuánto tiempo toma implementar VITA?",
+      "a6": "La configuración básica toma menos de una hora. Para organizaciones grandes con múltiples áreas y tarifas complejas, ofrecemos implementación asistida en 1-2 semanas.",
+      "q7": "¿Mis datos están seguros?",
+      "a7": "Absolutamente. Usamos encriptación de nivel empresarial, servidores seguros y cumplimos con las normativas de protección de datos. Tus datos nunca se comparten con terceros.",
+      "q8": "¿Ofrecen período de prueba?",
+      "a8": "Sí. Ofrecemos una demo personalizada y un período de prueba para que evalúes la plataforma con tu equipo real antes de comprometerte."
+    },
+    "finalCta": {
+      "title": "Transforma la gestión de turnos de tu organización",
+      "description": "Únete a los equipos que ya dejaron atrás las planillas y los sistemas legacy. Comienza hoy con VITA.",
+      "cta": "Solicitar Demo Gratuita",
+      "secondary": "Hablar con Ventas"
+    }
+  },
+  "featuresPage": {
+    "title": "Características de VITA",
+    "description": "Conoce todas las funcionalidades que hacen de VITA la plataforma líder en gestión de turnos.",
+    "calendar": {
+      "title": "Calendario Digital Inteligente",
+      "description": "Un calendario interactivo diseñado para la complejidad de los turnos rotativos.",
+      "feature1": "Vistas diaria, semanal y mensual",
+      "feature2": "Drag and drop para reasignación rápida",
+      "feature3": "Filtros por área, sector y tipo de turno",
+      "feature4": "Indicadores visuales de conflictos"
+    },
+    "payments": {
+      "title": "Cálculo Automático de Pagos",
+      "description": "Motor de cálculo flexible que se adapta a cualquier estructura de compensación.",
+      "feature1": "18 tipos de componentes de tarifa predefinidos",
+      "feature2": "Componentes personalizados ilimitados",
+      "feature3": "Cálculo en tiempo real por turno",
+      "feature4": "Exportación para sistemas de nómina"
+    },
+    "legal": {
+      "title": "Cumplimiento Legal Automatizado",
+      "description": "Validaciones que protegen a tu organización y a tu equipo.",
+      "feature1": "Descansos mínimos entre turnos (11 horas)",
+      "feature2": "Límite semanal de horas trabajadas",
+      "feature3": "Restricciones de turnos nocturnos",
+      "feature4": "Alertas preventivas antes de asignar"
+    },
+    "rotations": {
+      "title": "Rotativas y Patrones",
+      "description": "Automatiza la asignación de turnos con patrones inteligentes.",
+      "feature1": "Patrones personalizables de rotación",
+      "feature2": "Grupos de rotación con asignación automática",
+      "feature3": "Generación masiva de turnos",
+      "feature4": "Ajustes y excepciones por persona"
+    },
+    "multiArea": {
+      "title": "Gestión Multi-Área y Multi-Sede",
+      "description": "Organiza equipos complejos con jerarquías flexibles.",
+      "feature1": "Áreas y sectores independientes",
+      "feature2": "Jefes de área con permisos delimitados",
+      "feature3": "Personal compartido entre áreas",
+      "feature4": "Vista consolidada para RRHH"
+    },
+    "mobile": {
+      "title": "Acceso Multiplataforma",
+      "description": "Tu equipo siempre conectado, desde cualquier lugar.",
+      "feature1": "Aplicación web responsive",
+      "feature2": "Acceso desde celular y tablet",
+      "feature3": "Notificaciones en tiempo real",
+      "feature4": "Sin instalación requerida"
+    },
+    "cta": {
+      "title": "¿Listo para modernizar tu gestión de turnos?",
+      "description": "Solicita una demo personalizada y descubre cómo VITA puede transformar tu operación.",
+      "button": "Solicitar Demo"
+    }
+  },
+  "pricingPage": {
+    "title": "Precios Transparentes",
+    "description": "Planes diseñados para organizaciones de todos los tamaños. Sin sorpresas, sin costos ocultos.",
+    "calculator": {
+      "title": "Calcula tu precio estimado",
+      "staffLabel": "Cantidad de profesionales",
+      "staffPlaceholder": "Ej: 50",
+      "estimate": "Precio estimado",
+      "contact": "Contactar para cotización exacta",
+      "disclaimer": "* Precios referenciales. El valor final depende de las características específicas de tu organización."
+    },
+    "allPlans": "Todos los planes incluyen",
+    "included1": "Calendario digital completo",
+    "included2": "Cálculo automático de pagos",
+    "included3": "Gestión de áreas y sectores",
+    "included4": "Cumplimiento legal chileno",
+    "included5": "Actualizaciones gratuitas",
+    "included6": "Migración asistida de datos",
+    "cta": {
+      "title": "¿No estás seguro qué plan elegir?",
+      "description": "Nuestro equipo te ayuda a encontrar la mejor opción para tu organización.",
+      "button": "Hablar con un Asesor"
+    }
+  },
+  "aboutPage": {
+    "title": "Acerca de VITA",
+    "description": "Estamos transformando la forma en que las organizaciones gestionan sus turnos.",
+    "mission": {
+      "title": "Nuestra Misión",
+      "description": "Eliminar la complejidad de la gestión de turnos para que los equipos se enfoquen en lo que realmente importa: sus pacientes y su trabajo."
+    },
+    "story": {
+      "title": "Nuestra Historia",
+      "p1": "VITA nació de una frustración real: la gestión de turnos en instituciones de salud en Chile sigue dependiendo de planillas Excel, sistemas legacy costosos y procesos manuales propensos a errores.",
+      "p2": "Fundada por profesionales que vivieron el problema de primera mano, VITA combina tecnología moderna con un profundo entendimiento de las necesidades operativas de hospitales y clínicas.",
+      "p3": "Hoy, VITA es una plataforma SaaS que ayuda a organizaciones de todos los tamaños a automatizar sus turnos, calcular pagos y cumplir con la legislación laboral chilena."
+    },
+    "values": {
+      "title": "Nuestros Valores",
+      "value1": {
+        "title": "Simplicidad",
+        "description": "La tecnología debe simplificar, no complicar. Cada decisión de diseño busca la solución más clara."
+      },
+      "value2": {
+        "title": "Confiabilidad",
+        "description": "Turnos y pagos no admiten errores. Construimos sistemas robustos y verificados."
+      },
+      "value3": {
+        "title": "Cercanía",
+        "description": "Entendemos tu realidad porque la hemos vivido. Soporte humano y personalizado."
+      }
+    },
+    "cta": {
+      "title": "¿Quieres conocer más?",
+      "description": "Agenda una conversación con nuestro equipo.",
+      "button": "Contactar"
+    }
+  },
+  "contactPage": {
+    "title": "Contáctanos",
+    "description": "Estamos aquí para ayudarte. Escríbenos y te responderemos a la brevedad.",
+    "form": {
+      "name": "Nombre completo",
+      "namePlaceholder": "Tu nombre",
+      "email": "Correo electrónico",
+      "emailPlaceholder": "tu@email.com",
+      "org": "Organización",
+      "orgPlaceholder": "Nombre de tu organización",
+      "message": "Mensaje",
+      "messagePlaceholder": "¿En qué podemos ayudarte?",
+      "submit": "Enviar Mensaje",
+      "success": "Mensaje enviado exitosamente. Te responderemos pronto.",
+      "disclaimer": "Al enviar este formulario aceptas nuestra política de privacidad."
+    },
+    "info": {
+      "title": "Información de Contacto",
+      "email": "contacto@vita-turnos.com",
+      "schedule": "Lunes a Viernes, 9:00 - 18:00 (CLT)",
+      "location": "Santiago, Chile"
+    }
+  },
+  "supportPage": {
+    "title": "Centro de Soporte",
+    "description": "Encuentra respuestas rápidas o contacta a nuestro equipo de soporte.",
+    "categories": {
+      "gettingStarted": {
+        "title": "Primeros Pasos",
+        "description": "Guías para comenzar a usar VITA.",
+        "item1": "Crear tu cuenta y organización",
+        "item2": "Configurar áreas y sectores",
+        "item3": "Invitar a tu equipo",
+        "item4": "Crear tu primer turno"
+      },
+      "shifts": {
+        "title": "Gestión de Turnos",
+        "description": "Todo sobre la creación y administración de turnos.",
+        "item1": "Asignar turnos manualmente",
+        "item2": "Configurar rotativas",
+        "item3": "Resolver conflictos de horario",
+        "item4": "Exportar calendario"
+      },
+      "payments": {
+        "title": "Pagos y Tarifas",
+        "description": "Configuración y cálculo de pagos.",
+        "item1": "Crear plantillas de tarifa",
+        "item2": "Configurar componentes de pago",
+        "item3": "Revisar cálculos de turno",
+        "item4": "Exportar reportes de pago"
+      },
+      "account": {
+        "title": "Cuenta y Perfil",
+        "description": "Gestión de tu cuenta y configuración.",
+        "item1": "Actualizar datos personales",
+        "item2": "Cambiar contraseña",
+        "item3": "Gestionar notificaciones",
+        "item4": "Múltiples organizaciones"
+      }
+    },
+    "contact": {
+      "title": "¿Necesitas más ayuda?",
+      "description": "Nuestro equipo de soporte está listo para asistirte.",
+      "button": "Contactar Soporte"
+    }
+  },
+  "privacyPage": {
+    "title": "Política de Privacidad",
+    "lastUpdated": "Última actualización: Febrero 2026",
+    "intro": "En VITA nos tomamos muy en serio la privacidad de tus datos. Esta política describe cómo recopilamos, usamos y protegemos tu información personal.",
+    "section1": {
+      "title": "1. Información que Recopilamos",
+      "content": "Recopilamos información que nos proporcionas directamente al crear una cuenta, como tu nombre, correo electrónico, organización y datos profesionales. También recopilamos datos de uso del servicio para mejorar la plataforma."
+    },
+    "section2": {
+      "title": "2. Cómo Usamos tu Información",
+      "content": "Utilizamos tu información para proveer y mejorar nuestros servicios, procesar turnos y cálculos de pago, enviar notificaciones relevantes y cumplir con obligaciones legales."
+    },
+    "section3": {
+      "title": "3. Protección de Datos",
+      "content": "Implementamos medidas de seguridad técnicas y organizativas para proteger tus datos, incluyendo encriptación en tránsito y en reposo, acceso restringido y auditorías regulares."
+    },
+    "section4": {
+      "title": "4. Compartición de Datos",
+      "content": "No vendemos ni compartimos tus datos personales con terceros, excepto cuando sea necesario para proveer el servicio (proveedores de infraestructura) o cuando lo exija la ley."
+    },
+    "section5": {
+      "title": "5. Tus Derechos",
+      "content": "Tienes derecho a acceder, rectificar, eliminar y portar tus datos personales. Puedes ejercer estos derechos contactándonos en cualquier momento."
+    },
+    "section6": {
+      "title": "6. Contacto",
+      "content": "Para consultas sobre privacidad, escríbenos a privacidad@vita-turnos.com."
+    }
+  },
+  "termsPage": {
+    "title": "Términos de Servicio",
+    "lastUpdated": "Última actualización: Febrero 2026",
+    "intro": "Al utilizar VITA, aceptas los siguientes términos y condiciones. Por favor, léelos cuidadosamente.",
+    "section1": {
+      "title": "1. Aceptación de los Términos",
+      "content": "Al acceder o utilizar VITA, aceptas estar vinculado por estos términos de servicio. Si no estás de acuerdo, no debes utilizar la plataforma."
+    },
+    "section2": {
+      "title": "2. Descripción del Servicio",
+      "content": "VITA es una plataforma SaaS de gestión de turnos que permite a las organizaciones planificar, asignar y administrar turnos de trabajo, calcular pagos y cumplir con la legislación laboral."
+    },
+    "section3": {
+      "title": "3. Cuentas de Usuario",
+      "content": "Eres responsable de mantener la confidencialidad de tu cuenta y contraseña. Debes notificarnos inmediatamente si detectas uso no autorizado de tu cuenta."
+    },
+    "section4": {
+      "title": "4. Uso Aceptable",
+      "content": "Te comprometes a utilizar VITA solo para fines legítimos de gestión de turnos. No debes intentar acceder a datos de otras organizaciones ni comprometer la seguridad del sistema."
+    },
+    "section5": {
+      "title": "5. Propiedad Intelectual",
+      "content": "VITA y todo su contenido, características y funcionalidad son propiedad exclusiva de sus creadores. No se concede ninguna licencia sobre el código fuente o la propiedad intelectual."
+    },
+    "section6": {
+      "title": "6. Limitación de Responsabilidad",
+      "content": "VITA se provee \"tal cual\". No garantizamos que el servicio sea ininterrumpido o libre de errores. Nuestra responsabilidad se limita al monto pagado por el servicio en los últimos 12 meses."
+    },
+    "section7": {
+      "title": "7. Contacto",
+      "content": "Para consultas sobre estos términos, escríbenos a legal@vita-turnos.com."
     }
   }
 }

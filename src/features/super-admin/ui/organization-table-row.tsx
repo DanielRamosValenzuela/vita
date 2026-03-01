@@ -84,7 +84,7 @@ export function OrganizationTableRow({
           <div className="flex items-center justify-between gap-2">
             <span className="text-muted-foreground">{t('accountsStaff')}</span>
             <span className="font-medium">
-              {userCounts.STAFF_HEALTH}/{org.maxStaff}
+              {userCounts.STAFF}/{org.maxStaff}
             </span>
           </div>
         </div>

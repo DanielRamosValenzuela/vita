@@ -15,6 +15,14 @@ export function isChiefArea(user: CurrentUser | null): boolean {
   return hasRole(user, Role.CHIEF_AREA)
 }
 
-export function isStaffHealth(user: CurrentUser | null): boolean {
-  return hasRole(user, Role.STAFF_HEALTH)
+export function isChiefSector(user: CurrentUser | null): boolean {
+  return hasRole(user, Role.CHIEF_SECTOR)
+}
+
+export function isChief(user: CurrentUser | null): boolean {
+  return isChiefArea(user) || isChiefSector(user)
+}
+
+export function isStaff(user: CurrentUser | null): boolean {
+  return hasRole(user, Role.STAFF)
 }

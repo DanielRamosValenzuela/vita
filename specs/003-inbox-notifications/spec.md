@@ -9,7 +9,7 @@
 
 ### User Story 1 - Ver y gestionar la Bandeja de Entrada (Priority: P1)
 
-Cualquier usuario autenticado con rol organizacional (ADMIN_HR, CHIEF_AREA, STAFF_HEALTH) puede acceder a su Bandeja de Entrada desde el sidebar. SUPER_ADMIN queda excluido en esta iteración ya que los eventos actuales no aplican a su rol. Al entrar, ve una lista cronológica de notificaciones/mensajes, cada uno con un indicador de leído/no leído, un resumen del evento y la fecha. El usuario puede marcar notificaciones como leídas, hacer clic en una notificación para navegar al contexto relevante (p.ej. perfil para aceptar invitación, calendario de turnos, etc.), y ver un badge con el conteo de no leídas en el sidebar.
+Cualquier usuario autenticado con rol organizacional (ADMIN_HR, CHIEF_AREA, STAFF) puede acceder a su Bandeja de Entrada desde el sidebar. SUPER_ADMIN queda excluido en esta iteración ya que los eventos actuales no aplican a su rol. Al entrar, ve una lista cronológica de notificaciones/mensajes, cada uno con un indicador de leído/no leído, un resumen del evento y la fecha. El usuario puede marcar notificaciones como leídas, hacer clic en una notificación para navegar al contexto relevante (p.ej. perfil para aceptar invitación, calendario de turnos, etc.), y ver un badge con el conteo de no leídas en el sidebar.
 
 **Why this priority**: Es el núcleo de la feature. Sin la bandeja de entrada visible y navegable, no hay dónde mostrar las notificaciones. Provee valor inmediato al centralizar toda la información pendiente del usuario en un solo lugar tipo TODO list.
 
@@ -88,7 +88,7 @@ El usuario puede filtrar las notificaciones de su bandeja por estado (todas, no 
 
 ### Functional Requirements
 
-- **FR-001**: El sistema DEBE proveer una página de bandeja de entrada accesible desde `/dashboard/inbox` para los roles ADMIN_HR, CHIEF_AREA y STAFF_HEALTH. SUPER_ADMIN queda excluido en esta iteración.
+- **FR-001**: El sistema DEBE proveer una página de bandeja de entrada accesible desde `/dashboard/inbox` para los roles ADMIN_HR, CHIEF_AREA y STAFF. SUPER_ADMIN queda excluido en esta iteración.
 - **FR-002**: El sidebar DEBE mostrar un item "Bandeja de entrada" con un badge numérico que indique la cantidad de notificaciones no leídas del usuario actual.
 - **FR-003**: El sistema DEBE persistir notificaciones con al menos: usuario destinatario, usuario actor (quién ejecutó la acción), tipo de notificación, título, mensaje descriptivo, URL de destino, estado de lectura, y fecha de creación.
 - **FR-004**: El sistema DEBE generar notificaciones automáticamente al ocurrir los siguientes eventos: creación de invitación, asignación de usuario a área, creación de turno, modificación de turno, eliminación de turno.

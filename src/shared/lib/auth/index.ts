@@ -4,7 +4,12 @@ export {
   requireAuth,
   requireAdminHR,
   requireAdminHRWithOrg,
-  requireAdminHROrChiefArea,
+  requireAdminHROrChief,
   requireDashboardUser,
 } from './session'
-export { isAdminHR, isChiefArea, isStaffHealth } from './rbac'
+export { isAdminHR, isChiefArea, isChiefSector, isChief, isStaff } from './rbac'
+export {
+  getChiefAccessibleAreaIds,
+  chiefHasAreaAccess,
+  resolveChiefOrganizationId,
+} from './chief-access'

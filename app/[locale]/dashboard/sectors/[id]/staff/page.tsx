@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
 
-import { requireDashboardUser, isChiefArea, isStaffHealth } from '@/src/shared/lib/auth'
+import { requireDashboardUser, isChiefArea, isStaff } from '@/src/shared/lib/auth'
 import { prisma } from '@/src/shared/lib/db'
 import { getSectorById } from '@/src/entities/sector'
 import { SectorStaffQuery } from '@/src/features/sector/ui'
@@ -28,7 +28,7 @@ export default async function SectorStaffPage({ params }: StaffPageProps) {
   ])
 
   let orgId: string | null = user.organizationId ?? null
-  if ((isChiefArea(user) || isStaffHealth(user)) && !orgId) {
+  if ((isChiefArea(user) || isStaff(user)) && !orgId) {
     const firstArea = await prisma.userArea.findFirst({
       where: { userId: user.id },
       select: { area: { select: { organizationId: true } } },
@@ -41,7 +41,7 @@ export default async function SectorStaffPage({ params }: StaffPageProps) {
   const sector = await getSectorById(id, orgId)
   if (!sector) return notFound()
 
-  if (isChiefArea(user) || isStaffHealth(user)) {
+  if (isChiefArea(user) || isStaff(user)) {
     const userAreas = await prisma.userArea.findMany({
       where: { userId: user.id },
       select: { areaId: true },

@@ -1,7 +1,7 @@
 import { getTranslations } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 
-import { requireAdminHROrChiefArea } from '@/src/shared/lib/auth'
+import { requireAdminHROrChief } from '@/src/shared/lib/auth'
 import { isChiefArea } from '@/src/shared/lib/auth/rbac'
 import { prisma } from '@/src/shared/lib/db'
 import { getChiefsForAreaAction, getStaffForAreaAction } from '@/src/features/area/api'
@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: AreaEditPageProps) {
 export default async function AreaEditPage({ params }: AreaEditPageProps) {
   const { locale, id } = await params
   const [user, t] = await Promise.all([
-    requireAdminHROrChiefArea(locale),
+    requireAdminHROrChief(locale),
     getTranslations('adminHR.areas'),
   ])
 

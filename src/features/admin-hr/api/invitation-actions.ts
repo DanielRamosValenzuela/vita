@@ -164,7 +164,7 @@ export const inviteStaffAction = async (
         error: 'No tienes permisos para invitar a esta organización',
       }
 
-    const limitCheck = await checkOrganizationLimit(organizationId, ROLES.STAFF_HEALTH)
+    const limitCheck = await checkOrganizationLimit(organizationId, ROLES.STAFF)
     if (!limitCheck.success) return limitCheck
 
     if (!limitCheck.canAddMore)
@@ -190,7 +190,7 @@ export const inviteStaffAction = async (
         error: 'Usuario no encontrado',
       }
 
-    if (user.role === ROLES.STAFF_HEALTH && user.organizationId === organizationId)
+    if (user.role === ROLES.STAFF && user.organizationId === organizationId)
       return {
         success: false,
         error: 'Este usuario ya es staff de esta organización',
@@ -215,7 +215,7 @@ export const inviteStaffAction = async (
     const invitationResult = await createInvitation(
       organizationId,
       userId,
-      ROLES.STAFF_HEALTH,
+      ROLES.STAFF,
       session.id
     )
 

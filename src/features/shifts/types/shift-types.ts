@@ -1,28 +1,7 @@
-import type { Shift, ShiftStatus } from '@prisma/client'
+import type { ShiftStatus } from '@prisma/client'
 
-export interface ShiftWithRelations extends Shift {
-  user: {
-    id: string
-    name: string
-    email: string
-    role: string
-  }
-  area: {
-    id: string
-    name: string
-    description?: string | null
-  }
-  shiftType: {
-    id: string
-    name: string
-    color: string
-    icon?: string | null
-  }
-  rotation?: {
-    id: string
-    name: string
-  } | null
-}
+export type { ShiftWithRelations } from '@/src/entities/shift/types/shift-types'
+import type { ShiftWithRelations } from '@/src/entities/shift/types/shift-types'
 
 export interface CreateShiftFormData {
   title?: string

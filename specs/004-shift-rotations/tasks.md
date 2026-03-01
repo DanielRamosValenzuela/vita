@@ -84,10 +84,10 @@
 ### Implementation for User Story 2
 
 - [x] T026 Implement `addGroupAction` and `removeGroupAction` in `src/features/rotations/api/group-actions.ts`: auth + org + area access, validate rotation exists and belongs to org, auto-assign cycleOffset (next available), enforce min 2 / max 6 groups. removeGroupAction has deleteLinkedShifts param. revalidatePath
-- [x] T027 Implement `addMemberAction` and `removeMemberAction` in `src/features/rotations/api/group-actions.ts`: validate user is STAFF_HEALTH + has UserArea for rotation's area, check if already active member of another group in same rotation (block) or another rotation in same area (warn but allow per FR-004), set leftAt on remove. removeMemberAction has cancelFutureShifts param. Send ROTATION_ASSIGNED notification on add. revalidatePath
+- [x] T027 Implement `addMemberAction` and `removeMemberAction` in `src/features/rotations/api/group-actions.ts`: validate user is STAFF + has UserArea for rotation's area, check if already active member of another group in same rotation (block) or another rotation in same area (warn but allow per FR-004), set leftAt on remove. removeMemberAction has cancelFutureShifts param. Send ROTATION_ASSIGNED notification on add. revalidatePath
 - [x] T028 Update `src/features/rotations/api/index.ts` barrel to export group actions
 - [x] T029 [P] Add i18n keys for groups/members in `messages/es.json` and `messages/en.json` under `rotations.groups` (groupName, cycleOffset, addGroup, removeGroup, members, addMember, removeMember, staffCount, alreadyAssigned, warningOtherRotation, confirmRemoveGroup, confirmRemoveMember, cancelFutureShifts, etc.)
-- [x] T030 Implement `rotation-groups.tsx` in `src/features/rotations/ui/rotation-groups.tsx`: component showing groups as cards/tabs within rotation detail. Each group shows: name, offset, member count, member list with avatar + name. Add member button opens user selector (filtered to STAFF_HEALTH in area via UserArea, excluding already-assigned members). Remove member button with AlertDialog asking about future shifts. Add/remove group buttons. Use Shadcn Card, Avatar, Button, AlertDialog
+- [x] T030 Implement `rotation-groups.tsx` in `src/features/rotations/ui/rotation-groups.tsx`: component showing groups as cards/tabs within rotation detail. Each group shows: name, offset, member count, member list with avatar + name. Add member button opens user selector (filtered to STAFF in area via UserArea, excluding already-assigned members). Remove member button with AlertDialog asking about future shifts. Add/remove group buttons. Use Shadcn Card, Avatar, Button, AlertDialog
 - [x] T031 Implement `rotation-detail.tsx` in `src/features/rotations/ui/rotation-detail.tsx`: detail view (dialog or page section) showing rotation name, area, status, pattern visualization (colored step badges), shift configs (start times table), and embedded rotation-groups component. Include summary: total staff, staff per group, pattern length
 - [x] T032 Update `rotations-page.tsx` to open rotation-detail when clicking a rotation row, and update ui barrel exports
 
@@ -167,7 +167,7 @@
 
 ### Implementation for User Story 7
 
-- [x] T048 Implement `getExtraCandidatesAction` in `src/features/rotations/api/extras-actions.ts`: query STAFF_HEALTH users with UserArea for target area, exclude members of the understaffed group, check availability across ALL their areas (no conflicting shifts at requested time), fetch each candidate's recent shift history (last 48h), run extra-tier-engine.calculateTier for each, sort by tier (TIER_1 first, NEVER_RECOMMEND last), check area limits (maxConsecutiveHours, minRestHours) for warnings. Return GetExtraCandidatesResult
+- [x] T048 Implement `getExtraCandidatesAction` in `src/features/rotations/api/extras-actions.ts`: query STAFF users with UserArea for target area, exclude members of the understaffed group, check availability across ALL their areas (no conflicting shifts at requested time), fetch each candidate's recent shift history (last 48h), run extra-tier-engine.calculateTier for each, sort by tier (TIER_1 first, NEVER_RECOMMEND last), check area limits (maxConsecutiveHours, minRestHours) for warnings. Return GetExtraCandidatesResult
 - [x] T049 Implement `assignExtraShiftAction` in `src/features/rotations/api/extras-actions.ts`: create regular Shift with the extra ShiftType (e.g., "Largo Extra"), link contractId via existing pattern, send EXTRA_SHIFT_ASSIGNED notification, revalidatePath. Tariff system handles payment automatically via existing RateComponent/ShiftType linkage
 - [x] T050 Update `src/features/rotations/api/index.ts` barrel to export extras actions
 - [x] T051 [P] Add i18n keys for extras in `messages/es.json` and `messages/en.json` under `rotations.extras` (fillWithExtra, candidates, tier1, tier2, tier3, neverRecommend, tierLabels, extendingFromShift, restedAvailable, comingOffNight, nocheToLargo, warningMaxHours, warningMinRest, assignExtra, selectShiftType, noCandidate, understaffingGap, crossArea, etc.)
@@ -180,19 +180,19 @@
 
 ## Phase 9: User Story 6 — Staff Views Their Rotation Assignment (Priority: P3)
 
-**Goal**: STAFF_HEALTH can see which rotation and group they belong to, and rotation-generated shifts are visually distinguishable.
+**Goal**: STAFF can see which rotation and group they belong to, and rotation-generated shifts are visually distinguishable.
 
-**Independent Test**: Log in as STAFF_HEALTH in a rotation, view shifts, verify rotation/group label visible and generated shifts have a distinct visual indicator.
+**Independent Test**: Log in as STAFF in a rotation, view shifts, verify rotation/group label visible and generated shifts have a distinct visual indicator.
 
 **Depends on**: US3 (generated shifts must exist)
 
 ### Implementation for User Story 6
 
 - [x] T054 [P] Add i18n keys for staff rotation view in `messages/es.json` and `messages/en.json` under `rotations.staff` (myRotation, group, rotationGenerated, manualShift, noRotation, etc.)
-- [x] T055 Create a small server action `getMyRotationsAction` in `src/features/rotations/api/rotation-actions.ts`: returns the current user's active RotationMember records with rotation name, group name, and area name — for STAFF_HEALTH role
+- [x] T055 Create a small server action `getMyRotationsAction` in `src/features/rotations/api/rotation-actions.ts`: returns the current user's active RotationMember records with rotation name, group name, and area name — for STAFF role
 - [x] T056 Update shift calendar/list components to show a rotation badge on shifts that have `rotationId` set: add a small colored indicator (e.g., Shadcn Badge with rotation group letter) in `src/features/shifts/ui/shift-calendar.tsx` and `src/features/shifts/ui/shifts-page-content.tsx` — only if shift.rotationId is present
 
-**Checkpoint**: Staff sees rotation context. Log in as STAFF_HEALTH, verify rotation badge on generated shifts. Run `npm run build` + `npm run lint`.
+**Checkpoint**: Staff sees rotation context. Log in as STAFF, verify rotation badge on generated shifts. Run `npm run build` + `npm run lint`.
 
 ---
 
@@ -204,7 +204,7 @@
 - [x] T058 Run `npm run build` — fix any TypeScript errors or build failures
 - [x] T059 Run `npm run lint` — fix any ESLint violations
 - [x] T060 Manual smoke test: end-to-end flow as CHIEF_AREA — create rotation → add groups → assign staff → generate shifts → view coverage → fill extra → verify in calendar
-- [x] T061 Manual smoke test: STAFF_HEALTH view — verify rotation badge on shifts, no broken UI for users without rotation
+- [x] T061 Manual smoke test: STAFF view — verify rotation badge on shifts, no broken UI for users without rotation
 - [x] T062 Manual smoke test: ADMIN_HR supervisory access — verify can see/manage rotations across all areas in their org
 
 ---

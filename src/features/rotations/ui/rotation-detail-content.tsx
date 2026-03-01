@@ -721,6 +721,12 @@ function DetailFooter({
       <GenerationDialog
         rotationId={rotation.id}
         rotationName={rotation.name}
+        groups={rotation.groups.map((g) => ({
+          id: g.id,
+          name: g.name,
+          color: g.color,
+          cycleOffset: g.cycleOffset,
+        }))}
         open={state.generationOpen}
         onOpenChange={(v) => dispatch({ type: 'SET_GENERATION_OPEN', payload: v })}
         onGenerated={onMemberChanged}
@@ -728,6 +734,12 @@ function DetailFooter({
       <GenerationDialog
         rotationId={rotation.id}
         rotationName={rotation.name}
+        groups={rotation.groups.map((g) => ({
+          id: g.id,
+          name: g.name,
+          color: g.color,
+          cycleOffset: g.cycleOffset,
+        }))}
         open={state.regenerateOpen}
         onOpenChange={(v) => dispatch({ type: 'SET_REGENERATE_OPEN', payload: v })}
         onGenerated={onMemberChanged}

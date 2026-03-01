@@ -1,6 +1,7 @@
 'use server'
 
-import { requireAdminHROrChiefArea, requireAdminHRWithOrg } from '@/src/shared/lib/auth'
+import { requireAdminHROrChief, requireAdminHRWithOrg } from '@/src/shared/lib/auth'
+import { getChiefAccessibleAreaIds } from '@/src/shared/lib/auth/chief-access'
 import { ROLES } from '@/src/shared/lib/constants'
 import { prisma } from '@/src/shared/lib/db'
 import type { ActionResult } from '@/src/shared/lib/types'
@@ -69,7 +70,7 @@ export const getContractsPageDataAction = async (): Promise<ActionResult<Contrac
       prisma.user.findMany({
         where: {
           organizationId: orgId,
-          role: { in: [ROLES.STAFF_HEALTH, ROLES.CHIEF_AREA] },
+          role: { in: [ROLES.STAFF, ROLES.CHIEF_AREA] },
         },
         select: {
           id: true,
@@ -210,16 +211,11 @@ export const getContractsPageDataAction = async (): Promise<ActionResult<Contrac
 
 export const getStaffPageDataAction = async (): Promise<ActionResult<ContractsPageData>> => {
   try {
-    const session = await requireAdminHROrChiefArea()
+    const session = await requireAdminHROrChief()
 
     if (session.role === ROLES.ADMIN_HR) return await getContractsPageDataAction()
 
-    const userAreas = await prisma.userArea.findMany({
-      where: { userId: session.id },
-      select: { areaId: true },
-    })
-
-    const areaIds = userAreas.map((ua) => ua.areaId)
+    const areaIds = await getChiefAccessibleAreaIds(session.id)
 
     if (areaIds.length === 0)
       return {
@@ -234,7 +230,7 @@ export const getStaffPageDataAction = async (): Promise<ActionResult<ContractsPa
     const users = await prisma.user.findMany({
       where: {
         organizationId: session.organizationId!,
-        role: { in: [ROLES.STAFF_HEALTH, ROLES.CHIEF_AREA] },
+        role: { in: [ROLES.STAFF, ROLES.CHIEF_AREA] },
         userAreas: {
           some: {
             areaId: { in: areaIds },

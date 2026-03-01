@@ -21,7 +21,7 @@
 Costo Base: $200 USD/mes
 (Incluye: Plataforma + 5 cuentas ADMIN_HR gratis)
 
-+ Personal de Salud (STAFF_HEALTH): $15 USD/mes por persona
++ Personal de Salud (STAFF): $15 USD/mes por persona
 + Jefes de Área (CHIEF_AREA): $40 USD/mes por jefe
 ```
 
@@ -84,7 +84,7 @@ Distribución de límites:
 | -------- | -------------- | --------------------- | ------ |
 | Admin HR | `ADMIN_HR`     | maxAdminHR (5 gratis) | Gratis |
 | Jefes    | `CHIEF_AREA`   | maxChiefs             | $$     |
-| Staff    | `STAFF_HEALTH` | maxStaff              | $      |
+| Staff    | `STAFF` | maxStaff              | $      |
 
 ### Campos en Base de Datos
 

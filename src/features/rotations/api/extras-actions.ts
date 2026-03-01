@@ -3,8 +3,9 @@
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
+import { resolveChiefOrganizationId } from '@/src/shared/lib/auth/chief-access'
 import { isChiefArea } from '@/src/shared/lib/auth/rbac'
-import { requireAdminHROrChiefArea } from '@/src/shared/lib/auth/session'
+import { requireAdminHROrChief } from '@/src/shared/lib/auth/session'
 import { prisma } from '@/src/shared/lib/db'
 import type { ActionResult } from '@/src/shared/lib/types'
 
@@ -36,16 +37,11 @@ export const getExtraCandidatesAction = async (
   data: z.infer<typeof getExtraCandidatesSchema>
 ): Promise<ActionResult<GetExtraCandidatesResult>> => {
   try {
-    const session = await requireAdminHROrChiefArea()
+    const session = await requireAdminHROrChief()
 
-    let derivedOrgId: string | null = session.organizationId ?? null
-    if (isChiefArea(session) && !derivedOrgId) {
-      const firstArea = await prisma.userArea.findFirst({
-        where: { userId: session.id },
-        select: { area: { select: { organizationId: true } } },
-      })
-      derivedOrgId = firstArea?.area?.organizationId ?? null
-    }
+    const derivedOrgId = isChiefArea(session)
+      ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
+      : session.organizationId ?? null
     if (!derivedOrgId)
       return { success: false, error: 'No tienes una organización asignada' }
     const organizationId = derivedOrgId
@@ -83,7 +79,7 @@ export const getExtraCandidatesAction = async (
     const staffUsers = await prisma.user.findMany({
       where: {
         organizationId,
-        role: 'STAFF_HEALTH',
+        role: 'STAFF',
         id: { notIn: excludedUserIds },
         userAreas: {
           some: { areaId: validatedData.areaId },
@@ -232,16 +228,11 @@ export const assignExtraShiftAction = async (
   data: z.infer<typeof assignExtraShiftSchema>
 ): Promise<ActionResult<null>> => {
   try {
-    const session = await requireAdminHROrChiefArea()
+    const session = await requireAdminHROrChief()
 
-    let derivedOrgId: string | null = session.organizationId ?? null
-    if (isChiefArea(session) && !derivedOrgId) {
-      const firstArea = await prisma.userArea.findFirst({
-        where: { userId: session.id },
-        select: { area: { select: { organizationId: true } } },
-      })
-      derivedOrgId = firstArea?.area?.organizationId ?? null
-    }
+    const derivedOrgId = isChiefArea(session)
+      ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
+      : session.organizationId ?? null
     if (!derivedOrgId)
       return { success: false, error: 'No tienes una organización asignada' }
     const organizationId = derivedOrgId
@@ -249,7 +240,7 @@ export const assignExtraShiftAction = async (
     const validatedData = assignExtraShiftSchema.parse(data)
 
     const user = await prisma.user.findFirst({
-      where: { id: validatedData.userId, organizationId, role: 'STAFF_HEALTH' },
+      where: { id: validatedData.userId, organizationId, role: 'STAFF' },
       select: { id: true },
     })
     if (!user)

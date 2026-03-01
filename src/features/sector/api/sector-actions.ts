@@ -8,7 +8,7 @@ import {
   requireDashboardUser,
   isAdminHR,
   isChiefArea,
-  isStaffHealth,
+  isStaff,
 } from '@/src/shared/lib/auth'
 import { prisma } from '@/src/shared/lib/db'
 import { handleActionError } from '@/src/shared/lib/utils'
@@ -60,7 +60,7 @@ export async function updateSectorAction(id: string, data: UpdateSectorInput) {
         where: { userId_sectorId: { userId: user.id, sectorId: id } },
       })
       if (!isSectorChief) return { success: false as const, error: t('noPermission') }
-    } else if (isStaffHealth(user))
+    } else if (isStaff(user))
       return { success: false as const, error: t('noPermission') }
     else if (!isAdminHR(user))
       return { success: false as const, error: t('noPermission') }
@@ -116,12 +116,12 @@ export async function getSectorsAction() {
     const user = await requireDashboardUser()
     let orgId: string | null = user.organizationId ?? null
 
-    if ((isChiefArea(user) || isStaffHealth(user)) && !orgId)
+    if ((isChiefArea(user) || isStaff(user)) && !orgId)
       orgId = await resolveOrgIdFromUserArea(user.id)
 
     if (!orgId) return { success: false as const, error: 'No tienes una organización asignada' }
 
-    if (isChiefArea(user) || isStaffHealth(user)) {
+    if (isChiefArea(user) || isStaff(user)) {
       const userAreas = await prisma.userArea.findMany({
         where: { userId: user.id },
         select: { areaId: true },

@@ -36,9 +36,10 @@ const OrganizationDetailsPage = async ({ params }: PageProps) => {
 
   if (!organization) notFound()
 
-  const [t, tOrg] = await Promise.all([
+  const [t, tOrg, tCommon] = await Promise.all([
     getTranslations('superAdmin.organizationDetails'),
     getTranslations('superAdmin.organizations'),
+    getTranslations('common'),
   ])
 
   const getStatusBadge = (status: string) => {
@@ -71,13 +72,8 @@ const OrganizationDetailsPage = async ({ params }: PageProps) => {
   }
 
   const getRoleLabel = (role: string) => {
-    const labels: Record<string, string> = {
-      SUPER_ADMIN: 'Super Administrador',
-      ADMIN_HR: 'Administrador RRHH',
-      CHIEF_AREA: 'Jefe de Área',
-      STAFF_HEALTH: 'Personal de Salud',
-    }
-    return labels[role] || role
+    const key = `roles.${role}` as 'roles.SUPER_ADMIN' | 'roles.ADMIN_HR' | 'roles.CHIEF_AREA' | 'roles.CHIEF_SECTOR' | 'roles.STAFF'
+    return tCommon(key) || role
   }
 
   return (

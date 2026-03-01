@@ -53,7 +53,7 @@
 
 ### getSectorsAction
 
-**Auth**: `requireAdminHROrChiefArea()` (also STAFF_HEALTH via custom check)
+**Auth**: `requireAdminHROrChiefArea()` (also STAFF via custom check)
 **Input**: None (uses session organizationId)
 **Output**: `ActionResult<SectorWithCounts[]>`
 ```typescript
@@ -77,7 +77,7 @@
 ```
 **Role filtering**:
 - ADMIN_HR: all sectors in org
-- CHIEF_AREA/STAFF_HEALTH: sectors containing their assigned areas (via UserArea join)
+- CHIEF_AREA/STAFF: sectors containing their assigned areas (via UserArea join)
 
 ## Area Assignment Actions
 
@@ -96,7 +96,7 @@
 
 ### getSectorStaffAction
 
-**Auth**: `requireAdminHROrChiefArea()` (also STAFF_HEALTH via custom check)
+**Auth**: `requireAdminHROrChiefArea()` (also STAFF via custom check)
 **Input**:
 ```typescript
 {
@@ -128,5 +128,5 @@
 }
 ```
 **Query logic**: Three-part OR overlap, filtered by `areaId IN sectorAreaIds`, status `SCHEDULED`/`IN_PROGRESS`
-**Role filtering**: CHIEF_AREA/STAFF_HEALTH can only query sectors containing their areas (validated server-side)
+**Role filtering**: CHIEF_AREA/STAFF can only query sectors containing their areas (validated server-side)
 **Revalidates**: None (read-only query)

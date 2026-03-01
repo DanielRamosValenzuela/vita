@@ -49,7 +49,7 @@
 - [ ] T012 Create feature lib barrel exports at `src/features/sector/lib/index.ts`
 - [ ] T013 Add i18n translation keys to `messages/es.json`: `sectors.*` (title, description, create, edit, delete, empty, table columns, form labels, validation, staff query labels), `dashboard.sectors` sidebar label, `validation.sector.*`
 - [ ] T014 Add matching i18n translation keys to `messages/en.json` with identical structure
-- [ ] T015 Add "Sectores" navigation item in `src/widgets/dashboard-sidebar/constants.ts` with icon `Layers`, href `/dashboard/sectors`, roles `[ADMIN_HR, CHIEF_AREA, STAFF_HEALTH]`, positioned after "Áreas"
+- [ ] T015 Add "Sectores" navigation item in `src/widgets/dashboard-sidebar/constants.ts` with icon `Layers`, href `/dashboard/sectors`, roles `[ADMIN_HR, CHIEF_AREA, STAFF]`, positioned after "Áreas"
 
 **Checkpoint**: Foundation ready — entity layer, schemas, translations, and navigation in place. User story implementation can now begin.
 
@@ -63,7 +63,7 @@
 
 ### Implementation for User Story 1
 
-- [ ] T016 [US1] Create CRUD Server Actions at `src/features/sector/api/sector-actions.ts`: `createSectorAction`, `updateSectorAction`, `deleteSectorAction`, `getSectorsAction` — all with `requireAdminHRWithOrg()` auth (getSectors also supports CHIEF_AREA/STAFF_HEALTH with role-filtered results via UserArea join), duplicate name check, `handleActionError`, `revalidatePaths`, per contracts/sector-actions.md
+- [ ] T016 [US1] Create CRUD Server Actions at `src/features/sector/api/sector-actions.ts`: `createSectorAction`, `updateSectorAction`, `deleteSectorAction`, `getSectorsAction` — all with `requireAdminHRWithOrg()` auth (getSectors also supports CHIEF_AREA/STAFF with role-filtered results via UserArea join), duplicate name check, `handleActionError`, `revalidatePaths`, per contracts/sector-actions.md
 - [ ] T017 [US1] Create API barrel exports at `src/features/sector/api/index.ts`
 - [ ] T018 [P] [US1] Create `src/features/sector/ui/create-sector-form.tsx` — client component with useFormAction + Zod resolver, fields: name (Input), description (Textarea), icon (IconPicker), color (color input). Follow `create-area-form.tsx` pattern. Redirect to `/dashboard/sectors` on success
 - [ ] T019 [P] [US1] Create `src/features/sector/ui/sectors-table.tsx` — client component with DataTableToolbar (search), DataTablePagination, useClientPagination hook, delete confirmation AlertDialog. Columns: name+icon+color, description, areas count, actions (edit/delete/staff). Follow `areas-table.tsx` pattern
@@ -100,16 +100,16 @@
 
 **Goal**: Any user with access can query a sector to see all staff on shift for a specific date and time range, grouped by area
 
-**Independent Test**: Select sector "USI" and date range 08:00-20:00 today. Verify the query returns all shifts from all areas in the sector that overlap with the range. Verify results are grouped by area with staff name, shift type, and time shown. Verify STAFF_HEALTH pre-fill with their current shift times.
+**Independent Test**: Select sector "USI" and date range 08:00-20:00 today. Verify the query returns all shifts from all areas in the sector that overlap with the range. Verify results are grouped by area with staff name, shift type, and time shown. Verify STAFF pre-fill with their current shift times.
 
 **Depends on**: US1+US2 (sector with areas must exist, shifts must be scheduled)
 
 ### Implementation for User Story 3
 
-- [ ] T029 [US3] Create staff query Server Action at `src/features/sector/api/sector-staff-actions.ts`: `getSectorStaffAction` — accepts `{ sectorId, date, startTime, endTime }`, validates access (ADMIN_HR/CHIEF_AREA/STAFF_HEALTH via UserArea join), fetches sectorArea IDs, queries shifts with three-part OR overlap clause, status IN (SCHEDULED, IN_PROGRESS), groups results by area. Returns `SectorStaffResult` per contracts
+- [ ] T029 [US3] Create staff query Server Action at `src/features/sector/api/sector-staff-actions.ts`: `getSectorStaffAction` — accepts `{ sectorId, date, startTime, endTime }`, validates access (ADMIN_HR/CHIEF_AREA/STAFF via UserArea join), fetches sectorArea IDs, queries shifts with three-part OR overlap clause, status IN (SCHEDULED, IN_PROGRESS), groups results by area. Returns `SectorStaffResult` per contracts
 - [ ] T030 [US3] Update `src/features/sector/api/index.ts` to export `getSectorStaffAction`
 - [ ] T031 [US3] Add staff query i18n keys to `messages/es.json` and `messages/en.json`: `sectors.staffQuery.*` (title, description, dateLabel, startTimeLabel, endTimeLabel, searchButton, noResults, totalStaff, areaGroup headers, extraBadge, shiftTime format labels)
-- [ ] T032 [US3] Create `src/features/sector/ui/sector-staff-query.tsx` — client component with: sector selector (if multiple), date picker (Input type="date"), start time picker (Input type="time"), end time picker (Input type="time"), search button, results display grouped by area with Cards. Each area card shows staff list with name, shiftType badge (colored), time range, isExtra badge. Empty state message. For STAFF_HEALTH: auto-detect current shift and pre-fill date/times
+- [ ] T032 [US3] Create `src/features/sector/ui/sector-staff-query.tsx` — client component with: sector selector (if multiple), date picker (Input type="date"), start time picker (Input type="time"), end time picker (Input type="time"), search button, results display grouped by area with Cards. Each area card shows staff list with name, shiftType badge (colored), time range, isExtra badge. Empty state message. For STAFF: auto-detect current shift and pre-fill date/times
 - [ ] T033 [US3] Create staff query page at `app/[locale]/dashboard/sectors/[id]/staff/page.tsx` — Server Component with auth check (all roles with sector access), fetch sector data, render SectorStaffQuery component
 - [ ] T034 [US3] Update `src/features/sector/ui/index.ts` to export SectorStaffQuery
 - [ ] T035 [US3] Add "Ver personal" action button in `src/features/sector/ui/sectors-table.tsx` that links to `/dashboard/sectors/[id]/staff` for each sector row

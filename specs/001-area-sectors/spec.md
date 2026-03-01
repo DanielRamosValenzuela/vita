@@ -59,7 +59,7 @@ Un ADMIN_HR necesita vincular áreas existentes a un sector. Un área puede pert
 
 ### User Story 3 - Consultar personal de turno en un Sector (Priority: P2)
 
-Un usuario (STAFF_HEALTH, CHIEF_AREA o ADMIN_HR) necesita consultar qué personal está de turno dentro de un sector para un rango horario específico. Por ejemplo: una enfermera en turno de 08:00 a 20:00 quiere ver qué doctores, técnicos y kinesiólogos estarán disponibles durante esas horas en el sector USI.
+Un usuario (STAFF, CHIEF_AREA o ADMIN_HR) necesita consultar qué personal está de turno dentro de un sector para un rango horario específico. Por ejemplo: una enfermera en turno de 08:00 a 20:00 quiere ver qué doctores, técnicos y kinesiólogos estarán disponibles durante esas horas en el sector USI.
 
 **Why this priority**: Es la funcionalidad central que motiva el feature. Depende de que existan sectores con áreas asignadas (P1).
 
@@ -70,7 +70,7 @@ Un usuario (STAFF_HEALTH, CHIEF_AREA o ADMIN_HR) necesita consultar qué persona
 1. **Given** un sector "USI" con 3 áreas y turnos programados para hoy, **When** un usuario consulta el sector para el rango 08:00-20:00, **Then** ve una lista agrupada por área mostrando el personal de turno con nombre, área, tipo de turno y horario.
 2. **Given** un sector "USI" consultado para 08:00-20:00, **When** hay un doctor con turno de 08:00-16:00 y otro de 16:00-00:00, **Then** ambos aparecen porque sus turnos se solapan con el rango consultado.
 3. **Given** un sector "USI" consultado para 08:00-20:00, **When** hay un técnico con turno de 20:00-08:00 del día siguiente, **Then** el técnico NO aparece porque su turno no se solapa con el rango consultado.
-4. **Given** un STAFF_HEALTH con un turno activo, **When** accede a la vista de sector, **Then** el rango horario se pre-llena automáticamente con las horas de su turno actual.
+4. **Given** un STAFF con un turno activo, **When** accede a la vista de sector, **Then** el rango horario se pre-llena automáticamente con las horas de su turno actual.
 5. **Given** un sector sin turnos programados en el rango consultado, **When** el usuario realiza la consulta, **Then** el sistema muestra un mensaje indicando que no hay personal de turno en ese periodo.
 
 ---
@@ -99,7 +99,7 @@ Un CHIEF_AREA o ADMIN_HR puede ver un resumen de los sectores relevantes, incluy
 - **Múltiples turnos del mismo usuario**: Si un usuario tiene dos turnos en el mismo día (ej: turno normal + turno extra), ambos se muestran en la consulta de sector.
 - **Área transversal en múltiples sectores**: Si el área "Nutrición" pertenece a USI, UTI y Urgencias, la nutricionista de turno aparece en la consulta de los 3 sectores. Esto es correcto: el personal transversal es visible en todos los sectores que atiende.
 - **Organización sin sectores**: El feature es completamente opcional. Si una organización no crea sectores, el resto de la aplicación funciona exactamente igual.
-- **Permisos**: STAFF_HEALTH solo puede ver información de sectores que contienen áreas donde tienen asignación (vía UserArea). No pueden ver sectores de áreas a las que no pertenecen.
+- **Permisos**: STAFF solo puede ver información de sectores que contienen áreas donde tienen asignación (vía UserArea). No pueden ver sectores de áreas a las que no pertenecen.
 
 ## Requirements *(mandatory)*
 
@@ -117,10 +117,10 @@ Un CHIEF_AREA o ADMIN_HR puede ver un resumen de los sectores relevantes, incluy
 - **FR-010**: La consulta de personal por sector DEBE incluir todos los turnos que se solapan parcial o totalmente con el rango horario especificado.
 - **FR-011**: La consulta de personal DEBE mostrar: nombre del trabajador, área, tipo de turno, horario exacto del turno, y si es turno extra.
 - **FR-012**: La consulta de personal DEBE agrupar los resultados por área dentro del sector.
-- **FR-013**: Para STAFF_HEALTH, el rango horario de consulta DEBE pre-llenarse con el horario de su turno actual o próximo (si existe).
+- **FR-013**: Para STAFF, el rango horario de consulta DEBE pre-llenarse con el horario de su turno actual o próximo (si existe).
 - **FR-014**: El acceso a sectores DEBE respetar el modelo multi-tenant: cada organización ve solo sus sectores.
 - **FR-015**: CHIEF_AREA solo DEBE ver sectores que contengan al menos una de sus áreas asignadas.
-- **FR-016**: STAFF_HEALTH solo DEBE ver sectores que contengan al menos una de las áreas donde están asignados.
+- **FR-016**: STAFF solo DEBE ver sectores que contengan al menos una de las áreas donde están asignados.
 - **FR-017**: La eliminación de un área DEBE eliminar automáticamente sus vínculos con sectores (sin eliminar el sector).
 
 ### Key Entities
@@ -136,7 +136,7 @@ Un CHIEF_AREA o ADMIN_HR puede ver un resumen de los sectores relevantes, incluy
 - **SC-002**: Un usuario puede consultar el personal de turno de un sector para un rango horario en menos de 5 segundos desde que selecciona el sector.
 - **SC-003**: La consulta de sector muestra correctamente el 100% de los turnos que se solapan con el rango horario consultado (sin falsos negativos).
 - **SC-004**: El feature es completamente opcional: organizaciones que no crean sectores no experimentan ningún cambio en la interfaz ni en el rendimiento.
-- **SC-005**: 80% de los usuarios de STAFF_HEALTH pueden consultar el personal del sector sin necesidad de instructivo o capacitación.
+- **SC-005**: 80% de los usuarios de STAFF pueden consultar el personal del sector sin necesidad de instructivo o capacitación.
 
 ## Clarifications
 

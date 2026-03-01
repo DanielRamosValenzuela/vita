@@ -58,12 +58,12 @@ export async function requireAdminHRWithOrg(
   return user as CurrentUser & { organizationId: string }
 }
 
-export async function requireAdminHROrChiefArea(
+export async function requireAdminHROrChief(
   locale: string = 'es'
 ): Promise<CurrentUser & { organizationId: string | null }> {
   const user = await requireAuth(locale)
   const isAdminHR = user.role === Role.ADMIN_HR
-  const isChief = String(user.role) === 'CHIEF_AREA'
+  const isChief = user.role === Role.CHIEF_AREA || user.role === Role.CHIEF_SECTOR
 
   if (!isAdminHR && !isChief) redirect(`/${locale}/dashboard`)
 
@@ -79,7 +79,8 @@ export async function requireDashboardUser(
   const allowed =
     user.role === Role.ADMIN_HR ||
     user.role === Role.CHIEF_AREA ||
-    user.role === Role.STAFF_HEALTH
+    user.role === Role.CHIEF_SECTOR ||
+    user.role === Role.STAFF
 
   if (!allowed) redirect(`/${locale}/dashboard`)
 

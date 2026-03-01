@@ -35,7 +35,7 @@ src/
 
 ## 3. Roles, dominios y workflows
 
-- **Roles:** `SUPER_ADMIN`, `ADMIN_HR`, `CHIEF_AREA`, `STAFF_HEALTH`.
+- **Roles:** `SUPER_ADMIN`, `ADMIN_HR`, `CHIEF_AREA`, `STAFF`.
 - **Docs:** `docs/vita-roles.md` y `docs/vita-workflows.md` describen flujos completos por rol.
 
 **Dominios principales:**
@@ -43,7 +43,7 @@ src/
 - **Organizaciones / SUPER_ADMIN:** CRUD de organizaciones, planes y límites.
 - **ADMIN_HR:** configuración de organización, invitaciones, gestión de áreas, tipos de turno, tarifas flexibles y contratos, personal (`/dashboard/admin-hr/*`, `/dashboard/areas`, `/dashboard/shift-types`, `/dashboard/rates`, `/dashboard/staff`).
 - **CHIEF_AREA:** gestiona turnos y ve staff solo de sus áreas (via `UserArea`).
-- **STAFF_HEALTH:** ve sus turnos y perfil avanzado (múltiples emails, documentos, avatar).
+- **STAFF:** ve sus turnos y perfil avanzado (múltiples emails, documentos, avatar).
 
 Cuando el usuario pregunte por “cómo funciona X”, prioriza `docs/vita-workflows.md` y `docs/SISTEMA-PAGOS-Y-TARIFAS.md`.
 

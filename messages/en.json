@@ -20,6 +20,13 @@
     "logoLabel": "VITA - Home",
     "profile": "Profile",
     "settings": "Settings",
+    "roles": {
+      "SUPER_ADMIN": "Super Administrator",
+      "ADMIN_HR": "Administrator",
+      "CHIEF_AREA": "Area Chief",
+      "CHIEF_SECTOR": "Sector Chief",
+      "STAFF": "Staff"
+    },
     "languages": {
       "es": "Spanish",
       "en": "English"
@@ -40,7 +47,8 @@
       "withContract": "With contract",
       "withoutContract": "Without contract",
       "allRoles": "All roles",
-      "chief": "Area Chief",
+      "chiefArea": "Area Chief",
+      "chiefSector": "Sector Chief",
       "staff": "Staff",
       "allAreas": "All areas",
       "allTemplates": "All templates"
@@ -51,19 +59,22 @@
     "register": "Sign Up",
     "logout": "Sign Out",
     "profile": "My Profile",
+    "features": "Features",
+    "pricing": "Pricing",
     "support": "Support",
     "contact": "Contact Us",
     "toggleMenu": "Toggle menu"
   },
   "hero": {
+    "badge": "Shift Management Platform",
     "title": {
-      "line1": "Manage your medical shifts",
-      "line2": "intelligently"
+      "line1": "Automate your team's",
+      "line2": "shift management"
     },
-    "description": "Complete shift and attendance management system for healthcare institutions. Optimize your staff, reduce costs, and improve operational efficiency.",
+    "description": "Digital calendar, automatic pay calculation, and legal compliance. All in one platform designed for teams that work in shifts.",
     "cta": {
-      "primary": "Get Started Free",
-      "secondary": "Sign In",
+      "primary": "Request Free Demo",
+      "secondary": "See how it works",
       "dashboard": "Go to Dashboard"
     },
     "features": {
@@ -187,9 +198,10 @@
     "criticalsMessage": "Some roles have reached or exceeded their limits",
     "warningsMessage": "Some roles are close to reaching their limits",
     "roles": {
-      "ADMIN_HR": "Admin HR",
+      "ADMIN_HR": "Administrators",
       "CHIEF_AREA": "Area Chiefs",
-      "STAFF_HEALTH": "Health Staff",
+      "CHIEF_SECTOR": "Sector Chiefs",
+      "STAFF": "Staff",
       "unknown": "Unknown"
     },
     "badgeExceeded": "Exceeded",
@@ -267,6 +279,85 @@
     "calendarViewComingSoon": "Calendar in development",
     "calendarViewComingSoonDescription": "The calendar component will be implemented soon"
   },
+  "staffDashboard": {
+    "title": "My Calendar",
+    "description": "View your assigned shifts",
+    "emptyState": "You have no shifts assigned this month",
+    "emptyStateDescription": "When shifts are assigned to you, they will appear here",
+    "loading": "Loading shifts...",
+    "upcoming": {
+      "title": "Upcoming Shifts",
+      "empty": "You have no upcoming shifts scheduled",
+      "today": "Today",
+      "tomorrow": "Tomorrow"
+    },
+    "shiftDetail": {
+      "title": "Shift Detail",
+      "area": "Area",
+      "shiftType": "Shift Type",
+      "schedule": "Schedule",
+      "status": "Status",
+      "rotation": "Rotation",
+      "extra": "Extra Shift",
+      "nightShift": "Night shift (continues next day)"
+    },
+    "personnel": {
+      "title": "Active Sector Personnel",
+      "titleNoSector": "Active Area Personnel",
+      "loading": "Loading personnel...",
+      "totalStaff": "{count} active staff",
+      "relayIncoming": "Relay from {name}",
+      "relayOutgoing": "Relay to {name}",
+      "noPersonnel": "No active personnel at this time"
+    },
+    "export": {
+      "button": "Export",
+      "downloadIcs": "Download .ics for the month",
+      "feedPerOrg": "iCal Subscription (this organization)",
+      "feedUnified": "iCal Subscription (all my organizations)",
+      "manageFeeds": "Manage feeds",
+      "feedUrl": "Feed URL",
+      "copyUrl": "Copy URL",
+      "urlCopied": "URL copied to clipboard",
+      "createFeed": "Create feed",
+      "feedCreated": "Feed created successfully",
+      "revokeFeed": "Revoke",
+      "feedRevoked": "Feed revoked",
+      "noFeeds": "You have no active feeds",
+      "perOrgLabel": "Organization",
+      "unifiedLabel": "Unified (all organizations)",
+      "downloadSuccess": ".ics file downloaded",
+      "downloadError": "Error generating file"
+    },
+    "google": {
+      "connect": "Connect Google Calendar",
+      "connected": "Google Calendar connected",
+      "disconnect": "Disconnect",
+      "disconnectConfirm": "Disconnect Google Calendar?",
+      "disconnectDescription": "Imported events will no longer be shown in your calendar.",
+      "connecting": "Connecting...",
+      "personalEvent": "Personal Event",
+      "conflict": "Schedule conflict"
+    },
+    "notes": {
+      "title": "Note",
+      "placeholder": "Write a note for this day...",
+      "save": "Save",
+      "delete": "Delete",
+      "saving": "Saving...",
+      "saved": "Note saved",
+      "deleted": "Note deleted",
+      "error": "Error saving note",
+      "legendNote": "Personal note"
+    },
+    "status": {
+      "SCHEDULED": "Scheduled",
+      "IN_PROGRESS": "In Progress",
+      "COMPLETED": "Completed",
+      "CANCELLED": "Cancelled",
+      "NO_SHOW": "No Show"
+    }
+  },
   "shifts": {
     "title": "Shift Management",
     "description": "Manage your staff shifts efficiently",
@@ -342,7 +433,8 @@
       "weekend": "Weekend",
       "holiday": "Holiday",
       "rotation": "Rotation",
-      "extra": "Extra Shift"
+      "extra": "Extra Shift",
+      "note": "Personal note"
     },
     "rotationDetail": {
       "title": "Rotation Shifts",
@@ -806,9 +898,10 @@
       },
       "roles": {
         "SUPER_ADMIN": "Super Administrator",
-        "ADMIN_HR": "HR Administrator",
+        "ADMIN_HR": "Administrator",
         "CHIEF_AREA": "Area Chief",
-        "STAFF_HEALTH": "Health Staff"
+        "CHIEF_SECTOR": "Sector Chief",
+        "STAFF": "Staff"
       },
       "actions": {
         "view": "View details",
@@ -1332,7 +1425,8 @@
         "description": "Search for a user by email or document to invite them to your team.",
         "roleLabel": "Role to Invite",
         "roleChief": "Area Chief",
-        "roleStaff": "Health Staff",
+        "roleChiefSector": "Sector Chief",
+        "roleStaff": "Staff",
         "emailLabel": "Email",
         "emailPlaceholder": "example@email.com",
         "emailInvalid": "Invalid email",
@@ -1366,7 +1460,8 @@
         "cancelSuccess": "Invitation cancelled successfully",
         "cancelError": "Error cancelling invitation",
         "roleChief": "Area Chief",
-        "roleStaff": "Health Staff",
+        "roleChiefSector": "Sector Chief",
+        "roleStaff": "Staff",
         "columns": {
           "user": "User",
           "email": "Email",
@@ -1611,6 +1706,7 @@
     "rates": {
       "title": "Rates & Contracts",
       "description": "Assign rates to staff as negotiated. Create global types or customize per person.",
+      "guideLink": "Rates guide",
       "noOrganization": "You don't have an organization assigned",
       "loadError": "Error loading",
       "staffTable": {
@@ -1806,6 +1902,138 @@
         "baseSalary": "Base salary (optional)",
         "contractsCount": "{count} contract(s)"
       },
+      "guide": {
+        "title": "Rate System Guide",
+        "subtitle": "Learn how VITA's flexible rate system works and how to create rate templates with custom components.",
+        "backToRates": "Back to Rates",
+        "overview": {
+          "title": "Overview",
+          "description": "VITA's rate system lets you define exactly how your staff gets paid. Instead of a flat rate, you can combine multiple components to reflect your actual salary structure.",
+          "template": "Rate Template",
+          "templateDesc": "A reusable set of payment rules that you define once and assign to multiple people.",
+          "component": "Component",
+          "componentDesc": "Each individual piece of the calculation: base salary, bonuses, multipliers, etc.",
+          "contract": "Contract",
+          "contractDesc": "The link between a person and a rate template, with start date and optional multiplier."
+        },
+        "flow": {
+          "title": "Workflow",
+          "step1": {
+            "title": "Create a Template",
+            "description": "Define the name and add payment components based on the position's needs."
+          },
+          "step2": {
+            "title": "Configure Components",
+            "description": "For each component, choose the type, amount, unit, and when it applies."
+          },
+          "step3": {
+            "title": "Assign to Staff",
+            "description": "Link the template to each person by creating a contract with an optional multiplier."
+          },
+          "step4": {
+            "title": "Automatic Calculation",
+            "description": "VITA calculates the payment for each shift based on the applicable components."
+          }
+        },
+        "componentTypes": {
+          "title": "Component Types",
+          "description": "VITA includes 19 predefined component types grouped into 4 main categories.",
+          "fixed": {
+            "title": "Fixed Payments",
+            "description": "Amounts paid regularly, independent of shifts.",
+            "baseSalary": "Fixed monthly, biweekly, or weekly salary",
+            "perShift": "Fixed amount for each completed shift",
+            "completionBonus": "Extra bonus for completing the full shift"
+          },
+          "timeBased": {
+            "title": "Time-Based Payments",
+            "description": "Calculated based on actual time worked.",
+            "perMinute": "Payment for each minute worked",
+            "perHour": "Payment for each hour worked"
+          },
+          "bonuses": {
+            "title": "Conditional Bonuses",
+            "description": "Additional amounts applied under specific conditions.",
+            "night": "Extra for working night hours",
+            "weekend": "Extra for working Saturday or Sunday",
+            "holiday": "Extra for working on holidays",
+            "seniority": "Bonus for years of service",
+            "performance": "Bonus for meeting goals",
+            "area": "Extra for working in specific areas",
+            "emergency": "Bonus for emergency coverage",
+            "onCall": "Bonus for being on standby"
+          },
+          "multipliers": {
+            "title": "Multipliers",
+            "description": "Factors that multiply the base amount based on the shift context.",
+            "weekend": "Multiplies base pay on weekends",
+            "holiday": "Multiplies base pay on holidays",
+            "irrenunciable": "Legal multiplier for mandatory holidays",
+            "night": "Multiplies base pay during night hours",
+            "overtime": "Multiplies pay for overtime hours"
+          },
+          "custom": {
+            "title": "Custom",
+            "description": "Create custom components with your own name and rules for unique cases in your organization."
+          }
+        },
+        "units": {
+          "title": "Payment Units",
+          "description": "Each component has a unit that defines how its value is calculated.",
+          "periodic": "Periodic",
+          "periodicDesc": "Monthly, Biweekly, Weekly, Daily — regular payments independent of shifts.",
+          "eventBased": "Event-Based",
+          "eventBasedDesc": "Per Shift, Per Minute, Per Hour — calculated when the person works.",
+          "calculated": "Calculated",
+          "calculatedDesc": "Percentage, Multiplier, Fixed Amount — applied on top of other base values."
+        },
+        "conditions": {
+          "title": "Apply Conditions",
+          "description": "Each component can have a condition that determines when it applies.",
+          "always": "Always included in the calculation",
+          "weekday": "Only applies Monday through Friday",
+          "weekend": "Only applies Saturday and Sunday",
+          "holiday": "Only applies on holidays marked in the calendar",
+          "irrenunciable": "Only on mandatory holidays (Christmas, New Year, etc.)",
+          "overtime": "Only applies to extra hours beyond the scheduled shift",
+          "shiftType": "Only applies to specific shift types you choose"
+        },
+        "example": {
+          "title": "Practical Example",
+          "description": "Here's what a complete rate template looks like for an ICU nurse:",
+          "templateName": "ICU Nursing Rate",
+          "component1": "Base Salary — $500,000 monthly — Always",
+          "component2": "Per Shift — $50,000 per shift — Long Guard only",
+          "component3": "Night Bonus — $15,000 fixed — Night hours only",
+          "component4": "Overtime — $500/minute — Overtime only",
+          "component5": "Holiday Mult. — 2.5x — Holidays only",
+          "resultTitle": "Result for a night Long Guard shift on a holiday:",
+          "resultLine1": "Proportional base salary for the day",
+          "resultLine2": "$50,000 for completing the guard",
+          "resultLine3": "$15,000 night bonus",
+          "resultLine4": "Everything multiplied by 2.5x (holiday)",
+          "resultLine5": "Overtime at $500/min if applicable"
+        },
+        "tips": {
+          "title": "Tips & Best Practices",
+          "tip1": {
+            "title": "Start simple",
+            "description": "Create templates with 2-3 components first. You can always add more later."
+          },
+          "tip2": {
+            "title": "Reuse templates",
+            "description": "The same template can be assigned to many people. Use the contract multiplier to adjust individually."
+          },
+          "tip3": {
+            "title": "Use duplication",
+            "description": "If you need a variant of an existing template, duplicate it and modify only what's needed."
+          },
+          "tip4": {
+            "title": "Document your components",
+            "description": "Use the description field to explain why each component exists. Your future self will thank you."
+          }
+        }
+      },
       "saveConfirm": {
         "title": "Save changes?",
         "description": "Are you sure you want to save the changes?",
@@ -1937,8 +2165,9 @@
       "multiplierBadge": "{value}x"
     },
     "roles": {
-      "chief": "Area Chief",
-      "staff": "Health Staff"
+      "chiefArea": "Area Chief",
+      "chiefSector": "Sector Chief",
+      "staff": "Staff"
     },
     "goToRates": "Manage Rates",
     "empty": "No staff in the organization",
@@ -2304,7 +2533,14 @@
       "processingGenerateMsg1": "Creating shifts in database",
       "processingGenerateMsg2": "Checking schedule conflicts",
       "processingGenerateMsg3": "Assigning active contracts",
-      "processingGenerateMsg4": "Sending staff notifications"
+      "processingGenerateMsg4": "Sending staff notifications",
+      "endDateDisabledHint": "Select start date first",
+      "startingGroup": "Starting group",
+      "startingGroupHint": "The selected group will start from step 1 of the pattern",
+      "lastGenerationInfo": "Last generation: {date} — {group} ({shiftType})",
+      "totalGeneratedShifts": "{count} shifts generated",
+      "noExistingShifts": "No previously generated shifts",
+      "defaultGroupOrder": "Default order"
     },
     "coverage": {
       "title": "Coverage",
@@ -2432,6 +2668,454 @@
       "rotationGenerated": "Generated by rotation",
       "manualShift": "Manual shift",
       "noRotation": "You are not assigned to any rotation"
+    }
+  },
+  "landing": {
+    "socialProof": {
+      "metric1": "+500",
+      "metric1Label": "Professionals managed",
+      "metric2": "99.9%",
+      "metric2Label": "Uptime",
+      "metric3": "-70%",
+      "metric3Label": "Planning time",
+      "metric4": "24/7",
+      "metric4Label": "Technical support",
+      "trustedBy": "Used by healthcare teams in Chile"
+    },
+    "problem": {
+      "tag": "The Problem",
+      "title": "Excel wasn't designed to manage shifts",
+      "description": "If you're still using spreadsheets, legacy systems, or WhatsApp to coordinate shifts, you're losing time, money, and peace of mind.",
+      "pain1": {
+        "title": "Constant manual errors",
+        "description": "Copy-pasting shifts between cells creates conflicts, duplications, and uncovered positions."
+      },
+      "pain2": {
+        "title": "No real-time visibility",
+        "description": "Nobody knows who's working right now. Changes get lost between file versions."
+      },
+      "pain3": {
+        "title": "Complex pay calculations",
+        "description": "Overtime, night shifts, holidays, bonuses... calculating each component by hand is a headache."
+      },
+      "pain4": {
+        "title": "Legal compliance risk",
+        "description": "Labor law requires minimum rest periods and hour limits. Without a system, compliance is a gamble."
+      }
+    },
+    "features": {
+      "tag": "Features",
+      "title": "Everything you need to manage shifts",
+      "description": "A complete platform that replaces spreadsheets, legacy systems, and WhatsApp groups.",
+      "feature1": {
+        "title": "Digital Calendar",
+        "description": "View and manage all your organization's shifts in an interactive calendar with daily, weekly, and monthly views."
+      },
+      "feature2": {
+        "title": "Automatic Pay Calculation",
+        "description": "Define flexible rate components and let VITA automatically calculate the pay for each shift."
+      },
+      "feature3": {
+        "title": "Legal Compliance",
+        "description": "Automatic validations based on Chilean Labor Code: rest periods, hour limits, and restrictions."
+      },
+      "feature4": {
+        "title": "Smart Rotations",
+        "description": "Create rotation patterns and assign them to groups. The system generates shifts automatically."
+      },
+      "feature5": {
+        "title": "Multi-Area Management",
+        "description": "Organize your team by areas and sectors. Each manager handles only what's theirs."
+      },
+      "feature6": {
+        "title": "No Expensive Hardware",
+        "description": "100% cloud-based. No servers, no installations, no costly biometrics. Just a browser."
+      }
+    },
+    "howItWorks": {
+      "tag": "How It Works",
+      "title": "Up and running in 3 simple steps",
+      "description": "From setup to daily management, VITA adapts to your organization.",
+      "step1": {
+        "number": "1",
+        "title": "Set up your organization",
+        "description": "Create areas, define shift types, and set pay rates. All from an intuitive dashboard."
+      },
+      "step2": {
+        "number": "2",
+        "title": "Invite your team",
+        "description": "Send email invitations. Each person registers and gets linked to their area and contract."
+      },
+      "step3": {
+        "number": "3",
+        "title": "Manage intelligently",
+        "description": "Assign shifts, review calculated payments, and maintain legal compliance automatically."
+      }
+    },
+    "benefits": {
+      "tag": "Benefits by Role",
+      "title": "Designed for every role in your organization",
+      "description": "Each user sees exactly what they need, nothing more.",
+      "hr": {
+        "tab": "HR / Admin",
+        "title": "For the HR Team",
+        "description": "Full control over the organization, staff, and payments.",
+        "benefit1": "Complete visibility of all shifts and areas",
+        "benefit2": "Automatic pay calculation with flexible rates",
+        "benefit3": "Contract management and staff linking",
+        "benefit4": "Reports and data export",
+        "benefit5": "Automated invitations and onboarding"
+      },
+      "chief": {
+        "tab": "Area Managers",
+        "title": "For Area Managers",
+        "description": "Manage your team without relying on HR for every change.",
+        "benefit1": "Real-time area calendar",
+        "benefit2": "Direct shift assignment to your staff",
+        "benefit3": "Conflict and insufficient rest alerts",
+        "benefit4": "Team availability view",
+        "benefit5": "Rotation and pattern management"
+      },
+      "staff": {
+        "tab": "Staff",
+        "title": "For Healthcare Staff",
+        "description": "Your shifts always clear, accessible, and up to date.",
+        "benefit1": "Personal calendar with all your shifts",
+        "benefit2": "Change and assignment notifications",
+        "benefit3": "Professional profile with multiple organizations",
+        "benefit4": "Shift and payment history",
+        "benefit5": "Access from any device"
+      }
+    },
+    "testimonials": {
+      "tag": "Testimonials",
+      "title": "What our users say",
+      "description": "Real teams that transformed their shift management with VITA.",
+      "testimonial1": {
+        "quote": "We went from spending 2 days a month making shifts in Excel to having them ready in minutes. VITA completely changed our operation.",
+        "name": "Dr. María González",
+        "role": "Head of Nursing",
+        "org": "Regional Hospital"
+      },
+      "testimonial2": {
+        "quote": "Automatic pay calculation saved us countless hours of manual work and eliminated errors that generated complaints.",
+        "name": "Carlos Muñoz",
+        "role": "HR Director",
+        "org": "Santa María Clinic"
+      },
+      "testimonial3": {
+        "quote": "I can finally see my shifts from my phone without calling the office. Simple, fast, and always up to date.",
+        "name": "Nurse Sofía Ramírez",
+        "role": "Shift Nurse",
+        "org": "Integral Medical Center"
+      }
+    },
+    "pricing": {
+      "tag": "Pricing",
+      "title": "Plans adapted to your organization",
+      "description": "Transparent pricing based on your team size. No hidden costs.",
+      "monthly": "/month",
+      "cta": "Request Quote",
+      "popular": "Most Popular",
+      "plan1": {
+        "name": "Small Clinic",
+        "price": "$770",
+        "currency": "USD",
+        "staff": "Up to 30 professionals",
+        "feature1": "Complete digital calendar",
+        "feature2": "Automatic pay calculation",
+        "feature3": "Area and sector management",
+        "feature4": "Email support"
+      },
+      "plan2": {
+        "name": "Medium Hospital",
+        "price": "$1,800",
+        "currency": "USD",
+        "staff": "Up to 80 professionals",
+        "feature1": "Everything in previous plan",
+        "feature2": "Smart rotations",
+        "feature3": "Advanced legal validations",
+        "feature4": "Priority support"
+      },
+      "plan3": {
+        "name": "Large Hospital",
+        "price": "$4,200",
+        "currency": "USD",
+        "staff": "Up to 200 professionals",
+        "feature1": "Everything in previous plan",
+        "feature2": "Multi-site",
+        "feature3": "API and integrations",
+        "feature4": "Dedicated 24/7 support"
+      }
+    },
+    "faq": {
+      "tag": "FAQ",
+      "title": "Have questions? We've got answers",
+      "q1": "What types of organizations can use VITA?",
+      "a1": "VITA is designed for any organization that works with shifts: hospitals, clinics, medical centers, security companies, retail, and more. Our focus is on healthcare, but the platform is flexible.",
+      "q2": "Do I need to install anything on my computers?",
+      "a2": "No. VITA is 100% cloud-based. You just need an updated web browser. No installation, no own servers, no special hardware required.",
+      "q3": "How does pay calculation work?",
+      "a3": "You define rate components (base, night shifts, holidays, overtime, bonuses, etc.) and VITA automatically calculates the payment for each shift according to the rules you set up.",
+      "q4": "Does VITA comply with Chilean labor law?",
+      "a4": "Yes. VITA includes validations based on Chile's Labor Code: minimum rest between shifts, weekly hour limits, night shift restrictions, and more.",
+      "q5": "Can I migrate my data from Excel?",
+      "a5": "Yes. We offer assistance to migrate your information from existing spreadsheets to VITA. Our team supports you throughout the process.",
+      "q6": "How long does it take to implement VITA?",
+      "a6": "Basic setup takes less than an hour. For large organizations with multiple areas and complex rates, we offer assisted implementation in 1-2 weeks.",
+      "q7": "Is my data secure?",
+      "a7": "Absolutely. We use enterprise-level encryption, secure servers, and comply with data protection regulations. Your data is never shared with third parties.",
+      "q8": "Do you offer a trial period?",
+      "a8": "Yes. We offer a personalized demo and a trial period so you can evaluate the platform with your real team before committing."
+    },
+    "finalCta": {
+      "title": "Transform your organization's shift management",
+      "description": "Join the teams that have already left spreadsheets and legacy systems behind. Start today with VITA.",
+      "cta": "Request Free Demo",
+      "secondary": "Talk to Sales"
+    }
+  },
+  "featuresPage": {
+    "title": "VITA Features",
+    "description": "Discover all the functionalities that make VITA the leading shift management platform.",
+    "calendar": {
+      "title": "Smart Digital Calendar",
+      "description": "An interactive calendar designed for the complexity of rotating shifts.",
+      "feature1": "Daily, weekly, and monthly views",
+      "feature2": "Drag and drop for quick reassignment",
+      "feature3": "Filters by area, sector, and shift type",
+      "feature4": "Visual conflict indicators"
+    },
+    "payments": {
+      "title": "Automatic Pay Calculation",
+      "description": "A flexible calculation engine that adapts to any compensation structure.",
+      "feature1": "18 predefined rate component types",
+      "feature2": "Unlimited custom components",
+      "feature3": "Real-time calculation per shift",
+      "feature4": "Export for payroll systems"
+    },
+    "legal": {
+      "title": "Automated Legal Compliance",
+      "description": "Validations that protect your organization and your team.",
+      "feature1": "Minimum rest between shifts (11 hours)",
+      "feature2": "Weekly worked hours limit",
+      "feature3": "Night shift restrictions",
+      "feature4": "Preventive alerts before assigning"
+    },
+    "rotations": {
+      "title": "Rotations & Patterns",
+      "description": "Automate shift assignment with smart patterns.",
+      "feature1": "Customizable rotation patterns",
+      "feature2": "Rotation groups with automatic assignment",
+      "feature3": "Bulk shift generation",
+      "feature4": "Per-person adjustments and exceptions"
+    },
+    "multiArea": {
+      "title": "Multi-Area & Multi-Site Management",
+      "description": "Organize complex teams with flexible hierarchies.",
+      "feature1": "Independent areas and sectors",
+      "feature2": "Area managers with scoped permissions",
+      "feature3": "Shared staff between areas",
+      "feature4": "Consolidated view for HR"
+    },
+    "mobile": {
+      "title": "Cross-Platform Access",
+      "description": "Your team always connected, from anywhere.",
+      "feature1": "Responsive web application",
+      "feature2": "Access from phone and tablet",
+      "feature3": "Real-time notifications",
+      "feature4": "No installation required"
+    },
+    "cta": {
+      "title": "Ready to modernize your shift management?",
+      "description": "Request a personalized demo and discover how VITA can transform your operation.",
+      "button": "Request Demo"
+    }
+  },
+  "pricingPage": {
+    "title": "Transparent Pricing",
+    "description": "Plans designed for organizations of all sizes. No surprises, no hidden costs.",
+    "calculator": {
+      "title": "Calculate your estimated price",
+      "staffLabel": "Number of professionals",
+      "staffPlaceholder": "E.g.: 50",
+      "estimate": "Estimated price",
+      "contact": "Contact for exact quote",
+      "disclaimer": "* Reference prices. The final value depends on your organization's specific characteristics."
+    },
+    "allPlans": "All plans include",
+    "included1": "Complete digital calendar",
+    "included2": "Automatic pay calculation",
+    "included3": "Area and sector management",
+    "included4": "Chilean legal compliance",
+    "included5": "Free updates",
+    "included6": "Assisted data migration",
+    "cta": {
+      "title": "Not sure which plan to choose?",
+      "description": "Our team helps you find the best option for your organization.",
+      "button": "Talk to an Advisor"
+    }
+  },
+  "aboutPage": {
+    "title": "About VITA",
+    "description": "We're transforming how organizations manage their shifts.",
+    "mission": {
+      "title": "Our Mission",
+      "description": "Eliminate the complexity of shift management so teams can focus on what truly matters: their patients and their work."
+    },
+    "story": {
+      "title": "Our Story",
+      "p1": "VITA was born from a real frustration: shift management in Chilean healthcare institutions still depends on Excel spreadsheets, expensive legacy systems, and error-prone manual processes.",
+      "p2": "Founded by professionals who experienced the problem firsthand, VITA combines modern technology with a deep understanding of the operational needs of hospitals and clinics.",
+      "p3": "Today, VITA is a SaaS platform that helps organizations of all sizes automate their shifts, calculate payments, and comply with Chilean labor legislation."
+    },
+    "values": {
+      "title": "Our Values",
+      "value1": {
+        "title": "Simplicity",
+        "description": "Technology should simplify, not complicate. Every design decision seeks the clearest solution."
+      },
+      "value2": {
+        "title": "Reliability",
+        "description": "Shifts and payments don't tolerate errors. We build robust and verified systems."
+      },
+      "value3": {
+        "title": "Closeness",
+        "description": "We understand your reality because we've lived it. Human and personalized support."
+      }
+    },
+    "cta": {
+      "title": "Want to learn more?",
+      "description": "Schedule a conversation with our team.",
+      "button": "Contact Us"
+    }
+  },
+  "contactPage": {
+    "title": "Contact Us",
+    "description": "We're here to help. Write to us and we'll get back to you shortly.",
+    "form": {
+      "name": "Full name",
+      "namePlaceholder": "Your name",
+      "email": "Email address",
+      "emailPlaceholder": "you@email.com",
+      "org": "Organization",
+      "orgPlaceholder": "Your organization name",
+      "message": "Message",
+      "messagePlaceholder": "How can we help you?",
+      "submit": "Send Message",
+      "success": "Message sent successfully. We'll get back to you soon.",
+      "disclaimer": "By submitting this form you accept our privacy policy."
+    },
+    "info": {
+      "title": "Contact Information",
+      "email": "contact@vita-shifts.com",
+      "schedule": "Monday to Friday, 9:00 AM - 6:00 PM (CLT)",
+      "location": "Santiago, Chile"
+    }
+  },
+  "supportPage": {
+    "title": "Support Center",
+    "description": "Find quick answers or contact our support team.",
+    "categories": {
+      "gettingStarted": {
+        "title": "Getting Started",
+        "description": "Guides to start using VITA.",
+        "item1": "Create your account and organization",
+        "item2": "Set up areas and sectors",
+        "item3": "Invite your team",
+        "item4": "Create your first shift"
+      },
+      "shifts": {
+        "title": "Shift Management",
+        "description": "Everything about creating and managing shifts.",
+        "item1": "Assign shifts manually",
+        "item2": "Configure rotations",
+        "item3": "Resolve schedule conflicts",
+        "item4": "Export calendar"
+      },
+      "payments": {
+        "title": "Payments & Rates",
+        "description": "Payment setup and calculation.",
+        "item1": "Create rate templates",
+        "item2": "Configure payment components",
+        "item3": "Review shift calculations",
+        "item4": "Export payment reports"
+      },
+      "account": {
+        "title": "Account & Profile",
+        "description": "Account management and settings.",
+        "item1": "Update personal information",
+        "item2": "Change password",
+        "item3": "Manage notifications",
+        "item4": "Multiple organizations"
+      }
+    },
+    "contact": {
+      "title": "Need more help?",
+      "description": "Our support team is ready to assist you.",
+      "button": "Contact Support"
+    }
+  },
+  "privacyPage": {
+    "title": "Privacy Policy",
+    "lastUpdated": "Last updated: February 2026",
+    "intro": "At VITA, we take your data privacy very seriously. This policy describes how we collect, use, and protect your personal information.",
+    "section1": {
+      "title": "1. Information We Collect",
+      "content": "We collect information you provide directly when creating an account, such as your name, email, organization, and professional data. We also collect service usage data to improve the platform."
+    },
+    "section2": {
+      "title": "2. How We Use Your Information",
+      "content": "We use your information to provide and improve our services, process shifts and pay calculations, send relevant notifications, and comply with legal obligations."
+    },
+    "section3": {
+      "title": "3. Data Protection",
+      "content": "We implement technical and organizational security measures to protect your data, including encryption in transit and at rest, restricted access, and regular audits."
+    },
+    "section4": {
+      "title": "4. Data Sharing",
+      "content": "We do not sell or share your personal data with third parties, except when necessary to provide the service (infrastructure providers) or when required by law."
+    },
+    "section5": {
+      "title": "5. Your Rights",
+      "content": "You have the right to access, rectify, delete, and port your personal data. You can exercise these rights by contacting us at any time."
+    },
+    "section6": {
+      "title": "6. Contact",
+      "content": "For privacy inquiries, write to us at privacy@vita-shifts.com."
+    }
+  },
+  "termsPage": {
+    "title": "Terms of Service",
+    "lastUpdated": "Last updated: February 2026",
+    "intro": "By using VITA, you agree to the following terms and conditions. Please read them carefully.",
+    "section1": {
+      "title": "1. Acceptance of Terms",
+      "content": "By accessing or using VITA, you agree to be bound by these terms of service. If you do not agree, you must not use the platform."
+    },
+    "section2": {
+      "title": "2. Service Description",
+      "content": "VITA is a SaaS shift management platform that enables organizations to plan, assign, and manage work shifts, calculate payments, and comply with labor legislation."
+    },
+    "section3": {
+      "title": "3. User Accounts",
+      "content": "You are responsible for maintaining the confidentiality of your account and password. You must notify us immediately if you detect unauthorized use of your account."
+    },
+    "section4": {
+      "title": "4. Acceptable Use",
+      "content": "You agree to use VITA only for legitimate shift management purposes. You must not attempt to access other organizations' data or compromise system security."
+    },
+    "section5": {
+      "title": "5. Intellectual Property",
+      "content": "VITA and all its content, features, and functionality are the exclusive property of its creators. No license is granted over the source code or intellectual property."
+    },
+    "section6": {
+      "title": "6. Limitation of Liability",
+      "content": "VITA is provided \"as is\". We do not guarantee that the service will be uninterrupted or error-free. Our liability is limited to the amount paid for the service in the last 12 months."
+    },
+    "section7": {
+      "title": "7. Contact",
+      "content": "For inquiries about these terms, write to us at legal@vita-shifts.com."
     }
   }
 }

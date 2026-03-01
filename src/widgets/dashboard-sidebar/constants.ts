@@ -25,7 +25,7 @@ export function getNavItems(t: (key: string) => string, userRole: Role): NavItem
       href: userRole === Role.ADMIN_HR ? '/dashboard/admin-hr' : '/dashboard',
       label: isDashboardRole ? t('dashboard') : t('calendar'),
       icon: isDashboardRole ? LayoutGrid : Calendar,
-      roles: [Role.SUPER_ADMIN, Role.ADMIN_HR, Role.CHIEF_AREA, Role.STAFF_HEALTH],
+      roles: [Role.SUPER_ADMIN, Role.ADMIN_HR, Role.CHIEF_AREA, Role.CHIEF_SECTOR, Role.STAFF],
     },
     {
       href: '/dashboard/organizations',
@@ -49,25 +49,25 @@ export function getNavItems(t: (key: string) => string, userRole: Role): NavItem
       href: '/dashboard/inbox',
       label: t('inbox'),
       icon: Inbox,
-      roles: [Role.ADMIN_HR, Role.CHIEF_AREA, Role.STAFF_HEALTH],
+      roles: [Role.ADMIN_HR, Role.CHIEF_AREA, Role.CHIEF_SECTOR, Role.STAFF],
     },
     {
       href: '/dashboard/areas',
       label: t('areas'),
       icon: LayoutGrid,
-      roles: [Role.ADMIN_HR, Role.CHIEF_AREA],
+      roles: [Role.ADMIN_HR, Role.CHIEF_AREA, Role.CHIEF_SECTOR],
     },
     {
       href: '/dashboard/sectors',
       label: t('sectors'),
       icon: Layers,
-      roles: [Role.ADMIN_HR, Role.CHIEF_AREA, Role.STAFF_HEALTH],
+      roles: [Role.ADMIN_HR, Role.CHIEF_AREA, Role.CHIEF_SECTOR, Role.STAFF],
     },
     {
       href: '/dashboard/shift-types',
       label: t('shiftTypes'),
       icon: Clock,
-      roles: [Role.ADMIN_HR, Role.CHIEF_AREA],
+      roles: [Role.ADMIN_HR, Role.CHIEF_AREA, Role.CHIEF_SECTOR],
     },
     {
       href: '/dashboard/rates',
@@ -91,25 +91,25 @@ export function getNavItems(t: (key: string) => string, userRole: Role): NavItem
       href: '/dashboard/staff',
       label: t('staff'),
       icon: Users,
-      roles: [Role.ADMIN_HR, Role.CHIEF_AREA],
+      roles: [Role.ADMIN_HR, Role.CHIEF_AREA, Role.CHIEF_SECTOR],
     },
     {
       href: '/dashboard/shifts',
       label: t('shifts'),
       icon: Clock,
-      roles: [Role.ADMIN_HR, Role.CHIEF_AREA],
+      roles: [Role.ADMIN_HR, Role.CHIEF_AREA, Role.CHIEF_SECTOR],
     },
     {
       href: '/dashboard/rotations',
       label: t('rotations'),
       icon: RefreshCw,
-      roles: [Role.ADMIN_HR, Role.CHIEF_AREA],
+      roles: [Role.ADMIN_HR, Role.CHIEF_AREA, Role.CHIEF_SECTOR],
     },
     {
       href: '/dashboard/profile',
       label: t('profile'),
       icon: User,
-      roles: [Role.SUPER_ADMIN, Role.ADMIN_HR, Role.CHIEF_AREA, Role.STAFF_HEALTH],
+      roles: [Role.SUPER_ADMIN, Role.ADMIN_HR, Role.CHIEF_AREA, Role.CHIEF_SECTOR, Role.STAFF],
     },
   ]
 }

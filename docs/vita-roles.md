@@ -14,7 +14,7 @@ ORGANIZACIÓN (Hospital/Clínica)
     └── CHIEF_AREA (Jefes de Área - SE COBRA)
             │
             ▼
-        STAFF_HEALTH (Personal de Salud - SE COBRA)
+        STAFF (Personal de Salud - SE COBRA)
 ```
 
 ## SUPER_ADMIN
@@ -67,7 +67,7 @@ ORGANIZACIÓN (Hospital/Clínica)
 
 ---
 
-## STAFF_HEALTH (Personal de Salud)
+## STAFF (Personal de Salud)
 
 **Scope:** Multi-organización (puede trabajar en varios hospitales)
 

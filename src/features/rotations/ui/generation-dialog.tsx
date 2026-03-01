@@ -1,12 +1,15 @@
 'use client'
 
-import { Dispatch, useMemo, useReducer, useTransition } from 'react'
-import { useTranslations } from 'next-intl'
-import { CalendarPlus, Eye, RefreshCw } from 'lucide-react'
+import { Dispatch, useEffect, useMemo, useReducer, useTransition } from 'react'
+import { useLocale, useTranslations } from 'next-intl'
+import { Calendar as CalendarIcon, CalendarPlus, Eye, Info, Loader2, RefreshCw } from 'lucide-react'
 import { toast } from 'sonner'
 
+import { cn } from '@/src/shared/lib/utils'
+import { formatDateLong } from '@/src/shared/lib/utils/format'
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
+import { Calendar } from '@/src/shared/ui/calendar'
 import { Checkbox } from '@/src/shared/ui/checkbox'
 import {
   Dialog,
@@ -16,8 +19,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/src/shared/ui/dialog'
-import { Input } from '@/src/shared/ui/input'
 import { Label } from '@/src/shared/ui/label'
+import { Popover, PopoverContent, PopoverTrigger } from '@/src/shared/ui/popover'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/src/shared/ui/select'
 import {
   Table,
   TableBody,
@@ -28,12 +38,25 @@ import {
 } from '@/src/shared/ui/table'
 import { ProcessingOverlay } from '@/src/shared/ui/atoms/processing-overlay'
 
-import { generateShiftsAction, previewGenerationAction, regenerateShiftsAction } from '../api/generation-actions'
-import type { GenerationPreview } from '../types/rotation-types'
+import {
+  generateShiftsAction,
+  getLastGenerationInfoAction,
+  previewGenerationAction,
+  regenerateShiftsAction,
+} from '../api/generation-actions'
+import type { GenerationPreview, LastGenerationInfo } from '../types/rotation-types'
+
+interface RotationGroup {
+  id: string
+  name: string
+  color: string
+  cycleOffset: number
+}
 
 interface GenerationDialogProps {
   rotationId: string
   rotationName: string
+  groups: RotationGroup[]
   open: boolean
   onOpenChange: (open: boolean) => void
   onGenerated: () => void
@@ -52,6 +75,9 @@ type GenState = {
   step: Step
   pendingOp: PendingOp
   generateComplete: boolean
+  startingGroupId: string | undefined
+  lastGenInfo: LastGenerationInfo | null
+  loadingLastGen: boolean
 }
 
 type GenAction =
@@ -65,6 +91,9 @@ type GenAction =
   | { type: 'SET_PENDING_OP'; payload: PendingOp }
   | { type: 'SET_GENERATE_COMPLETE' }
   | { type: 'FINISH_GENERATE' }
+  | { type: 'SET_STARTING_GROUP'; payload: string | undefined }
+  | { type: 'SET_LAST_GEN_INFO'; payload: LastGenerationInfo | null }
+  | { type: 'SET_LOADING_LAST_GEN'; payload: boolean }
 
 const initialState: GenState = {
   startDate: undefined,
@@ -75,6 +104,9 @@ const initialState: GenState = {
   step: 'dates',
   pendingOp: 'none',
   generateComplete: false,
+  startingGroupId: undefined,
+  lastGenInfo: null,
+  loadingLastGen: false,
 }
 
 function genReducer(state: GenState, action: GenAction): GenState {
@@ -82,7 +114,13 @@ function genReducer(state: GenState, action: GenAction): GenState {
     case 'RESET':
       return initialState
     case 'SET_START_DATE':
-      return { ...state, startDate: action.payload }
+      return {
+        ...state,
+        startDate: action.payload,
+        endDate: action.payload && state.endDate && state.endDate < action.payload
+          ? undefined
+          : state.endDate,
+      }
     case 'SET_END_DATE':
       return { ...state, endDate: action.payload }
     case 'SET_PREVIEW':
@@ -99,6 +137,12 @@ function genReducer(state: GenState, action: GenAction): GenState {
       return { ...state, generateComplete: true }
     case 'FINISH_GENERATE':
       return { ...state, pendingOp: 'none', generateComplete: false }
+    case 'SET_STARTING_GROUP':
+      return { ...state, startingGroupId: action.payload }
+    case 'SET_LAST_GEN_INFO':
+      return { ...state, lastGenInfo: action.payload }
+    case 'SET_LOADING_LAST_GEN':
+      return { ...state, loadingLastGen: action.payload }
     default:
       return state
   }
@@ -110,37 +154,143 @@ interface DateStepContentProps {
   state: GenState
   dispatch: Dispatch<GenAction>
   isPending: boolean
+  groups: RotationGroup[]
+  locale: string
   t: TranslationFn
 }
 
-function DateStepContent({ state, dispatch, t }: DateStepContentProps) {
+function DateStepContent({ state, dispatch, groups, locale, t }: DateStepContentProps) {
+  const loc = locale as 'es' | 'en'
+
   return (
     <div className="space-y-4">
       <p className="text-muted-foreground text-sm">{t('generation.selectDates')}</p>
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <Label htmlFor="gen-start-date">{t('generation.startDate')}</Label>
-          <Input
-            id="gen-start-date"
-            type="date"
-            value={state.startDate ? state.startDate.toISOString().split('T')[0] : ''}
-            onChange={(e) =>
-              dispatch({ type: 'SET_START_DATE', payload: e.target.value ? new Date(e.target.value) : undefined })
-            }
-          />
+          <Label>{t('generation.startDate')}</Label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn(
+                  'w-full justify-start text-left font-normal',
+                  !state.startDate && 'text-muted-foreground'
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" aria-hidden />
+                {state.startDate
+                  ? formatDateLong(state.startDate, loc)
+                  : t('generation.startDate')}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={state.startDate}
+                onSelect={(date) => dispatch({ type: 'SET_START_DATE', payload: date ?? undefined })}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="gen-end-date">{t('generation.endDate')}</Label>
-          <Input
-            id="gen-end-date"
-            type="date"
-            value={state.endDate ? state.endDate.toISOString().split('T')[0] : ''}
-            onChange={(e) =>
-              dispatch({ type: 'SET_END_DATE', payload: e.target.value ? new Date(e.target.value) : undefined })
-            }
-          />
+          <Label>{t('generation.endDate')}</Label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                disabled={!state.startDate}
+                className={cn(
+                  'w-full justify-start text-left font-normal',
+                  !state.endDate && 'text-muted-foreground'
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" aria-hidden />
+                {state.endDate
+                  ? formatDateLong(state.endDate, loc)
+                  : t('generation.endDate')}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={state.endDate}
+                onSelect={(date) => dispatch({ type: 'SET_END_DATE', payload: date ?? undefined })}
+                disabled={(date) => !!state.startDate && date < state.startDate}
+                defaultMonth={state.startDate}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
+          {!state.startDate && (
+            <p className="text-muted-foreground text-xs">
+              {t('generation.endDateDisabledHint')}
+            </p>
+          )}
         </div>
       </div>
+
+      {state.loadingLastGen ? (
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
+        </div>
+      ) : state.lastGenInfo ? (
+        <div className="bg-muted/50 flex items-start gap-2 rounded-lg border p-3">
+          <Info className="text-muted-foreground mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+          <div className="space-y-0.5">
+            <p className="text-sm">
+              {t('generation.lastGenerationInfo', {
+                date: formatDateLong(state.lastGenInfo.lastDate, loc),
+                group: state.lastGenInfo.lastGroupName,
+                shiftType: state.lastGenInfo.lastShiftTypeName,
+              })}
+            </p>
+            <p className="text-muted-foreground text-xs">
+              {t('generation.totalGeneratedShifts', { count: state.lastGenInfo.totalShifts })}
+            </p>
+          </div>
+        </div>
+      ) : !state.loadingLastGen ? (
+        <p className="text-muted-foreground text-xs">
+          {t('generation.noExistingShifts')}
+        </p>
+      ) : null}
+
+      {groups.length > 1 && (
+        <div className="space-y-1.5">
+          <Label>{t('generation.startingGroup')}</Label>
+          <Select
+            value={state.startingGroupId ?? '_default'}
+            onValueChange={(v) =>
+              dispatch({ type: 'SET_STARTING_GROUP', payload: v === '_default' ? undefined : v })
+            }
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="_default">
+                {t('generation.defaultGroupOrder')}
+              </SelectItem>
+              {groups.map((g) => (
+                <SelectItem key={g.id} value={g.id}>
+                  <span className="flex items-center gap-1.5">
+                    <span
+                      className="inline-block h-2 w-2 shrink-0 rounded-full"
+                      style={{ backgroundColor: g.color }}
+                      aria-hidden
+                    />
+                    {g.name}
+                  </span>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <p className="text-muted-foreground text-xs">
+            {t('generation.startingGroupHint')}
+          </p>
+        </div>
+      )}
     </div>
   )
 }
@@ -278,14 +428,34 @@ function PreviewStepContent({ state, dispatch, preview, regenerateMode, t }: Pre
 export function GenerationDialog({
   rotationId,
   rotationName,
+  groups,
   open,
   onOpenChange,
   onGenerated,
   regenerateMode,
 }: GenerationDialogProps) {
   const t = useTranslations('rotations')
+  const locale = useLocale()
   const [state, dispatch] = useReducer(genReducer, initialState)
   const [isPending, startTransition] = useTransition()
+
+  useEffect(() => {
+    if (!open) return
+    dispatch({ type: 'SET_LOADING_LAST_GEN', payload: true })
+    getLastGenerationInfoAction(rotationId).then((result) => {
+      if (result.success) {
+        dispatch({ type: 'SET_LAST_GEN_INFO', payload: result.data ?? null })
+        if (result.data) {
+          const last = new Date(result.data.lastDate)
+          const nextDay = new Date(
+            Date.UTC(last.getUTCFullYear(), last.getUTCMonth(), last.getUTCDate() + 1)
+          )
+          dispatch({ type: 'SET_START_DATE', payload: nextDay })
+        }
+      }
+      dispatch({ type: 'SET_LOADING_LAST_GEN', payload: false })
+    })
+  }, [open, rotationId])
 
   const previewMessages = useMemo(() => [
     t('generation.processingPreviewMsg1'),
@@ -315,6 +485,7 @@ export function GenerationDialog({
         rotationId,
         startDate: state.startDate!,
         endDate: state.endDate!,
+        startingGroupId: state.startingGroupId,
       })
 
       dispatch({ type: 'SET_PENDING_OP', payload: 'none' })
@@ -338,6 +509,7 @@ export function GenerationDialog({
           startDate: state.startDate!,
           endDate: state.endDate!,
           replaceExisting: state.replaceExisting,
+          startingGroupId: state.startingGroupId,
         })
       else
         result = await generateShiftsAction({
@@ -345,6 +517,7 @@ export function GenerationDialog({
           startDate: state.startDate!,
           endDate: state.endDate!,
           overrideConflicts: state.overrideConflicts,
+          startingGroupId: state.startingGroupId,
         })
 
       if (result.success) {
@@ -404,6 +577,8 @@ export function GenerationDialog({
             state={state}
             dispatch={dispatch}
             isPending={isPending}
+            groups={groups}
+            locale={locale}
             t={t}
           />
         )}

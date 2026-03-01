@@ -38,7 +38,7 @@
 /dashboard/sectors/[id]/staff → Query staff on shift in sector
 ```
 
-**Rationale**: Follows `areas/` routing pattern (list, new, [id]/edit). The `/staff` sub-route is unique to sectors — it serves the P2 user story (query personnel by time range). Separate from edit to keep concerns clean and allow CHIEF_AREA/STAFF_HEALTH to access staff query without edit permissions.
+**Rationale**: Follows `areas/` routing pattern (list, new, [id]/edit). The `/staff` sub-route is unique to sectors — it serves the P2 user story (query personnel by time range). Separate from edit to keep concerns clean and allow CHIEF_AREA/STAFF to access staff query without edit permissions.
 
 **Alternatives considered**:
 - All-in-one page with tabs: Too complex for initial implementation. Rejected.
@@ -66,7 +66,7 @@ OR: [
 **Decision**:
 - **ADMIN_HR**: Can query any sector in their organization
 - **CHIEF_AREA**: Can query sectors containing at least one of their assigned areas (via UserArea). Results show ALL areas in the sector, not just their own.
-- **STAFF_HEALTH**: Same as CHIEF_AREA — can query sectors containing their assigned areas. Results show ALL areas.
+- **STAFF**: Same as CHIEF_AREA — can query sectors containing their assigned areas. Results show ALL areas.
 
 **Rationale**: The whole point of sectors is cross-area visibility. Restricting results to only the user's own area would defeat the purpose. Access control happens at sector level (can you see this sector?), not at result level (can you see this area's shifts?).
 
@@ -76,9 +76,9 @@ OR: [
 
 ### D6: Sidebar Navigation Placement
 
-**Decision**: Add "Sectores" nav item in sidebar with icon `Layers` (lucide-react), visible to `ADMIN_HR`, `CHIEF_AREA`, and `STAFF_HEALTH`. Position after "Áreas" in nav order.
+**Decision**: Add "Sectores" nav item in sidebar with icon `Layers` (lucide-react), visible to `ADMIN_HR`, `CHIEF_AREA`, and `STAFF`. Position after "Áreas" in nav order.
 
-**Rationale**: All three roles need sector access (ADMIN_HR to manage, CHIEF_AREA/STAFF_HEALTH to query). Using `Layers` icon visually represents stacked/grouped areas.
+**Rationale**: All three roles need sector access (ADMIN_HR to manage, CHIEF_AREA/STAFF to query). Using `Layers` icon visually represents stacked/grouped areas.
 
 **Alternatives considered**:
 - Only visible to ADMIN_HR: Would block the primary use case (staff querying sector). Rejected.

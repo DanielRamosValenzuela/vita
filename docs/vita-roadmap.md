@@ -13,7 +13,7 @@
 | 6    | Analytics                         | Pendiente  |
 | 7    | Dashboard ADMIN_HR                | Completado |
 | 8    | Dashboard CHIEF_AREA              | Parcial    |
-| 9    | Dashboard STAFF_HEALTH            | Parcial    |
+| 9    | Dashboard STAFF            | Parcial    |
 | 10   | Seguridad y Upload                | Completado |
 | 11   | Calendario Visual                 | Completado |
 | 12   | Perfiles de Usuario Avanzados     | Completado |
@@ -70,7 +70,7 @@
 
 - Layout y Sidebar ✅
 - Historial de pagos
-- Sistema de notificaciones ✅ (Bandeja de entrada para ADMIN_HR, CHIEF_AREA, STAFF_HEALTH; incluye notificaciones de rotativas; pendiente SUPER_ADMIN, tiempo real, email)
+- Sistema de notificaciones ✅ (Bandeja de entrada para ADMIN_HR, CHIEF_AREA, STAFF; incluye notificaciones de rotativas; pendiente SUPER_ADMIN, tiempo real, email)
 - Rotativas de turno ✅ (CRUD, grupos, miembros, generación de turnos, cobertura, asignación de extras)
 - Export a Excel/PDF
 

@@ -43,7 +43,8 @@ export function StaffViewPage({ staff, canManageRates = false }: StaffViewPagePr
       if (contractFilter === 'withContract' && person.contracts.length === 0) return false
       if (contractFilter === 'withoutContract' && person.contracts.length > 0) return false
       if (roleFilter === 'CHIEF_AREA' && person.role !== 'CHIEF_AREA') return false
-      if (roleFilter === 'STAFF_HEALTH' && person.role !== 'STAFF_HEALTH') return false
+      if (roleFilter === 'CHIEF_SECTOR' && person.role !== 'CHIEF_SECTOR') return false
+      if (roleFilter === 'STAFF' && person.role !== 'STAFF') return false
       return true
     },
     [contractFilter, roleFilter]
@@ -111,8 +112,9 @@ export function StaffViewPage({ staff, canManageRates = false }: StaffViewPagePr
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">{tFilters('allRoles')}</SelectItem>
-                    <SelectItem value="CHIEF_AREA">{tFilters('chief')}</SelectItem>
-                    <SelectItem value="STAFF_HEALTH">{tFilters('staff')}</SelectItem>
+                    <SelectItem value="CHIEF_AREA">{tFilters('chiefArea')}</SelectItem>
+                    <SelectItem value="CHIEF_SECTOR">{tFilters('chiefSector')}</SelectItem>
+                    <SelectItem value="STAFF">{tFilters('staff')}</SelectItem>
                   </SelectContent>
                 </Select>
               </DataTableToolbar>
@@ -142,7 +144,11 @@ export function StaffViewPage({ staff, canManageRates = false }: StaffViewPagePr
                         </TableCell>
                         <TableCell>
                           <Badge variant="outline">
-                            {person.role === 'CHIEF_AREA' ? t('roles.chief') : t('roles.staff')}
+                            {person.role === 'CHIEF_AREA'
+                              ? t('roles.chiefArea')
+                              : person.role === 'CHIEF_SECTOR'
+                                ? t('roles.chiefSector')
+                                : t('roles.staff')}
                           </Badge>
                         </TableCell>
                         <TableCell>

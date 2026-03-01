@@ -6,8 +6,9 @@ import type { Prisma } from '@prisma/client'
 import { format } from 'date-fns'
 import { z } from 'zod'
 
+import { chiefHasAreaAccess, getChiefAccessibleAreaIds, resolveChiefOrganizationId } from '@/src/shared/lib/auth/chief-access'
 import { isChiefArea } from '@/src/shared/lib/auth/rbac'
-import { requireAdminHROrChiefArea } from '@/src/shared/lib/auth/session'
+import { requireAdminHROrChief } from '@/src/shared/lib/auth/session'
 import { prisma } from '@/src/shared/lib/db'
 import type { ActionResult } from '@/src/shared/lib/types'
 import { createNotification } from '@/src/features/notifications/lib/notification-service'
@@ -30,16 +31,11 @@ export const createShiftAction = async (
   data: z.infer<typeof createShiftSchema>
 ): Promise<ActionResult<ShiftWithRelations>> => {
   try {
-    const session = await requireAdminHROrChiefArea()
+    const session = await requireAdminHROrChief()
 
-    let derivedOrgId: string | null = session.organizationId ?? null
-    if (isChiefArea(session) && !derivedOrgId) {
-      const firstArea = await prisma.userArea.findFirst({
-        where: { userId: session.id },
-        select: { area: { select: { organizationId: true } } },
-      })
-      derivedOrgId = firstArea?.area?.organizationId ?? null
-    }
+    const derivedOrgId = isChiefArea(session)
+      ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
+      : session.organizationId ?? null
     if (!derivedOrgId)
       return {
         success: false,
@@ -50,10 +46,8 @@ export const createShiftAction = async (
     const validatedData = createShiftSchema.parse(data)
 
     if (isChiefArea(session)) {
-      const chiefArea = await prisma.userArea.findFirst({
-        where: { userId: session.id, areaId: validatedData.areaId },
-      })
-      if (!chiefArea)
+      const hasAccess = await chiefHasAreaAccess(session.id, validatedData.areaId)
+      if (!hasAccess)
         return {
           success: false,
           error: 'Solo puedes crear turnos en las áreas que tienes asignadas',
@@ -210,16 +204,11 @@ export const updateShiftAction = async (
   data: z.infer<typeof updateShiftSchema>
 ): Promise<ActionResult<ShiftWithRelations>> => {
   try {
-    const session = await requireAdminHROrChiefArea()
+    const session = await requireAdminHROrChief()
 
-    let derivedOrgId: string | null = session.organizationId ?? null
-    if (isChiefArea(session) && !derivedOrgId) {
-      const firstArea = await prisma.userArea.findFirst({
-        where: { userId: session.id },
-        select: { area: { select: { organizationId: true } } },
-      })
-      derivedOrgId = firstArea?.area?.organizationId ?? null
-    }
+    const derivedOrgId = isChiefArea(session)
+      ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
+      : session.organizationId ?? null
     if (!derivedOrgId)
       return { success: false, error: 'No tienes una organización asignada' }
     const organizationId = derivedOrgId
@@ -232,10 +221,8 @@ export const updateShiftAction = async (
       return { success: false, error: 'Turno no encontrado' }
 
     if (isChiefArea(session)) {
-      const chiefArea = await prisma.userArea.findFirst({
-        where: { userId: session.id, areaId: existing.areaId },
-      })
-      if (!chiefArea)
+      const hasAccess = await chiefHasAreaAccess(session.id, existing.areaId)
+      if (!hasAccess)
         return {
           success: false,
           error: 'Solo puedes editar turnos de las áreas que tienes asignadas',
@@ -245,10 +232,8 @@ export const updateShiftAction = async (
     const validatedData = updateShiftSchema.parse(data)
 
     if (isChiefArea(session)) {
-      const chiefArea = await prisma.userArea.findFirst({
-        where: { userId: session.id, areaId: validatedData.areaId },
-      })
-      if (!chiefArea)
+      const hasNewAccess = await chiefHasAreaAccess(session.id, validatedData.areaId)
+      if (!hasNewAccess)
         return {
           success: false,
           error: 'Solo puedes asignar turnos en las áreas que tienes asignadas',
@@ -370,16 +355,11 @@ export const deleteShiftAction = async (
   shiftId: string
 ): Promise<ActionResult<null>> => {
   try {
-    const session = await requireAdminHROrChiefArea()
+    const session = await requireAdminHROrChief()
 
-    let derivedOrgId: string | null = session.organizationId ?? null
-    if (isChiefArea(session) && !derivedOrgId) {
-      const firstArea = await prisma.userArea.findFirst({
-        where: { userId: session.id },
-        select: { area: { select: { organizationId: true } } },
-      })
-      derivedOrgId = firstArea?.area?.organizationId ?? null
-    }
+    const derivedOrgId = isChiefArea(session)
+      ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
+      : session.organizationId ?? null
     if (!derivedOrgId)
       return { success: false, error: 'No tienes una organización asignada' }
 
@@ -390,10 +370,8 @@ export const deleteShiftAction = async (
       return { success: false, error: 'Turno no encontrado' }
 
     if (isChiefArea(session)) {
-      const chiefArea = await prisma.userArea.findFirst({
-        where: { userId: session.id, areaId: existing.areaId },
-      })
-      if (!chiefArea)
+      const hasAccess = await chiefHasAreaAccess(session.id, existing.areaId)
+      if (!hasAccess)
         return {
           success: false,
           error: 'Solo puedes eliminar turnos de las áreas que tienes asignadas',
@@ -418,18 +396,11 @@ export const getShiftsAction = async (
   params: GetShiftsParams
 ): Promise<ActionResult<GetShiftsResult>> => {
   try {
-    const session = await requireAdminHROrChiefArea()
+    const session = await requireAdminHROrChief()
 
-    const userAreas = await prisma.userArea.findMany({
-      where: { userId: session.id },
-      select: { areaId: true, area: { select: { organizationId: true } } },
-    })
-    const chiefAreaIds = userAreas.map((a) => a.areaId)
-    const hasAreaAssignment = chiefAreaIds.length > 0
-
-    let organizationId: string | null = session.organizationId ?? null
-    if (hasAreaAssignment && !organizationId)
-      organizationId = userAreas[0]?.area?.organizationId ?? null
+    const organizationId = isChiefArea(session)
+      ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
+      : session.organizationId ?? null
 
     if (!organizationId)
       return {
@@ -437,7 +408,23 @@ export const getShiftsAction = async (
         error: 'No tienes una organización asignada',
       }
 
-    const effectiveOrgId = organizationId as string
+    const effectiveOrgId = organizationId
+
+    let chiefAreaIds: string[] | null = null
+    if (isChiefArea(session)) {
+      chiefAreaIds = await getChiefAccessibleAreaIds(session.id)
+      if (chiefAreaIds.length === 0)
+        return {
+          success: true,
+          data: {
+            shifts: [],
+            total: 0,
+            page: 1,
+            pageSize: params.pageSize ?? 20,
+            totalPages: 0,
+          },
+        }
+    }
 
     const {
       page = 1,
@@ -455,23 +442,11 @@ export const getShiftsAction = async (
       organizationId: effectiveOrgId,
     }
 
-    if (isChiefArea(session) && !hasAreaAssignment)
-      return {
-        success: true,
-        data: {
-          shifts: [],
-          total: 0,
-          page: 1,
-          pageSize: params.pageSize ?? 20,
-          totalPages: 0,
-        },
-      }
-
-    if (hasAreaAssignment) where.areaId = { in: chiefAreaIds }
+    if (chiefAreaIds) where.areaId = { in: chiefAreaIds }
 
     if (status) where.status = status
     if (userId) where.userId = userId
-    if (areaId && (!hasAreaAssignment || chiefAreaIds.includes(areaId))) where.areaId = areaId
+    if (areaId && (!chiefAreaIds || chiefAreaIds.includes(areaId))) where.areaId = areaId
     if (shiftTypeId) where.shiftTypeId = shiftTypeId
 
     if (search)

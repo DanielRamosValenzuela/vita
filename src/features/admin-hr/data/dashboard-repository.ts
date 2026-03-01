@@ -22,7 +22,7 @@ export async function getAdminHRDashboardStats(
         where: {
           organizationId,
           role: {
-            in: [ROLES.CHIEF_AREA, ROLES.STAFF_HEALTH],
+            in: [ROLES.CHIEF_AREA, ROLES.STAFF],
           },
         },
       }),

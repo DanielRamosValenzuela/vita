@@ -1,6 +1,6 @@
 import { getTranslations } from 'next-intl/server'
 
-import { requireDashboardUser, isAdminHR, isChiefArea, isStaffHealth } from '@/src/shared/lib/auth'
+import { requireDashboardUser, isAdminHR, isChiefArea, isStaff } from '@/src/shared/lib/auth'
 import { prisma } from '@/src/shared/lib/db'
 import { getSectorsAction } from '@/src/features/sector/api'
 import { SectorsTable } from '@/src/features/sector/ui'
@@ -27,7 +27,7 @@ export default async function SectorsPage({ params }: SectorsPageProps) {
   ])
 
   let organizationId: string | null = user.organizationId ?? null
-  if ((isChiefArea(user) || isStaffHealth(user)) && !organizationId) {
+  if ((isChiefArea(user) || isStaff(user)) && !organizationId) {
     const firstArea = await prisma.userArea.findFirst({
       where: { userId: user.id },
       select: { area: { select: { organizationId: true } } },
@@ -72,7 +72,7 @@ export default async function SectorsPage({ params }: SectorsPageProps) {
         sectors={sectors}
         canCreate={isAdminHR(user)}
         canDelete={isAdminHR(user)}
-        canEdit={!isStaffHealth(user)}
+        canEdit={!isStaff(user)}
       />
     </div>
   )

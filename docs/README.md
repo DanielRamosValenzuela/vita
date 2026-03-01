@@ -8,7 +8,7 @@ Sistema de Gestión de Turnos Médicos Multi-Tenant SaaS B2B.
 | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
 | [vita-overview.md](./vita-overview.md)                                               | Qué es VITA, problema, solución                                                      |
 | [vita-business-model.md](./vita-business-model.md)                                   | Modelo SaaS B2B, pricing, límites                                                    |
-| [vita-roles.md](./vita-roles.md)                                                     | Sistema de roles (SUPER_ADMIN, ADMIN_HR, CHIEF_AREA, STAFF_HEALTH)                   |
+| [vita-roles.md](./vita-roles.md)                                                     | Sistema de roles (SUPER_ADMIN, ADMIN_HR, CHIEF_AREA, STAFF)                   |
 | [vita-competitive.md](./vita-competitive.md)                                         | Análisis Rflex, propuesta de valor                                                   |
 | [vita-architecture.md](./vita-architecture.md)                                       | Stack, FSD, estructura, i18n                                                         |
 | [vita-roadmap.md](./vita-roadmap.md)                                                 | Fases, próximos pasos, prioridades                                                   |

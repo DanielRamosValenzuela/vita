@@ -46,7 +46,7 @@ Documento de referencia de **flujos funcionales** por rol. Resume qué pasos sig
   - Desde “Mi Organización”, en la sección correspondiente (Jefes de Área o Personal de Salud):
   - Abre el diálogo **Invitar**.
   - Busca usuario por email o documento (`searchUserAction`).
-  - Si existe y hay cupo según límites, envía invitación con rol `CHIEF_AREA` o `STAFF_HEALTH`.
+  - Si existe y hay cupo según límites, envía invitación con rol `CHIEF_AREA` o `STAFF`.
   - La invitación aparece en la tabla de invitaciones; puede cancelarse.
 
 - **Gestionar Áreas**
@@ -145,27 +145,56 @@ Documento de referencia de **flujos funcionales** por rol. Resume qué pasos sig
 
 ---
 
-## STAFF_HEALTH (Personal de Salud)
+## STAFF (Personal de Salud)
 
-### Workflows implementados (backend/UI parcial)
+### Workflows implementados
 
 - **Vinculación a organizaciones**
   - Al registrarse obtiene un código de vinculación.
   - ADMIN_HR/CHIEF pueden invitarlo y se muestra en perfil/organizations.
 
-- **Vista de turnos (MVP inicial)**
-  - Desde `/dashboard/shifts` ve los turnos asignados (una organización).
+- **Calendario personal de turnos** (`/dashboard`)
+  - Calendario mensual interactivo con todos los turnos asignados del mes.
+  - Navegación entre meses con carga automática.
+  - Diferenciación visual por tipo de turno (color), estado, rotativas y extras.
+  - Badge con nombre de la organización actual en el header.
+  - Estado vacío informativo cuando no hay turnos en el mes.
+
+- **Detalle de turno + personal activo del sector**
+  - Click en turno abre panel lateral con detalle completo.
+  - Lista de personal activo del mismo sector, agrupado por área.
+  - Detección automática de relevos (gap <30min entre turnos consecutivos).
+
+- **Próximos turnos (7 días)**
+  - Panel lateral con los turnos de los próximos 7 días.
+  - Fechas relativas (Hoy, Mañana, nombre del día).
+  - Click para acceder al detalle del turno.
+
+- **Notas personales en el calendario**
+  - Click en un día del calendario abre un popover inline.
+  - Textarea para escribir una nota personal (máx. 500 caracteres).
+  - Una nota por día, editable y eliminable.
+  - Indicador visual (punto azul) en días con nota.
+  - Las notas son personales del usuario (no vinculadas a organización).
+
+- **Exportación iCal y feeds de suscripción**
+  - Descarga de archivo `.ics` del mes actual.
+  - Feed iCal por organización (token único, suscripción en Google/Apple Calendar).
+  - Feed iCal unificado (todas las organizaciones del usuario).
+  - Gestión de tokens: crear, revocar, copiar URL.
 
 ### Workflows pendientes
 
+- **Importación de Google Calendar (P5 — diferible)**
+  - Conectar Google Calendar via OAuth 2.0.
+  - Importar eventos personales al calendario.
+  - Detección de conflictos con turnos.
 - **Calendario unificado multi-organización**
   - Ver todos los turnos de todas las organizaciones donde trabaja.
 - **Postulaciones a turnos abiertos**
   - Listado de turnos abiertos por área, postulación y estado.
 - **Intercambios de turnos**
   - Solicitar intercambio, ver estado, aceptar/rechazar.
-- **Notificaciones**
-  - Recordatorios de turnos, avisos de cambios o cancelaciones.
 
 ---
 
@@ -240,7 +269,7 @@ El sistema de tarifas flexibles permite a ADMIN_HR crear tarifas completamente p
 1. ADMIN_HR o CHIEF accede al módulo de Personal.
 2. Ve tabla simplificada con:
    - Nombre y correo.
-   - Rol (CHIEF_AREA / STAFF_HEALTH).
+   - Rol (CHIEF_AREA / STAFF).
    - Área asignada (según contrato o área principal).
    - Estado de contrato (✓/✗) calculado en base a si el usuario tiene al menos un `Contract` activo.
    - Nombre de la **tarifa principal** (primer contrato activo mostrado).
@@ -340,7 +369,7 @@ Las rotativas automatizan la creación de turnos cíclicos. En vez de crear turn
 1. Desde la vista de detalle de una rotativa, ve los grupos como tarjetas
 2. Cada grupo muestra sus miembros actuales con avatar y email
 3. Para añadir miembros: clic en **Añadir miembro** → popover con personal disponible
-   - Solo aparece personal STAFF_HEALTH del área que **no** está ya en alguna rotativa de la organización
+   - Solo aparece personal STAFF del área que **no** está ya en alguna rotativa de la organización
    - Selección múltiple con checkbox
 4. Para eliminar miembro: clic en icono de eliminar → confirma con opción de cancelar turnos futuros
 5. Si un miembro fue removido previamente y se re-añade, se reactiva (soft undelete)
@@ -546,7 +575,7 @@ Las rotativas automatizan la creación de turnos cíclicos. En vez de crear turn
 
 ### Sistema de Notificaciones (Bandeja de Entrada)
 
-Implementado para ADMIN_HR, CHIEF_AREA y STAFF_HEALTH. SUPER_ADMIN no recibe notificaciones en esta iteración.
+Implementado para ADMIN_HR, CHIEF_AREA y STAFF. SUPER_ADMIN no recibe notificaciones en esta iteración.
 
 **Funcionalidades implementadas:**
 - Bandeja de Entrada (`/dashboard/inbox`) accesible desde el sidebar con badge de no leídas.

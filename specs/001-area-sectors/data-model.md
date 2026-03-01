@@ -132,7 +132,7 @@ Deletion cascade:
 SELECT * FROM Sector WHERE organizationId = :orgId
 ```
 
-**CHIEF_AREA / STAFF_HEALTH**:
+**CHIEF_AREA / STAFF**:
 ```
 SELECT DISTINCT s.* FROM Sector s
 JOIN SectorArea sa ON s.id = sa.sectorId

@@ -1,8 +1,8 @@
 import { getTranslations } from 'next-intl/server'
 
+import { resolveChiefOrganizationId } from '@/src/shared/lib/auth/chief-access'
 import { isChiefArea } from '@/src/shared/lib/auth/rbac'
-import { requireAdminHROrChiefArea } from '@/src/shared/lib/auth/session'
-import { prisma } from '@/src/shared/lib/db'
+import { requireAdminHROrChief } from '@/src/shared/lib/auth/session'
 import { getAreasAction } from '@/src/features/area/api'
 import { getRotationsAction } from '@/src/features/rotations/api'
 import { RotationsPageContent } from '@/src/features/rotations/ui'
@@ -24,18 +24,13 @@ export async function generateMetadata({ params }: RotationsPageProps) {
 export default async function RotationsPage({ params }: RotationsPageProps) {
   const { locale } = await params
   const [session, t] = await Promise.all([
-    requireAdminHROrChiefArea(locale),
+    requireAdminHROrChief(locale),
     getTranslations('rotations'),
   ])
 
-  let organizationId: string | null = session.organizationId ?? null
-  if (isChiefArea(session) && !organizationId) {
-    const firstArea = await prisma.userArea.findFirst({
-      where: { userId: session.id },
-      select: { area: { select: { organizationId: true } } },
-    })
-    organizationId = firstArea?.area?.organizationId ?? null
-  }
+  const organizationId = isChiefArea(session)
+    ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
+    : session.organizationId ?? null
 
   if (!organizationId)
     return (

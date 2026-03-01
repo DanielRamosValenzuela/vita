@@ -143,7 +143,7 @@ prevents dependency sprawl in a domain-heavy application.
 
 ## Technology Stack & Constraints
 
-- **Roles**: `SUPER_ADMIN`, `ADMIN_HR`, `CHIEF_AREA`, `STAFF_HEALTH`.
+- **Roles**: `SUPER_ADMIN`, `ADMIN_HR`, `CHIEF_AREA`, `STAFF`.
   Every feature MUST respect role-based access. Server Actions MUST
   verify the caller's role before executing.
 - **Legal compliance**: Shift scheduling MUST consider Chilean Labor

@@ -1,13 +1,17 @@
 'use client'
 
+import { ArrowRight, Calendar, Play, Shield, Users } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { ArrowRight, Calendar, Shield, Users } from 'lucide-react'
 
+import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 import { Skeleton } from '@/src/shared/ui/skeleton'
+
+import { HeroDashboardMockup } from './hero-dashboard-mockup'
+import { HeroFloatingElements } from './hero-floating-elements'
 
 interface HeroSectionProps {
   locale?: string
@@ -21,93 +25,100 @@ export function HeroSection({ locale }: HeroSectionProps) {
   const isLoading = status === 'loading'
   const isAuthenticated = !!session
 
-  const features = [
-    {
-      icon: Calendar,
-      title: t('features.scheduling.title'),
-      description: t('features.scheduling.description'),
-    },
-    {
-      icon: Users,
-      title: t('features.staff.title'),
-      description: t('features.staff.description'),
-    },
-    {
-      icon: Shield,
-      title: t('features.security.title'),
-      description: t('features.security.description'),
-    },
-  ]
-
   return (
-    <section className="relative flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center overflow-hidden px-4 py-16 md:py-24">
-      <div className="relative z-10 container mx-auto max-w-6xl">
-        <div className="flex flex-col items-center text-center">
-          <h1 className="mb-6 text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
-            <span className="block">{t('title.line1')}</span>
-            <span className="from-primary to-primary/60 block bg-linear-to-r bg-clip-text text-transparent">
-              {t('title.line2')}
-            </span>
-          </h1>
+    <section className="bg-gradient-to-br from-primary to-primary/80 relative overflow-hidden px-4 py-16 md:py-24 lg:py-32">
+      <HeroFloatingElements />
 
-          <p className="text-muted-foreground mb-8 max-w-2xl text-lg sm:text-xl md:text-2xl">
-            {t('description')}
-          </p>
+      <div className="relative z-10 container mx-auto max-w-7xl">
+        <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+          <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
+            <Badge
+              variant="secondary"
+              className="animate-fade-in-up mb-6 bg-white/20 text-sm text-white backdrop-blur-sm transition-transform duration-300 hover:scale-105"
+            >
+              {t('badge')}
+            </Badge>
 
-          {isLoading && (
-            <div className="mb-12 flex flex-col gap-4 sm:flex-row">
-              <Skeleton className="h-12 w-48" />
-              <Skeleton className="h-12 w-32" />
-            </div>
-          )}
+            <h1 className="animate-fade-in-up-delay-1 mb-6 text-4xl font-bold tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl">
+              <span className="block">{t('title.line1')}</span>
+              <span className="block text-white/90">{t('title.line2')}</span>
+            </h1>
 
-          {!isLoading && !isAuthenticated && (
-            <div className="mb-12 flex flex-col gap-4 sm:flex-row">
-              <Button asChild size="lg" className="text-base">
-                <Link href={`/${currentLocale}/register`}>
-                  {t('cta.primary')}
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
-              <Button asChild variant="outline" size="lg" className="text-base">
-                <Link href={`/${currentLocale}/login`}>{t('cta.secondary')}</Link>
-              </Button>
-            </div>
-          )}
+            <p className="animate-fade-in-up-delay-2 mb-8 max-w-xl text-lg text-white/80 sm:text-xl">
+              {t('description')}
+            </p>
 
-          {!isLoading && isAuthenticated && (
-            <div className="mb-12 flex flex-col gap-4 sm:flex-row">
-              <Button asChild size="lg" className="text-base">
-                <Link href={`/${currentLocale}/dashboard`}>
-                  {t('cta.dashboard')}
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
-            </div>
-          )}
+            {isLoading && (
+              <div className="animate-fade-in-up-delay-3 flex flex-col gap-4 sm:flex-row">
+                <Skeleton className="h-12 w-48 bg-white/20" />
+                <Skeleton className="h-12 w-40 bg-white/20" />
+              </div>
+            )}
 
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {features.map((feature) => {
-              const Icon = feature.icon
-              return (
-                <article
-                  key={feature.title}
-                  className="group bg-card hover:border-primary/50 rounded-lg border p-6 text-left transition-all hover:shadow-md"
+            {!isLoading && !isAuthenticated && (
+              <div className="animate-fade-in-up-delay-3 flex flex-col gap-4 sm:flex-row">
+                <Button
+                  asChild
+                  size="lg"
+                  className="bg-white text-primary hover:bg-white/90 text-base shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(255,255,255,0.3)] focus-visible:ring-white active:scale-95"
                 >
-                  <div className="bg-primary/10 text-primary mb-4 flex h-12 w-12 items-center justify-center rounded-lg">
-                    <Icon className="h-6 w-6" />
-                  </div>
-                  <h3 className="mb-2 text-lg font-semibold">{feature.title}</h3>
-                  <p className="text-muted-foreground text-sm">{feature.description}</p>
-                </article>
-              )
-            })}
+                  <Link href={`/${currentLocale}/contact`}>
+                    {t('cta.primary')}
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Link>
+                </Button>
+                <Button
+                  asChild
+                  variant="outline"
+                  size="lg"
+                  className="border-white/60 bg-transparent text-base text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-white/10 hover:text-white hover:shadow-[0_0_30px_rgba(255,255,255,0.15)] focus-visible:ring-white active:scale-95"
+                >
+                  <Link href="#how-it-works">
+                    <Play className="mr-2 h-4 w-4" />
+                    {t('cta.secondary')}
+                  </Link>
+                </Button>
+              </div>
+            )}
+
+            {!isLoading && isAuthenticated && (
+              <div className="animate-fade-in-up-delay-3 flex flex-col gap-4 sm:flex-row">
+                <Button
+                  asChild
+                  size="lg"
+                  className="bg-white text-primary hover:bg-white/90 text-base shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(255,255,255,0.3)] focus-visible:ring-white active:scale-95"
+                >
+                  <Link href={`/${currentLocale}/dashboard`}>
+                    {t('cta.dashboard')}
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Link>
+                </Button>
+              </div>
+            )}
+
+            <div className="animate-fade-in-up-delay-4 mt-8 flex flex-wrap justify-center gap-4 lg:justify-start">
+              <TrustPill icon={<Calendar className="h-4 w-4" />} label={t('features.scheduling.title')} />
+              <TrustPill icon={<Users className="h-4 w-4" />} label={t('features.staff.title')} />
+              <TrustPill icon={<Shield className="h-4 w-4" />} label={t('features.security.title')} />
+            </div>
+          </div>
+
+          <div className="animate-fade-in-up-delay-2 flex justify-center lg:justify-end">
+            <div className="w-full max-w-lg">
+              <HeroDashboardMockup />
+            </div>
           </div>
         </div>
       </div>
-
-      <div className="from-background via-background/95 to-background absolute inset-0 z-0 bg-linear-to-b" />
-      <div className="bg-primary/5 absolute inset-0 z-0 [mask-image:radial-gradient(circle_at_50%_50%,black,transparent_70%)]" />
     </section>
+  )
+}
+
+function TrustPill({ icon, label }: { icon: React.ReactNode; label: string }) {
+  return (
+    <div className="flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm text-white/90 backdrop-blur-sm transition-all duration-300 hover:border-white/40 hover:bg-white/15">
+      {icon}
+      <span>{label}</span>
+    </div>
   )
 }
