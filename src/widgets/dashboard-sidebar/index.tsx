@@ -55,9 +55,19 @@ export function DashboardSidebar({
       className={cn('bg-card flex h-screen w-64 flex-col border-r', className)}
       aria-label={t('sidebarLabel')}
     >
-      <Link href="/" className="border-b p-6 transition-opacity hover:opacity-80">
-        <h2 className="text-primary text-xl font-bold">{tCommon('appName')}</h2>
-        <p className="text-muted-foreground text-sm">{tCommon(`roles.${displayRole ?? user.role}`)}</p>
+      <Link href="/" className="group flex items-center gap-3 border-b p-6">
+        <Image
+          src="/logo-icon.png"
+          alt=""
+          width={36}
+          height={36}
+          className="shrink-0 transition-transform duration-300 group-hover:scale-110"
+          priority
+        />
+        <div>
+          <h2 className="text-primary text-xl font-bold">{tCommon('appName')}</h2>
+          <p className="text-muted-foreground text-sm">{tCommon(`roles.${displayRole ?? user.role}`)}</p>
+        </div>
       </Link>
 
       <nav className="flex-1 space-y-1 p-4">

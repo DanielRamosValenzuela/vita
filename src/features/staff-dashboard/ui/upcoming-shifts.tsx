@@ -65,7 +65,7 @@ export function UpcomingShifts({ shifts, onShiftClick }: UpcomingShiftsProps) {
                 />
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium">
-                    {shift.area.name}
+                    {shift.shiftType.name}
                   </p>
                   <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                     <span>{getRelativeDay(shift.startTime, t)}</span>
@@ -84,7 +84,7 @@ export function UpcomingShifts({ shifts, onShiftClick }: UpcomingShiftsProps) {
                     color: shift.shiftType.color,
                   }}
                 >
-                  {shift.shiftType.name}
+                  {shift.area.name}
                 </Badge>
               </button>
             ))}

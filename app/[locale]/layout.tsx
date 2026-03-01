@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { hasLocale, NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
 import {
@@ -19,6 +20,7 @@ import '../globals.css'
 import '../themes.css'
 
 import { AppProviders } from '@/src/shared/lib/providers'
+import { siteMetadata } from './metadata'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -75,6 +77,8 @@ const ibmPlexMono = IBM_Plex_Mono({
   weight: ['400', '500', '700'],
   display: 'swap',
 })
+
+export const metadata: Metadata = siteMetadata
 
 interface LocaleLayoutProps {
   children: React.ReactNode

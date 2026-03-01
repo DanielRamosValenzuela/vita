@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
+import Image from 'next/image'
 import { Menu } from 'lucide-react'
 
 import { Button } from '@/src/shared/ui/button'
@@ -38,6 +39,7 @@ export function DashboardShell({ user, children, unreadNotificationCount, displa
         >
           <Menu className="h-6 w-6" />
         </Button>
+        <Image src="/logo-icon.png" alt="" width={24} height={24} priority />
         <span className="text-primary font-semibold">{t('appName')}</span>
       </header>
 

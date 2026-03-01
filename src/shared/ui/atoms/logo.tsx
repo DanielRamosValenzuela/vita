@@ -1,7 +1,8 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
+import Image from 'next/image'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 
 import { cn } from '@/src/shared/lib/utils'
 
@@ -12,13 +13,15 @@ interface LogoProps {
   locale?: string
 }
 
+const sizeConfig = {
+  sm: { icon: 24, text: 'text-base' },
+  md: { icon: 32, text: 'text-xl' },
+  lg: { icon: 48, text: 'text-2xl' },
+}
+
 export function Logo({ className, showText = true, size = 'md', locale = 'es' }: LogoProps) {
   const t = useTranslations('common')
-  const sizeClasses = {
-    sm: 'h-6 w-6 text-lg',
-    md: 'h-8 w-8 text-xl',
-    lg: 'h-12 w-12 text-3xl',
-  }
+  const config = sizeConfig[size]
 
   return (
     <Link
@@ -29,20 +32,17 @@ export function Logo({ className, showText = true, size = 'md', locale = 'es' }:
       )}
       aria-label={t('logoLabel')}
     >
-      <span
-        className={cn(
-          'bg-primary text-primary-foreground flex items-center justify-center rounded-lg',
-          sizeClasses[size]
-        )}
-      >
-        🏥
-      </span>
+      <Image
+        src="/logo-icon.png"
+        alt=""
+        width={config.icon}
+        height={config.icon}
+        className="shrink-0"
+        priority
+      />
       {showText && (
         <span
-          className={cn(
-            'text-foreground font-semibold',
-            size === 'lg' ? 'text-2xl' : size === 'sm' ? 'text-base' : 'text-xl'
-          )}
+          className={cn('text-foreground font-semibold', config.text)}
         >
           {t('appName')}
         </span>
