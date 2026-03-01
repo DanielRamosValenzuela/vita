@@ -16,7 +16,7 @@ interface DashboardShellProps extends DashboardSidebarProps {
   children: React.ReactNode
 }
 
-export function DashboardShell({ user, children, unreadNotificationCount }: DashboardShellProps) {
+export function DashboardShell({ user, children, unreadNotificationCount, displayRole }: DashboardShellProps) {
   const t = useTranslations('common')
   const tNav = useTranslations('nav')
   const tDashboard = useTranslations('dashboard')
@@ -55,12 +55,13 @@ export function DashboardShell({ user, children, unreadNotificationCount }: Dash
             user={user}
             className="h-full w-full border-0"
             unreadNotificationCount={unreadNotificationCount}
+            displayRole={displayRole}
           />
         </SheetContent>
       </Sheet>
 
       <div className="hidden lg:block">
-        <DashboardSidebar user={user} unreadNotificationCount={unreadNotificationCount} />
+        <DashboardSidebar user={user} unreadNotificationCount={unreadNotificationCount} displayRole={displayRole} />
       </div>
 
       <main className="bg-background flex-1 overflow-y-auto pt-14 lg:pt-0">

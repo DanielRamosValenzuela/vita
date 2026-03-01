@@ -22,6 +22,15 @@ Sistema de Gestión de Turnos Médicos Multi-Tenant SaaS B2B.
 | [REQUERIMIENTOS-DEL-PROYECTO.md](./REQUERIMIENTOS-DEL-PROYECTO.md)                   | Requerimientos cumplidos y pendientes (sin términos técnicos)                        |
 | [DICCIONARIO-BASE-DE-DATOS.md](./DICCIONARIO-BASE-DE-DATOS.md)                       | Descripción de todas las tablas y campos de la base de datos (sin términos técnicos) |
 
+## Specs de Features
+
+| Spec                                                                         | Feature                 | Estado     |
+| ---------------------------------------------------------------------------- | ----------------------- | ---------- |
+| [specs/005-staff-dashboard-calendar/](../specs/005-staff-dashboard-calendar/) | Staff Dashboard Calendar | Completado |
+| [specs/004-shift-rotations/](../specs/004-shift-rotations/)                   | Rotativas de Turno       | Completado |
+| [specs/003-inbox-notifications/](../specs/003-inbox-notifications/)           | Bandeja de Notificaciones| Completado |
+| [specs/001-area-sectors/](../specs/001-area-sectors/)                         | Áreas y Sectores         | Completado |
+
 ## Historial de Sesiones (por fase)
 
 | Documento                                                                      | Fase    | Contenido                             |

@@ -33,8 +33,8 @@ src/
 ├── shared/          # Utilidades, UI primitivos, constantes
 │   ├── lib/         # utils, auth, constants, types
 │   └── ui/          # Componentes Shadcn + molecules
-├── entities/        # Lógica de dominio (area, invitation, organization, rotation, shift, user)
-├── features/        # Features por dominio (admin-hr, auth, rotations, shifts, profile, super-admin)
+├── entities/        # Lógica de dominio (area, calendar-feed, invitation, organization, rotation, shift, user)
+├── features/        # Features por dominio (admin-hr, auth, rotations, shifts, staff-dashboard, profile, super-admin)
 └── widgets/         # Bloques UI compuestos
 ```
 
@@ -52,6 +52,7 @@ src/
 - `app/[locale]/dashboard/rotations/[id]` - Detalle de rotativa
 - `app/[locale]/dashboard/admin-hr/organization` - Mi Organización
 - `app/[locale]/dashboard/organizations` - Organizaciones (SUPER_ADMIN)
+- `app/api/ical/[token]` - Feed iCal para suscripción de calendarios externos
 
 ## i18n (next-intl)
 

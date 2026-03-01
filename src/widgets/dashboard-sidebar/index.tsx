@@ -28,6 +28,7 @@ export function DashboardSidebar({
   user,
   className,
   unreadNotificationCount,
+  displayRole,
 }: DashboardSidebarProps) {
   const t = useTranslations('dashboard')
   const tCommon = useTranslations('common')
@@ -56,7 +57,7 @@ export function DashboardSidebar({
     >
       <Link href="/" className="border-b p-6 transition-opacity hover:opacity-80">
         <h2 className="text-primary text-xl font-bold">{tCommon('appName')}</h2>
-        <p className="text-muted-foreground text-sm">{tCommon(`roles.${user.role}`)}</p>
+        <p className="text-muted-foreground text-sm">{tCommon(`roles.${displayRole ?? user.role}`)}</p>
       </Link>
 
       <nav className="flex-1 space-y-1 p-4">

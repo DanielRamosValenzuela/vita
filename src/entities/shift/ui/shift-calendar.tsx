@@ -24,7 +24,6 @@ import { Popover, PopoverAnchor, PopoverContent } from '@/src/shared/ui/popover'
 import { Skeleton } from '@/src/shared/ui/skeleton'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/src/shared/ui/tooltip'
 
-const LEGEND_SEP = '\u00B7'
 
 interface CalendarEventBase {
   id: string
@@ -33,6 +32,7 @@ interface CalendarEventBase {
   endTime: Date
   color: string
   areaName: string
+  shiftTypeName: string
 }
 
 export interface IndividualCalendarEvent extends CalendarEventBase {
@@ -66,6 +66,7 @@ interface ShiftCalendarProps {
   notePopoverContent?: React.ReactNode
   notePopoverOpen?: boolean
   onNotePopoverOpenChange?: (open: boolean) => void
+  headerExtra?: React.ReactNode
 }
 
 interface ShiftCalendarDayCellProps {
@@ -87,7 +88,7 @@ function ShiftCalendarDayCellSkeleton({ date, dayIndex }: { date: Date; dayIndex
   return (
     <div className="relative flex h-full w-full flex-col">
       <div className="shrink-0 p-0.5">
-        <div className="text-sm font-medium">{formattedDay}</div>
+        <div className="text-xs font-medium sm:text-sm">{formattedDay}</div>
       </div>
       {barCount > 0 && (
         <div className="flex min-h-0 flex-1 flex-col gap-1 p-1 pt-0">
@@ -118,7 +119,7 @@ function ShiftCalendarDayCell({
     return (
       <div className="relative flex h-full w-full flex-col">
         <div className="shrink-0 p-0.5">
-          <div className="text-sm font-medium">{formattedDay}</div>
+          <div className="text-xs font-medium sm:text-sm">{formattedDay}</div>
         </div>
       </div>
     )
@@ -128,7 +129,7 @@ function ShiftCalendarDayCell({
   return (
     <div className="relative flex h-full w-full flex-col">
       <div className="shrink-0 p-0.5">
-        <div className="text-sm font-medium">{formattedDay}</div>
+        <div className="text-xs font-medium sm:text-sm">{formattedDay}</div>
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col gap-0.5 p-0.5 pt-0">
@@ -151,7 +152,7 @@ function ShiftCalendarDayCell({
                   <TooltipTrigger asChild>
                     <button
                       type="button"
-                      className="flex min-w-0 flex-1 items-center gap-1 px-1 py-1 text-left text-[10px] leading-tight cursor-pointer hover:opacity-80 overflow-hidden"
+                      className="flex min-w-0 flex-1 items-center gap-0.5 px-0.5 py-0.5 text-left text-[8px] leading-tight cursor-pointer hover:opacity-80 overflow-hidden sm:gap-1 sm:px-1 sm:py-1 sm:text-[10px]"
                       style={{ color: shift.color }}
                       onClick={(event) => {
                         event.stopPropagation()
@@ -204,7 +205,7 @@ function ShiftCalendarDayCell({
                 <TooltipTrigger asChild>
                   <button
                     type="button"
-                    className="flex min-w-0 flex-1 flex-col items-stretch justify-center gap-0 px-1 py-1 text-left text-[10px] leading-tight cursor-pointer hover:opacity-80 overflow-hidden"
+                    className="flex min-w-0 flex-1 flex-col items-stretch justify-center gap-0 px-0.5 py-0.5 text-left text-[8px] leading-tight cursor-pointer hover:opacity-80 overflow-hidden sm:px-1 sm:py-1 sm:text-[10px]"
                     style={{ color: shift.color }}
                     onClick={(event) => {
                       event.stopPropagation()
@@ -251,6 +252,7 @@ export function ShiftCalendar({
   notePopoverContent,
   notePopoverOpen,
   onNotePopoverOpenChange,
+  headerExtra,
 }: ShiftCalendarProps) {
   const t = useTranslations('shifts')
   const locale = useLocale()
@@ -273,7 +275,7 @@ export function ShiftCalendar({
     const seen = new Map<string, { color: string; name: string }>()
     for (const shift of shifts)
       if (!seen.has(shift.color))
-        seen.set(shift.color, { color: shift.color, name: shift.areaName })
+        seen.set(shift.color, { color: shift.color, name: shift.shiftTypeName })
 
     return Array.from(seen.values())
   }, [shifts])
@@ -323,20 +325,33 @@ export function ShiftCalendar({
   return (
     <TooltipProvider delayDuration={200}>
       <Card className="w-full">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">{formatMonthTitle(currentMonth)}</CardTitle>
+        <CardHeader className="px-4 py-3 sm:px-6 sm:py-4">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-base sm:text-lg">{formatMonthTitle(currentMonth)}</CardTitle>
+              <div className="flex items-center gap-1 sm:hidden">
+                <Button variant="outline" size="icon" className="h-8 w-8" onClick={handlePreviousMonth}>
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button variant="outline" size="icon" className="h-8 w-8" onClick={handleNextMonth}>
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="icon" onClick={handlePreviousMonth}>
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Button variant="outline" size="icon" onClick={handleNextMonth}>
-                <ChevronRight className="h-4 w-4" />
-              </Button>
+              {headerExtra}
+              <div className="hidden sm:flex sm:items-center sm:gap-1">
+                <Button variant="outline" size="icon" onClick={handlePreviousMonth}>
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button variant="outline" size="icon" onClick={handleNextMonth}>
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </div>
         </CardHeader>
-        <CardContent className="w-full">
+        <CardContent className="w-full px-2 sm:px-6">
           <Popover open={notePopoverOpen} onOpenChange={onNotePopoverOpenChange}>
             <div className="w-full min-w-0 overflow-x-auto rounded-md border">
               <table
@@ -350,7 +365,7 @@ export function ShiftCalendar({
                     {weekDays.map((dayName) => (
                       <th
                         key={dayName}
-                        className="border-b p-1 text-center text-[0.8rem] font-normal text-muted-foreground"
+                        className="border-b p-0.5 text-center text-[0.65rem] font-normal text-muted-foreground sm:p-1 sm:text-[0.8rem]"
                         scope="col"
                       >
                         {dayName}
@@ -398,12 +413,12 @@ export function ShiftCalendar({
                           <td
                             key={dateKey}
                             className={cn(
-                              'relative h-32 min-h-32 border-b border-r p-0 align-top last:border-r-0 cursor-pointer transition-colors duration-150 hover:bg-foreground/5 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-[-2px]',
+                              'relative h-20 min-h-20 border-b border-r p-0 align-top last:border-r-0 cursor-pointer transition-colors duration-150 hover:bg-foreground/5 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-[-2px] sm:h-24 sm:min-h-24 md:h-32 md:min-h-32',
                               !isCurrentMonth && 'text-muted-foreground/60',
                               isTodayCell &&
                                 'bg-primary/25 ring-2 ring-primary/50 ring-inset',
-                              isHoliday && !isTodayCell && 'bg-amber-500/15',
-                              isWeekend && !isHoliday && !isTodayCell && 'bg-muted/75',
+                              isHoliday && !isTodayCell && 'bg-calendar-holiday',
+                              isWeekend && !isHoliday && !isTodayCell && 'bg-calendar-weekend',
                               isSelected && 'bg-accent'
                             )}
                             onClick={() => onDateSelect?.(date)}
@@ -425,12 +440,12 @@ export function ShiftCalendar({
                 </tbody>
               </table>
             </div>
-            <PopoverContent side="right" align="start" className="w-80">
+            <PopoverContent side="bottom" align="center" className="w-[calc(100vw-2rem)] sm:w-80 sm:max-w-80" sideOffset={4}>
               {notePopoverContent}
             </PopoverContent>
           </Popover>
 
-          <div className="mt-4 flex flex-wrap items-center gap-4 border-t pt-4">
+          <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1.5 border-t pt-3 sm:mt-4 sm:gap-4 sm:pt-4">
             {uniqueShiftTypes.length > 0 && (
               <>
                 {uniqueShiftTypes.map((st) => (
@@ -442,7 +457,7 @@ export function ShiftCalendar({
                     <span className="text-muted-foreground">{st.name}</span>
                   </div>
                 ))}
-                <span className="text-muted-foreground/50" aria-hidden>{LEGEND_SEP}</span>
+                <div className="mx-1 h-3.5 w-px bg-border" aria-hidden />
               </>
             )}
             <div className="flex items-center gap-1.5 text-xs">
@@ -450,14 +465,14 @@ export function ShiftCalendar({
               <span className="text-muted-foreground">{t('legend.today')}</span>
             </div>
             <div className="flex items-center gap-1.5 text-xs">
-              <div className="h-2.5 w-2.5 shrink-0 rounded bg-muted" />
+              <div className="h-2.5 w-2.5 shrink-0 rounded bg-primary/15 ring-1 ring-primary/30" />
               <span className="text-muted-foreground">{t('legend.weekend')}</span>
             </div>
             <div className="flex items-center gap-1.5 text-xs">
-              <div className="h-2.5 w-2.5 shrink-0 rounded bg-amber-500/30" />
+              <div className="h-2.5 w-2.5 shrink-0 rounded bg-amber-400/35" />
               <span className="text-muted-foreground">{t('legend.holiday')}</span>
             </div>
-            <span className="text-muted-foreground/50" aria-hidden>{LEGEND_SEP}</span>
+            <div className="mx-1 h-3.5 w-px bg-border" aria-hidden />
             <div className="flex items-center gap-1.5 text-xs">
               <RefreshCw className="h-2.5 w-2.5 shrink-0 text-blue-500" />
               <span className="text-muted-foreground">{t('legend.rotation')}</span>
@@ -468,7 +483,7 @@ export function ShiftCalendar({
             </div>
             {noteDates && noteDates.size > 0 && (
               <>
-                <span className="text-muted-foreground/50" aria-hidden>{LEGEND_SEP}</span>
+                <div className="mx-1 h-3.5 w-px bg-border" aria-hidden />
                 <div className="flex items-center gap-1.5 text-xs">
                   <StickyNote className="h-2.5 w-2.5 shrink-0 text-blue-500" />
                   <span className="text-muted-foreground">{t('legend.note')}</span>

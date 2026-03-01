@@ -15,6 +15,7 @@ import {
 } from '@/src/features/super-admin/lib/helpers/server/dashboard-helpers'
 import { AlertsPanel, OrganizationsTable, StatsCards } from '@/src/features/super-admin/ui'
 import { getNotesForMonthAction } from '@/src/features/staff-dashboard/api/calendar-note-actions'
+import { getMyAreasAndSectorsAction } from '@/src/features/staff-dashboard/api/staff-filter-actions'
 import { getMyShiftsAction, getUpcomingShiftsAction } from '@/src/features/staff-dashboard/api/staff-shifts-actions'
 import { StaffDashboardContent } from '@/src/features/staff-dashboard/ui/staff-dashboard-content'
 
@@ -81,10 +82,11 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
   const now = new Date()
   const startDate = new Date(now.getFullYear(), now.getMonth(), 1)
   const endDate = new Date(now.getFullYear(), now.getMonth() + 1, 1)
-  const [shiftsResult, upcomingResult, notesResult, org] = await Promise.all([
+  const [shiftsResult, upcomingResult, notesResult, filtersResult, org] = await Promise.all([
     getMyShiftsAction({ startDate, endDate }),
     getUpcomingShiftsAction(),
     getNotesForMonthAction(now.getMonth(), now.getFullYear()),
+    getMyAreasAndSectorsAction(),
     organizationId
       ? prisma.organization.findUnique({ where: { id: organizationId }, select: { name: true } })
       : null,
@@ -92,6 +94,7 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
   const initialShifts = shiftsResult.success && shiftsResult.data ? shiftsResult.data.shifts : []
   const initialUpcoming = upcomingResult.success && upcomingResult.data ? upcomingResult.data.shifts : []
   const initialNotes = notesResult.success && notesResult.data ? notesResult.data.notes : []
+  const filterOptions = filtersResult.success && filtersResult.data ? filtersResult.data : undefined
 
   return (
     <StaffDashboardContent
@@ -99,6 +102,7 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
       initialUpcoming={initialUpcoming}
       initialNotes={initialNotes}
       organizationName={org?.name}
+      filterOptions={filterOptions}
     />
   )
 }

@@ -158,6 +158,8 @@ export function CalendarImportDialog({
 
     if (selectedHolidays.length === 0) return
 
+    const toastId = toast.loading(t('importingToast'))
+
     startTransition(async () => {
       const result = await importNationalHolidaysAction({
         year: state.year,
@@ -172,11 +174,11 @@ export function CalendarImportDialog({
         if (result.data.skipped > 0)
           messages.push(t('skippedMessage', { skipped: result.data.skipped }))
 
-        toast.success(messages.join(' — '))
+        toast.success(messages.join(' — '), { id: toastId })
         onOpenChange(false)
         onImportComplete?.()
         router.refresh()
-      } else toast.error(result.error)
+      } else toast.error(result.error ?? t('importError'), { id: toastId })
     })
   }
 

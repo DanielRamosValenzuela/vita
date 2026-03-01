@@ -162,12 +162,13 @@ export function ContractsPage({ data, currency }: ContractsPageProps) {
             })
 
       if (result.success) {
-        if (createContractTarget.mode === 'add') toast.warning(t('contract.multipleWarning'))
-
-        toast.success(
+        const successMsg =
           result.message ||
-            t(createContractTarget.mode === 'edit' ? 'contract.edit' : 'contract.create')
-        )
+          t(createContractTarget.mode === 'edit' ? 'contract.edit' : 'contract.create')
+
+        if (createContractTarget.mode === 'add')
+          toast.success(successMsg, { description: t('contract.multipleWarning') })
+        else toast.success(successMsg)
         dispatch({ type: 'SET_CREATE_CONTRACT_TARGET', payload: null })
         router.refresh()
       } else toast.error(result.error || t('loadError'))

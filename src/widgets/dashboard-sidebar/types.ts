@@ -7,6 +7,7 @@ export interface DashboardSidebarProps {
   user: CurrentUser
   className?: string
   unreadNotificationCount?: number
+  displayRole?: Role
 }
 
 export interface NavItem {

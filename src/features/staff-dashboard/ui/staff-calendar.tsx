@@ -21,6 +21,7 @@ interface StaffCalendarProps {
   notePopoverContent?: ReactNode
   notePopoverOpen?: boolean
   onNotePopoverOpenChange?: (open: boolean) => void
+  headerExtra?: ReactNode
 }
 
 export function StaffCalendar({
@@ -34,6 +35,7 @@ export function StaffCalendar({
   notePopoverContent,
   notePopoverOpen,
   onNotePopoverOpenChange,
+  headerExtra,
 }: StaffCalendarProps) {
   const t = useTranslations('staffDashboard')
 
@@ -55,6 +57,7 @@ export function StaffCalendar({
           notePopoverContent={notePopoverContent}
           notePopoverOpen={notePopoverOpen}
           onNotePopoverOpenChange={onNotePopoverOpenChange}
+          headerExtra={headerExtra}
         />
         <div className="flex flex-col items-center gap-2 py-4">
           <Calendar className="h-8 w-8 text-muted-foreground" />
@@ -80,6 +83,7 @@ export function StaffCalendar({
       notePopoverContent={notePopoverContent}
       notePopoverOpen={notePopoverOpen}
       onNotePopoverOpenChange={onNotePopoverOpenChange}
+      headerExtra={headerExtra}
     />
   )
 }

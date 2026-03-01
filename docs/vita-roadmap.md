@@ -13,7 +13,7 @@
 | 6    | Analytics                         | Pendiente  |
 | 7    | Dashboard ADMIN_HR                | Completado |
 | 8    | Dashboard CHIEF_AREA              | Parcial    |
-| 9    | Dashboard STAFF            | Parcial    |
+| 9    | Dashboard STAFF                   | Completado |
 | 10   | Seguridad y Upload                | Completado |
 | 11   | Calendario Visual                 | Completado |
 | 12   | Perfiles de Usuario Avanzados     | Completado |
@@ -21,7 +21,26 @@
 | 13.5 | Rotativas de Turno                | Completado |
 | 14   | Testing y Pulido                  | Pendiente  |
 
-## Próximos Pasos Inmediatos (Feb 2026)
+## Prioridad 1.7: Dashboard STAFF ✅
+
+- **Calendario interactivo de turnos** ✅
+  - Vista mensual con navegación, turnos coloreados por tipo
+  - Panel lateral de detalle de sector al hacer clic en un turno
+  - Lista de próximos turnos (colapsable)
+- **Notas personales del calendario** ✅
+  - Click en día → popover inline con textarea
+  - CRUD completo (crear, editar, eliminar)
+  - Indicador visual (punto azul) en días con nota
+  - Notas personales por usuario (no vinculadas a organización)
+- **Exportación iCal** ✅
+  - Feed iCal por organización y unificado
+  - Endpoint `GET /api/ical/[token]`
+  - Tokens con expiración y revocación
+  - Modelo CalendarFeedToken en schema
+- **Badge de organización activa** ✅
+  - Muestra nombre de la organización que el usuario está visualizando
+
+## Próximos Pasos Inmediatos (Mar 2026)
 
 1. ~~**UserArea en schema**~~ ✅ Chief ↔ Área (modelo UserArea, migración aplicada)
 2. ~~**Gestión de Personal** (`/dashboard/staff`)~~ ✅ ADMIN_HR y CHIEF ven la página; ADMIN_HR todo el personal, CHIEF solo personal de sus áreas (según UserArea)

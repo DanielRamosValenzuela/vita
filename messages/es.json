@@ -327,7 +327,9 @@
       "perOrgLabel": "Organización",
       "unifiedLabel": "Unificado (todas las organizaciones)",
       "downloadSuccess": "Archivo .ics descargado",
-      "downloadError": "Error al generar el archivo"
+      "downloadError": "Error al generar el archivo",
+      "downloading": "Generando archivo .ics...",
+      "revokeError": "Error al revocar el feed"
     },
     "google": {
       "connect": "Conectar Google Calendar",
@@ -349,6 +351,12 @@
       "deleted": "Nota eliminada",
       "error": "Error al guardar la nota",
       "legendNote": "Nota personal"
+    },
+    "filters": {
+      "allAreas": "Todas mis áreas",
+      "allSectors": "Todos los sectores",
+      "area": "Área",
+      "sector": "Sector"
     },
     "status": {
       "SCHEDULED": "Programado",
@@ -1793,7 +1801,8 @@
           "emptyDescription": "Añade componentes para definir cómo se pagará al personal. Puedes combinar salarios base, tarifas por tiempo trabajado, bonos especiales y multiplicadores.",
           "addFirst": "Añadir Primer Componente"
         },
-        "componentsTooltip": "Los componentes definen cómo se calcula el pago. Puedes combinar: salario base (mensual/quincenal), tarifas por tiempo (minuto/hora), bonos (nocturno/fin de semana) y multiplicadores (horas extra/feriados)."
+        "componentsTooltip": "Los componentes definen cómo se calcula el pago. Puedes combinar: salario base (mensual/quincenal), tarifas por tiempo (minuto/hora), bonos (nocturno/fin de semana) y multiplicadores (horas extra/feriados).",
+        "loadShiftTypesError": "Error al cargar tipos de turno"
       },
       "componentForm": {
         "type": "Tipo de Componente",
@@ -2113,7 +2122,9 @@
         "date": "Fecha",
         "name": "Nombre",
         "type": "Tipo",
-        "multiplierCol": "Multiplicador"
+        "multiplierCol": "Multiplicador",
+        "importError": "Error al importar feriados",
+        "importingToast": "Importando feriados..."
       },
       "summary": {
         "title": "Resumen del Mes",
@@ -2340,6 +2351,7 @@
       "deleteConfirm": "¿Eliminar esta notificación?",
       "deleteConfirmDescription": "Esta acción no se puede deshacer.",
       "deleteSuccess": "Notificación eliminada",
+      "deleteError": "Error al eliminar la notificación",
       "loadMore": "Cargar más",
       "filters": {
         "all": "Todas",

@@ -1,6 +1,6 @@
 'use server'
 
-import { resolveChiefOrganizationId } from '@/src/shared/lib/auth/chief-access'
+import { getChiefAccessibleAreaIds, resolveChiefOrganizationId } from '@/src/shared/lib/auth/chief-access'
 import { isChief } from '@/src/shared/lib/auth/rbac'
 import { requireDashboardUser } from '@/src/shared/lib/auth/session'
 import { prisma } from '@/src/shared/lib/db'
@@ -13,6 +13,8 @@ interface GetMyShiftsParams {
   startDate: Date
   endDate: Date
   status?: string
+  areaId?: string
+  areaIds?: string[]
 }
 
 export async function getMyShiftsAction(
@@ -21,7 +23,9 @@ export async function getMyShiftsAction(
   try {
     const session = await requireDashboardUser()
 
-    const organizationId = isChief(session)
+    const chiefMode = isChief(session)
+
+    const organizationId = chiefMode
       ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
       : session.organizationId ?? null
 
@@ -29,12 +33,36 @@ export async function getMyShiftsAction(
       return { success: true, data: { shifts: [] } }
 
     const where: Record<string, unknown> = {
-      userId: session.id,
       organizationId,
       startTime: {
         gte: params.startDate,
         lt: params.endDate,
       },
+    }
+
+    if (chiefMode) {
+      const chiefAreaIds = await getChiefAccessibleAreaIds(session.id)
+      if (chiefAreaIds.length === 0)
+        return { success: true, data: { shifts: [] } }
+
+      if (params.areaId) {
+        if (!chiefAreaIds.includes(params.areaId))
+          return { success: true, data: { shifts: [] } }
+        where.areaId = params.areaId
+      } else if (params.areaIds?.length) {
+        const validIds = params.areaIds.filter((id) => chiefAreaIds.includes(id))
+        if (validIds.length === 0)
+          return { success: true, data: { shifts: [] } }
+        where.areaId = { in: validIds }
+      } else
+        where.areaId = { in: chiefAreaIds }
+    } else {
+      where.userId = session.id
+
+      if (params.areaId)
+        where.areaId = params.areaId
+      else if (params.areaIds?.length)
+        where.areaId = { in: params.areaIds }
     }
 
     if (params.status)
@@ -71,7 +99,9 @@ export async function getUpcomingShiftsAction(): Promise<
   try {
     const session = await requireDashboardUser()
 
-    const organizationId = isChief(session)
+    const chiefMode = isChief(session)
+
+    const organizationId = chiefMode
       ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
       : session.organizationId ?? null
 
@@ -82,16 +112,25 @@ export async function getUpcomingShiftsAction(): Promise<
     const sevenDaysLater = new Date(now)
     sevenDaysLater.setDate(sevenDaysLater.getDate() + 7)
 
-    const shifts = await prisma.shift.findMany({
-      where: {
-        userId: session.id,
-        organizationId,
-        status: { in: ['SCHEDULED', 'IN_PROGRESS'] },
-        startTime: {
-          gte: now,
-          lt: sevenDaysLater,
-        },
+    const where: Record<string, unknown> = {
+      organizationId,
+      status: { in: ['SCHEDULED', 'IN_PROGRESS'] },
+      startTime: {
+        gte: now,
+        lt: sevenDaysLater,
       },
+    }
+
+    if (chiefMode) {
+      const chiefAreaIds = await getChiefAccessibleAreaIds(session.id)
+      if (chiefAreaIds.length === 0)
+        return { success: true, data: { shifts: [] } }
+      where.areaId = { in: chiefAreaIds }
+    } else
+      where.userId = session.id
+
+    const shifts = await prisma.shift.findMany({
+      where,
       include: {
         user: {
           select: { id: true, name: true, email: true, role: true },

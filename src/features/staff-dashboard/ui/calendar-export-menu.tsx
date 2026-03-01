@@ -54,6 +54,7 @@ export function CalendarExportMenu({
   const [feeds, setFeeds] = useState<FeedToken[]>([])
 
   const handleDownloadIcs = useCallback(() => {
+    const toastId = toast.loading(t('downloading'))
     startTransition(async () => {
       const result = await generateIcsFileAction({
         month: currentMonth,
@@ -69,9 +70,9 @@ export function CalendarExportMenu({
         a.download = result.data.filename
         a.click()
         URL.revokeObjectURL(url)
-        toast.success(t('downloadSuccess'))
+        toast.success(t('downloadSuccess'), { id: toastId })
       } else
-        toast.error(t('downloadError'))
+        toast.error(t('downloadError'), { id: toastId })
     })
   }, [currentMonth, currentYear, t])
 
@@ -81,8 +82,7 @@ export function CalendarExportMenu({
         const result = await createFeedTokenAction({ type })
         if (result.success && result.data) {
           await navigator.clipboard.writeText(result.data.feedUrl)
-          toast.success(t('feedCreated'))
-          toast.info(t('urlCopied'))
+          toast.success(t('feedCreated'), { description: t('urlCopied') })
           const feedsResult = await getMyFeedTokensAction()
           if (feedsResult.success && feedsResult.data)
             setFeeds(feedsResult.data.tokens)
@@ -104,8 +104,9 @@ export function CalendarExportMenu({
   const handleRevokeFeed = useCallback(
     (tokenId: string) => {
       startTransition(async () => {
-        await revokeFeedTokenAction({ tokenId })
-        toast.success(t('feedRevoked'))
+        const revokeResult = await revokeFeedTokenAction({ tokenId })
+        if (revokeResult.success) toast.success(t('feedRevoked'))
+        else toast.error(revokeResult.error ?? t('revokeError'))
         const result = await getMyFeedTokensAction()
         if (result.success && result.data)
           setFeeds(result.data.tokens)

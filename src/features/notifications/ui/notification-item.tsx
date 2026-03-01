@@ -94,7 +94,7 @@ export function NotificationItem({ notification, onDelete }: NotificationItemPro
       if (result.success) {
         toast.success(t('inbox.deleteSuccess'))
         onDelete?.(notification.id)
-      }
+      } else toast.error(result.error ?? t('inbox.deleteError'))
     })
     setShowDeleteDialog(false)
   }

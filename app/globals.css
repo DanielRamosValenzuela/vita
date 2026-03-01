@@ -59,6 +59,8 @@
   --shadow-xl:
     0 0.25rem 0.5rem 0 hsl(222.2 47.4% 11.2% / 0.1), 0 8px 10px -1px hsl(222.2 47.4% 11.2% / 0.1);
   --shadow-2xl: 0 0.25rem 0.5rem 0 hsl(222.2 47.4% 11.2% / 0.25);
+  --calendar-weekend: color-mix(in oklch, var(--primary) 8%, var(--background));
+  --calendar-holiday: color-mix(in oklch, oklch(0.82 0.12 85) 15%, var(--background));
   --tracking-normal: 0em;
   --spacing: 0.25rem;
 }
@@ -149,6 +151,8 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-calendar-weekend: var(--calendar-weekend);
+  --color-calendar-holiday: var(--calendar-holiday);
 
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
@@ -182,7 +186,8 @@
   [data-slot],
   aside, header, nav a,
   .bg-card, .bg-background, .bg-primary,
-  .bg-accent, .bg-muted, .bg-secondary {
+  .bg-accent, .bg-muted, .bg-secondary,
+  .bg-calendar-weekend, .bg-calendar-holiday {
     transition-property: background-color, border-color, color, fill, stroke;
     transition-duration: 0.3s;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);

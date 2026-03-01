@@ -24,6 +24,15 @@ Documentación dividida en archivos enfocados. Ver [README.md](./README.md) para
 | vita-sessions-phase-7-admin-hr.md    | 7    | ADMIN_HR, invitaciones, entities, molecules        |
 | vita-sessions-phase-11-turnos.md     | 11   | Shifts, ShiftTypes, Rates, Contratos, Áreas        |
 
+## Specs de Features
+
+| Spec                                       | Feature                  | Contenido                                            |
+| ------------------------------------------ | ------------------------ | ---------------------------------------------------- |
+| specs/001-area-sectors/                     | Áreas y Sectores         | Modelo de datos, server actions, UI para sectores    |
+| specs/003-inbox-notifications/              | Notificaciones           | Bandeja de entrada, notificaciones por rol           |
+| specs/004-shift-rotations/                  | Rotativas de Turno       | Creación de rotativas, grupos, generación de turnos  |
+| specs/005-staff-dashboard-calendar/         | Staff Dashboard Calendar | Calendario personal, notas, iCal, panel de detalle   |
+
 ## Uso para IA
 
 Al consultar el plan, usar búsqueda semántica en estos archivos. Cada documento tiene menos de 500 líneas para contexto eficiente.

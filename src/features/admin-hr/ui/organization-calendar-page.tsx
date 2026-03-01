@@ -40,7 +40,7 @@ export function OrganizationCalendarPage({
     startTransition(async () => {
       const result = await getOrganizationCalendarAction(year, month)
       if (result.success && result.data) setCalendarDays(result.data)
-      else if (result.error) toast.error(result.error)
+      else toast.error(result.error ?? t('errorLoading'))
     })
   }
 

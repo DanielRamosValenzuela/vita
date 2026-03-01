@@ -11,9 +11,11 @@ import type { CalendarEvent } from '@/src/entities/shift/ui/shift-calendar'
 
 import { Badge } from '@/src/shared/ui/badge'
 
+import type { FilterOptions } from '../api/staff-filter-actions'
 import { deleteNoteAction, getNotesForMonthAction, upsertNoteAction } from '../api/calendar-note-actions'
 import { getMyShiftsAction, getUpcomingShiftsAction } from '../api/staff-shifts-actions'
 import { CalendarExportMenu } from './calendar-export-menu'
+import { CalendarFilters } from './calendar-filters'
 import { NotePopoverContent } from './note-popover-content'
 import { ShiftDetailPanel } from './shift-detail-panel'
 import { StaffCalendar } from './staff-calendar'
@@ -29,6 +31,7 @@ interface StaffDashboardContentProps {
   initialUpcoming: ShiftWithRelations[]
   initialNotes?: Array<{ id: string; date: string; content: string }>
   organizationName?: string
+  filterOptions?: FilterOptions
 }
 
 function getMonthRange(date: Date) {
@@ -42,6 +45,7 @@ export function StaffDashboardContent({
   initialUpcoming,
   initialNotes,
   organizationName,
+  filterOptions,
 }: StaffDashboardContentProps) {
   const t = useTranslations('staffDashboard')
   const [shifts, setShifts] = useState<ShiftWithRelations[]>(initialShifts)
@@ -51,6 +55,8 @@ export function StaffDashboardContent({
   const [panelOpen, setPanelOpen] = useState(false)
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth())
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear())
+  const [selectedSectorId, setSelectedSectorId] = useState<string | null>(null)
+  const [selectedAreaId, setSelectedAreaId] = useState<string | null>(null)
 
   const [notes, setNotes] = useState<Map<string, CalendarNoteData>>(() => {
     const map = new Map<string, CalendarNoteData>()
@@ -83,14 +89,33 @@ export function StaffDashboardContent({
     })
   }, [])
 
-  const fetchShifts = useCallback((month: Date) => {
-    startTransition(async () => {
-      const { startDate, endDate } = getMonthRange(month)
-      const result = await getMyShiftsAction({ startDate, endDate })
-      if (result.success && result.data)
-        setShifts(result.data.shifts)
-    })
-  }, [])
+  const resolveFilterParams = useCallback(
+    (areaId: string | null, sectorId: string | null) => {
+      if (areaId) return { areaId }
+      if (sectorId && filterOptions) {
+        const sector = filterOptions.sectors.find((s) => s.id === sectorId)
+        if (sector?.areaIds.length) return { areaIds: sector.areaIds }
+      }
+      return {}
+    },
+    [filterOptions]
+  )
+
+  const fetchShifts = useCallback(
+    (month: Date, areaId?: string | null, sectorId?: string | null) => {
+      startTransition(async () => {
+        const { startDate, endDate } = getMonthRange(month)
+        const filterParams = resolveFilterParams(
+          areaId ?? selectedAreaId,
+          sectorId ?? selectedSectorId
+        )
+        const result = await getMyShiftsAction({ startDate, endDate, ...filterParams })
+        if (result.success && result.data)
+          setShifts(result.data.shifts)
+      })
+    },
+    [resolveFilterParams, selectedAreaId, selectedSectorId]
+  )
 
   const handleMonthChange = useCallback(
     (month: Date) => {
@@ -98,10 +123,29 @@ export function StaffDashboardContent({
       setCurrentYear(month.getFullYear())
       setNotePopoverOpen(false)
       setSelectedDate(null)
-      fetchShifts(month)
+      fetchShifts(month, selectedAreaId, selectedSectorId)
       fetchNotes(month.getMonth(), month.getFullYear())
     },
-    [fetchShifts, fetchNotes]
+    [fetchShifts, fetchNotes, selectedAreaId, selectedSectorId]
+  )
+
+  const handleSectorChange = useCallback(
+    (sectorId: string | null) => {
+      setSelectedSectorId(sectorId)
+      setSelectedAreaId(null)
+      const month = new Date(currentYear, currentMonth, 1)
+      fetchShifts(month, null, sectorId)
+    },
+    [currentMonth, currentYear, fetchShifts]
+  )
+
+  const handleAreaChange = useCallback(
+    (areaId: string | null) => {
+      setSelectedAreaId(areaId)
+      const month = new Date(currentYear, currentMonth, 1)
+      fetchShifts(month, areaId, selectedSectorId)
+    },
+    [currentMonth, currentYear, selectedSectorId, fetchShifts]
   )
 
   const handleDateSelect = useCallback(
@@ -196,12 +240,23 @@ export function StaffDashboardContent({
     )
     : null
 
+  const headerExtra = filterOptions ? (
+    <CalendarFilters
+      areas={filterOptions.areas}
+      sectors={filterOptions.sectors}
+      selectedAreaId={selectedAreaId}
+      selectedSectorId={selectedSectorId}
+      onAreaChange={handleAreaChange}
+      onSectorChange={handleSectorChange}
+    />
+  ) : null
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <div className="flex items-center gap-3">
-            <h1 className="text-3xl font-bold">{t('title')}</h1>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            <h1 className="text-2xl font-bold sm:text-3xl">{t('title')}</h1>
             {organizationName && (
               <Badge variant="outline" className="text-muted-foreground">
                 <Building2 />
@@ -209,7 +264,7 @@ export function StaffDashboardContent({
               </Badge>
             )}
           </div>
-          <p className="text-muted-foreground mt-1">{t('description')}</p>
+          <p className="text-muted-foreground mt-1 text-sm sm:text-base">{t('description')}</p>
         </div>
         <CalendarExportMenu
           currentMonth={currentMonth}
@@ -229,6 +284,7 @@ export function StaffDashboardContent({
             notePopoverContent={notePopoverContent}
             notePopoverOpen={notePopoverOpen}
             onNotePopoverOpenChange={setNotePopoverOpen}
+            headerExtra={headerExtra}
           />
         </div>
         <div className="lg:col-span-4">

@@ -327,7 +327,9 @@
       "perOrgLabel": "Organization",
       "unifiedLabel": "Unified (all organizations)",
       "downloadSuccess": ".ics file downloaded",
-      "downloadError": "Error generating file"
+      "downloadError": "Error generating file",
+      "downloading": "Generating .ics file...",
+      "revokeError": "Error revoking feed"
     },
     "google": {
       "connect": "Connect Google Calendar",
@@ -349,6 +351,12 @@
       "deleted": "Note deleted",
       "error": "Error saving note",
       "legendNote": "Personal note"
+    },
+    "filters": {
+      "allAreas": "All my areas",
+      "allSectors": "All sectors",
+      "area": "Area",
+      "sector": "Sector"
     },
     "status": {
       "SCHEDULED": "Scheduled",
@@ -1820,7 +1828,8 @@
           "emptyDescription": "Add components to define how staff will be paid. You can combine base salaries, time-based rates, special bonuses, and multipliers.",
           "addFirst": "Add First Component"
         },
-        "componentsTooltip": "Components define how payment is calculated. You can combine: base salary (monthly/biweekly), time-based rates (minute/hour), bonuses (night/weekend), and multipliers (overtime/holidays)."
+        "componentsTooltip": "Components define how payment is calculated. You can combine: base salary (monthly/biweekly), time-based rates (minute/hour), bonuses (night/weekend), and multipliers (overtime/holidays).",
+        "loadShiftTypesError": "Error loading shift types"
       },
       "componentForm": {
         "type": "Component Type",
@@ -2140,7 +2149,9 @@
         "date": "Date",
         "name": "Name",
         "type": "Type",
-        "multiplierCol": "Multiplier"
+        "multiplierCol": "Multiplier",
+        "importError": "Error importing holidays",
+        "importingToast": "Importing holidays..."
       },
       "summary": {
         "title": "Month Summary",
@@ -2367,6 +2378,7 @@
       "deleteConfirm": "Delete this notification?",
       "deleteConfirmDescription": "This action cannot be undone.",
       "deleteSuccess": "Notification deleted",
+      "deleteError": "Error deleting notification",
       "loadMore": "Load more",
       "filters": {
         "all": "All",

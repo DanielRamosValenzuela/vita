@@ -115,7 +115,7 @@ export function RateTemplateForm({
               })) ?? [],
         }))
       )
-    else toast.error(shiftResult.error || 'Error al cargar tipos de turno')
+    else toast.error(shiftResult.error || t('loadShiftTypesError'))
     if (areasResult.success && Array.isArray(areasResult.data))
       setAreas(
         (areasResult.data as Array<{ id: string; name: string }>)
@@ -123,7 +123,7 @@ export function RateTemplateForm({
           .map((a) => ({ id: a.id, name: a.name }))
       )
     setIsLoadingShiftTypes(false)
-  }, [])
+  }, [t])
 
   useEffect(() => {
     if (mode === 'edit' && existingTemplate) setFormState(mapTemplateToState(existingTemplate))
