@@ -114,6 +114,26 @@ El usuario puede conectar su cuenta de Google para importar eventos de un calend
 
 ---
 
+### User Story 6 - Notas personales en el calendario (Priority: P2) ✅
+
+Como STAFF o CHIEF_AREA, quiero poder hacer clic en un día del calendario y agregar una nota personal para recordar tareas o información relevante de ese día.
+
+El usuario hace clic en cualquier día del calendario y aparece un popover inline anclado al día con un textarea para escribir una nota (máximo 500 caracteres). Puede guardar, editar y eliminar notas. Los días con nota muestran un punto azul como indicador visual. Las notas son personales del usuario (no están vinculadas a ninguna organización).
+
+**Why this priority**: Complementa la funcionalidad del calendario con capacidad de anotación personal, similar a Google Calendar. Bajo costo de implementación con alto valor de usabilidad.
+
+**Independent Test**: Click en día vacío → popover con textarea. Guardar nota → punto azul. Click en día con nota → contenido existente editable. Eliminar → punto desaparece. Cambiar de mes → notas del nuevo mes se cargan.
+
+**Acceptance Scenarios**:
+
+1. **Given** un STAFF viendo el calendario, **When** hace clic en un día vacío, **Then** aparece un popover con textarea, contador de caracteres y botón guardar.
+2. **Given** un STAFF que escribe "Reunión de equipo a las 9am" y guarda, **When** ve el calendario, **Then** el día muestra un punto azul indicador y la nota aparece al hacer clic nuevamente.
+3. **Given** un STAFF que ya tiene una nota en un día, **When** hace clic en ese día, **Then** el popover muestra el contenido existente editable con opción de eliminar.
+4. **Given** un STAFF que elimina una nota, **When** confirma la eliminación, **Then** el punto azul desaparece y el día queda sin nota.
+5. **Given** un STAFF que cambia de mes, **When** navega al mes siguiente, **Then** las notas del nuevo mes se cargan correctamente.
+
+---
+
 ### Edge Cases
 
 - **Turno que cruza la medianoche**: Un turno nocturno (22:00 a 06:00) debe mostrarse en el día de inicio con indicación visual de que continúa al día siguiente.

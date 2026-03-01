@@ -32,6 +32,8 @@
 22. [Calendario Organizacional](#calendario-organizacional)
 23. [Pago de Turno](#pago-de-turno)
 24. [Desglose de Pago](#desglose-de-pago)
+25. [Token de Suscripción iCal](#token-de-suscripción-ical)
+26. [Nota de Calendario Personal](#nota-de-calendario-personal)
 
 ---
 
@@ -1046,6 +1048,80 @@ Turno 25-Dic Guardia Larga:
 
 ---
 
+## 25. Token de Suscripción iCal
+
+**Nombre técnico:** `CalendarFeedToken`
+
+**¿Para qué sirve?**
+Almacena tokens únicos que permiten a los usuarios suscribirse a un feed iCal de sus turnos desde Google Calendar, Apple Calendar u Outlook, sin necesidad de autenticarse cada vez.
+
+**Ejemplo práctico:**
+
+```
+Feed por organización:
+  • Token: abc123-unique-token
+  • URL: https://vita.app/api/ical/abc123-unique-token
+  • Contenido: Solo turnos de "Clínica Santa María"
+
+Feed unificado (personal):
+  • Token: xyz789-unique-token
+  • URL: https://vita.app/api/ical/xyz789-unique-token
+  • Contenido: Turnos de TODAS las organizaciones del usuario
+```
+
+### **Campos:**
+
+| Campo             | ¿Qué es?                                                  |
+| ----------------- | ---------------------------------------------------------- |
+| `id`              | Identificador único del token                              |
+| `userId`          | Usuario dueño del feed                                     |
+| `organizationId`  | Organización del feed (null = feed unificado personal)     |
+| `token`           | Token único para la URL del feed                           |
+| `isActive`        | Si el feed está activo (se puede revocar)                  |
+| `createdAt`       | Fecha de creación                                          |
+| `updatedAt`       | Última actualización                                       |
+
+**Relaciones:**
+
+- **Pertenece a:** Un usuario (User) y opcionalmente una organización (Organization)
+- **Único:** Un token por combinación usuario + organización
+
+---
+
+## 26. Nota de Calendario Personal
+
+**Nombre técnico:** `CalendarNote`
+
+**¿Para qué sirve?**
+Permite al personal agregar notas personales a días específicos del calendario (estilo Google Calendar). Cada usuario puede tener una nota por día, independiente de la organización.
+
+**Ejemplo práctico:**
+
+```
+Usuario: Dr. López
+  • 15 de Marzo: "Recordar llevar credencial nueva"
+  • 20 de Marzo: "Reunión con jefe de área a las 9am"
+  • 25 de Marzo: "Cumpleaños de María - traer torta"
+```
+
+### **Campos:**
+
+| Campo       | ¿Qué es?                                      |
+| ----------- | ---------------------------------------------- |
+| `id`        | Identificador único de la nota                 |
+| `userId`    | Usuario que creó la nota                       |
+| `date`      | Fecha del día (solo fecha, sin hora)           |
+| `content`   | Contenido de la nota (máximo 500 caracteres)   |
+| `createdAt` | Fecha de creación                              |
+| `updatedAt` | Última actualización                           |
+
+**Relaciones:**
+
+- **Pertenece a:** Un usuario (User, con eliminación en cascada)
+- **Único:** Una nota por combinación usuario + fecha
+
+---
+
 ## 🔒 Seguridad y Privacidad
 
 ### **Datos sensibles protegidos:**
@@ -1063,14 +1139,14 @@ Turno 25-Dic Guardia Larga:
 ### **Eliminación en cascada:**
 
 - Si se elimina una organización → se eliminan todas sus áreas, turnos, contratos
-- Si se elimina un usuario → se eliminan sus turnos, contratos, historial
+- Si se elimina un usuario → se eliminan sus turnos, contratos, historial, notas de calendario, tokens iCal
 - Si se elimina un área → sus turnos quedan sin área (no se eliminan)
 
 ---
 
 ## 📝 Resumen Ejecutivo
 
-**¿Cuántas tablas hay?** 24 tablas principales
+**¿Cuántas tablas hay?** 26 tablas principales
 
 **¿Qué información se guarda?**
 
@@ -1082,6 +1158,8 @@ Turno 25-Dic Guardia Larga:
 - 💰 **Tarifas:** Plantillas de pago completamente flexibles
 - 📄 **Contratos:** Asignaciones de tarifas a personal
 - 📅 **Calendario:** Días especiales con multiplicadores
+- 📝 **Notas personales:** Notas del staff en días del calendario
+- 🔗 **Feeds iCal:** Tokens de suscripción para calendarios externos
 - 📨 **Invitaciones:** Vinculación de personal a organizaciones
 - 🔐 **Seguridad:** Sesiones, métodos de acceso, verificaciones
 
@@ -1096,5 +1174,5 @@ Turno 25-Dic Guardia Larga:
 ---
 
 **Documento creado para:** Gerentes, administradores de hospitales, auditores, personal de cumplimiento
-**Última actualización:** Febrero 2026
-**Versión del sistema:** 4.1.0 (Rotativas de Turno)
+**Última actualización:** Marzo 2026
+**Versión del sistema:** 5.0.0 (Staff Dashboard Calendar + Notas Personales)

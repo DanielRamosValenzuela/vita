@@ -315,3 +315,65 @@
   animation: fade-in-up 0.6s ease-out 0.4s forwards;
   opacity: 0;
 }
+
+@keyframes hero-float {
+  0%, 100% { transform: translateY(0) translateX(0); }
+  25% { transform: translateY(-20px) translateX(10px); }
+  50% { transform: translateY(-10px) translateX(-5px); }
+  75% { transform: translateY(-25px) translateX(5px); }
+}
+
+@keyframes hero-float-slow {
+  0%, 100% { transform: translateY(0) translateX(0); }
+  33% { transform: translateY(-15px) translateX(-10px); }
+  66% { transform: translateY(-5px) translateX(8px); }
+}
+
+@keyframes hero-gradient-rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes hero-scale-in {
+  0% { opacity: 0; transform: scale(0.9); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes hero-glow-pulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(255, 255, 255, 0.1), inset 0 0 20px rgba(255, 255, 255, 0.05); }
+  50% { box-shadow: 0 0 40px rgba(255, 255, 255, 0.2), inset 0 0 30px rgba(255, 255, 255, 0.1); }
+}
+
+.animate-hero-float {
+  animation: hero-float 6s ease-in-out infinite;
+}
+
+.animate-hero-float-delay-1 {
+  animation: hero-float 6s ease-in-out 1s infinite;
+}
+
+.animate-hero-float-delay-2 {
+  animation: hero-float 6s ease-in-out 2s infinite;
+}
+
+.animate-hero-float-slow {
+  animation: hero-float-slow 8s ease-in-out infinite;
+}
+
+.animate-hero-gradient-rotate {
+  animation: hero-gradient-rotate 20s linear infinite;
+}
+
+.animate-hero-scale-in {
+  animation: hero-scale-in 0.8s ease-out forwards;
+  opacity: 0;
+}
+
+.animate-hero-scale-in-delay-2 {
+  animation: hero-scale-in 0.8s ease-out 0.2s forwards;
+  opacity: 0;
+}
+
+.animate-hero-glow-pulse {
+  animation: hero-glow-pulse 3s ease-in-out infinite;
+}

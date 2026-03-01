@@ -135,13 +135,36 @@
 
 ---
 
-## Phase 8: Polish & Cross-Cutting Concerns
+## Phase 8: User Story 6 — Notas personales en el calendario (Priority: P2)
+
+**Goal**: STAFF puede hacer click en un día del calendario y agregar una nota personal (estilo Google Calendar). Un popover inline aparece con textarea + botón guardar.
+
+**Independent Test**: Click en día vacío → popover con textarea. Escribir nota + guardar → punto azul aparece. Click en día con nota → contenido existente editable. Delete → punto desaparece.
+
+### Implementation for User Story 6
+
+- [x] T038 [US6] Add `CalendarNote` model to `prisma/schema.prisma` — Fields: id, userId, date (@db.Date), content (String). Unique constraint: [userId, date]. Relation: User (cascade). Run `npx prisma db push && npx prisma generate`
+- [x] T039 [P] [US6] Add `PopoverAnchor` export from `src/shared/ui/popover.tsx` — Needed to anchor the note popover to the selected calendar day cell
+- [x] T040 [P] [US6] Create calendar note server actions in `src/features/staff-dashboard/api/calendar-note-actions.ts` — Actions: `getNotesForMonthAction(month, year)`, `upsertNoteAction(date, content)` with Zod validation (min 1, max 500), `deleteNoteAction(noteId)` with ownership check. Normalize dates to midnight UTC for @db.Date
+- [x] T041 [P] [US6] Add i18n keys for `staffDashboard.notes` in both locale files and `shifts.legend.note`
+- [x] T042 [US6] Create `NotePopoverContent` component in `src/features/staff-dashboard/ui/note-popover-content.tsx` — Textarea with max 500 chars, character counter, save/delete buttons, date header, loading state
+- [x] T043 [US6] Modify `ShiftCalendar` in `src/entities/shift/ui/shift-calendar.tsx` — Add props: noteDates, notePopoverContent, notePopoverOpen, onNotePopoverOpenChange. Wrap table with Popover+PopoverAnchor on selected day. Add blue dot indicator for days with notes. Add legend entry. Add cursor-pointer, hover:bg-foreground/5, transition-colors, focus-visible outline to day cells
+- [x] T044 [US6] Modify `StaffCalendar` passthrough in `src/features/staff-dashboard/ui/staff-calendar.tsx` — Add note-related props and pass through to ShiftCalendar
+- [x] T045 [US6] Orchestrate notes in `StaffDashboardContent` — Add notes state (Map), fetch on month change, handlers for save/delete/date-select, derive noteDates Set, pass NotePopoverContent as render prop
+- [x] T046 [US6] Modify dashboard page `app/[locale]/dashboard/page.tsx` — Add getNotesForMonthAction to initial Promise.all, pass initialNotes prop. Also add organization name resolution and pass organizationName prop
+- [x] T047 [US6] Verify build and lint pass: `npm run build`
+
+**Checkpoint**: Users can add/edit/delete personal notes on calendar days with inline popover UX
+
+---
+
+## Phase 9: Polish & Cross-Cutting Concerns
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T038 [P] Update workflow documentation in `docs/vita-workflows.md` — Add Staff Dashboard Calendar section documenting: personal calendar view, sector personnel detail, iCal export/subscription, Google Calendar integration
-- [ ] T039 [P] Verify responsive layout across breakpoints — Test dashboard on mobile (sm), tablet (md), desktop (lg+). Verify: calendar readable on all sizes, upcoming panel stacks on mobile, shift detail panel works as sheet on mobile, export menu accessible on all sizes
-- [x] T040 Final comprehensive build and lint verification: run `npm run build && npm run lint`
+- [x] T048 [P] Update workflow documentation in `docs/vita-workflows.md` — Add Staff Dashboard Calendar section documenting: personal calendar view, sector personnel detail, iCal export/subscription, calendar notes
+- [ ] T049 [P] Verify responsive layout across breakpoints — Test dashboard on mobile (sm), tablet (md), desktop (lg+). Verify: calendar readable on all sizes, upcoming panel stacks on mobile, shift detail panel works as sheet on mobile, export menu accessible on all sizes
+- [x] T050 Final comprehensive build and lint verification: run `npm run build && npm run lint`
 
 ---
 

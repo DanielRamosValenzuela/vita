@@ -72,14 +72,16 @@ src/features/staff-dashboard/
 │   ├── staff-shifts-actions.ts       # NEW: Get personal shifts for calendar
 │   ├── sector-personnel-actions.ts   # NEW: Get active personnel by sector
 │   ├── ical-actions.ts               # NEW: Generate .ics, manage feed tokens
+│   ├── calendar-note-actions.ts      # NEW: CRUD for personal calendar notes
 │   └── google-calendar-actions.ts    # NEW: Google OAuth connect/disconnect/import
 ├── ui/
-│   ├── staff-dashboard-content.tsx   # NEW: Main orchestrator (calendar + upcoming + detail)
+│   ├── staff-dashboard-content.tsx   # NEW: Main orchestrator (calendar + upcoming + detail + notes)
 │   ├── staff-calendar.tsx            # NEW: Wrapper around ShiftCalendar for staff context
 │   ├── upcoming-shifts.tsx           # NEW: Next 7 days panel
 │   ├── shift-detail-panel.tsx        # NEW: Shift detail + sector personnel modal
 │   ├── sector-personnel-list.tsx     # NEW: Personnel grouped by area with relays
 │   ├── calendar-export-menu.tsx      # NEW: Export .ics / copy feed URL
+│   ├── note-popover-content.tsx      # NEW: Inline popover for calendar notes
 │   └── google-calendar-connect.tsx   # NEW: Google Calendar connection UI
 ├── lib/
 │   ├── ical-generator.ts             # NEW: .ics file generation logic
@@ -108,7 +110,7 @@ src/entities/google-connection/
 └── index.ts
 
 prisma/
-└── schema.prisma                     # MODIFY: Add CalendarFeedToken, GoogleCalendarConnection
+└── schema.prisma                     # MODIFY: Add CalendarFeedToken, CalendarNote, GoogleCalendarConnection
 
 messages/
 ├── es.json                           # MODIFY: Add staffDashboard namespace
