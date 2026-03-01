@@ -37,7 +37,8 @@ model Organization {
   calendars      OrganizationCalendar[]
   notifications  Notification[]
   rotations      Rotation[]
-  sectors        Sector[]
+  sectors            Sector[]
+  calendarFeedTokens CalendarFeedToken[]
 
   @@index([taxId])
   @@index([country])
@@ -78,6 +79,8 @@ model User {
   notificationsActed    Notification[]         @relation("NotificationActor")
   rotationMemberships   RotationMember[]
   userSectors           UserSector[]
+  calendarFeedTokens    CalendarFeedToken[]
+  calendarNotes         CalendarNote[]
 
   @@index([email])
   @@index([docNumber])
@@ -441,6 +444,22 @@ model UserSector {
   @@index([sectorId])
 }
 
+model CalendarFeedToken {
+  id             String        @id @default(cuid())
+  userId         String
+  organizationId String?
+  token          String        @unique
+  isActive       Boolean       @default(true)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, organizationId])
+  @@index([token])
+  @@index([userId])
+}
+
 model OrganizationInvitation {
   id             String           @id @default(cuid())
   organizationId String
@@ -759,4 +778,18 @@ model Notification {
   @@index([userId, isRead, createdAt(sort: Desc)])
   @@index([userId, createdAt(sort: Desc)])
   @@index([userId, type])
+}
+
+model CalendarNote {
+  id        String   @id @default(cuid())
+  userId    String
+  date      DateTime @db.Date
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@index([userId])
+  @@index([userId, date])
 }

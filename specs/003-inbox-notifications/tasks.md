@@ -73,7 +73,7 @@
 
 ## Phase 3: User Story 1 — Ver y gestionar la Bandeja de Entrada (Priority: P1) 🎯 MVP
 
-**Goal**: ADMIN_HR, CHIEF_AREA, and STAFF_HEALTH can access their inbox from the sidebar, see a chronological list of notifications with read/unread state, click to navigate, and mark all as read. Sidebar shows unread badge.
+**Goal**: ADMIN_HR, CHIEF_AREA, and STAFF can access their inbox from the sidebar, see a chronological list of notifications with read/unread state, click to navigate, and mark all as read. Sidebar shows unread badge.
 
 **Independent Test**: Create an invitation for a user (seed manually in DB or via ADMIN_HR UI), login as that user. Verify badge in sidebar, notification in inbox, click navigates to profile, mark-as-read updates badge.
 
@@ -89,7 +89,7 @@
 
 - [x] T015 [US1] Extend `src/widgets/dashboard-sidebar/types.ts` — add optional `badge?: number` field to `NavItem` interface.
 
-- [x] T016 [US1] Update `src/widgets/dashboard-sidebar/constants.ts` — add inbox nav item with `href: '/dashboard/inbox'`, `label: t('inbox')`, `icon: Inbox` (from lucide-react), `roles: [Role.ADMIN_HR, Role.CHIEF_AREA, Role.STAFF_HEALTH]`. Place it after the Dashboard/Calendar item and before role-specific items. Import `Inbox` from lucide-react.
+- [x] T016 [US1] Update `src/widgets/dashboard-sidebar/constants.ts` — add inbox nav item with `href: '/dashboard/inbox'`, `label: t('inbox')`, `icon: Inbox` (from lucide-react), `roles: [Role.ADMIN_HR, Role.CHIEF_AREA, Role.STAFF]`. Place it after the Dashboard/Calendar item and before role-specific items. Import `Inbox` from lucide-react.
 
 - [x] T017 [US1] Update sidebar rendering to show badge. Read `src/widgets/dashboard-sidebar/dashboard-shell.tsx` (or the component that renders `NavItem` list). Add badge rendering: when `item.badge` is defined and > 0, show a `Badge` component (variant="destructive", small size) next to the label. The badge should show the count (cap at "99+" if > 99).
 
@@ -167,7 +167,7 @@
 
 - [x] T032 [P] Run `npx next build` and verify the build succeeds with no TypeScript errors.
 
-- [x] T033 Update `docs/vita-workflows.md` — add a new section "Sistema de Notificaciones (Bandeja de Entrada)" under "Workflows transversales" documenting: ✅ Inbox page for ADMIN_HR, CHIEF_AREA, STAFF_HEALTH; ✅ Auto-generation from invitations, area assignments, shift CRUD; ✅ Toast integration for all types; ✅ Status and type filters; ⏳ SUPER_ADMIN notifications — pending; ⏳ Real-time updates (WebSocket/SSE) — pending; ⏳ Email notifications — pending.
+- [x] T033 Update `docs/vita-workflows.md` — add a new section "Sistema de Notificaciones (Bandeja de Entrada)" under "Workflows transversales" documenting: ✅ Inbox page for ADMIN_HR, CHIEF_AREA, STAFF; ✅ Auto-generation from invitations, area assignments, shift CRUD; ✅ Toast integration for all types; ✅ Status and type filters; ⏳ SUPER_ADMIN notifications — pending; ⏳ Real-time updates (WebSocket/SSE) — pending; ⏳ Email notifications — pending.
 
 - [x] T034 Update `docs/vita-roadmap.md` — change "Sistema de Notificaciones" status from "Pendiente" to "Parcial" and add completion notes.
 

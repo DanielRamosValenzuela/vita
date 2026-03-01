@@ -7,7 +7,7 @@
 
 Obtiene los turnos del usuario autenticado para un rango de fechas.
 
-**Auth**: `requireDashboardUser()` — STAFF_HEALTH, CHIEF_AREA, CHIEF_SECTOR
+**Auth**: `requireDashboardUser()` — STAFF, CHIEF_AREA
 **Multi-tenant**: Filtra por `organizationId` de la sesión activa
 
 ### Input

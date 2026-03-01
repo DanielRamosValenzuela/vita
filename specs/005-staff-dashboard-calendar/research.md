@@ -5,17 +5,19 @@
 
 ## R1: Reutilización del ShiftCalendar existente
 
-**Decision**: Reutilizar `ShiftCalendar` directamente como componente de presentación. Crear un wrapper `StaffCalendar` que adapte los datos y callbacks al contexto personal del staff.
+**Decision**: Promover `ShiftCalendar` y `groupShiftsForCalendar()` de `features/shifts/` a `entities/shift/` para cumplir FSD (features no importan de otras features). Crear un wrapper `StaffCalendar` en `features/staff-dashboard/` que adapte los datos y callbacks al contexto personal del staff.
 
 **Rationale**:
-- `ShiftCalendar` (~450 LOC) es completamente genérico: acepta `CalendarEvent[]` y callbacks opcionales.
+- `ShiftCalendar` (~450 LOC) es completamente genérico: acepta `CalendarEvent[]` y callbacks opcionales. Solo importa de `shared/`, por lo que es portable a `entities/`.
 - Tipos `IndividualCalendarEvent` y `RotationGroupCalendarEvent` ya cubren todos los casos de turnos.
 - `groupShiftsForCalendar()` es una función pura que funciona con cualquier `ShiftWithRelations[]`.
 - Solo necesita: no pasar `onShiftDelete` (read-only), no pasar `onDateSelect` (no creación), sí pasar `onShiftClick` (para abrir detalle).
+- **FSD compliance**: Al moverlos a `entities/shift/`, ambas features (`shifts` y `staff-dashboard`) pueden importar sin violar la regla de no-import entre features.
 
 **Alternatives considered**:
 - Crear un calendario nuevo desde cero: Rechazado por duplicación de código y riesgo de inconsistencia visual.
 - Fork del componente: Rechazado; el componente original es suficientemente flexible vía props opcionales.
+- Importar directamente desde `features/shifts/`: Rechazado; viola Principio I de la Constitución (FSD).
 
 ## R2: Server Action para turnos personales del staff
 

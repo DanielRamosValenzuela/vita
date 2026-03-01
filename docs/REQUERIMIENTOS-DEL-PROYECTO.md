@@ -215,7 +215,7 @@ VITA es una plataforma digital que permite a hospitales y clínicas:
 
 ---
 
-### 6. Panel de Personal de Salud (STAFF_HEALTH)
+### 6. Panel de Personal de Salud (STAFF)
 
 **¿Qué se logró?**
 
@@ -370,7 +370,7 @@ VITA es una plataforma digital que permite a hospitales y clínicas:
 
 **¿Qué se logró?**
 
-- Bandeja de entrada de notificaciones para ADMIN_HR, CHIEF_AREA y STAFF_HEALTH
+- Bandeja de entrada de notificaciones para ADMIN_HR, CHIEF_AREA y STAFF
 - Notificaciones in-app para eventos de rotativas:
   - Asignación a rotativa
   - Generación de turnos desde rotativa
@@ -622,7 +622,7 @@ VITA es una plataforma digital que permite a hospitales y clínicas:
 | **Panel SUPER_ADMIN**      | ✅ 85%  | Falta gestión de pagos                                                                           |
 | **Panel ADMIN_HR**         | ✅ 95%  | Completado: áreas, turnos, tarifas, personal, rotativas. Falta: cálculo de pagos, calendario org |
 | **Panel CHIEF_AREA**       | ⏳ 65%  | Funcional: turnos, rotativas, personal. Falta: vinculación directa, aprobaciones, asistencia     |
-| **Panel STAFF_HEALTH**     | ⏳ 30%  | Solo vista básica. Falta todo el ecosistema de turnos                                            |
+| **Panel STAFF**     | ⏳ 30%  | Solo vista básica. Falta todo el ecosistema de turnos                                            |
 | **Calendario visual**      | ✅ 75%  | Funcional. Falta: drag-and-drop, vistas múltiples, sincronización                                |
 | **Sistema de tarifas**     | ✅ 95%  | Completado: plantillas flexibles, contratos. Falta: cálculo automático de pagos                  |
 | **Perfiles avanzados**     | ✅ 90%  | Completado: documentos, emails, fotos. Falta: verificación de emails                             |
@@ -639,7 +639,7 @@ VITA es una plataforma digital que permite a hospitales y clínicas:
 | **SUPER_ADMIN**  | Gestionar todas las organizaciones, crear usuarios ADMIN_HR, establecer límites                                                | Registrar pagos, ver morosidad, notificaciones                                                     |
 | **ADMIN_HR**     | Crear áreas, tipos de turno, tarifas flexibles, invitar personal, asignar contratos, ver métricas, crear y gestionar rotativas | Calcular pagos automáticos, gestionar calendario organizacional, exportar reportes                 |
 | **CHIEF_AREA**   | Ver sus áreas, gestionar turnos y rotativas, ver su personal, asignar extras con motor de tiers                                | Vincular personal directamente, aprobar intercambios, marcar asistencia                            |
-| **STAFF_HEALTH** | Ver sus turnos en una organización, recibir notificaciones in-app                                                              | Ver calendario unificado multi-org, postular a turnos, intercambiar turnos, notificaciones por email |
+| **STAFF** | Ver sus turnos en una organización, recibir notificaciones in-app                                                              | Ver calendario unificado multi-org, postular a turnos, intercambiar turnos, notificaciones por email |
 
 ---
 

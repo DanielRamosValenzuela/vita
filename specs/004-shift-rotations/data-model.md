@@ -180,7 +180,7 @@ model RotationMember {
 **Rules**:
 - User can only be active (`leftAt=null`) in one group per rotation (application validates)
 - Application warns (but allows) if user is in another active rotation in the same area (FR-004)
-- Only STAFF_HEALTH users with UserArea assignment to the rotation's area can be added
+- Only STAFF users with UserArea assignment to the rotation's area can be added
 - `leftAt` set when member is removed (soft tracking for history)
 
 ## Extended Models

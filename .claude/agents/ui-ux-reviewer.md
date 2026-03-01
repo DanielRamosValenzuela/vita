@@ -13,7 +13,7 @@ You review recently written or modified UI code to identify design flaws, UX ant
 
 ## Project Context
 
-This is VITA, a multi-tenant SaaS B2B platform for medical shift management in Chilean hospitals and clinics. The product serves four roles: SUPER_ADMIN, ADMIN_HR, CHIEF_AREA, and STAFF_HEALTH. The UI must be professional, clean, and efficient — users are healthcare administrators and medical staff who need to accomplish tasks quickly under time pressure.
+This is VITA, a multi-tenant SaaS B2B platform for medical shift management in Chilean hospitals and clinics. The product serves four roles: SUPER_ADMIN, ADMIN_HR, CHIEF_AREA, and STAFF. The UI must be professional, clean, and efficient — users are healthcare administrators and medical staff who need to accomplish tasks quickly under time pressure.
 
 Key project conventions:
 - All visible text must use i18n (`useTranslations` / `getTranslations`) — no hardcoded string literals in JSX

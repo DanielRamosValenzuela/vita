@@ -51,7 +51,7 @@ As a CHIEF_AREA, I want to create multiple groups (e.g., A, B, C, D) within a ro
 **Acceptance Scenarios**:
 
 1. **Given** a rotation with pattern [Largo, Noche, Libre, Libre], **When** the CHIEF_AREA adds groups A, B, C, D, **Then** each group is automatically assigned an offset position in the cycle (A=0, B=1, C=2, D=3) so they rotate in sequence.
-2. **Given** a rotation group, **When** the CHIEF_AREA assigns staff members, **Then** only staff (STAFF_HEALTH) who belong to the rotation's area (via UserArea) are available for selection.
+2. **Given** a rotation group, **When** the CHIEF_AREA assigns staff members, **Then** only staff (STAFF) who belong to the rotation's area (via UserArea) are available for selection.
 3. **Given** a staff member already assigned to another active rotation in the same area, **When** the CHIEF_AREA tries to assign them to a new rotation group, **Then** the system warns about the potential conflict but allows the assignment (shift conflict detection during generation handles overlaps).
 4. **Given** a rotation with 4 groups of 10 people each, **When** viewed by the CHIEF_AREA, **Then** the system shows a summary: total staff (40), staff per group, and the coverage pattern.
 5. **Given** a CHIEF_AREA removes a staff member from a group, **When** there are future generated shifts for that person in this rotation, **Then** the system asks whether to also cancel those future shifts or leave them.
@@ -116,17 +116,17 @@ As a CHIEF_AREA, I want to edit an existing rotation's configuration (name, patt
 
 ### User Story 6 - Staff Views Their Rotation Assignment (Priority: P3)
 
-As a STAFF_HEALTH, I want to see which rotation and group I belong to and preview my upcoming shift pattern, so I know my schedule in advance without needing to ask my supervisor.
+As a STAFF, I want to see which rotation and group I belong to and preview my upcoming shift pattern, so I know my schedule in advance without needing to ask my supervisor.
 
 **Why this priority**: Staff visibility is important for satisfaction and planning, but the generated shifts already appear in their existing calendar views. This adds a rotation-specific context.
 
-**Independent Test**: Can be tested by logging in as STAFF_HEALTH, navigating to the shifts view, and verifying the rotation/group assignment is visible alongside upcoming generated shifts.
+**Independent Test**: Can be tested by logging in as STAFF, navigating to the shifts view, and verifying the rotation/group assignment is visible alongside upcoming generated shifts.
 
 **Acceptance Scenarios**:
 
-1. **Given** a STAFF_HEALTH assigned to Group B of "Cuarto Turno Emergencias", **When** they view their shifts, **Then** they see a label indicating their rotation and group assignment.
-2. **Given** a STAFF_HEALTH in a rotation, **When** they view their upcoming shifts, **Then** shifts generated from the rotation are visually distinguishable from manually created shifts.
-3. **Given** a STAFF_HEALTH not assigned to any rotation, **When** they view their shifts, **Then** no rotation information is shown and their experience is unchanged.
+1. **Given** a STAFF assigned to Group B of "Cuarto Turno Emergencias", **When** they view their shifts, **Then** they see a label indicating their rotation and group assignment.
+2. **Given** a STAFF in a rotation, **When** they view their upcoming shifts, **Then** shifts generated from the rotation are visually distinguishable from manually created shifts.
+3. **Given** a STAFF not assigned to any rotation, **When** they view their shifts, **Then** no rotation information is shown and their experience is unchanged.
 
 ---
 
@@ -172,7 +172,7 @@ As a CHIEF_AREA, when my rotation group has fewer members than the shift type's 
 - **FR-001**: System MUST allow CHIEF_AREA and ADMIN_HR users to create rotation configurations tied to a single active area within their organization.
 - **FR-002**: System MUST allow defining a rotation pattern as an ordered sequence of steps, where each step is either a shift type (from the area's available shift types) or a rest day.
 - **FR-003**: System MUST support configurable number of groups per rotation (minimum 2, maximum 6), where each group follows the same pattern but offset by one position in the cycle.
-- **FR-004**: System MUST allow assigning staff members (STAFF_HEALTH users in the rotation's area) to rotation groups. A staff member can only belong to one group within a rotation. If a staff member is already in another active rotation in the same area, the system warns about potential conflicts but does not block the assignment (shift conflict detection during generation handles overlaps).
+- **FR-004**: System MUST allow assigning staff members (STAFF users in the rotation's area) to rotation groups. A staff member can only belong to one group within a rotation. If a staff member is already in another active rotation in the same area, the system warns about potential conflicts but does not block the assignment (shift conflict detection during generation handles overlaps).
 - **FR-005**: System MUST auto-generate individual shifts for all staff in all groups of a rotation for a selected date range, respecting the pattern, group offsets, and shift type time configurations.
 - **FR-006**: Generated shifts MUST appear in the existing calendar and shift management views, indistinguishable in functionality from manually created shifts.
 - **FR-007**: Generated shifts MUST maintain a link to their source rotation and group for traceability and management.
@@ -224,6 +224,6 @@ As a CHIEF_AREA, when my rotation group has fewer members than the shift type's 
 
 - Requires active Areas.
 - Requires active ShiftTypes assigned to the area (start times are configured per rotation, not on ShiftType itself).
-- Requires staff members (STAFF_HEALTH) linked to the area via UserArea.
+- Requires staff members (STAFF) linked to the area via UserArea.
 - Depends on existing shift conflict detection logic (checkShiftConflicts).
 - Depends on existing notification system for staff notifications.

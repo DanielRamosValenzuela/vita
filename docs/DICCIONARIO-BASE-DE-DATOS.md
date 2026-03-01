@@ -278,7 +278,7 @@ Registra todas las invitaciones. El usuario ve invitaciones pendientes en su per
 
 **Ejemplo:**
 
-- Hospital Central invita a enfermera@gmail.com como STAFF_HEALTH
+- Hospital Central invita a enfermera@gmail.com como STAFF
 - Ella ve la invitación en su perfil
 - Acepta → queda vinculada al hospital
 - Rechaza → la invitación queda marcada como rechazada
@@ -692,7 +692,7 @@ Define qué días se pagan diferente. Los turnos en esos días aplican multiplic
 | **SUPER_ADMIN**  | Equipo VITA - gestiona todas las organizaciones                   |
 | **ADMIN_HR**     | Recursos Humanos del hospital - gestiona personal, áreas, tarifas |
 | **CHIEF_AREA**   | Jefe de área - gestiona turnos de su área y su personal           |
-| **STAFF_HEALTH** | Personal de salud - ve sus turnos, postula, intercambia           |
+| **STAFF** | Personal de salud - ve sus turnos, postula, intercambia           |
 
 ### Países Soportados
 
@@ -881,8 +881,8 @@ Define qué días se pagan diferente. Los turnos en esos días aplican multiplic
 **Usuario:** María González
 
 - Email: `maria@gmail.com`
-- Rol en Hospital A: STAFF_HEALTH
-- Rol en Hospital B: STAFF_HEALTH
+- Rol en Hospital A: STAFF
+- Rol en Hospital B: STAFF
 
 **Registros:**
 

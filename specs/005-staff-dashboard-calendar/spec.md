@@ -15,7 +15,7 @@
 
 ### User Story 1 - Visualizar mis turnos en el calendario (Priority: P1)
 
-Como STAFF_HEALTH o CHIEF_AREA, quiero ver todos mis turnos asignados en un calendario mensual interactivo, para tener una visión clara de mi agenda laboral.
+Como STAFF o CHIEF_AREA, quiero ver todos mis turnos asignados en un calendario mensual interactivo, para tener una visión clara de mi agenda laboral.
 
 El calendario se muestra como vista principal del dashboard (`/dashboard`). Presenta un mes a la vez con navegación entre meses. Cada turno aparece como un evento coloreado según su tipo de turno, mostrando el horario (inicio-fin) y el área asignada. Si el usuario no tiene turnos asignados en el mes visible (incluyendo un CHIEF sin turnos propios), se muestra el calendario vacío con un mensaje indicativo.
 
@@ -27,10 +27,10 @@ El estilo visual se basa en el calendario existente de `/dashboard/shifts`, adap
 
 **Acceptance Scenarios**:
 
-1. **Given** un STAFF_HEALTH con 5 turnos asignados en marzo 2026, **When** navega a `/dashboard`, **Then** ve el calendario de marzo con los 5 turnos representados como eventos con su horario, tipo de turno y área.
-2. **Given** un STAFF_HEALTH sin turnos en abril 2026, **When** navega al mes de abril, **Then** ve el calendario vacío con un mensaje como "No tienes turnos asignados este mes".
+1. **Given** un STAFF con 5 turnos asignados en marzo 2026, **When** navega a `/dashboard`, **Then** ve el calendario de marzo con los 5 turnos representados como eventos con su horario, tipo de turno y área.
+2. **Given** un STAFF sin turnos en abril 2026, **When** navega al mes de abril, **Then** ve el calendario vacío con un mensaje como "No tienes turnos asignados este mes".
 3. **Given** un CHIEF_AREA sin turnos propios asignados, **When** accede a `/dashboard`, **Then** ve el calendario vacío (el dashboard de gestión de shifts está en `/dashboard/shifts`, no aquí).
-4. **Given** un STAFF_HEALTH con turnos, **When** hace clic en las flechas de navegación, **Then** puede moverse entre meses y ver los turnos correspondientes a cada mes.
+4. **Given** un STAFF con turnos, **When** hace clic en las flechas de navegación, **Then** puede moverse entre meses y ver los turnos correspondientes a cada mes.
 5. **Given** un turno con estado CANCELLED, **When** el calendario se renderiza, **Then** el turno cancelado aparece con indicación visual diferenciada (opacidad reducida o tachado).
 6. **Given** un turno nocturno de 22:00 a 06:00, **When** se renderiza, **Then** aparece en el día de inicio con indicación visual de que continúa al día siguiente.
 
@@ -38,7 +38,7 @@ El estilo visual se basa en el calendario existente de `/dashboard/shifts`, adap
 
 ### User Story 2 - Ver detalle de turno y personal activo del sector (Priority: P2)
 
-Como STAFF_HEALTH o CHIEF_AREA, quiero hacer clic en uno de mis turnos y ver quién más está trabajando en mi sector durante ese período, para saber con quién compartiré jornada.
+Como STAFF o CHIEF_AREA, quiero hacer clic en uno de mis turnos y ver quién más está trabajando en mi sector durante ese período, para saber con quién compartiré jornada.
 
 Al hacer clic en un turno, se abre un panel o modal con dos secciones: (1) detalle del turno seleccionado (horario, área, tipo, estado) y (2) lista del personal activo en el sector al que pertenece esa área, agrupado por área dentro del sector. Cada persona muestra su nombre, hora de inicio, hora de fin y, si hay un cambio de turno programado durante la jornada, se indica quién es la persona de relevo.
 
@@ -58,7 +58,7 @@ Al hacer clic en un turno, se abre un panel o modal con dos secciones: (1) detal
 
 ### User Story 3 - Vista de próximos turnos (Priority: P3)
 
-Como STAFF_HEALTH o CHIEF_AREA, quiero ver un resumen de mis próximos turnos más cercanos (próximos 7 días), para tener acceso rápido a mi agenda inmediata sin navegar el calendario completo.
+Como STAFF o CHIEF_AREA, quiero ver un resumen de mis próximos turnos más cercanos (próximos 7 días), para tener acceso rápido a mi agenda inmediata sin navegar el calendario completo.
 
 Se muestra una sección complementaria al calendario (panel lateral o sección superior) con los próximos turnos ordenados cronológicamente, mostrando fecha, hora, área y tipo de turno. Permite acceso rápido al detalle de cada turno.
 
@@ -76,7 +76,7 @@ Se muestra una sección complementaria al calendario (panel lateral o sección s
 
 ### User Story 4 - Exportar turnos a Google Calendar (Priority: P4)
 
-Como STAFF_HEALTH o CHIEF_AREA, quiero exportar mis turnos a Google Calendar para sincronizar mi agenda laboral con mi calendario personal.
+Como STAFF o CHIEF_AREA, quiero exportar mis turnos a Google Calendar para sincronizar mi agenda laboral con mi calendario personal.
 
 El sistema permite exportar turnos de dos formas: (1) descarga de un archivo .ics con los turnos del mes seleccionado, y (2) una URL de suscripción (feed iCal) que Google Calendar puede consumir automáticamente para mantenerse sincronizado. Cada evento exportado incluye título (tipo de turno + área), horario, y descripción con detalles del turno.
 
@@ -97,7 +97,7 @@ El sistema permite exportar turnos de dos formas: (1) descarga de un archivo .ic
 
 ### User Story 5 - Importar eventos desde Google Calendar (Priority: P5)
 
-Como STAFF_HEALTH, quiero importar eventos de mi Google Calendar para ver mis compromisos personales junto a mis turnos y detectar posibles conflictos de horario.
+Como STAFF, quiero importar eventos de mi Google Calendar para ver mis compromisos personales junto a mis turnos y detectar posibles conflictos de horario.
 
 El usuario puede conectar su cuenta de Google para importar eventos de un calendario seleccionado. Los eventos importados se muestran de forma diferenciada en el calendario (color/estilo distinto a los turnos) y son de solo lectura. Si un evento personal se superpone con un turno asignado, se muestra una indicación visual de conflicto.
 
@@ -130,7 +130,7 @@ El usuario puede conectar su cuenta de Google para importar eventos de un calend
 
 ### Functional Requirements
 
-- **FR-001**: El sistema DEBE mostrar un calendario mensual interactivo como vista principal del dashboard para usuarios con rol STAFF_HEALTH y CHIEF_AREA.
+- **FR-001**: El sistema DEBE mostrar un calendario mensual interactivo como vista principal del dashboard para usuarios con rol STAFF y CHIEF_AREA.
 - **FR-002**: El calendario DEBE mostrar todos los turnos asignados al usuario autenticado dentro del mes visible, incluyendo turnos individuales y generados por rotación.
 - **FR-003**: Cada evento del calendario DEBE mostrar como mínimo: horario (inicio-fin), tipo de turno y área asignada, con diferenciación visual por tipo de turno.
 - **FR-004**: El sistema DEBE permitir navegación entre meses (anterior/siguiente) manteniendo la carga de turnos correspondiente.

@@ -40,7 +40,7 @@ src/
 - **Backend:** Server Actions (no API Routes except webhooks), Prisma, PostgreSQL (Supabase)
 - **Auth:** NextAuth v4 (JWT), bcryptjs
 - **Multi-tenant:** Shared DB with `organizationId` filtering everywhere
-- **Roles:** SUPER_ADMIN, ADMIN_HR, CHIEF_AREA, STAFF_HEALTH
+- **Roles:** SUPER_ADMIN, ADMIN_HR, CHIEF_AREA, STAFF
 - **i18n:** All visible text uses `useTranslations`/`getTranslations`, keys in `messages/es.json` and `messages/en.json`
 
 ### App Router Structure

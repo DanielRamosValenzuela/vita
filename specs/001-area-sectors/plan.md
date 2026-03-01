@@ -16,7 +16,7 @@ Implementar el concepto de **Sector** como agrupación lógica/física de múlti
 **Target Platform**: Web (desktop + responsive)
 **Project Type**: Web application (Next.js monolith with FSD architecture)
 **Performance Goals**: Staff query < 5s for sectors with up to 10 areas and 100 shifts in range
-**Constraints**: Multi-tenant isolation (organizationId), role-based access (ADMIN_HR, CHIEF_AREA, STAFF_HEALTH)
+**Constraints**: Multi-tenant isolation (organizationId), role-based access (ADMIN_HR, CHIEF_AREA, STAFF)
 **Scale/Scope**: ~5-15 sectors per organization, ~3-8 areas per sector, ~25 new files, ~5 modified files
 
 ## Constitution Check

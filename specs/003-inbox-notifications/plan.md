@@ -5,7 +5,7 @@
 
 ## Summary
 
-Create a persistent notification inbox ("Bandeja de Entrada") accessible via sidebar for ADMIN_HR, CHIEF_AREA, and STAFF_HEALTH roles. Notifications are generated automatically when system events occur (invitations, area assignments, shift CRUD) and displayed as an immutable TODO-style list with read/unread state, actor attribution, and click-to-navigate to the relevant context. The existing toast notification system (`PendingNotificationsToaster`) is extended to show all recent notification types instead of just invitations. Notifications are persisted in a new Prisma model and isolated per user.
+Create a persistent notification inbox ("Bandeja de Entrada") accessible via sidebar for ADMIN_HR, CHIEF_AREA, and STAFF roles. Notifications are generated automatically when system events occur (invitations, area assignments, shift CRUD) and displayed as an immutable TODO-style list with read/unread state, actor attribution, and click-to-navigate to the relevant context. The existing toast notification system (`PendingNotificationsToaster`) is extended to show all recent notification types instead of just invitations. Notifications are persisted in a new Prisma model and isolated per user.
 
 ## Technical Context
 

@@ -46,7 +46,7 @@ Documento de referencia de **flujos funcionales** por rol. Resume qué pasos sig
   - Desde “Mi Organización”, en la sección correspondiente (Jefes de Área o Personal de Salud):
   - Abre el diálogo **Invitar**.
   - Busca usuario por email o documento (`searchUserAction`).
-  - Si existe y hay cupo según límites, envía invitación con rol `CHIEF_AREA` o `STAFF_HEALTH`.
+  - Si existe y hay cupo según límites, envía invitación con rol `CHIEF_AREA` o `STAFF`.
   - La invitación aparece en la tabla de invitaciones; puede cancelarse.
 
 - **Gestionar Áreas**
@@ -145,7 +145,7 @@ Documento de referencia de **flujos funcionales** por rol. Resume qué pasos sig
 
 ---
 
-## STAFF_HEALTH (Personal de Salud)
+## STAFF (Personal de Salud)
 
 ### Workflows implementados (backend/UI parcial)
 
@@ -240,7 +240,7 @@ El sistema de tarifas flexibles permite a ADMIN_HR crear tarifas completamente p
 1. ADMIN_HR o CHIEF accede al módulo de Personal.
 2. Ve tabla simplificada con:
    - Nombre y correo.
-   - Rol (CHIEF_AREA / STAFF_HEALTH).
+   - Rol (CHIEF_AREA / STAFF).
    - Área asignada (según contrato o área principal).
    - Estado de contrato (✓/✗) calculado en base a si el usuario tiene al menos un `Contract` activo.
    - Nombre de la **tarifa principal** (primer contrato activo mostrado).
@@ -340,7 +340,7 @@ Las rotativas automatizan la creación de turnos cíclicos. En vez de crear turn
 1. Desde la vista de detalle de una rotativa, ve los grupos como tarjetas
 2. Cada grupo muestra sus miembros actuales con avatar y email
 3. Para añadir miembros: clic en **Añadir miembro** → popover con personal disponible
-   - Solo aparece personal STAFF_HEALTH del área que **no** está ya en alguna rotativa de la organización
+   - Solo aparece personal STAFF del área que **no** está ya en alguna rotativa de la organización
    - Selección múltiple con checkbox
 4. Para eliminar miembro: clic en icono de eliminar → confirma con opción de cancelar turnos futuros
 5. Si un miembro fue removido previamente y se re-añade, se reactiva (soft undelete)
@@ -546,7 +546,7 @@ Las rotativas automatizan la creación de turnos cíclicos. En vez de crear turn
 
 ### Sistema de Notificaciones (Bandeja de Entrada)
 
-Implementado para ADMIN_HR, CHIEF_AREA y STAFF_HEALTH. SUPER_ADMIN no recibe notificaciones en esta iteración.
+Implementado para ADMIN_HR, CHIEF_AREA y STAFF. SUPER_ADMIN no recibe notificaciones en esta iteración.
 
 **Funcionalidades implementadas:**
 - Bandeja de Entrada (`/dashboard/inbox`) accesible desde el sidebar con badge de no leídas.

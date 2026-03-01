@@ -279,6 +279,85 @@
     "calendarViewComingSoon": "Calendario en desarrollo",
     "calendarViewComingSoonDescription": "El componente de calendario se implementará próximamente"
   },
+  "staffDashboard": {
+    "title": "Mi Calendario",
+    "description": "Visualiza tus turnos asignados",
+    "emptyState": "No tienes turnos asignados este mes",
+    "emptyStateDescription": "Cuando te asignen turnos, aparecerán aquí",
+    "loading": "Cargando turnos...",
+    "upcoming": {
+      "title": "Próximos Turnos",
+      "empty": "No tienes turnos programados próximamente",
+      "today": "Hoy",
+      "tomorrow": "Mañana"
+    },
+    "shiftDetail": {
+      "title": "Detalle del Turno",
+      "area": "Área",
+      "shiftType": "Tipo de Turno",
+      "schedule": "Horario",
+      "status": "Estado",
+      "rotation": "Rotación",
+      "extra": "Turno Extra",
+      "nightShift": "Turno nocturno (continúa al día siguiente)"
+    },
+    "personnel": {
+      "title": "Personal Activo del Sector",
+      "titleNoSector": "Personal Activo del Área",
+      "loading": "Cargando personal...",
+      "totalStaff": "{count} personas activas",
+      "relayIncoming": "Relevo de {name}",
+      "relayOutgoing": "Relevo por {name}",
+      "noPersonnel": "No hay personal activo en este horario"
+    },
+    "export": {
+      "button": "Exportar",
+      "downloadIcs": "Descargar .ics del mes",
+      "feedPerOrg": "Suscripción iCal (esta organización)",
+      "feedUnified": "Suscripción iCal (todas mis organizaciones)",
+      "manageFeeds": "Gestionar feeds",
+      "feedUrl": "URL del feed",
+      "copyUrl": "Copiar URL",
+      "urlCopied": "URL copiada al portapapeles",
+      "createFeed": "Crear feed",
+      "feedCreated": "Feed creado exitosamente",
+      "revokeFeed": "Revocar",
+      "feedRevoked": "Feed revocado",
+      "noFeeds": "No tienes feeds activos",
+      "perOrgLabel": "Organización",
+      "unifiedLabel": "Unificado (todas las organizaciones)",
+      "downloadSuccess": "Archivo .ics descargado",
+      "downloadError": "Error al generar el archivo"
+    },
+    "google": {
+      "connect": "Conectar Google Calendar",
+      "connected": "Google Calendar conectado",
+      "disconnect": "Desconectar",
+      "disconnectConfirm": "¿Desconectar Google Calendar?",
+      "disconnectDescription": "Los eventos importados dejarán de mostrarse en tu calendario.",
+      "connecting": "Conectando...",
+      "personalEvent": "Evento Personal",
+      "conflict": "Conflicto de horario"
+    },
+    "notes": {
+      "title": "Nota",
+      "placeholder": "Escribe una nota para este día...",
+      "save": "Guardar",
+      "delete": "Eliminar",
+      "saving": "Guardando...",
+      "saved": "Nota guardada",
+      "deleted": "Nota eliminada",
+      "error": "Error al guardar la nota",
+      "legendNote": "Nota personal"
+    },
+    "status": {
+      "SCHEDULED": "Programado",
+      "IN_PROGRESS": "En Progreso",
+      "COMPLETED": "Completado",
+      "CANCELLED": "Cancelado",
+      "NO_SHOW": "No Presentado"
+    }
+  },
   "shifts": {
     "title": "Gestión de Turnos",
     "description": "Administra los turnos de tu personal de forma eficiente",
@@ -354,7 +433,8 @@
       "weekend": "Fin de semana",
       "holiday": "Feriado",
       "rotation": "Rotativa",
-      "extra": "Turno Extra"
+      "extra": "Turno Extra",
+      "note": "Nota personal"
     },
     "rotationDetail": {
       "title": "Turnos de Rotativa",
@@ -1599,6 +1679,7 @@
     "rates": {
       "title": "Tarifas y Contratos",
       "description": "Asigna tarifas al personal según lo negociado. Crea tipos globales o personaliza por persona.",
+      "guideLink": "Guía de tarifas",
       "noOrganization": "No tienes una organización asignada",
       "loadError": "Error al cargar",
       "staffTable": {
@@ -1823,6 +1904,138 @@
         "ratePerMinute": "Tarifa por minuto",
         "baseSalary": "Sueldo base (opcional)",
         "contractsCount": "{count} contrato(s)"
+      },
+      "guide": {
+        "title": "Guía del Sistema de Tarifas",
+        "subtitle": "Aprende cómo funciona el sistema de tarifas flexibles de VITA y cómo crear plantillas de tarifa con componentes personalizados.",
+        "backToRates": "Volver a Tarifas",
+        "overview": {
+          "title": "Visión General",
+          "description": "El sistema de tarifas de VITA te permite definir exactamente cómo se paga a tu personal. En lugar de una tarifa fija, puedes combinar múltiples componentes para reflejar la realidad de tu estructura salarial.",
+          "template": "Plantilla de Tarifa",
+          "templateDesc": "Un conjunto reutilizable de reglas de pago que defines una vez y asignas a múltiples personas.",
+          "component": "Componente",
+          "componentDesc": "Cada pieza individual que forma parte del cálculo: sueldo base, bonos, multiplicadores, etc.",
+          "contract": "Contrato",
+          "contractDesc": "La vinculación entre una persona y una plantilla de tarifa, con fecha de inicio y multiplicador opcional."
+        },
+        "flow": {
+          "title": "Flujo de Trabajo",
+          "step1": {
+            "title": "Crea una Plantilla",
+            "description": "Define el nombre y agrega componentes de pago según las necesidades del cargo."
+          },
+          "step2": {
+            "title": "Configura Componentes",
+            "description": "Para cada componente, elige el tipo, monto, unidad y cuándo se aplica."
+          },
+          "step3": {
+            "title": "Asigna al Personal",
+            "description": "Vincula la plantilla a cada persona creando un contrato con multiplicador opcional."
+          },
+          "step4": {
+            "title": "Cálculo Automático",
+            "description": "VITA calcula el pago de cada turno basándose en los componentes aplicables."
+          }
+        },
+        "componentTypes": {
+          "title": "Tipos de Componentes",
+          "description": "VITA incluye 19 tipos de componentes predefinidos agrupados en 4 categorías principales.",
+          "fixed": {
+            "title": "Pagos Fijos",
+            "description": "Montos que se pagan de forma regular, independiente de los turnos.",
+            "baseSalary": "Sueldo fijo mensual, quincenal o semanal",
+            "perShift": "Monto fijo por cada turno completado",
+            "completionBonus": "Bono extra por completar el turno completo"
+          },
+          "timeBased": {
+            "title": "Pagos por Tiempo",
+            "description": "Se calculan según el tiempo efectivamente trabajado.",
+            "perMinute": "Pago por cada minuto trabajado",
+            "perHour": "Pago por cada hora trabajada"
+          },
+          "bonuses": {
+            "title": "Bonos Condicionales",
+            "description": "Montos adicionales que se aplican bajo condiciones específicas.",
+            "night": "Extra por trabajar en horario nocturno",
+            "weekend": "Extra por trabajar sábado o domingo",
+            "holiday": "Extra por trabajar en feriados",
+            "seniority": "Bono por años de antigüedad",
+            "performance": "Bono por cumplimiento de metas",
+            "area": "Extra por trabajar en áreas específicas",
+            "emergency": "Bono por cobertura de emergencia",
+            "onCall": "Bono por estar disponible/de turno"
+          },
+          "multipliers": {
+            "title": "Multiplicadores",
+            "description": "Factores que multiplican el monto base según el contexto del turno.",
+            "weekend": "Multiplica el pago base en fin de semana",
+            "holiday": "Multiplica el pago base en feriados",
+            "irrenunciable": "Multiplicador legal para feriados irrenunciables",
+            "night": "Multiplica el pago base en horario nocturno",
+            "overtime": "Multiplica el pago por horas extra trabajadas"
+          },
+          "custom": {
+            "title": "Personalizado",
+            "description": "Crea componentes a medida con nombre y reglas propias para casos únicos de tu organización."
+          }
+        },
+        "units": {
+          "title": "Unidades de Pago",
+          "description": "Cada componente tiene una unidad que define cómo se calcula su valor.",
+          "periodic": "Periódicos",
+          "periodicDesc": "Mensual, Quincenal, Semanal, Diario — pagos regulares independientes de turnos.",
+          "eventBased": "Por Evento",
+          "eventBasedDesc": "Por Turno, Por Minuto, Por Hora — se calculan cuando la persona trabaja.",
+          "calculated": "Calculados",
+          "calculatedDesc": "Porcentaje, Multiplicador, Monto Fijo — se aplican sobre otros valores base."
+        },
+        "conditions": {
+          "title": "Condiciones de Aplicación",
+          "description": "Cada componente puede tener una condición que determina cuándo se aplica.",
+          "always": "Se incluye siempre en el cálculo",
+          "weekday": "Solo se aplica de lunes a viernes",
+          "weekend": "Solo se aplica sábado y domingo",
+          "holiday": "Solo se aplica en feriados marcados en el calendario",
+          "irrenunciable": "Solo en feriados irrenunciables (Navidad, Año Nuevo, etc.)",
+          "overtime": "Solo se aplica a horas extra más allá del turno programado",
+          "shiftType": "Solo se aplica a tipos de turno específicos que tú eliges"
+        },
+        "example": {
+          "title": "Ejemplo Práctico",
+          "description": "Así se ve una plantilla de tarifa completa para una enfermera de UCI:",
+          "templateName": "Tarifa Enfermería UCI",
+          "component1": "Sueldo Base — $500.000 mensual — Siempre",
+          "component2": "Por Turno — $50.000 por turno — Solo Guardia Larga",
+          "component3": "Bono Nocturno — $15.000 fijo — Solo horario nocturno",
+          "component4": "Horas Extra — $500/minuto — Solo horas extra",
+          "component5": "Mult. Feriado — 2.5x — Solo feriados",
+          "resultTitle": "Resultado para un turno de Guardia Larga nocturna en feriado:",
+          "resultLine1": "Sueldo base proporcional al día",
+          "resultLine2": "$50.000 por completar guardia",
+          "resultLine3": "$15.000 bono nocturno",
+          "resultLine4": "Todo multiplicado por 2.5x (feriado)",
+          "resultLine5": "Horas extra a $500/min si corresponde"
+        },
+        "tips": {
+          "title": "Consejos y Buenas Prácticas",
+          "tip1": {
+            "title": "Empieza simple",
+            "description": "Crea plantillas con 2-3 componentes primero. Siempre puedes agregar más después."
+          },
+          "tip2": {
+            "title": "Reutiliza plantillas",
+            "description": "Una misma plantilla puede asignarse a muchas personas. Usa el multiplicador del contrato para ajustar individualmente."
+          },
+          "tip3": {
+            "title": "Usa el duplicado",
+            "description": "Si necesitas una variante de una plantilla existente, duplícala y modifica solo lo necesario."
+          },
+          "tip4": {
+            "title": "Documenta tus componentes",
+            "description": "Usa el campo de descripción para explicar por qué existe cada componente. Tu futuro yo te lo agradecerá."
+          }
+        }
       }
     },
     "calendar": {

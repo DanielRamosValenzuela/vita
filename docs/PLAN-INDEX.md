@@ -8,7 +8,7 @@ Documentación dividida en archivos enfocados. Ver [README.md](./README.md) para
 | ----------------------- | ---------------------- | ----------------------------------------------- |
 | vita-overview.md        | overview, qué es       | Problema, solución, estado                      |
 | vita-business-model.md  | pricing, límites       | SaaS B2B, pool de cuentas                       |
-| vita-roles.md           | roles                  | SUPER_ADMIN, ADMIN_HR, CHIEF_AREA, STAFF_HEALTH |
+| vita-roles.md           | roles                  | SUPER_ADMIN, ADMIN_HR, CHIEF_AREA, STAFF |
 | vita-competitive.md     | Rflex                  | Análisis competitivo, propuesta de valor        |
 | vita-architecture.md    | stack, FSD             | Next.js, Prisma, estructura                     |
 | vita-roadmap.md         | fases, próximos        | Roadmap, prioridades                            |

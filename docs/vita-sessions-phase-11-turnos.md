@@ -83,7 +83,7 @@ Sesiones relacionadas con el sistema de gestión de turnos, tipos de turno, áre
 - **Repositorio de datos:** Creado `features/admin-hr/data/dashboard-repository.ts` con `getAdminHRDashboardStats`. Usa `Promise.all` para consultas paralelas optimizadas:
   - `totalAreas`: count de áreas de la org
   - `totalShiftTypes`: count de tipos de turno activos
-  - `totalStaff`: count de usuarios CHIEF_AREA + STAFF_HEALTH
+  - `totalStaff`: count de usuarios CHIEF_AREA + STAFF
   - `totalContracts`: count de contratos activos
   - `activeShifts`: count de turnos del mes actual (SCHEDULED o IN_PROGRESS)
 - **Server Action:** Creado `features/admin-hr/api/dashboard-actions.ts` con `getDashboardStatsAction`. Maneja errores y valida sesión con `requireAdminHRWithOrg`.

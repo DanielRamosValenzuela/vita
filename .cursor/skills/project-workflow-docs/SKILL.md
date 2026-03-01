@@ -69,7 +69,7 @@ When this skill is active, the agent should:
      - Why it exists from a business perspective.
 
    - Actors and roles
-     - Which roles participate (e.g. SUPER_ADMIN, ADMIN_HR, CHIEF_AREA, STAFF_HEALTH).
+     - Which roles participate (e.g. SUPER_ADMIN, ADMIN_HR, CHIEF_AREA, STAFF).
      - Which systems/services participate (e.g. Auth, DB, external APIs).
 
    - Preconditions

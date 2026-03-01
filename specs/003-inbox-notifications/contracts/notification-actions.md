@@ -27,7 +27,7 @@ async function getNotificationsAction(
 }>>
 ```
 
-**Auth**: `requireAuth()` — any authenticated org role (ADMIN_HR, CHIEF_AREA, STAFF_HEALTH).
+**Auth**: `requireAuth()` — any authenticated org role (ADMIN_HR, CHIEF_AREA, STAFF).
 **Filter**: `where: { userId: session.id }` + optional isRead/type filters.
 **Sort**: `createdAt DESC`.
 **Pagination**: Cursor-based using `id` field.

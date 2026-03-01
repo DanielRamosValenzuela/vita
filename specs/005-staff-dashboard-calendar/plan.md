@@ -5,7 +5,7 @@
 
 ## Summary
 
-Dashboard personal para STAFF_HEALTH y CHIEF_AREA en `/dashboard` con calendario mensual interactivo de turnos asignados, panel de detalle con personal activo por sector (incluyendo relevos), lista de próximos turnos, exportación .ics/feed iCal (dual: per-org + unificado), e importación desde Google Calendar con detección de conflictos.
+Dashboard personal para STAFF y CHIEF_AREA en `/dashboard` con calendario mensual interactivo de turnos asignados, panel de detalle con personal activo por sector (incluyendo relevos), lista de próximos turnos, exportación .ics/feed iCal (dual: per-org + unificado), e importación desde Google Calendar con detección de conflictos.
 
 **Enfoque técnico**: Reutilizar el componente `ShiftCalendar` existente y la función `groupShiftsForCalendar()` como base. Crear server actions nuevos para consulta de turnos personales y personal activo por sector. Nuevos modelos Prisma para tokens de feed iCal y conexiones Google Calendar. Route Handler (GET) para endpoint del feed iCal.
 
@@ -27,7 +27,7 @@ Dashboard personal para STAFF_HEALTH y CHIEF_AREA en `/dashboard` con calendario
 
 | Principle | Status | Notes |
 |-----------|--------|-------|
-| I. FSD & Code Quality | PASS | Nuevos archivos en capas correctas: `features/staff-dashboard/` para actions+UI, `entities/` para repositorios de feed token |
+| I. FSD & Code Quality | PASS | Nuevos archivos en capas correctas: `features/staff-dashboard/` para actions+UI, `entities/` para repositorios de feed token. `ShiftCalendar` y `groupShiftsForCalendar()` se promueven de `features/shifts/` a `entities/shift/` para evitar import cross-feature |
 | II. Mandatory i18n | PASS | Todos los textos visibles usarán `useTranslations`/`getTranslations`. Keys en es.json + en.json |
 | III. Multi-Tenant Isolation | PASS | Todas las queries filtran por organizationId. Feed per-org aislado. Feed unificado solo accesible por el usuario |
 | IV. Testing Standards | PASS | Build + lint antes de merge. Flujos documentados en spec con Given/When/Then |
@@ -88,6 +88,15 @@ src/features/staff-dashboard/
 └── types/
     └── staff-dashboard-types.ts      # NEW: Types for staff dashboard
 
+src/entities/shift/
+├── ui/
+│   └── shift-calendar.tsx            # MOVE from features/shifts/ui/ (FSD: entities importable by features)
+├── lib/
+│   ├── calendar-grouping.ts          # MOVE from features/shifts/lib/
+│   ├── shift-validation.ts           # EXISTING
+│   └── shift-validation-client.ts    # EXISTING
+└── index.ts                          # MODIFY: Re-export moved modules
+
 src/entities/calendar-feed/
 ├── lib/
 │   └── calendar-feed-repository.ts   # NEW: CRUD for CalendarFeedToken
@@ -106,7 +115,7 @@ messages/
 └── en.json                           # MODIFY: Add staffDashboard namespace
 ```
 
-**Structure Decision**: FSD architecture existente del proyecto. Nuevo feature slice `staff-dashboard` en `src/features/`. Nuevas entities `calendar-feed` y `google-connection` en `src/entities/`. Route Handler para el feed iCal en `app/` (exceción justificada al patrón Server Actions: feed necesita ser endpoint GET consumible sin autenticación interactiva).
+**Structure Decision**: FSD architecture existente del proyecto. Nuevo feature slice `staff-dashboard` en `src/features/`. Nuevas entities `calendar-feed` y `google-connection` en `src/entities/`. `ShiftCalendar` y `groupShiftsForCalendar()` se promueven de `features/shifts/` a `entities/shift/` para que ambas features (`shifts` y `staff-dashboard`) puedan importarlos sin violar regla FSD de no-import entre features. Route Handler para el feed iCal en `app/` (excepción justificada al patrón Server Actions: feed necesita ser endpoint GET consumible sin autenticación interactiva).
 
 ## Complexity Tracking
 

@@ -279,6 +279,85 @@
     "calendarViewComingSoon": "Calendar in development",
     "calendarViewComingSoonDescription": "The calendar component will be implemented soon"
   },
+  "staffDashboard": {
+    "title": "My Calendar",
+    "description": "View your assigned shifts",
+    "emptyState": "You have no shifts assigned this month",
+    "emptyStateDescription": "When shifts are assigned to you, they will appear here",
+    "loading": "Loading shifts...",
+    "upcoming": {
+      "title": "Upcoming Shifts",
+      "empty": "You have no upcoming shifts scheduled",
+      "today": "Today",
+      "tomorrow": "Tomorrow"
+    },
+    "shiftDetail": {
+      "title": "Shift Detail",
+      "area": "Area",
+      "shiftType": "Shift Type",
+      "schedule": "Schedule",
+      "status": "Status",
+      "rotation": "Rotation",
+      "extra": "Extra Shift",
+      "nightShift": "Night shift (continues next day)"
+    },
+    "personnel": {
+      "title": "Active Sector Personnel",
+      "titleNoSector": "Active Area Personnel",
+      "loading": "Loading personnel...",
+      "totalStaff": "{count} active staff",
+      "relayIncoming": "Relay from {name}",
+      "relayOutgoing": "Relay to {name}",
+      "noPersonnel": "No active personnel at this time"
+    },
+    "export": {
+      "button": "Export",
+      "downloadIcs": "Download .ics for the month",
+      "feedPerOrg": "iCal Subscription (this organization)",
+      "feedUnified": "iCal Subscription (all my organizations)",
+      "manageFeeds": "Manage feeds",
+      "feedUrl": "Feed URL",
+      "copyUrl": "Copy URL",
+      "urlCopied": "URL copied to clipboard",
+      "createFeed": "Create feed",
+      "feedCreated": "Feed created successfully",
+      "revokeFeed": "Revoke",
+      "feedRevoked": "Feed revoked",
+      "noFeeds": "You have no active feeds",
+      "perOrgLabel": "Organization",
+      "unifiedLabel": "Unified (all organizations)",
+      "downloadSuccess": ".ics file downloaded",
+      "downloadError": "Error generating file"
+    },
+    "google": {
+      "connect": "Connect Google Calendar",
+      "connected": "Google Calendar connected",
+      "disconnect": "Disconnect",
+      "disconnectConfirm": "Disconnect Google Calendar?",
+      "disconnectDescription": "Imported events will no longer be shown in your calendar.",
+      "connecting": "Connecting...",
+      "personalEvent": "Personal Event",
+      "conflict": "Schedule conflict"
+    },
+    "notes": {
+      "title": "Note",
+      "placeholder": "Write a note for this day...",
+      "save": "Save",
+      "delete": "Delete",
+      "saving": "Saving...",
+      "saved": "Note saved",
+      "deleted": "Note deleted",
+      "error": "Error saving note",
+      "legendNote": "Personal note"
+    },
+    "status": {
+      "SCHEDULED": "Scheduled",
+      "IN_PROGRESS": "In Progress",
+      "COMPLETED": "Completed",
+      "CANCELLED": "Cancelled",
+      "NO_SHOW": "No Show"
+    }
+  },
   "shifts": {
     "title": "Shift Management",
     "description": "Manage your staff shifts efficiently",
@@ -354,7 +433,8 @@
       "weekend": "Weekend",
       "holiday": "Holiday",
       "rotation": "Rotation",
-      "extra": "Extra Shift"
+      "extra": "Extra Shift",
+      "note": "Personal note"
     },
     "rotationDetail": {
       "title": "Rotation Shifts",
@@ -1626,6 +1706,7 @@
     "rates": {
       "title": "Rates & Contracts",
       "description": "Assign rates to staff as negotiated. Create global types or customize per person.",
+      "guideLink": "Rates guide",
       "noOrganization": "You don't have an organization assigned",
       "loadError": "Error loading",
       "staffTable": {
@@ -1820,6 +1901,138 @@
         "ratePerMinute": "Rate per minute",
         "baseSalary": "Base salary (optional)",
         "contractsCount": "{count} contract(s)"
+      },
+      "guide": {
+        "title": "Rate System Guide",
+        "subtitle": "Learn how VITA's flexible rate system works and how to create rate templates with custom components.",
+        "backToRates": "Back to Rates",
+        "overview": {
+          "title": "Overview",
+          "description": "VITA's rate system lets you define exactly how your staff gets paid. Instead of a flat rate, you can combine multiple components to reflect your actual salary structure.",
+          "template": "Rate Template",
+          "templateDesc": "A reusable set of payment rules that you define once and assign to multiple people.",
+          "component": "Component",
+          "componentDesc": "Each individual piece of the calculation: base salary, bonuses, multipliers, etc.",
+          "contract": "Contract",
+          "contractDesc": "The link between a person and a rate template, with start date and optional multiplier."
+        },
+        "flow": {
+          "title": "Workflow",
+          "step1": {
+            "title": "Create a Template",
+            "description": "Define the name and add payment components based on the position's needs."
+          },
+          "step2": {
+            "title": "Configure Components",
+            "description": "For each component, choose the type, amount, unit, and when it applies."
+          },
+          "step3": {
+            "title": "Assign to Staff",
+            "description": "Link the template to each person by creating a contract with an optional multiplier."
+          },
+          "step4": {
+            "title": "Automatic Calculation",
+            "description": "VITA calculates the payment for each shift based on the applicable components."
+          }
+        },
+        "componentTypes": {
+          "title": "Component Types",
+          "description": "VITA includes 19 predefined component types grouped into 4 main categories.",
+          "fixed": {
+            "title": "Fixed Payments",
+            "description": "Amounts paid regularly, independent of shifts.",
+            "baseSalary": "Fixed monthly, biweekly, or weekly salary",
+            "perShift": "Fixed amount for each completed shift",
+            "completionBonus": "Extra bonus for completing the full shift"
+          },
+          "timeBased": {
+            "title": "Time-Based Payments",
+            "description": "Calculated based on actual time worked.",
+            "perMinute": "Payment for each minute worked",
+            "perHour": "Payment for each hour worked"
+          },
+          "bonuses": {
+            "title": "Conditional Bonuses",
+            "description": "Additional amounts applied under specific conditions.",
+            "night": "Extra for working night hours",
+            "weekend": "Extra for working Saturday or Sunday",
+            "holiday": "Extra for working on holidays",
+            "seniority": "Bonus for years of service",
+            "performance": "Bonus for meeting goals",
+            "area": "Extra for working in specific areas",
+            "emergency": "Bonus for emergency coverage",
+            "onCall": "Bonus for being on standby"
+          },
+          "multipliers": {
+            "title": "Multipliers",
+            "description": "Factors that multiply the base amount based on the shift context.",
+            "weekend": "Multiplies base pay on weekends",
+            "holiday": "Multiplies base pay on holidays",
+            "irrenunciable": "Legal multiplier for mandatory holidays",
+            "night": "Multiplies base pay during night hours",
+            "overtime": "Multiplies pay for overtime hours"
+          },
+          "custom": {
+            "title": "Custom",
+            "description": "Create custom components with your own name and rules for unique cases in your organization."
+          }
+        },
+        "units": {
+          "title": "Payment Units",
+          "description": "Each component has a unit that defines how its value is calculated.",
+          "periodic": "Periodic",
+          "periodicDesc": "Monthly, Biweekly, Weekly, Daily — regular payments independent of shifts.",
+          "eventBased": "Event-Based",
+          "eventBasedDesc": "Per Shift, Per Minute, Per Hour — calculated when the person works.",
+          "calculated": "Calculated",
+          "calculatedDesc": "Percentage, Multiplier, Fixed Amount — applied on top of other base values."
+        },
+        "conditions": {
+          "title": "Apply Conditions",
+          "description": "Each component can have a condition that determines when it applies.",
+          "always": "Always included in the calculation",
+          "weekday": "Only applies Monday through Friday",
+          "weekend": "Only applies Saturday and Sunday",
+          "holiday": "Only applies on holidays marked in the calendar",
+          "irrenunciable": "Only on mandatory holidays (Christmas, New Year, etc.)",
+          "overtime": "Only applies to extra hours beyond the scheduled shift",
+          "shiftType": "Only applies to specific shift types you choose"
+        },
+        "example": {
+          "title": "Practical Example",
+          "description": "Here's what a complete rate template looks like for an ICU nurse:",
+          "templateName": "ICU Nursing Rate",
+          "component1": "Base Salary — $500,000 monthly — Always",
+          "component2": "Per Shift — $50,000 per shift — Long Guard only",
+          "component3": "Night Bonus — $15,000 fixed — Night hours only",
+          "component4": "Overtime — $500/minute — Overtime only",
+          "component5": "Holiday Mult. — 2.5x — Holidays only",
+          "resultTitle": "Result for a night Long Guard shift on a holiday:",
+          "resultLine1": "Proportional base salary for the day",
+          "resultLine2": "$50,000 for completing the guard",
+          "resultLine3": "$15,000 night bonus",
+          "resultLine4": "Everything multiplied by 2.5x (holiday)",
+          "resultLine5": "Overtime at $500/min if applicable"
+        },
+        "tips": {
+          "title": "Tips & Best Practices",
+          "tip1": {
+            "title": "Start simple",
+            "description": "Create templates with 2-3 components first. You can always add more later."
+          },
+          "tip2": {
+            "title": "Reuse templates",
+            "description": "The same template can be assigned to many people. Use the contract multiplier to adjust individually."
+          },
+          "tip3": {
+            "title": "Use duplication",
+            "description": "If you need a variant of an existing template, duplicate it and modify only what's needed."
+          },
+          "tip4": {
+            "title": "Document your components",
+            "description": "Use the description field to explain why each component exists. Your future self will thank you."
+          }
+        }
       },
       "saveConfirm": {
         "title": "Save changes?",

@@ -121,7 +121,7 @@ Additional warnings:
 
 **Question**: How to find extra candidates across areas?
 
-**Decision**: Query all STAFF_HEALTH users who:
+**Decision**: Query all STAFF users who:
 1. Have UserArea assignment to the target area (MANDATORY - no exceptions)
 2. Are not already working a shift at the requested time (check across ALL their areas)
 3. Are not in the same rotation group that needs filling
