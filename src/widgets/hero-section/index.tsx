@@ -1,11 +1,12 @@
 'use client'
 
+import { ArrowRight } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { ArrowRight, Calendar, Shield, Users } from 'lucide-react'
 
+import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 import { Skeleton } from '@/src/shared/ui/skeleton'
 
@@ -21,63 +22,63 @@ export function HeroSection({ locale }: HeroSectionProps) {
   const isLoading = status === 'loading'
   const isAuthenticated = !!session
 
-  const features = [
-    {
-      icon: Calendar,
-      title: t('features.scheduling.title'),
-      description: t('features.scheduling.description'),
-    },
-    {
-      icon: Users,
-      title: t('features.staff.title'),
-      description: t('features.staff.description'),
-    },
-    {
-      icon: Shield,
-      title: t('features.security.title'),
-      description: t('features.security.description'),
-    },
-  ]
-
   return (
-    <section className="relative flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center overflow-hidden px-4 py-16 md:py-24">
-      <div className="relative z-10 container mx-auto max-w-6xl">
+    <section className="bg-gradient-to-br from-primary to-primary/80 relative overflow-hidden px-4 py-20 md:py-28 lg:py-36">
+      <div className="relative z-10 container mx-auto max-w-5xl">
         <div className="flex flex-col items-center text-center">
-          <h1 className="mb-6 text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
+          <Badge
+            variant="secondary"
+            className="animate-fade-in-up mb-6 bg-white/20 text-sm text-white backdrop-blur-sm"
+          >
+            {t('badge')}
+          </Badge>
+
+          <h1 className="animate-fade-in-up-delay-1 mb-6 text-4xl font-bold tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl">
             <span className="block">{t('title.line1')}</span>
-            <span className="from-primary to-primary/60 block bg-linear-to-r bg-clip-text text-transparent">
-              {t('title.line2')}
-            </span>
+            <span className="block text-white/90">{t('title.line2')}</span>
           </h1>
 
-          <p className="text-muted-foreground mb-8 max-w-2xl text-lg sm:text-xl md:text-2xl">
+          <p className="animate-fade-in-up-delay-2 mb-10 max-w-2xl text-lg text-white/80 sm:text-xl">
             {t('description')}
           </p>
 
           {isLoading && (
-            <div className="mb-12 flex flex-col gap-4 sm:flex-row">
-              <Skeleton className="h-12 w-48" />
-              <Skeleton className="h-12 w-32" />
+            <div className="animate-fade-in-up-delay-3 flex flex-col gap-4 sm:flex-row">
+              <Skeleton className="h-12 w-48 bg-white/20" />
+              <Skeleton className="h-12 w-40 bg-white/20" />
             </div>
           )}
 
           {!isLoading && !isAuthenticated && (
-            <div className="mb-12 flex flex-col gap-4 sm:flex-row">
-              <Button asChild size="lg" className="text-base">
-                <Link href={`/${currentLocale}/register`}>
+            <div className="animate-fade-in-up-delay-3 flex flex-col gap-4 sm:flex-row">
+              <Button
+                asChild
+                size="lg"
+                className="bg-white text-primary hover:bg-white/90 text-base focus-visible:ring-white"
+              >
+                <Link href={`/${currentLocale}/contact`}>
                   {t('cta.primary')}
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
-              <Button asChild variant="outline" size="lg" className="text-base">
-                <Link href={`/${currentLocale}/login`}>{t('cta.secondary')}</Link>
+              <Button
+                asChild
+                variant="outline"
+                size="lg"
+                className="border-white/60 bg-transparent text-base text-white hover:bg-white/10 hover:text-white focus-visible:ring-white"
+              >
+                <Link href="#how-it-works">{t('cta.secondary')}</Link>
               </Button>
             </div>
           )}
 
           {!isLoading && isAuthenticated && (
-            <div className="mb-12 flex flex-col gap-4 sm:flex-row">
-              <Button asChild size="lg" className="text-base">
+            <div className="animate-fade-in-up-delay-3 flex flex-col gap-4 sm:flex-row">
+              <Button
+                asChild
+                size="lg"
+                className="bg-white text-primary hover:bg-white/90 text-base focus-visible:ring-white"
+              >
                 <Link href={`/${currentLocale}/dashboard`}>
                   {t('cta.dashboard')}
                   <ArrowRight className="ml-2 h-5 w-5" />
@@ -85,29 +86,11 @@ export function HeroSection({ locale }: HeroSectionProps) {
               </Button>
             </div>
           )}
-
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {features.map((feature) => {
-              const Icon = feature.icon
-              return (
-                <article
-                  key={feature.title}
-                  className="group bg-card hover:border-primary/50 rounded-lg border p-6 text-left transition-all hover:shadow-md"
-                >
-                  <div className="bg-primary/10 text-primary mb-4 flex h-12 w-12 items-center justify-center rounded-lg">
-                    <Icon className="h-6 w-6" />
-                  </div>
-                  <h3 className="mb-2 text-lg font-semibold">{feature.title}</h3>
-                  <p className="text-muted-foreground text-sm">{feature.description}</p>
-                </article>
-              )
-            })}
-          </div>
         </div>
       </div>
 
-      <div className="from-background via-background/95 to-background absolute inset-0 z-0 bg-linear-to-b" />
-      <div className="bg-primary/5 absolute inset-0 z-0 [mask-image:radial-gradient(circle_at_50%_50%,black,transparent_70%)]" />
+      <div className="pointer-events-none absolute inset-0 z-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.1),transparent_50%)]" />
+      <div className="pointer-events-none absolute inset-0 z-0 bg-[radial-gradient(circle_at_70%_80%,rgba(255,255,255,0.05),transparent_50%)]" />
     </section>
   )
 }

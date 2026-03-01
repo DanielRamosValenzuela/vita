@@ -1,6 +1,16 @@
 import { hasLocale, NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
-import { Geist, Geist_Mono, Outfit, Oxanium, Source_Code_Pro, Space_Mono } from 'next/font/google'
+import {
+  Geist,
+  Geist_Mono,
+  IBM_Plex_Mono,
+  Libre_Baskerville,
+  Outfit,
+  Oxanium,
+  Poppins,
+  Source_Code_Pro,
+  Space_Mono,
+} from 'next/font/google'
 import { notFound } from 'next/navigation'
 
 import { routing } from '@/i18n/routing'
@@ -45,6 +55,27 @@ const spaceMono = Space_Mono({
   display: 'swap',
 })
 
+const poppins = Poppins({
+  variable: '--font-poppins',
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  display: 'swap',
+})
+
+const libreBaskerville = Libre_Baskerville({
+  variable: '--font-libre-baskerville',
+  subsets: ['latin'],
+  weight: ['400', '700'],
+  display: 'swap',
+})
+
+const ibmPlexMono = IBM_Plex_Mono({
+  variable: '--font-ibm-plex-mono',
+  subsets: ['latin'],
+  weight: ['400', '500', '700'],
+  display: 'swap',
+})
+
 interface LocaleLayoutProps {
   children: React.ReactNode
   params: Promise<{ locale: string }>
@@ -58,9 +89,9 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
   const messages = await getMessages()
 
   return (
-    <html lang={locale} suppressHydrationWarning className="h-full overflow-hidden">
+    <html lang={locale} suppressHydrationWarning className="h-full">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${oxanium.variable} ${outfit.variable} ${sourceCodePro.variable} ${spaceMono.variable} h-full overflow-hidden antialiased font-sans`}
+        className={`${geistSans.variable} ${geistMono.variable} ${oxanium.variable} ${outfit.variable} ${sourceCodePro.variable} ${spaceMono.variable} ${poppins.variable} ${libreBaskerville.variable} ${ibmPlexMono.variable} h-full antialiased font-sans`}
         suppressHydrationWarning
       >
         <NextIntlClientProvider locale={locale} messages={messages}>
