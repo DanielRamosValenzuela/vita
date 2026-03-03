@@ -10,6 +10,7 @@ import { chiefHasAreaAccess, getChiefAccessibleAreaIds, resolveChiefOrganization
 import { isChiefArea } from '@/src/shared/lib/auth/rbac'
 import { requireAdminHROrChief } from '@/src/shared/lib/auth/session'
 import { prisma } from '@/src/shared/lib/db'
+import { calculateShiftPayment } from '@/src/shared/lib/payment/calculate-shift-payment'
 import type { ActionResult } from '@/src/shared/lib/types'
 import { createNotification } from '@/src/features/notifications/lib/notification-service'
 
@@ -351,6 +352,90 @@ export const updateShiftAction = async (
   }
 }
 
+const completeShiftSchema = z.object({
+  actualStartTime: z.date().optional(),
+  actualEndTime: z.date(),
+  notes: z.string().optional(),
+})
+
+export const completeShiftAction = async (
+  shiftId: string,
+  data: z.infer<typeof completeShiftSchema>
+): Promise<ActionResult<{ shiftId: string; paymentId?: string; finalAmount?: number }>> => {
+  try {
+    const session = await requireAdminHROrChief()
+
+    const derivedOrgId = isChiefArea(session)
+      ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
+      : session.organizationId ?? null
+    if (!derivedOrgId)
+      return { success: false, error: 'No tienes una organización asignada' }
+    const organizationId = derivedOrgId
+
+    const existing = await prisma.shift.findFirst({
+      where: { id: shiftId, organizationId },
+      include: { payment: true },
+    })
+    if (!existing)
+      return { success: false, error: 'Turno no encontrado' }
+
+    if (existing.status === 'COMPLETED')
+      return { success: false, error: 'El turno ya está completado' }
+
+    if (isChiefArea(session)) {
+      const hasAccess = await chiefHasAreaAccess(session.id, existing.areaId)
+      if (!hasAccess)
+        return {
+          success: false,
+          error: 'Solo puedes completar turnos de las áreas que tienes asignadas',
+        }
+    }
+
+    const validatedData = completeShiftSchema.parse(data)
+
+    
+    await prisma.shift.update({
+      where: { id: shiftId },
+      data: {
+        status: 'COMPLETED',
+        actualStartTime: validatedData.actualStartTime ?? existing.startTime,
+        actualEndTime: validatedData.actualEndTime,
+        notes: validatedData.notes ?? existing.notes,
+      },
+    })
+
+    
+    let paymentId: string | undefined
+    let finalAmount: number | undefined
+
+    if (existing.contractId && !existing.payment) 
+      try {
+        const paymentResult = await calculateShiftPayment(shiftId)
+        paymentId = paymentResult.paymentId
+        finalAmount = paymentResult.finalAmount
+      } catch (paymentError) {
+        console.error('[completeShiftAction] Payment calculation failed:', paymentError)
+        
+      }
+    
+
+    revalidatePath('/dashboard/shifts')
+    revalidatePath('/dashboard/shifts/calendar')
+
+    return {
+      success: true,
+      data: { shiftId, paymentId, finalAmount },
+      message: 'Turno completado',
+    }
+  } catch (error) {
+    console.error('[completeShiftAction] Error:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Error al completar turno',
+    }
+  }
+}
+
 export const deleteShiftAction = async (
   shiftId: string
 ): Promise<ActionResult<null>> => {
@@ -484,6 +569,7 @@ export const getShiftsAction = async (
           rotationGroupId: true,
           isManuallyModified: true,
           isExtra: true,
+          coverageStatus: true,
           startTime: true,
           endTime: true,
           actualStartTime: true,

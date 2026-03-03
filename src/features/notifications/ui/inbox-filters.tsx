@@ -16,6 +16,10 @@ export const TYPE_GROUPS: TypeGroup[] = [
   { key: 'INVITATION_PENDING', types: ['INVITATION_PENDING'] },
   { key: 'SHIFTS', types: ['SHIFT_CREATED', 'SHIFT_UPDATED', 'SHIFT_CANCELLED'] },
   { key: 'AREA_ASSIGNED', types: ['AREA_ASSIGNED'] },
+  {
+    key: 'PAYROLL',
+    types: ['PAYROLL_GENERATED', 'PAYROLL_GENERATION_FAILED', 'PAYROLL_DOCUMENT_AVAILABLE'],
+  },
   { key: 'GENERAL', types: ['GENERAL'] },
 ]
 

@@ -103,6 +103,7 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
       initialNotes={initialNotes}
       organizationName={org?.name}
       filterOptions={filterOptions}
+      currentUserId={user.id}
     />
   )
 }

@@ -6,6 +6,7 @@ import { requireAdminHRWithOrg } from '@/src/shared/lib/auth/session'
 import { prisma } from '@/src/shared/lib/db'
 import { getContractsPageDataAction } from '@/src/features/admin-hr/api'
 import { ContractsPage } from '@/src/features/admin-hr/ui'
+import { BillingDayConfig } from '@/src/features/admin-hr/ui/billing-day-config'
 import { Button } from '@/src/shared/ui/button'
 
 interface RatesRouteProps {
@@ -68,6 +69,8 @@ export default async function RatesRoute({ params }: RatesRouteProps) {
           </Link>
         </Button>
       </div>
+
+      <BillingDayConfig />
 
       <ContractsPage data={result.data} currency={organization.currency} />
     </div>

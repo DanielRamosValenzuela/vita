@@ -1,5 +1,6 @@
 import { Role } from '@prisma/client'
 import {
+  ArrowLeftRight,
   BarChart3,
   Building2,
   Calendar,
@@ -11,6 +12,7 @@ import {
   Inbox,
   Layers,
   LayoutGrid,
+  Receipt,
   User,
   Users,
 } from 'lucide-react'
@@ -52,6 +54,12 @@ export function getNavItems(t: (key: string) => string, userRole: Role): NavItem
       roles: [Role.ADMIN_HR, Role.CHIEF_AREA, Role.CHIEF_SECTOR, Role.STAFF],
     },
     {
+      href: '/dashboard/requests',
+      label: t('requests'),
+      icon: ArrowLeftRight,
+      roles: [Role.CHIEF_AREA, Role.CHIEF_SECTOR, Role.STAFF],
+    },
+    {
       href: '/dashboard/areas',
       label: t('areas'),
       icon: LayoutGrid,
@@ -74,6 +82,17 @@ export function getNavItems(t: (key: string) => string, userRole: Role): NavItem
       label: t('rates'),
       icon: DollarSign,
       roles: [Role.ADMIN_HR],
+    },
+    {
+      href: '/dashboard/payroll',
+      label:
+        userRole === Role.ADMIN_HR
+          ? t('payroll')
+          : userRole === Role.STAFF
+            ? t('myPayments')
+            : t('payrollPayments'),
+      icon: Receipt,
+      roles: [Role.ADMIN_HR, Role.CHIEF_AREA, Role.CHIEF_SECTOR, Role.STAFF],
     },
     {
       href: '/dashboard/calendar',

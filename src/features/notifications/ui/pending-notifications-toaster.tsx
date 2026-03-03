@@ -21,6 +21,18 @@ const TOAST_METHOD: Record<NotificationType, 'info' | 'success' | 'warning'> = {
   ROTATION_ASSIGNED: 'info',
   ROTATION_SHIFTS_GENERATED: 'success',
   EXTRA_SHIFT_ASSIGNED: 'info',
+  SWAP_REQUESTED: 'info',
+  SWAP_OPEN_PUBLISHED: 'info',
+  SWAP_OFFER_RECEIVED: 'info',
+  SWAP_PEER_ACCEPTED: 'success',
+  SWAP_APPROVED: 'success',
+  SWAP_REJECTED: 'warning',
+  EXTRA_SHIFT_AVAILABLE: 'info',
+  EXTRA_SHIFT_APPLIED: 'info',
+  EXTRA_SHIFT_APPROVED: 'success',
+  PAYROLL_GENERATED: 'success',
+  PAYROLL_GENERATION_FAILED: 'warning',
+  PAYROLL_DOCUMENT_AVAILABLE: 'info',
 }
 
 interface PendingNotificationsToasterProps {
