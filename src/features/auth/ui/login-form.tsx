@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { signIn } from 'next-auth/react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 
 import { Button } from '@/src/shared/ui/button'
@@ -14,9 +14,11 @@ import { Link } from '@/i18n/navigation'
 
 import { loginAction } from '../api'
 
-export function LoginForm({ callbackUrl = '/es' }: { callbackUrl?: string }) {
+export function LoginForm({ callbackUrl }: { callbackUrl?: string }) {
   const t = useTranslations('auth')
+  const locale = useLocale()
   const router = useRouter()
+  const resolvedCallbackUrl = callbackUrl ?? `/${locale}/dashboard`
 
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState<Record<string, string[]>>({})
@@ -46,7 +48,7 @@ export function LoginForm({ callbackUrl = '/es' }: { callbackUrl?: string }) {
         })
 
         if (signInResult?.ok) {
-          router.push(callbackUrl)
+          router.push(resolvedCallbackUrl)
           router.refresh()
         } else setGeneralError(signInResult?.error || t('signInError'))
       } else {
@@ -74,7 +76,7 @@ export function LoginForm({ callbackUrl = '/es' }: { callbackUrl?: string }) {
 
       <div className="space-y-2">
         <Label htmlFor="email">{t('email')}</Label>
-        <Input type="email" id="email" name="email" required placeholder={t('emailPlaceholder')} />
+        <Input type="email" id="email" name="email" placeholder={t('emailPlaceholder')} />
         {errors.email && (
           <p className="text-destructive text-sm" role="alert">
             {errors.email[0]}
@@ -84,7 +86,7 @@ export function LoginForm({ callbackUrl = '/es' }: { callbackUrl?: string }) {
 
       <div className="space-y-2">
         <Label htmlFor="password">{t('password')}</Label>
-        <Input type="password" id="password" name="password" required />
+        <Input type="password" id="password" name="password" />
         {errors.password && (
           <p className="text-destructive text-sm" role="alert">
             {errors.password[0]}
@@ -127,7 +129,7 @@ export function LoginForm({ callbackUrl = '/es' }: { callbackUrl?: string }) {
       <Button
         type="button"
         variant="outline"
-        onClick={() => signIn('google', { callbackUrl })}
+        onClick={() => signIn('google', { callbackUrl: resolvedCallbackUrl })}
         className="w-full"
       >
         <GoogleIcon className="mr-2 h-5 w-5" />
