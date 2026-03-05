@@ -13,6 +13,7 @@ import { getBillingConfigAction, updateBillingDayAction } from '../api/payroll-a
 
 export function BillingDayConfig() {
   const t = useTranslations('payroll.billingDay')
+  const tCommon = useTranslations('common')
   const [billingDay, setBillingDay] = useState<string>('')
   const [initialValue, setInitialValue] = useState<string>('')
   const [isPending, startTransition] = useTransition()
@@ -65,7 +66,7 @@ export function BillingDayConfig() {
             <p className="text-muted-foreground text-xs">{t('help')}</p>
           </div>
           <Button type="submit" disabled={isPending || !hasChanges}>
-            {isPending ? t('~common.save') : t('~common.save')}
+            {isPending ? tCommon('saving') : tCommon('save')}
           </Button>
         </form>
       </CardContent>

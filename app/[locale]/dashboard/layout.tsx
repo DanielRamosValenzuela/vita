@@ -1,3 +1,5 @@
+import { redirect } from 'next/navigation'
+
 import { Role } from '@prisma/client'
 
 import { getCurrentUser } from '@/src/shared/lib/auth'
@@ -14,14 +16,10 @@ interface DashboardLayoutProps {
 }
 
 export default async function DashboardLayout({ children, params }: DashboardLayoutProps) {
-  const [, user] = await Promise.all([params, getCurrentUser()])
+  const [resolvedParams, user] = await Promise.all([params, getCurrentUser()])
 
   if (!user)
-    return (
-      <div className="flex min-h-screen">
-        <main className="flex-1">{children}</main>
-      </div>
-    )
+    redirect(`/${resolvedParams.locale}/login`)
 
   const [pendingNotifications, unreadNotificationCount, displayRole] = await Promise.all([
     getUserPendingNotifications({ userId: user.id }),
