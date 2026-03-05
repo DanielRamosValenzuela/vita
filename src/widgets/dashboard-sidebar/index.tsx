@@ -37,7 +37,7 @@ export function DashboardSidebar({
   const locale = (params?.locale as string) || 'es'
 
   const handleLogout = async () => {
-    await signOut({ callbackUrl: `/${locale}/login` })
+    await signOut({ redirect: true, callbackUrl: `/${locale}/login` })
   }
 
   const navItems = getNavItems(t, user.role)

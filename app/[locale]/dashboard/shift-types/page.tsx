@@ -5,13 +5,6 @@ import { getAreasAction } from '@/src/features/area/api'
 import { getShiftTypesAction } from '@/src/features/shifts/api'
 import { ShiftTypesPage } from '@/src/features/shifts/ui'
 import { requireAdminHROrChief } from '@/src/shared/lib/auth/session'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/src/shared/ui/card'
 
 interface ShiftTypesProps {
   params: Promise<{ locale: string }>
@@ -68,26 +61,11 @@ export default async function ShiftTypes({ params }: ShiftTypesProps) {
   const shiftTypes = shiftTypesResult.data
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
-        <p className="text-muted-foreground mt-2">{t('description')}</p>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('title')}</CardTitle>
-          <CardDescription>{t('description')}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ShiftTypesPage
-            shiftTypes={shiftTypes || []}
-            areas={areas}
-            canCreateGlobal={isAdminHR}
-            isChief={session.role === Role.CHIEF_AREA}
-          />
-        </CardContent>
-      </Card>
-    </div>
+    <ShiftTypesPage
+      shiftTypes={shiftTypes || []}
+      areas={areas}
+      canCreateGlobal={isAdminHR}
+      isChief={session.role === Role.CHIEF_AREA}
+    />
   )
 }

@@ -62,18 +62,11 @@ export default async function SectorsPage({ params }: SectorsPageProps) {
   }>
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">{t('title')}</h1>
-        <p className="text-muted-foreground mt-1">{t('description')}</p>
-      </div>
-
-      <SectorsTable
+    <SectorsTable
         sectors={sectors}
         canCreate={isAdminHR(user)}
         canDelete={isAdminHR(user)}
         canEdit={!isStaff(user)}
-      />
-    </div>
+    />
   )
 }

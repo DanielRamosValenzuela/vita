@@ -1,9 +1,9 @@
 # Resumen Ejecutivo - QA E2E Testing VITA
 
-**Fecha**: 2026-03-05
-**Version**: 6.0
+**Fecha**: 2026-03-05 (actualizado: 2026-03-05 fix session)
+**Version**: 6.1
 **Tester**: Claude AI (Browser MCP + Supabase MCP)
-**Ambiente**: localhost:3001 (Next.js 16 dev server)
+**Ambiente**: localhost:3000 (Next.js 16 dev server)
 
 ---
 
@@ -173,30 +173,37 @@
 - Eliminar turno creado por CHIEF_AREA
 - Paginas Pagos y Analiticas del SUPER_ADMIN (contenido no verificado en detalle)
 
+## Fix Session (2026-03-05)
+
+Todos los 11 bugs y 10 problemas UX han sido resueltos o confirmados como ya resueltos. Resumen:
+
+| ID | Estado | Fix aplicado |
+|----|--------|-------------|
+| BUG-001 | Pre-existente | proxy.ts + layout.tsx redirect |
+| BUG-002 | Pre-existente | callbackUrl ya usa /${locale}/dashboard |
+| BUG-003 | Pre-existente | i18n clave corregida previamente |
+| BUG-004 | Ya funciona | Zod retorna fieldErrors correctamente, form los renderiza |
+| BUG-005 | Pre-existente | Ternario corregido previamente |
+| BUG-006 | Fix aplicado | Import Link from @/i18n/navigation en areas-table.tsx |
+| BUG-007 | Pre-existente | Revalidacion ya funciona |
+| BUG-008 | Fix aplicado | checkOrganizationRoleLimit en acceptInvitation |
+| BUG-009 | Fix aplicado | Instancia unica ShiftCalendar + empty state overlay |
+| BUG-010 | Fix aplicado | handleShiftClick maneja rotation-group con shiftIds |
+| BUG-011 | Fix aplicado | es.json/en.json actions object + address object, removed duplicate keys |
+| UX-001 | Pre-existente | Clave i18n corregida previamente |
+| UX-002 | Fix aplicado | signOut redirect:true callbackUrl=/${locale}/login |
+| UX-003 | Fix aplicado | useClientPagination 10/page en organization-team-section |
+| UX-004 | Fix aplicado | Headers duplicados eliminados en areas, shift-types, sectors pages |
+| UX-005 | No es bug | Comportamiento correcto: UserSector asignado = Jefe de Sector |
+| UX-006 | Fix aplicado | DocumentSection movido antes de PersonalInfoForm |
+| UX-007 | Fix aplicado | Calendar captionLayout dropdown + fromYear/toYear |
+| UX-008 | Fix aplicado | onInput filter stripea caracteres no-telefono + maxLength 20 |
+| UX-009 | Fix aplicado | Placeholder cambiado a +56 9 1234 5678 en es.json |
+| UX-010 | Fix aplicado | maxLength=20 en Input telefono |
+
+Build verificado: `next build` pasa sin errores de TypeScript ni i18n.
+Verificacion Browser MCP: todas las correcciones confirmadas visualmente en 3 roles (SUPER_ADMIN, ADMIN_HR, STAFF).
+
 ## Conclusion
 
-El sistema VITA presenta una **base solida y funcional**. Los CRUD E2E de Organizaciones (SUPER_ADMIN), Areas, Tipos de Turno, Tarifas, Invitaciones y Turnos completan sus flujos correctamente. Los 4 roles principales (SUPER_ADMIN, ADMIN_HR, CHIEF_AREA, STAFF) tienen dashboards funcionales con vistas filtradas segun permisos.
-
-El modulo SUPER_ADMIN demuestra funcionalidad CRUD completa con validaciones server-side robustas (limites por uso actual, soft delete con razon, confirmacion AlertDialog), pero tiene un problema significativo de i18n con multiples claves sin traducir (BUG-011).
-
-**Prioridad inmediata:**
-1. Corregir la proteccion de rutas del dashboard (BUG-001) -- problema de seguridad
-2. Corregir la redireccion post-login (BUG-002) -- afecta todos los usuarios
-3. Corregir calendario STAFF remonta al navegar (BUG-009) -- funcionalidad rota
-4. Corregir clicks en turnos rotacion (BUG-010) -- UX afectada
-
-**Segundo ciclo (i18n):**
-5. Corregir claves i18n SUPER_ADMIN (BUG-011) -- multiples textos sin traducir
-6. Corregir clave i18n tarifas (BUG-003) -- visible en produccion
-7. Corregir links de edicion sin locale (BUG-006) -- navegacion rota
-
-**Tercer ciclo (UX Perfil):**
-8. Mover seccion documento/RUT arriba (UX-006)
-9. Agregar selector de ano al calendario fecha nacimiento (UX-007)
-10. Agregar input mask para telefono (UX-008/UX-009)
-
-**Cuarto ciclo:**
-11. Validar limite de staff al aceptar invitaciones (BUG-008)
-12. Agregar revalidacion de tabla post-creacion de rate template (BUG-007)
-13. Agregar validacion visible en formulario de login (BUG-004)
-14. Implementar las mejoras de UX restantes (paginacion, headers duplicados, signout i18n)
+El sistema VITA presenta una **base solida y funcional** con todos los bugs y problemas UX reportados resueltos. Los CRUD E2E de Organizaciones (SUPER_ADMIN), Areas, Tipos de Turno, Tarifas, Invitaciones y Turnos completan sus flujos correctamente. Los 4 roles principales (SUPER_ADMIN, ADMIN_HR, CHIEF_AREA, STAFF) tienen dashboards funcionales con vistas filtradas segun permisos.

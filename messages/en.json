@@ -953,18 +953,7 @@
       "accountsStaff": "Staff:",
       "status": "Status",
       "plan": "Plan",
-      "accounts": "Accounts",
-      "actions": "Actions",
-      "view": "View",
-      "registerPayment": "Register Payment",
-      "reactivate": "Reactivate",
-      "status_active": "Active",
-      "status_pending": "Payment Due",
-      "status_suspended": "Suspended",
-      "status_inactive": "Inactive",
-      "plan_basic": "BASIC",
-      "plan_pro": "PRO",
-      "plan_enterprise": "ENTERPRISE"
+      "accounts": "Accounts"
     },
     "createOrganization": {
       "title": "Create New Organization",
@@ -1027,8 +1016,7 @@
         "submit": "Create Organization",
         "submitting": "Creating...",
         "cancel": "Cancel",
-        "phone": "Phone",
-        "address": "Address"
+        "phone": "Phone"
       },
       "success": "Organization created successfully",
       "error": "Error creating organization"

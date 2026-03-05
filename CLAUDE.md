@@ -99,5 +99,6 @@ Cuando el usuario pregunte por “cómo funciona X”, prioriza `docs/vita-workf
    - Documentar brevemente el flujo en `docs/vita-workflows.md` o el doc que corresponda.
    - Actualizar roadmap si impacta prioridades.
 5. **Comandos útiles:** `npm run dev`, `npm run build`, `npm run lint`, `npx prisma generate`, `prisma db push`.
+6. **Next.js DevTools MCP:** Siempre consultar el MCP server `next-devtools` (configurado en `.mcp.json`) durante el desarrollo. Usar sus herramientas (`get_errors`, `get_logs`, `get_page_metadata`) para detectar errores de build/runtime/tipos en tiempo real antes y después de cada cambio. Requiere el dev server corriendo (`npm run dev`).
 
 > Para Claude u otros agentes, `CLAUDE.md` es una copia de este archivo y debe mantenerse en sync.

@@ -5,7 +5,7 @@
 
 ---
 
-### [CRITICO] BUG-001: Dashboard accesible sin autenticacion - No hay proteccion de rutas
+### [CRITICO] BUG-001: Dashboard accesible sin autenticacion - No hay proteccion de rutas -- RESUELTO (pre-existente: proxy.ts + layout.tsx redirect)
 - **Ubicacion:** Pagina de dashboard
 - **Rol:** No autenticado
 - **Test Case:** TC-AUTH-006
@@ -33,7 +33,7 @@
 
 ---
 
-### [ALTO] BUG-002: Login exitoso redirige a landing en vez de dashboard
+### [ALTO] BUG-002: Login exitoso redirige a landing en vez de dashboard -- RESUELTO (pre-existente: callbackUrl ya usa /${locale}/dashboard)
 - **Ubicacion:** Formulario de login
 - **Rol:** Todos
 - **Test Case:** TC-AUTH-001
@@ -59,7 +59,7 @@
 
 ---
 
-### [ALTO] BUG-003: Clave i18n sin traducir en boton de tarifas
+### [ALTO] BUG-003: Clave i18n sin traducir en boton de tarifas -- RESUELTO (pre-existente)
 - **Ubicacion:** Pagina de tarifas - seccion "Fecha de facturacion"
 - **Rol:** ADMIN_HR
 - **Test Case:** TC-UX-004
@@ -87,7 +87,7 @@
 
 ---
 
-### [MEDIO] BUG-004: Formulario de login vacio no muestra errores de validacion
+### [MEDIO] BUG-004: Formulario de login vacio no muestra errores de validacion -- RESUELTO (ya funcionaba: Zod retorna fieldErrors correctamente)
 - **Ubicacion:** Pagina de login
 - **Rol:** No autenticado
 - **Test Case:** TC-AUTH-005, TC-UX-009
@@ -105,7 +105,7 @@
 
 ---
 
-### [BAJO] BUG-005: Boton "Iniciar sesion" duplica logica identica en ambos estados
+### [BAJO] BUG-005: Boton "Iniciar sesion" duplica logica identica en ambos estados -- RESUELTO (pre-existente)
 - **Ubicacion:** Formulario de login
 - **Rol:** No autenticado
 - **Test Case:** TC-UX-007
@@ -126,7 +126,7 @@
 
 ---
 
-### [MEDIO] BUG-006: Links de edicion en tablas no incluyen prefijo de locale
+### [MEDIO] BUG-006: Links de edicion en tablas no incluyen prefijo de locale -- RESUELTO (fix: import Link from @/i18n/navigation)
 - **Ubicacion:** Tabla de areas `/es/dashboard/areas`, potencialmente otras tablas
 - **Rol:** ADMIN_HR
 - **Test Case:** TC-AH-004-CRUD
@@ -152,7 +152,7 @@
 
 ---
 
-### [BAJO] BUG-007: Tabla de rate templates no se revalida despues de crear nueva plantilla
+### [BAJO] BUG-007: Tabla de rate templates no se revalida despues de crear nueva plantilla -- RESUELTO (pre-existente)
 - **Ubicacion:** `/es/dashboard/rates` - seccion "Plantillas de Tarifa"
 - **Rol:** ADMIN_HR
 - **Test Case:** TC-AH-008-CRUD
@@ -179,7 +179,7 @@
 
 ---
 
-### [MEDIO] BUG-008: Personal de Salud excede limite configurado (52/50)
+### [MEDIO] BUG-008: Personal de Salud excede limite configurado (52/50) -- RESUELTO (fix: checkOrganizationRoleLimit en acceptInvitation)
 - **Ubicacion:** `/es/dashboard/admin-hr/organization` - seccion Personal de Salud
 - **Rol:** ADMIN_HR
 - **Test Case:** TC-AH-009-CRUD
@@ -204,7 +204,7 @@
 
 ---
 
-### [ALTO] BUG-009: Navegacion del calendario STAFF remonta componente y pierde mes seleccionado
+### [ALTO] BUG-009: Navegacion del calendario STAFF remonta componente y pierde mes seleccionado -- RESUELTO (fix: instancia unica ShiftCalendar + empty state overlay)
 - **Ubicacion:** Dashboard STAFF - calendario
 - **Rol:** STAFF
 - **Test Case:** TC-ST-002
@@ -243,7 +243,7 @@
 
 ---
 
-### [MEDIO] BUG-010: Clicks en turnos de rotacion en el calendario no abren detalle
+### [MEDIO] BUG-010: Clicks en turnos de rotacion en el calendario no abren detalle -- RESUELTO (fix: handleShiftClick maneja rotation-group)
 - **Ubicacion:** Dashboard STAFF - calendario grid
 - **Rol:** STAFF
 - **Test Case:** TC-ST-003
@@ -279,7 +279,7 @@
 
 ---
 
-### [ALTO] BUG-011: Multiples claves i18n sin traducir en modulo SUPER_ADMIN
+### [ALTO] BUG-011: Multiples claves i18n sin traducir en modulo SUPER_ADMIN -- RESUELTO (fix: es.json/en.json actions object + address object, removed duplicate keys)
 - **Ubicacion:** Paginas de organizaciones SUPER_ADMIN
 - **Rol:** SUPER_ADMIN
 - **Test Case:** TC-SA-002, TC-SA-003, TC-SA-005, TC-SA-006, TC-SA-007

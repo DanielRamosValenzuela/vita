@@ -211,6 +211,10 @@ export function StaffDashboardContent({
     if (event.kind === 'individual') {
       setSelectedShiftId(event.id)
       setPanelOpen(true)
+    } else if (event.kind === 'rotation-group') {
+      const firstShiftId = event.shiftIds?.[0] ?? event.id
+      setSelectedShiftId(firstShiftId)
+      setPanelOpen(true)
     }
   }, [])
 
