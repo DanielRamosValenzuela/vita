@@ -463,32 +463,54 @@ Usuario A:
 - ✅ `messages/es.json` - Traducciones completas
 - ✅ `messages/en.json` - Traducciones completas
 
-### Documentación
+### Documentacion
 
-- ✅ `docs/CONFIGURACION-SUPABASE-STORAGE.md` - Guía de configuración
-- ✅ `docs/SCHEMA-USER-MULTI-EMAIL-DOC.md` - Diseño técnico
+- `prisma/schema.prisma` - Modelos UserEmail, UserDocumentHistory, campos de imagen en User
 
 ---
 
-## 7. Configuración Necesaria
+## 7. Configuracion de Supabase Storage (Avatares)
 
 ### Variables de Entorno
 
-Agrega a tu `.env`:
+Agrega a `.env`:
 
 ```env
-SUPABASE_URL="https://tkfsyqywlojjztkewonv.supabase.co"
+SUPABASE_URL="https://tu-proyecto.supabase.co"
 SUPABASE_SERVICE_ROLE_KEY="tu-service-role-key-aqui"
 ```
 
-Ver guía completa: [CONFIGURACION-SUPABASE-STORAGE.md](./CONFIGURACION-SUPABASE-STORAGE.md)
+Obtener credenciales: Supabase Dashboard > Settings > API > Project URL y service_role key.
 
-### Crear Bucket en Supabase
+### Crear Bucket
 
-1. Dashboard > Storage > New bucket
-2. Nombre: `avatars`
-3. Público: ✅
-4. Ejecutar policies SQL (ver guía)
+1. Dashboard > Storage > New bucket > Nombre: `avatars` > Publico: activado
+
+O via SQL:
+
+```sql
+INSERT INTO storage.buckets (id, name, public) VALUES ('avatars', 'avatars', true);
+
+CREATE POLICY "Users can upload their own avatar"
+ON storage.objects FOR INSERT
+WITH CHECK (bucket_id = 'avatars' AND (storage.foldername(name))[1] = auth.uid()::text);
+
+CREATE POLICY "Avatars are publicly accessible"
+ON storage.objects FOR SELECT
+USING (bucket_id = 'avatars');
+
+CREATE POLICY "Users can update their own avatar"
+ON storage.objects FOR UPDATE
+USING (bucket_id = 'avatars' AND (storage.foldername(name))[1] = auth.uid()::text);
+
+CREATE POLICY "Users can delete their own avatar"
+ON storage.objects FOR DELETE
+USING (bucket_id = 'avatars' AND (storage.foldername(name))[1] = auth.uid()::text);
+```
+
+### Estructura de archivos: `avatars/{userId}/avatar.jpg`
+
+### Limites: 5MB por imagen, formatos JPG/PNG/GIF/WebP. Free tier Supabase: 1GB almacenamiento, 2GB transferencia/mes.
 
 ---
 

@@ -651,5 +651,40 @@ async function calculateShiftPayment(shiftId: string) {
 
 ---
 
-**Documentación creada:** Febrero 2026  
-**Versión:** 1.0
+## Estado de Implementacion
+
+### Completado
+
+- Schema: `RateTemplate`, `RateComponent`, `OrganizationCalendar`, enums (`Currency`, `ComponentType`, `ComponentUnit`, `ApplyCondition`, `DayType`)
+- Backend API: CRUD completo de plantillas, contratos, duplicacion
+- UI: formulario de plantillas con componentes, presets (10 predefinidos), asignacion de contratos
+- Modulo Personal simplificado (solo visualizacion, sin edicion de contratos)
+- Formateo de moneda dinamico por pais (CurrencyInput con react-imask)
+- Calendario organizacional: CRUD de dias especiales, navegacion mensual, importacion de feriados
+- i18n completo en espanol e ingles
+
+### Archivos Clave
+
+| Capa | Archivos |
+|------|----------|
+| Schema | `prisma/schema.prisma` |
+| API Tarifas | `features/admin-hr/api/rate-template-actions.ts`, `contract-actions.ts` |
+| API Calendario | `features/admin-hr/api/calendar-actions.ts` |
+| UI Tarifas | `features/admin-hr/ui/rate-template-form.tsx`, `rate-component-form.tsx`, `contracts-page.tsx` |
+| UI Calendario | `widgets/calendar-view/organization-calendar-view.tsx` |
+| Shared | `shared/ui/input.tsx` (con mask), `shared/lib/utils/format.ts`, `shared/lib/constants/day-types.ts` |
+| Presets | `features/admin-hr/lib/rate-presets.ts` |
+
+### Pendiente
+
+1. Calculo automatico de pagos (integrar componentes + calendario + check-in/out)
+2. UI para check-in/check-out del staff
+3. Dashboard de pagos (aprobar pagos calculados)
+4. Reportes mensuales por empleado
+5. Exportar a nomina / Excel / PDF
+6. Dias recurrentes en calendario (ej: todos los domingos)
+7. Auto-importacion de feriados al crear organizacion
+
+---
+
+**Version:** 2.0 (Febrero 2026)
