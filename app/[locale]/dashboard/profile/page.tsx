@@ -68,6 +68,14 @@ export default async function ProfilePage({ params, searchParams }: ProfilePageP
         </CardContent>
       </Card>
 
+      <DocumentSection
+        user={
+          userData.country && userData.docNumber
+            ? { country: userData.country as Country, docNumber: userData.docNumber }
+            : null
+        }
+      />
+
       <PersonalInfoForm
         initialData={{
           name: userData.name,
@@ -88,14 +96,6 @@ export default async function ProfilePage({ params, searchParams }: ProfilePageP
       <InvitationsSection />
 
       <OrganizationsSection />
-
-      <DocumentSection
-        user={
-          userData.country && userData.docNumber
-            ? { country: userData.country as Country, docNumber: userData.docNumber }
-            : null
-        }
-      />
     </div>
   )
 }

@@ -19,6 +19,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/src/shared/ui/alert-dialog'
+import { useClientPagination } from '@/src/shared/lib/hooks/use-client-pagination'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
 import {
@@ -29,6 +30,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/src/shared/ui/dialog'
+import { DataTablePagination } from '@/src/shared/ui/molecules/data-table-pagination'
 import {
   Table,
   TableBody,
@@ -84,6 +86,11 @@ export function OrganizationTeamSection({
   const [isUnlinking, setIsUnlinking] = useState(false)
 
   const canCreateMore = currentCount < maxLimit
+
+  const { paginatedItems: paginatedUsers, page, totalPages, setPage } = useClientPagination({
+    items: users,
+    pageSize: 10,
+  })
 
   async function handleUnlink() {
     if (!unlinkTarget) return
@@ -170,7 +177,7 @@ export function OrganizationTeamSection({
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {users.map((user) => (
+                  {paginatedUsers.map((user) => (
                     <TableRow key={user.id}>
                       <TableCell className="font-medium">{user.name}</TableCell>
                       <TableCell>{user.email}</TableCell>
@@ -204,6 +211,9 @@ export function OrganizationTeamSection({
                   ))}
                 </TableBody>
               </Table>
+              {totalPages > 1 && (
+                <DataTablePagination page={page} totalPages={totalPages} onPageChange={setPage} />
+              )}
             </div>
 
             <AlertDialog

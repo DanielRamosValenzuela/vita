@@ -739,7 +739,7 @@
       },
       "phone": {
         "label": "Teléfono",
-        "placeholder": "+1 555 123 4567"
+        "placeholder": "+56 9 1234 5678"
       },
       "birthDate": {
         "label": "Fecha de Nacimiento",
@@ -896,7 +896,13 @@
         "CHIEF_SECTOR": "Jefe de Sector",
         "STAFF": "Personal"
       },
-      "actions": "Acciones",
+      "actions": {
+        "view": "Ver detalles",
+        "edit": "Editar",
+        "suspend": "Suspender",
+        "reactivate": "Reactivar",
+        "delete": "Eliminar"
+      },
       "confirmSuspend": "¿Estás seguro de que deseas suspender la organización {name}?",
       "confirmReactivate": "¿Estás seguro de que deseas reactivar la organización {name}?",
       "confirmDelete": "¿Estás seguro de que deseas eliminar la organización {name}?",
@@ -978,7 +984,10 @@
           "placeholder": "+56 9 1234 5678"
         },
         "phone": "Teléfono",
-        "address": "Dirección",
+        "address": {
+          "label": "Dirección (opcional)",
+          "placeholder": "Av. Providencia 1234, Santiago"
+        },
         "submit": "Crear Organización",
         "submitting": "Creando...",
         "cancel": "Cancelar"

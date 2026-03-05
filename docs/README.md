@@ -1,46 +1,54 @@
-# Documentación VITA
+# Documentacion VITA
 
-Sistema de Gestión de Turnos Médicos Multi-Tenant SaaS B2B.
+Sistema de Gestion de Turnos Medicos — SaaS B2B Multi-Tenant.
 
-## Índice
+## Documentos Principales
 
-| Documento                                                                            | Contenido                                                                            |
-| ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
-| [vita-overview.md](./vita-overview.md)                                               | Qué es VITA, problema, solución                                                      |
-| [vita-business-model.md](./vita-business-model.md)                                   | Modelo SaaS B2B, pricing, límites                                                    |
-| [vita-roles.md](./vita-roles.md)                                                     | Sistema de roles (SUPER_ADMIN, ADMIN_HR, CHIEF_AREA, STAFF)                   |
-| [vita-competitive.md](./vita-competitive.md)                                         | Análisis Rflex, propuesta de valor                                                   |
-| [vita-architecture.md](./vita-architecture.md)                                       | Stack, FSD, estructura, i18n                                                         |
-| [vita-roadmap.md](./vita-roadmap.md)                                                 | Fases, próximos pasos, prioridades                                                   |
-| [vita-lessons.md](./vita-lessons.md)                                                 | Lecciones aprendidas, mejores prácticas                                              |
-| [vita-workflows.md](./vita-workflows.md)                                             | Workflows por rol y pendientes                                                       |
-| [INTERNACIONALIZACION.md](./INTERNACIONALIZACION.md)                                 | Formatos de fecha, moneda y locales por país                                         |
-| [SISTEMA-VALIDACION-DOCUMENTOS-EMAILS.md](./SISTEMA-VALIDACION-DOCUMENTOS-EMAILS.md) | Sistema de documentos únicos, múltiples emails e imágenes                            |
-| [CONFIGURACION-SUPABASE-STORAGE.md](./CONFIGURACION-SUPABASE-STORAGE.md)             | Configuración de Supabase Storage para avatares                                      |
-| [SISTEMA-I18N-VALIDACION.md](./SISTEMA-I18N-VALIDACION.md)                           | Sistema de validación de traducciones (detecta claves faltantes)                     |
-| [SISTEMA-PAGOS-Y-TARIFAS.md](./SISTEMA-PAGOS-Y-TARIFAS.md)                           | Sistema completo de pagos, tarifas, check-in/check-out y cálculo automático          |
-| [REQUERIMIENTOS-DEL-PROYECTO.md](./REQUERIMIENTOS-DEL-PROYECTO.md)                   | Requerimientos cumplidos y pendientes (sin términos técnicos)                        |
-| [DICCIONARIO-BASE-DE-DATOS.md](./DICCIONARIO-BASE-DE-DATOS.md)                       | Descripción de todas las tablas y campos de la base de datos (sin términos técnicos) |
+| Documento | Contenido |
+|-----------|-----------|
+| [vita-overview.md](./vita-overview.md) | Que es VITA, problema, solucion |
+| [vita-business-model.md](./vita-business-model.md) | Modelo SaaS B2B, pricing, limites |
+| [vita-roles.md](./vita-roles.md) | Roles: SUPER_ADMIN, ADMIN_HR, CHIEF_AREA, STAFF |
+| [vita-competitive.md](./vita-competitive.md) | Analisis competitivo, propuesta de valor |
+| [vita-architecture.md](./vita-architecture.md) | Stack, FSD, estructura de carpetas |
+| [vita-shared-fsd.md](./vita-shared-fsd.md) | Referencia FSD: capas, reglas, ejemplos |
+| [vita-roadmap.md](./vita-roadmap.md) | Fases, proximos pasos, prioridades |
+| [vita-lessons.md](./vita-lessons.md) | Lecciones aprendidas, mejores practicas |
 
-## Specs de Features
+## Workflows y Requerimientos
 
-| Spec                                                                         | Feature                 | Estado     |
-| ---------------------------------------------------------------------------- | ----------------------- | ---------- |
+| Documento | Contenido |
+|-----------|-----------|
+| [vita-workflows.md](./vita-workflows.md) | Flujos por rol con checkboxes [x]/[ ] implementado/pendiente |
+| [REQUERIMIENTOS-DEL-PROYECTO.md](./REQUERIMIENTOS-DEL-PROYECTO.md) | Requerimientos cumplidos y pendientes |
+
+## Sistemas Tecnicos
+
+| Documento | Contenido |
+|-----------|-----------|
+| [DICCIONARIO-BASE-DE-DATOS.md](./DICCIONARIO-BASE-DE-DATOS.md) | Todas las tablas y campos del schema Prisma |
+| [SISTEMA-PAGOS-Y-TARIFAS.md](./SISTEMA-PAGOS-Y-TARIFAS.md) | Tarifas flexibles, componentes, calculo de pagos, calendario org |
+| [SISTEMA-VALIDACION-DOCUMENTOS-EMAILS.md](./SISTEMA-VALIDACION-DOCUMENTOS-EMAILS.md) | Documentos unicos, multiples emails, avatares, Supabase Storage |
+| [SISTEMA-I18N.md](./SISTEMA-I18N.md) | Internacionalizacion: formatos, traducciones, validacion, mascaras |
+
+## Features Pendientes
+
+| Documento | Feature |
+|-----------|---------|
+| [PLAN-SHIFT-SWAP-AND-EXTRA.md](./PLAN-SHIFT-SWAP-AND-EXTRA.md) | Intercambio de turnos y turnos extra |
+| [TASKS-SHIFT-SWAP-AND-EXTRA.md](./TASKS-SHIFT-SWAP-AND-EXTRA.md) | Tareas para shift swap |
+
+## Specs Implementadas
+
+| Spec | Feature | Estado |
+|------|---------|--------|
 | [specs/005-staff-dashboard-calendar/](../specs/005-staff-dashboard-calendar/) | Staff Dashboard Calendar | Completado |
-| [specs/004-shift-rotations/](../specs/004-shift-rotations/)                   | Rotativas de Turno       | Completado |
-| [specs/003-inbox-notifications/](../specs/003-inbox-notifications/)           | Bandeja de Notificaciones| Completado |
-| [specs/001-area-sectors/](../specs/001-area-sectors/)                         | Áreas y Sectores         | Completado |
-
-## Historial de Sesiones (por fase)
-
-| Documento                                                                      | Fase    | Contenido                             |
-| ------------------------------------------------------------------------------ | ------- | ------------------------------------- |
-| [vita-sessions-phase-4-super-admin.md](./vita-sessions-phase-4-super-admin.md) | FASE 4  | SUPER_ADMIN, Organizations CRUD       |
-| [vita-sessions-phase-7-admin-hr.md](./vita-sessions-phase-7-admin-hr.md)       | FASE 7  | ADMIN_HR, invitaciones, Mi Org        |
-| [vita-sessions-phase-11-turnos.md](./vita-sessions-phase-11-turnos.md)         | FASE 11 | Sistema de turnos, tarifas, contratos |
+| [specs/004-shift-rotations/](../specs/004-shift-rotations/) | Rotativas de Turno | Completado |
+| [specs/003-inbox-notifications/](../specs/003-inbox-notifications/) | Bandeja de Notificaciones | Completado |
+| [specs/001-area-sectors/](../specs/001-area-sectors/) | Areas y Sectores | Completado |
 
 ## Para Agente IA
 
-- Contexto técnico conciso: `AGENTS.md` (raíz)
-- Regla Cursor: `@vita-plan-reference`
-- Usar búsqueda semántica para secciones específicas
+- Contexto principal: `CLAUDE.md` (raiz del repo)
+- Usar busqueda semantica en estos archivos
+- Cada documento tiene menos de 700 lineas para contexto eficiente

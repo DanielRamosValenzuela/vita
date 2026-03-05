@@ -99,9 +99,15 @@ export function PersonalInfoForm({ initialData }: PersonalInfoFormProps) {
               <Input
                 id="phone"
                 type="tel"
+                inputMode="tel"
+                maxLength={20}
                 placeholder={t('phone.placeholder')}
                 {...register('phone')}
                 aria-invalid={!!errors.phone}
+                onInput={(e) => {
+                  const input = e.currentTarget
+                  input.value = input.value.replace(/[^0-9+\s()\-]/g, '')
+                }}
               />
               {errors.phone && <p className="text-destructive text-sm">{errors.phone.message}</p>}
             </div>
@@ -128,6 +134,9 @@ export function PersonalInfoForm({ initialData }: PersonalInfoFormProps) {
                 <PopoverContent className="w-auto p-0">
                   <Calendar
                     mode="single"
+                    captionLayout="dropdown"
+                    fromYear={1920}
+                    toYear={new Date().getFullYear()}
                     selected={birthDate}
                     onSelect={(date) => {
                       setBirthDate(date)

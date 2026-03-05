@@ -3,6 +3,7 @@ import type { OrganizationInvitation, Role } from '@prisma/client'
 import { INVITATION_STATUS } from '@/src/shared/lib/constants'
 import { prisma } from '@/src/shared/lib/db'
 import type { ActionResult } from '@/src/shared/lib/types'
+import { checkOrganizationRoleLimit } from '@/src/entities/organization/lib/organization-limits'
 
 interface InvitationWithUser extends OrganizationInvitation {
   user: {
@@ -166,6 +167,13 @@ export async function acceptInvitation(
       return {
         success: false,
         error: 'Debes completar tu número de documento antes de aceptar la invitación',
+      }
+
+    const limitCheck = await checkOrganizationRoleLimit(invitation.organizationId, invitation.role)
+    if (!limitCheck.canAddMore)
+      return {
+        success: false,
+        error: limitCheck.error || 'La organización ha alcanzado el límite de usuarios para este rol',
       }
 
     await prisma.$transaction([

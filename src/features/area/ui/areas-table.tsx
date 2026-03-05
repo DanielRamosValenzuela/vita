@@ -2,7 +2,7 @@
 
 import { useCallback, useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { Eye, Plus, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 
