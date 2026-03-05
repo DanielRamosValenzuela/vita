@@ -11,6 +11,7 @@ if (!supabaseUrl || !supabaseKey)
 const supabaseStorage = createClient(supabaseUrl, supabaseKey)
 
 const AVATARS_BUCKET = 'avatars'
+const PAYROLL_BUCKET = 'payroll-documents'
 
 interface UploadAvatarOptions {
   userId: string
@@ -70,6 +71,81 @@ export async function uploadUserAvatar({
     }
   }
 }
+
+
+
+export async function uploadPayrollDocument(
+  organizationId: string,
+  year: number,
+  month: string,
+  userId: string,
+  periodId: string,
+  buffer: Buffer | Uint8Array
+): Promise<{ success: boolean; storagePath?: string; error?: string }> {
+  try {
+    const storagePath = `${organizationId}/${year}/${month}/${userId}-${periodId}.pdf`
+
+    const { error: uploadError } = await supabaseStorage.storage
+      .from(PAYROLL_BUCKET)
+      .upload(storagePath, buffer, {
+        upsert: true,
+        contentType: 'application/pdf',
+      })
+
+    if (uploadError) {
+      console.error('Error uploading payroll document:', uploadError)
+      return { success: false, error: 'Error al subir el documento de nómina' }
+    }
+
+    return { success: true, storagePath }
+  } catch (error) {
+    console.error('Unexpected error uploading payroll document:', error)
+    return { success: false, error: 'Error inesperado al subir el documento' }
+  }
+}
+
+export async function deletePayrollDocument(
+  storagePath: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const { error } = await supabaseStorage.storage
+      .from(PAYROLL_BUCKET)
+      .remove([storagePath])
+
+    if (error) {
+      console.error('Error deleting payroll document:', error)
+      return { success: false, error: 'Error al eliminar el documento' }
+    }
+
+    return { success: true }
+  } catch (error) {
+    console.error('Unexpected error deleting payroll document:', error)
+    return { success: false, error: 'Error inesperado al eliminar el documento' }
+  }
+}
+
+export async function getPayrollDocumentSignedUrl(
+  storagePath: string,
+  expiresIn: number = 3600
+): Promise<{ success: boolean; signedUrl?: string; error?: string }> {
+  try {
+    const { data, error } = await supabaseStorage.storage
+      .from(PAYROLL_BUCKET)
+      .createSignedUrl(storagePath, expiresIn)
+
+    if (error || !data?.signedUrl) {
+      console.error('Error generating signed URL:', error)
+      return { success: false, error: 'Error al generar enlace de descarga' }
+    }
+
+    return { success: true, signedUrl: data.signedUrl }
+  } catch (error) {
+    console.error('Unexpected error generating signed URL:', error)
+    return { success: false, error: 'Error inesperado al generar enlace' }
+  }
+}
+
+
 
 export async function deleteUserAvatar(
   userId: string

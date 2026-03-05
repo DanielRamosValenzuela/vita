@@ -32,6 +32,7 @@ interface StaffDashboardContentProps {
   initialNotes?: Array<{ id: string; date: string; content: string }>
   organizationName?: string
   filterOptions?: FilterOptions
+  currentUserId?: string
 }
 
 function getMonthRange(date: Date) {
@@ -46,6 +47,7 @@ export function StaffDashboardContent({
   initialNotes,
   organizationName,
   filterOptions,
+  currentUserId,
 }: StaffDashboardContentProps) {
   const t = useTranslations('staffDashboard')
   const [shifts, setShifts] = useState<ShiftWithRelations[]>(initialShifts)
@@ -298,6 +300,7 @@ export function StaffDashboardContent({
         shiftId={selectedShiftId}
         open={panelOpen}
         onOpenChange={setPanelOpen}
+        currentUserId={currentUserId}
       />
     </div>
   )

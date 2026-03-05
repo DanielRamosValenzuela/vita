@@ -8,6 +8,7 @@ const {
   NEXTAUTH_SECRET,
   SUPABASE_URL,
   SUPABASE_SERVICE_ROLE_KEY,
+  CRON_SECRET,
 } = process.env
 
 function required(value: string | undefined, key: string): string {
@@ -29,6 +30,7 @@ export const env = {
   SUPABASE_URL: required(SUPABASE_URL, 'SUPABASE_URL'),
   SUPABASE_SERVICE_ROLE_KEY: required(SUPABASE_SERVICE_ROLE_KEY, 'SUPABASE_SERVICE_ROLE_KEY'),
   GOOGLE_LINK_CALLBACK_URL: `${nextAuthUrl}/api/auth/callback/google-link`,
+  CRON_SECRET: CRON_SECRET ?? '',
 } as const
 
 export const isDev = env.NODE_ENV === 'development'

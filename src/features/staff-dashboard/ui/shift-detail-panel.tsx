@@ -2,9 +2,17 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
-import { Clock, Loader2, MapPin, Star } from 'lucide-react'
+import { ArrowLeftRight, Clock, Loader2, MapPin, Star } from 'lucide-react'
 
 import { Badge } from '@/src/shared/ui/badge'
+import { Button } from '@/src/shared/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/src/shared/ui/dialog'
 import {
   Sheet,
   SheetContent,
@@ -12,6 +20,9 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/src/shared/ui/sheet'
+
+import { SwapRequestForm } from '@/src/features/shift-swap/ui/swap-request-form'
+import { OpenSwapForm } from '@/src/features/shift-swap/ui/open-swap-form'
 
 import type { SectorPersonnelResult } from '../types/staff-dashboard-types'
 import { getSectorPersonnelForShiftAction } from '../api/sector-personnel-actions'
@@ -21,6 +32,7 @@ interface ShiftDetailPanelProps {
   shiftId: string | null
   open: boolean
   onOpenChange: (open: boolean) => void
+  currentUserId?: string
 }
 
 function formatDateTime(date: Date) {
@@ -37,10 +49,15 @@ export function ShiftDetailPanel({
   shiftId,
   open,
   onOpenChange,
+  currentUserId,
 }: ShiftDetailPanelProps) {
   const t = useTranslations('staffDashboard')
+  const tSwap = useTranslations('swap')
   const [data, setData] = useState<SectorPersonnelResult | null>(null)
   const [loading, setLoading] = useState(false)
+  const [swapOptionsOpen, setSwapOptionsOpen] = useState(false)
+  const [directSwapOpen, setDirectSwapOpen] = useState(false)
+  const [openSwapOpen, setOpenSwapOpen] = useState(false)
 
   const fetchPersonnel = useCallback(async (id: string) => {
     setLoading(true)
@@ -60,7 +77,25 @@ export function ShiftDetailPanel({
     data?.shift &&
     new Date(data.shift.endTime).getDate() !== new Date(data.shift.startTime).getDate()
 
+  const [canRequestSwap, setCanRequestSwap] = useState(false)
+
+  useEffect(() => {
+    if (currentUserId && data?.shift) {
+      const threshold = Date.now() + 24 * 60 * 60 * 1000
+      setCanRequestSwap(
+        data.shift.status === 'SCHEDULED' &&
+        new Date(data.shift.startTime).getTime() > threshold
+      )
+    } else
+      setCanRequestSwap(false)
+  }, [currentUserId, data])
+
+  const shiftDateStr = data?.shift
+    ? formatDateTime(data.shift.startTime)
+    : ''
+
   return (
+  <>
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="overflow-y-auto sm:max-w-md">
         <SheetHeader>
@@ -151,6 +186,18 @@ export function ShiftDetailPanel({
               {data.shift.isExtra && (
                 <Badge variant="destructive">{t('shiftDetail.extra')}</Badge>
               )}
+
+              {canRequestSwap && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="mt-2 w-full"
+                  onClick={() => setSwapOptionsOpen(true)}
+                >
+                  <ArrowLeftRight className="mr-2 h-4 w-4" />
+                  {tSwap('requestSwap')}
+                </Button>
+              )}
             </div>
 
             <hr />
@@ -164,5 +211,59 @@ export function ShiftDetailPanel({
         )}
       </SheetContent>
     </Sheet>
+
+    <Dialog open={swapOptionsOpen} onOpenChange={setSwapOptionsOpen}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>{tSwap('swapOptions')}</DialogTitle>
+          <DialogDescription>{tSwap('swapOptionsDescription')}</DialogDescription>
+        </DialogHeader>
+        <div className="space-y-3 py-2">
+          <button
+            type="button"
+            className="w-full rounded-lg border p-4 text-left transition-colors hover:bg-muted/50"
+            onClick={() => {
+              setSwapOptionsOpen(false)
+              setDirectSwapOpen(true)
+            }}
+          >
+            <p className="text-sm font-medium">{tSwap('directSwap')}</p>
+            <p className="text-xs text-muted-foreground">{tSwap('directSwapDescription')}</p>
+          </button>
+          <button
+            type="button"
+            className="w-full rounded-lg border p-4 text-left transition-colors hover:bg-muted/50"
+            onClick={() => {
+              setSwapOptionsOpen(false)
+              setOpenSwapOpen(true)
+            }}
+          >
+            <p className="text-sm font-medium">{tSwap('openSwap')}</p>
+            <p className="text-xs text-muted-foreground">{tSwap('openSwapDescription')}</p>
+          </button>
+        </div>
+      </DialogContent>
+    </Dialog>
+
+    {data?.shift && shiftId && (
+      <>
+        <SwapRequestForm
+          open={directSwapOpen}
+          onOpenChange={setDirectSwapOpen}
+          requesterShiftId={shiftId}
+          areaId={data.shift.area.id}
+          shiftTypeName={data.shift.shiftType.name}
+          shiftDate={shiftDateStr}
+        />
+        <OpenSwapForm
+          open={openSwapOpen}
+          onOpenChange={setOpenSwapOpen}
+          requesterShiftId={shiftId}
+          shiftTypeName={data.shift.shiftType.name}
+          shiftDate={shiftDateStr}
+        />
+      </>
+    )}
+  </>
   )
 }
