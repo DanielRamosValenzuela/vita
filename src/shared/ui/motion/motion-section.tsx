@@ -1,6 +1,6 @@
 'use client'
 
-import { motion, useReducedMotion } from 'framer-motion'
+import { m, useReducedMotion } from 'framer-motion'
 import { useScrollAnimation } from '@/src/shared/lib/animations/use-scroll-animation'
 import {
   fadeInUp,
@@ -36,7 +36,7 @@ export function MotionSection({
   const selectedVariant = variantMap[variant]
 
   return (
-    <motion.section
+    <m.section
       ref={ref}
       initial="hidden"
       animate={isInView ? 'visible' : 'hidden'}
@@ -61,6 +61,6 @@ export function MotionSection({
       className={className}
     >
       {children}
-    </motion.section>
+    </m.section>
   )
 }

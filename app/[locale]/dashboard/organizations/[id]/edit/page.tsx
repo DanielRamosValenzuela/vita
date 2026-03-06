@@ -27,8 +27,10 @@ export default async function EditOrganizationPage({ params }: EditOrganizationP
   const user = await requireSuperAdmin()
   if (!user) redirect(`/${locale}/login`)
 
-  const t = await getTranslations({ locale, namespace: 'superAdmin.editOrganization' })
-  const organization = await getOrganizationById(id)
+  const [t, organization] = await Promise.all([
+    getTranslations({ locale, namespace: 'superAdmin.editOrganization' }),
+    getOrganizationById(id),
+  ])
 
   if (!organization) notFound()
 

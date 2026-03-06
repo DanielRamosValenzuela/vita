@@ -97,9 +97,11 @@ const CONCEPT_COLORS = {
 
 export default async function RatesGuidePage({ params }: RatesGuideProps) {
   const { locale } = await params
-  await requireAdminHRWithOrg(locale)
-  const t = await getTranslations('adminHR.rates.guide')
-  const tf = await getTranslations('adminHR.rates.componentForm')
+  const [, t, tf] = await Promise.all([
+    requireAdminHRWithOrg(locale),
+    getTranslations('adminHR.rates.guide'),
+    getTranslations('adminHR.rates.componentForm'),
+  ])
 
   return (
     <div className="space-y-12 pb-16">

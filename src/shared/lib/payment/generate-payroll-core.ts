@@ -1,5 +1,3 @@
-import { renderToBuffer } from '@react-pdf/renderer'
-
 import { prisma } from '@/src/shared/lib/db'
 import { calculatePayrollForUser } from '@/src/shared/lib/payment/calculate-payroll'
 import {
@@ -15,7 +13,13 @@ import {
   updatePayrollPeriod,
 } from '@/src/entities/payroll/lib/payroll-repository'
 import { createNotification } from '@/src/features/notifications/lib/notification-service'
-import { PayrollDocumentPdf } from '@/src/features/payroll/ui/payroll-document-pdf'
+async function loadPdfModules() {
+  const [{ renderToBuffer }, { PayrollDocumentPdf }] = await Promise.all([
+    import('@react-pdf/renderer'),
+    import('@/src/features/payroll/ui/payroll-document-pdf'),
+  ])
+  return { renderToBuffer, PayrollDocumentPdf }
+}
 
 export interface GeneratePayrollParams {
   organizationId: string
@@ -96,13 +100,15 @@ export async function generatePayrollForOrganization(
   const errors: string[] = []
   const monthStr = String(month).padStart(2, '0')
 
-  for (const user of usersWithContracts) 
+  const { renderToBuffer, PayrollDocumentPdf } = await loadPdfModules()
+
+  for (const user of usersWithContracts)
     try {
       const result = await calculatePayrollForUser(user.id, organizationId, month, year)
 
       if (!result || result.totalAmount <= 0) continue
 
-      
+
       const pdfElement = PayrollDocumentPdf({
         data: result,
         orgName: org.name,

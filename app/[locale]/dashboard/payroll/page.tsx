@@ -30,22 +30,22 @@ export default async function PayrollRoute({ params }: PayrollRouteProps) {
     redirect(`/${locale}/dashboard`)
   
 
-  const organization = await prisma.organization.findUnique({
-    where: { id: session.organizationId },
-    select: { currency: true },
-  })
-
-  if (!organization) 
-    redirect(`/${locale}/dashboard`)
-  
-
   const currentYear = new Date().getFullYear()
-  const periodsResult = await getPayrollPeriodsAction({ year: currentYear })
+  const [organization, periodsResult, t] = await Promise.all([
+    prisma.organization.findUnique({
+      where: { id: session.organizationId },
+      select: { currency: true },
+    }),
+    getPayrollPeriodsAction({ year: currentYear }),
+    getTranslations('payroll'),
+  ])
+
+  if (!organization)
+    redirect(`/${locale}/dashboard`)
+
+
   const initialPeriods = periodsResult.success ? (periodsResult.data ?? []) : []
-
   const isAdmin = session.role === Role.ADMIN_HR
-
-  const t = await getTranslations('payroll')
 
   return (
     <div className="space-y-8">

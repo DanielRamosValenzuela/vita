@@ -2,14 +2,23 @@ import type { Metadata } from 'next'
 import { hasLocale, NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
 import {
+  Bitter,
+  Cormorant_Garamond,
+  Crimson_Pro,
+  DM_Sans,
   Geist,
   Geist_Mono,
   IBM_Plex_Mono,
   Libre_Baskerville,
+  Merriweather,
+  Nunito,
   Outfit,
   Oxanium,
+  Playfair_Display,
   Poppins,
+  Quicksand,
   Source_Code_Pro,
+  Space_Grotesk,
   Space_Mono,
 } from 'next/font/google'
 import { notFound } from 'next/navigation'
@@ -78,6 +87,62 @@ const ibmPlexMono = IBM_Plex_Mono({
   display: 'swap',
 })
 
+const nunito = Nunito({
+  variable: '--font-nunito',
+  subsets: ['latin'],
+  display: 'swap',
+})
+
+const merriweather = Merriweather({
+  variable: '--font-merriweather',
+  subsets: ['latin'],
+  weight: ['300', '400', '700'],
+  display: 'swap',
+})
+
+const dmSans = DM_Sans({
+  variable: '--font-dm-sans',
+  subsets: ['latin'],
+  display: 'swap',
+})
+
+const playfairDisplay = Playfair_Display({
+  variable: '--font-playfair-display',
+  subsets: ['latin'],
+  display: 'swap',
+})
+
+const spaceGrotesk = Space_Grotesk({
+  variable: '--font-space-grotesk',
+  subsets: ['latin'],
+  display: 'swap',
+})
+
+const crimsonPro = Crimson_Pro({
+  variable: '--font-crimson-pro',
+  subsets: ['latin'],
+  display: 'swap',
+})
+
+const quicksand = Quicksand({
+  variable: '--font-quicksand',
+  subsets: ['latin'],
+  display: 'swap',
+})
+
+const cormorantGaramond = Cormorant_Garamond({
+  variable: '--font-cormorant-garamond',
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  display: 'swap',
+})
+
+const bitter = Bitter({
+  variable: '--font-bitter',
+  subsets: ['latin'],
+  display: 'swap',
+})
+
 export const metadata: Metadata = siteMetadata
 
 interface LocaleLayoutProps {
@@ -95,7 +160,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
   return (
     <html lang={locale} suppressHydrationWarning className="h-full">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${oxanium.variable} ${outfit.variable} ${sourceCodePro.variable} ${spaceMono.variable} ${poppins.variable} ${libreBaskerville.variable} ${ibmPlexMono.variable} h-full antialiased font-sans`}
+        className={`${geistSans.variable} ${geistMono.variable} ${oxanium.variable} ${outfit.variable} ${sourceCodePro.variable} ${spaceMono.variable} ${poppins.variable} ${libreBaskerville.variable} ${ibmPlexMono.variable} ${nunito.variable} ${merriweather.variable} ${dmSans.variable} ${playfairDisplay.variable} ${spaceGrotesk.variable} ${crimsonPro.variable} ${quicksand.variable} ${cormorantGaramond.variable} ${bitter.variable} h-full antialiased font-sans`}
         suppressHydrationWarning
       >
         <NextIntlClientProvider locale={locale} messages={messages}>

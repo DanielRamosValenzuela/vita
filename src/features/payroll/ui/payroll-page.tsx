@@ -32,9 +32,17 @@ export function PayrollPage({ role, initialPeriods, currency }: PayrollPageProps
   const t = useTranslations('payroll')
   const currentYear = new Date().getFullYear()
   const [year, setYear] = useState<string>(String(currentYear))
-  const [periods, setPeriods] = useState<PayrollPeriodSummary[]>(initialPeriods)
-  const [selectedPeriodId, setSelectedPeriodId] = useState<string | null>(null)
-  const [documents, setDocuments] = useState<PayrollDocumentSummary[]>([])
+  const [periodsState, setPeriodsState] = useState({
+    periods: initialPeriods,
+    prevInitial: initialPeriods,
+  })
+  if (initialPeriods !== periodsState.prevInitial)
+    setPeriodsState({ periods: initialPeriods, prevInitial: initialPeriods })
+
+  const [selection, setSelection] = useState<{
+    periodId: string | null
+    documents: PayrollDocumentSummary[]
+  }>({ periodId: null, documents: [] })
   const [, startTransition] = useTransition()
 
   const years = Array.from({ length: 5 }, (_, i) => currentYear - i)
@@ -44,9 +52,8 @@ export function PayrollPage({ role, initialPeriods, currency }: PayrollPageProps
     (yearValue: string) => {
       startTransition(async () => {
         const result = await getPayrollPeriodsAction({ year: parseInt(yearValue) })
-        if (result.success && result.data) 
-          setPeriods(result.data)
-        
+        if (result.success && result.data)
+          setPeriodsState((prev) => ({ ...prev, periods: result.data! }))
       })
     },
     [startTransition]
@@ -56,9 +63,8 @@ export function PayrollPage({ role, initialPeriods, currency }: PayrollPageProps
     (periodId: string) => {
       startTransition(async () => {
         const result = await getPayrollDocumentsAction({ periodId })
-        if (result.success && result.data) 
-          setDocuments(result.data)
-        
+        if (result.success && result.data)
+          setSelection((prev) => ({ ...prev, documents: result.data! }))
       })
     },
     [startTransition]
@@ -69,18 +75,18 @@ export function PayrollPage({ role, initialPeriods, currency }: PayrollPageProps
   }, [year, loadPeriods])
 
   const handleSelectPeriod = (periodId: string) => {
-    setSelectedPeriodId(periodId)
+    setSelection((prev) => ({ ...prev, periodId }))
     loadDocuments(periodId)
   }
 
   const handleRefresh = () => {
-    if (selectedPeriodId) 
-      loadDocuments(selectedPeriodId)
-    
+    if (selection.periodId)
+      loadDocuments(selection.periodId)
+
     loadPeriods(year)
   }
 
-  const selectedPeriod = periods.find((p) => p.id === selectedPeriodId)
+  const selectedPeriod = periodsState.periods.find((p) => p.id === selection.periodId)
 
   return (
     <div className="space-y-6">
@@ -106,8 +112,8 @@ export function PayrollPage({ role, initialPeriods, currency }: PayrollPageProps
         <div>
           <h3 className="mb-3 text-sm font-medium">{t('periods.title')}</h3>
           <PayrollPeriodsList
-            periods={periods}
-            selectedPeriodId={selectedPeriodId}
+            periods={periodsState.periods}
+            selectedPeriodId={selection.periodId}
             onSelectPeriod={handleSelectPeriod}
             currency={currency}
           />
@@ -125,7 +131,7 @@ export function PayrollPage({ role, initialPeriods, currency }: PayrollPageProps
               </CardHeader>
               <CardContent>
                 <PayrollDocumentsTable
-                  documents={documents}
+                  documents={selection.documents}
                   periodId={selectedPeriod.id}
                   currency={currency}
                   isAdminHR={isAdmin}

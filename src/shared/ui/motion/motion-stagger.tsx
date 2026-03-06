@@ -1,6 +1,6 @@
 'use client'
 
-import { motion, useReducedMotion } from 'framer-motion'
+import { m, useReducedMotion } from 'framer-motion'
 import { useScrollAnimation } from '@/src/shared/lib/animations/use-scroll-animation'
 
 interface MotionStaggerProps {
@@ -18,7 +18,7 @@ export function MotionStagger({
   const shouldReduceMotion = useReducedMotion()
 
   return (
-    <motion.div
+    <m.div
       ref={ref}
       initial="hidden"
       animate={isInView ? 'visible' : 'hidden'}
@@ -42,6 +42,6 @@ export function MotionStagger({
       className={className}
     >
       {children}
-    </motion.div>
+    </m.div>
   )
 }

@@ -48,7 +48,6 @@ export function NotePopoverContent({
         rows={3}
         className="min-h-[72px] resize-none text-sm"
         disabled={isSaving}
-        autoFocus
       />
       <div className="flex items-center justify-between">
         <span className="text-xs text-muted-foreground">

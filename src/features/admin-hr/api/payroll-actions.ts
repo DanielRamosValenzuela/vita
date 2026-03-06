@@ -1,6 +1,5 @@
 'use server'
 
-import { renderToBuffer } from '@react-pdf/renderer'
 import { z } from 'zod'
 
 import { requireAdminHRWithOrg } from '@/src/shared/lib/auth'
@@ -21,7 +20,13 @@ import {
 } from '@/src/entities/payroll/lib/payroll-repository'
 import { createNotification } from '@/src/features/notifications/lib/notification-service'
 
-import { PayrollDocumentPdf } from '@/src/features/payroll/ui/payroll-document-pdf'
+async function loadPdfModules() {
+  const [{ renderToBuffer }, { PayrollDocumentPdf }] = await Promise.all([
+    import('@react-pdf/renderer'),
+    import('@/src/features/payroll/ui/payroll-document-pdf'),
+  ])
+  return { renderToBuffer, PayrollDocumentPdf }
+}
 
 const PAYROLL_PATHS = ['/dashboard/payroll', '/dashboard/rates'] as const
 
@@ -199,6 +204,7 @@ export async function regeneratePayrollDocumentAction(
     })
 
     const monthStr = String(period.month).padStart(2, '0')
+    const { renderToBuffer, PayrollDocumentPdf } = await loadPdfModules()
     const pdfElement = PayrollDocumentPdf({
       data: result,
       orgName: org.name,

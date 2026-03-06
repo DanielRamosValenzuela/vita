@@ -12,12 +12,14 @@ export default async function LoginPage({
   params: Promise<{ locale: string }>
   searchParams: Promise<{ callbackUrl?: string; registered?: string }>
 }) {
-  const [{ locale }, session] = await Promise.all([params, getServerSession(authOptions)])
+  const [{ locale }, session, { registered, callbackUrl }] = await Promise.all([
+    params,
+    getServerSession(authOptions),
+    searchParams,
+  ])
   const t = await getTranslations({ locale, namespace: 'auth' })
 
   if (session) redirect(`/${locale}`)
-
-  const { registered, callbackUrl } = await searchParams
 
   return (
     <main className="bg-background relative min-h-screen font-sans">

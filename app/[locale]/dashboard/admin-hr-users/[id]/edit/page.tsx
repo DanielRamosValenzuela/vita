@@ -24,14 +24,15 @@ export default async function EditAdminHRUserPage({ params }: EditAdminHRUserPag
     getTranslations('superAdmin.editAdminHRUser'),
     params,
   ])
-  const user = await getAdminHRUserById(id)
+  const [user, organizations] = await Promise.all([
+    getAdminHRUserById(id),
+    prisma.organization.findMany({
+      where: { status: 'ACTIVE' },
+      orderBy: { name: 'asc' },
+    }),
+  ])
 
   if (!user) notFound()
-
-  const organizations = await prisma.organization.findMany({
-    where: { status: 'ACTIVE' },
-    orderBy: { name: 'asc' },
-  })
 
   return (
     <div className="space-y-6">

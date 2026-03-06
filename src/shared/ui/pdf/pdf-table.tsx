@@ -37,8 +37,8 @@ export function PdfTable({ columns, data, totalRow }: PdfTableProps) {
       </View>
 
       {}
-      {data.map((row, index) => (
-        <View key={index} style={pdfStyles.tableRow}>
+      {data.map((row, rowIdx) => (
+        <View key={`row-${columns.map(c => row[c.key]).join('-')}-${rowIdx}`} style={pdfStyles.tableRow}>
           {columns.map((col) => (
             <Text
               key={col.key}

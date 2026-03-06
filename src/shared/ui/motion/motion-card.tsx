@@ -1,6 +1,6 @@
 'use client'
 
-import { motion, useReducedMotion } from 'framer-motion'
+import { m, useReducedMotion } from 'framer-motion'
 import { fadeInUp } from '@/src/shared/lib/animations/motion-variants'
 
 interface MotionCardProps {
@@ -19,7 +19,7 @@ export function MotionCard({
   const shouldReduceMotion = useReducedMotion()
 
   return (
-    <motion.div
+    <m.div
       variants={
         shouldReduceMotion
           ? {
@@ -40,6 +40,6 @@ export function MotionCard({
       className={className}
     >
       {children}
-    </motion.div>
+    </m.div>
   )
 }
