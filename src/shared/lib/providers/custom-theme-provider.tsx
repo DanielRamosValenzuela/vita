@@ -14,7 +14,10 @@ const CustomThemeContext = createContext<CustomThemeContextType | undefined>(und
 
 export function CustomThemeProvider({ children }: { children: React.ReactNode }) {
   const [themes] = useState<Theme[]>(themesList)
-  const [currentThemeId, setCurrentThemeId] = useState<string>('default')
+  const [currentThemeId, setCurrentThemeId] = useState<string>(() => {
+    if (typeof window === 'undefined') return 'default'
+    return getStoredThemeId() || 'default'
+  })
 
   const applyThemeClass = useCallback((themeId: string) => {
     if (typeof document === 'undefined') return
@@ -31,12 +34,8 @@ export function CustomThemeProvider({ children }: { children: React.ReactNode })
   }, [])
 
   useEffect(() => {
-    const stored = getStoredThemeId()
-    if (stored) {
-      setCurrentThemeId(stored)
-      applyThemeClass(stored)
-    }
-  }, [applyThemeClass])
+    applyThemeClass(currentThemeId)
+  }, [applyThemeClass, currentThemeId])
 
   const currentTheme = themes.find((t) => t.id === currentThemeId) || themesList[0]
 

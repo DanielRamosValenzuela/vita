@@ -158,7 +158,9 @@
       "AR": "Argentina",
       "MX": "México",
       "US": "Estados Unidos"
-    }
+    },
+    "showPassword": "Mostrar contraseña",
+    "hidePassword": "Ocultar contraseña"
   },
   "meta": {
     "title": "VITA - Gestión de Turnos Médicos",
@@ -1705,19 +1707,19 @@
       "noOrganization": "No tienes una organización asignada",
       "loadError": "Error al cargar",
       "staffTable": {
-        "title": "Personal y tarifas",
+        "title": "Personal con Contratos",
+        "description": "Visualiza el personal y sus contratos activos",
         "person": "Persona",
         "area": "Área",
-        "rateSource": "Origen",
-        "effectiveRate": "Tarifa efectiva",
-        "baseSalary": "Sueldo base",
+        "rateTemplate": "Plantilla de Tarifa",
+        "status": "Estado",
+        "statusActive": "Activo",
+        "statusNoContract": "Sin contrato",
+        "multiplier": "Multiplicador",
+        "multiplierValue": "Multiplicador: {value}x",
         "actions": "Acciones",
-        "noContract": "Sin contrato",
-        "source": {
-          "template": "Tipo: {name}",
-          "template_adjusted": "Tipo: {name} + {adjustment}",
-          "custom": "Personalizada"
-        }
+        "endContract": "Finalizar contrato",
+        "viewRates": "Ver tarifas ({count})"
       },
       "rateTemplates": {
         "title": "Plantillas de Tarifa",
@@ -1735,21 +1737,6 @@
           "duplicate": "Duplicar",
           "delete": "Eliminar"
         }
-      },
-      "staffTable": {
-        "title": "Personal con Contratos",
-        "description": "Visualiza el personal y sus contratos activos",
-        "person": "Persona",
-        "area": "Área",
-        "rateTemplate": "Plantilla de Tarifa",
-        "status": "Estado",
-        "statusActive": "Activo",
-        "statusNoContract": "Sin contrato",
-        "multiplier": "Multiplicador",
-        "multiplierValue": "Multiplicador: {value}x",
-        "actions": "Acciones",
-        "endContract": "Finalizar contrato",
-        "viewRates": "Ver tarifas ({count})"
       },
       "contract": {
         "create": "Asignar tarifa",
@@ -2240,7 +2227,24 @@
       "monthlyFeeMax": "La tarifa mensual no puede exceder $1,000,000"
     },
     "organization": {
-      "required": "La organización es obligatoria"
+      "nameMinLength": "El nombre debe tener al menos {min} caracteres",
+      "nameMaxLength": "El nombre no puede exceder {max} caracteres",
+      "contactNameMinLength": "El nombre de contacto debe tener al menos {min} caracteres",
+      "contactNameMaxLength": "El nombre de contacto no puede exceder {max} caracteres",
+      "contactEmailMaxLength": "El email no puede exceder {max} caracteres",
+      "contactPhoneMinLength": "El teléfono debe tener al menos {min} caracteres",
+      "contactPhoneMaxLength": "El teléfono no puede exceder {max} caracteres",
+      "addressMaxLength": "La dirección no puede exceder {max} caracteres",
+      "monthlyFeeMin": "La tarifa mensual no puede ser negativa",
+      "monthlyFeeMax": "La tarifa mensual no puede exceder $1,000,000",
+      "limitInteger": "Debe ser un número entero",
+      "limitMin": "El límite no puede ser negativo",
+      "limitMax": "El límite no puede exceder {max}",
+      "planLimitMaxAdminHRExceeded": "El límite de Admin HR excede el máximo permitido para este plan",
+      "planLimitMaxChiefsExceeded": "El límite de Jefes excede el máximo permitido para este plan",
+      "planLimitMaxStaffExceeded": "El límite de Staff excede el máximo permitido para este plan",
+      "taxIdMinLength": "El RUT/Tax ID debe tener al menos {min} caracteres",
+      "taxIdMaxLength": "El RUT/Tax ID no puede exceder {max} caracteres"
     },
     "reason": {
       "minLength": "La razón debe tener al menos {min} caracteres",
@@ -2262,26 +2266,6 @@
       "nameMinLength": "El nombre debe tener al menos {min} caracteres",
       "nameMaxLength": "El nombre no puede exceder {max} caracteres",
       "descriptionMaxLength": "La descripción no puede exceder {max} caracteres"
-    },
-    "organization": {
-      "nameMinLength": "El nombre debe tener al menos {min} caracteres",
-      "nameMaxLength": "El nombre no puede exceder {max} caracteres",
-      "contactNameMinLength": "El nombre de contacto debe tener al menos {min} caracteres",
-      "contactNameMaxLength": "El nombre de contacto no puede exceder {max} caracteres",
-      "contactEmailMaxLength": "El email no puede exceder {max} caracteres",
-      "contactPhoneMinLength": "El teléfono debe tener al menos {min} caracteres",
-      "contactPhoneMaxLength": "El teléfono no puede exceder {max} caracteres",
-      "addressMaxLength": "La dirección no puede exceder {max} caracteres",
-      "monthlyFeeMin": "La tarifa mensual no puede ser negativa",
-      "monthlyFeeMax": "La tarifa mensual no puede exceder $1,000,000",
-      "limitInteger": "Debe ser un número entero",
-      "limitMin": "El límite no puede ser negativo",
-      "limitMax": "El límite no puede exceder {max}",
-      "planLimitMaxAdminHRExceeded": "El límite de Admin HR excede el máximo permitido para este plan",
-      "planLimitMaxChiefsExceeded": "El límite de Jefes excede el máximo permitido para este plan",
-      "planLimitMaxStaffExceeded": "El límite de Staff excede el máximo permitido para este plan",
-      "taxIdMinLength": "El RUT/Tax ID debe tener al menos {min} caracteres",
-      "taxIdMaxLength": "El RUT/Tax ID no puede exceder {max} caracteres"
     },
     "adminHRUser": {
       "emailInvalid": "Email inválido"

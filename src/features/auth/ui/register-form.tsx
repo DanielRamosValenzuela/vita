@@ -1,10 +1,10 @@
 'use client'
 
-import { useEffect, useReducer, useRef } from 'react'
+import { useEffect, useReducer, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { Country } from '@prisma/client'
-import { HelpCircle } from 'lucide-react'
+import { Eye, EyeOff, HelpCircle } from 'lucide-react'
 
 import { getDocTypeForCountry } from '@/src/shared/lib/utils/doc-type-mapper'
 import { formatTaxId, getTaxIdConfig, validateTaxId } from '@/src/shared/lib/utils/tax-id-config'
@@ -86,6 +86,8 @@ export function RegisterForm() {
   const formRef = useRef<HTMLFormElement>(null)
 
   const { loading, errors, generalError, country, docNumberValue, docNumberError } = state
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const taxIdConfig = getTaxIdConfig(country)
   const docType = getDocTypeForCountry(country)
@@ -273,7 +275,17 @@ export function RegisterForm() {
             </TooltipContent>
           </Tooltip>
         </div>
-        <Input type="password" id="password" name="password" required placeholder="••••••••" />
+        <div className="relative">
+          <Input type={showPassword ? 'text' : 'password'} id="password" name="password" required placeholder="••••••••" className="pr-10" />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            aria-label={showPassword ? t('hidePassword') : t('showPassword')}
+          >
+            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+          </button>
+        </div>
         {errors.password && (
           <p className="text-destructive text-sm" role="alert">
             {errors.password[0]}
@@ -283,7 +295,17 @@ export function RegisterForm() {
 
       <div className="space-y-2">
         <Label htmlFor="confirmPassword">{t('confirmPassword')}</Label>
-        <Input type="password" id="confirmPassword" name="confirmPassword" required />
+        <div className="relative">
+          <Input type={showConfirmPassword ? 'text' : 'password'} id="confirmPassword" name="confirmPassword" required className="pr-10" />
+          <button
+            type="button"
+            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            aria-label={showConfirmPassword ? t('hidePassword') : t('showPassword')}
+          >
+            {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+          </button>
+        </div>
         {errors.confirmPassword && (
           <p className="text-destructive text-sm" role="alert">
             {errors.confirmPassword[0]}

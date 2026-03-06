@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { startTransition, useCallback, useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { ArrowLeftRight, Clock, Loader2, MapPin, Star } from 'lucide-react'
 
@@ -70,7 +70,7 @@ export function ShiftDetailPanel({
 
   useEffect(() => {
     if (open && shiftId)
-      fetchPersonnel(shiftId)
+      startTransition(() => { void fetchPersonnel(shiftId) })
   }, [open, shiftId, fetchPersonnel])
 
   const isNightShift =
@@ -82,12 +82,14 @@ export function ShiftDetailPanel({
   useEffect(() => {
     if (currentUserId && data?.shift) {
       const threshold = Date.now() + 24 * 60 * 60 * 1000
-      setCanRequestSwap(
-        data.shift.status === 'SCHEDULED' &&
-        new Date(data.shift.startTime).getTime() > threshold
+      startTransition(() =>
+        setCanRequestSwap(
+          data.shift.status === 'SCHEDULED' &&
+          new Date(data.shift.startTime).getTime() > threshold
+        )
       )
     } else
-      setCanRequestSwap(false)
+      startTransition(() => setCanRequestSwap(false))
   }, [currentUserId, data])
 
   const shiftDateStr = data?.shift

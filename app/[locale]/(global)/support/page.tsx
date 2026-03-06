@@ -4,6 +4,7 @@ import { Rocket, Calendar, CreditCard, UserCircle, ChevronRight } from 'lucide-r
 
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardHeader } from '@/src/shared/ui/card'
+import { PageAnimationWrapper, PageSection } from '@/src/shared/ui/motion'
 
 interface SupportPageProps {
   params: Promise<{ locale: string }>
@@ -25,8 +26,8 @@ export default async function SupportPage({ params }: SupportPageProps) {
   const t = await getTranslations('supportPage')
 
   return (
-    <div className="flex flex-col">
-      <section className="bg-background py-20 text-center">
+    <PageAnimationWrapper className="flex flex-col">
+      <PageSection className="bg-background py-20 text-center">
         <div className="container mx-auto max-w-4xl px-4">
           <h1 className="mb-4 text-4xl font-bold tracking-tight sm:text-5xl">
             {t('title')}
@@ -35,16 +36,16 @@ export default async function SupportPage({ params }: SupportPageProps) {
             {t('description')}
           </p>
         </div>
-      </section>
+      </PageSection>
 
-      <section className="bg-muted/30 py-20">
+      <PageSection className="bg-muted/30 py-20">
         <div className="container mx-auto max-w-6xl px-4">
           <div className="grid gap-8 sm:grid-cols-2">
             {categories.map((category) => {
               const { Icon, key } = category
               const categoryKey = key as CategoryKey
               return (
-                <Card key={key}>
+                <Card key={key} className="transition-shadow hover:shadow-lg">
                   <CardHeader className="pb-3">
                     <div className="mb-2 flex items-center gap-3">
                       <div className="bg-primary/10 text-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
@@ -75,9 +76,9 @@ export default async function SupportPage({ params }: SupportPageProps) {
             })}
           </div>
         </div>
-      </section>
+      </PageSection>
 
-      <section className="bg-background py-20 text-center">
+      <PageSection className="bg-background py-20 text-center">
         <div className="container mx-auto max-w-3xl px-4">
           <h2 className="mb-4 text-3xl font-bold tracking-tight">
             {t('contact.title')}
@@ -89,7 +90,7 @@ export default async function SupportPage({ params }: SupportPageProps) {
             <Link href={`/${locale}/contact`}>{t('contact.button')}</Link>
           </Button>
         </div>
-      </section>
-    </div>
+      </PageSection>
+    </PageAnimationWrapper>
   )
 }

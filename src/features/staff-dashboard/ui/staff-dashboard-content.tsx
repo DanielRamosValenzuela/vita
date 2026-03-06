@@ -231,7 +231,7 @@ export function StaffDashboardContent({
 
   useEffect(() => {
     if (!panelOpen)
-      refreshUpcoming()
+      startTransition(() => { void refreshUpcoming() })
   }, [panelOpen, refreshUpcoming])
 
   const notePopoverContent = selectedDate

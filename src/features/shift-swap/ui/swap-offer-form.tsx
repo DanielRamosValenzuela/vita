@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { startTransition, useCallback, useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
@@ -67,7 +67,7 @@ export function SwapOfferForm({
 
   useEffect(() => {
     if (open)
-      loadShifts()
+      startTransition(() => { void loadShifts() })
   }, [open, loadShifts])
 
   const handleSubmit = async () => {

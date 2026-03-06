@@ -20,16 +20,21 @@ export default async function LoginPage({
   const { registered, callbackUrl } = await searchParams
 
   return (
-    <main className="bg-background fixed inset-0 overflow-y-auto font-sans">
-      <section className="flex min-h-full items-start justify-center px-4 pt-16 pb-20 sm:px-6 lg:px-8">
-        <article className="w-full max-w-md space-y-8 py-8">
-          <header>
-            <h1 className="text-foreground mt-6 text-center text-3xl font-bold tracking-tight">
+    <main className="bg-background relative min-h-screen font-sans">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="bg-primary/5 absolute -top-40 -right-40 h-80 w-80 rounded-full blur-3xl" />
+        <div className="bg-primary/5 absolute -bottom-40 -left-40 h-80 w-80 rounded-full blur-3xl" />
+      </div>
+
+      <section className="relative flex min-h-screen items-center justify-center px-4 py-16 sm:px-6 lg:px-8">
+        <article className="w-full max-w-md space-y-6">
+          <header className="text-center">
+            <h1 className="text-foreground text-3xl font-bold tracking-tight">
               {t('signInTitle')}
             </h1>
             {registered === 'true' && (
               <p
-                className="mt-2 text-center text-sm text-green-600"
+                className="mt-2 text-sm text-green-600"
                 role="status"
                 aria-live="polite"
               >
@@ -37,7 +42,7 @@ export default async function LoginPage({
               </p>
             )}
           </header>
-          <section className="bg-card rounded-lg px-8 py-8 shadow">
+          <section className="bg-card rounded-xl border px-8 py-8 shadow-sm">
             <LoginForm callbackUrl={callbackUrl} />
           </section>
         </article>

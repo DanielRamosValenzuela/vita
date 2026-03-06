@@ -3,9 +3,9 @@
 import { Quote } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
-import { cn } from '@/src/shared/lib/utils'
 import { Badge } from '@/src/shared/ui/badge'
 import { Card, CardContent } from '@/src/shared/ui/card'
+import { MotionCard, MotionSection, MotionStagger } from '@/src/shared/ui/motion'
 
 interface Testimonial {
   quote: string
@@ -35,7 +35,7 @@ export function TestimonialsSection() {
   ]
 
   return (
-    <section className={cn('bg-muted/30 py-20')}>
+    <MotionSection className="bg-muted/30 py-20">
       <div className="container mx-auto max-w-6xl px-4">
         <div className="mb-12 flex flex-col items-center text-center">
           <Badge variant="outline" className="mb-4">
@@ -47,23 +47,25 @@ export function TestimonialsSection() {
           <p className="text-muted-foreground max-w-2xl text-lg">{t('testimonials.description')}</p>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <MotionStagger className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {testimonials.map((testimonial) => (
-            <Card key={testimonial.name} className="flex flex-col">
-              <CardContent className="flex flex-1 flex-col pt-6">
-                <Quote className="text-primary/30 mb-4 h-8 w-8 shrink-0" />
-                <p className="text-muted-foreground mb-6 flex-1 text-sm italic">
-                  {testimonial.quote}
-                </p>
-                <div className="border-t pt-4">
-                  <p className="font-semibold">{testimonial.name}</p>
-                  <p className="text-muted-foreground text-xs">{testimonial.roleOrg}</p>
-                </div>
-              </CardContent>
-            </Card>
+            <MotionCard key={testimonial.name}>
+              <Card className="flex h-full flex-col transition-shadow hover:shadow-lg">
+                <CardContent className="flex flex-1 flex-col pt-6">
+                  <Quote className="text-primary/30 mb-4 h-8 w-8 shrink-0" />
+                  <p className="text-muted-foreground mb-6 flex-1 text-sm italic">
+                    {testimonial.quote}
+                  </p>
+                  <div className="border-t pt-4">
+                    <p className="font-semibold">{testimonial.name}</p>
+                    <p className="text-muted-foreground text-xs">{testimonial.roleOrg}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </MotionCard>
           ))}
-        </div>
+        </MotionStagger>
       </div>
-    </section>
+    </MotionSection>
   )
 }

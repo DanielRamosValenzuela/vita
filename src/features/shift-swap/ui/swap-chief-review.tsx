@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { startTransition, useCallback, useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { ArrowLeftRight, Check, Loader2, X } from 'lucide-react'
 import { toast } from 'sonner'
@@ -51,7 +51,7 @@ export function SwapChiefReview() {
   }, [])
 
   useEffect(() => {
-    load()
+    startTransition(() => { void load() })
   }, [load])
 
   const handleReview = async (requestId: string, approve: boolean, note?: string) => {

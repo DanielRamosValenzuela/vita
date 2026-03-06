@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import type { Role } from '@prisma/client'
 
@@ -18,14 +18,14 @@ interface RequestsPageProps {
 
 export function RequestsPage({ showApprovals, userRole }: RequestsPageProps) {
   const t = useTranslations('requests')
-  const [activeTab, setActiveTab] = useState('swaps')
-
-  useEffect(() => {
+  const [activeTab, setActiveTab] = useState(() => {
+    if (typeof window === 'undefined') return 'swaps'
     const params = new URLSearchParams(window.location.search)
     const tab = params.get('tab')
     if (tab && ['swaps', 'extraShifts', 'approvals'].includes(tab))
-      setActiveTab(tab)
-  }, [])
+      return tab
+    return 'swaps'
+  })
 
   return (
     <div className="space-y-6">

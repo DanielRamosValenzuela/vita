@@ -126,11 +126,11 @@ export function RateTemplateForm({
   }, [t])
 
   useEffect(() => {
-    if (mode === 'edit' && existingTemplate) setFormState(mapTemplateToState(existingTemplate))
+    if (mode === 'edit' && existingTemplate) startTransition(() => setFormState(mapTemplateToState(existingTemplate)))
   }, [mode, existingTemplate, open])
 
   useEffect(() => {
-    if (open && shiftTypes.length === 0 && !isLoadingShiftTypes) void loadShiftTypesAndAreas()
+    if (open && shiftTypes.length === 0 && !isLoadingShiftTypes) startTransition(() => { void loadShiftTypesAndAreas() })
   }, [open, shiftTypes.length, isLoadingShiftTypes, loadShiftTypesAndAreas])
 
   const handleDialogOpenChange = (nextOpen: boolean) => {

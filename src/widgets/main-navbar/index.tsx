@@ -1,12 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { signOut, useSession } from 'next-auth/react'
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { Menu, Settings } from 'lucide-react'
+
+import { cn } from '@/src/shared/lib/utils'
 
 import { LanguageSelector, Logo, ThemeSelector, ThemeToggle } from '@/src/shared/ui/atoms'
 import { Button } from '@/src/shared/ui/button'
@@ -31,13 +33,25 @@ export function MainNavbar() {
   const t = useTranslations('nav')
   const tCommon = useTranslations('common')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 10)
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   const isLoading = status === 'loading'
   const isAuthenticated = !!session
   const navLinks = getNavLinks(t, locale)
 
   return (
-    <header className="bg-background/95 supports-backdrop-filter:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">
+    <header className={cn(
+      'sticky top-0 z-50 w-full border-b backdrop-blur transition-all duration-300',
+      scrolled
+        ? 'bg-background/95 supports-backdrop-filter:bg-background/80 shadow-sm'
+        : 'bg-background/95 supports-backdrop-filter:bg-background/60'
+    )}>
       <nav className="container flex h-16 items-center justify-between px-4">
         <div className="flex items-center gap-6">
           <Logo locale={locale} size="sm" />

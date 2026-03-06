@@ -158,7 +158,9 @@
       "AR": "Argentina",
       "MX": "Mexico",
       "US": "United States"
-    }
+    },
+    "showPassword": "Show password",
+    "hidePassword": "Hide password"
   },
   "meta": {
     "title": "VITA - Medical Shift Management",
@@ -847,7 +849,7 @@
       "viewAll": "View All",
       "edit": "Edit Organization",
       "editDescription": "Update organization information",
-      "name": "Name",
+      "name": "Organization",
       "status": "Status",
       "plan": "Plan",
       "accounts": "Accounts",
@@ -944,16 +946,10 @@
         "previous": "Previous",
         "next": "Next"
       },
-      "viewAll": "View All",
-      "new": "New Organization",
-      "name": "Organization",
       "openMenu": "Open menu",
       "accountsAdminHR": "Admin HR:",
       "accountsChiefs": "Chiefs:",
-      "accountsStaff": "Staff:",
-      "status": "Status",
-      "plan": "Plan",
-      "accounts": "Accounts"
+      "accountsStaff": "Staff:"
     },
     "createOrganization": {
       "title": "Create New Organization",
@@ -1711,19 +1707,19 @@
       "noOrganization": "You don't have an organization assigned",
       "loadError": "Error loading",
       "staffTable": {
-        "title": "Staff and rates",
+        "title": "Staff with Contracts",
+        "description": "View staff and their active contracts",
         "person": "Person",
         "area": "Area",
-        "rateSource": "Source",
-        "effectiveRate": "Effective rate",
-        "baseSalary": "Base salary",
+        "rateTemplate": "Rate Template",
+        "status": "Status",
+        "statusActive": "Active",
+        "statusNoContract": "No contract",
+        "multiplier": "Multiplier",
+        "multiplierValue": "Multiplier: {value}x",
         "actions": "Actions",
-        "noContract": "No contract",
-        "source": {
-          "template": "Type: {name}",
-          "template_adjusted": "Type: {name} + {adjustment}",
-          "custom": "Custom"
-        }
+        "endContract": "End contract",
+        "viewRates": "View rates ({count})"
       },
       "rateTemplates": {
         "title": "Rate Templates",
@@ -1741,21 +1737,6 @@
           "duplicate": "Duplicate",
           "delete": "Delete"
         }
-      },
-      "staffTable": {
-        "title": "Staff with Contracts",
-        "description": "View staff and their active contracts",
-        "person": "Person",
-        "area": "Area",
-        "rateTemplate": "Rate Template",
-        "status": "Status",
-        "statusActive": "Active",
-        "statusNoContract": "No contract",
-        "multiplier": "Multiplier",
-        "multiplierValue": "Multiplier: {value}x",
-        "actions": "Actions",
-        "endContract": "End contract",
-        "viewRates": "View rates ({count})"
       },
       "contract": {
         "create": "Assign rate",
@@ -2246,7 +2227,24 @@
       "monthlyFeeMax": "Monthly fee cannot exceed $1,000,000"
     },
     "organization": {
-      "required": "Organization is required"
+      "nameMinLength": "Name must be at least {min} characters",
+      "nameMaxLength": "Name cannot exceed {max} characters",
+      "contactNameMinLength": "Contact name must be at least {min} characters",
+      "contactNameMaxLength": "Contact name cannot exceed {max} characters",
+      "contactEmailMaxLength": "Email cannot exceed {max} characters",
+      "contactPhoneMinLength": "Phone must be at least {min} characters",
+      "contactPhoneMaxLength": "Phone cannot exceed {max} characters",
+      "addressMaxLength": "Address cannot exceed {max} characters",
+      "monthlyFeeMin": "Monthly fee cannot be negative",
+      "monthlyFeeMax": "Monthly fee cannot exceed $1,000,000",
+      "limitInteger": "Must be an integer",
+      "limitMin": "Limit cannot be negative",
+      "limitMax": "Limit cannot exceed {max}",
+      "planLimitMaxAdminHRExceeded": "Admin HR limit exceeds the maximum allowed for this plan",
+      "planLimitMaxChiefsExceeded": "Chiefs limit exceeds the maximum allowed for this plan",
+      "planLimitMaxStaffExceeded": "Staff limit exceeds the maximum allowed for this plan",
+      "taxIdMinLength": "Tax ID must be at least {min} characters",
+      "taxIdMaxLength": "Tax ID cannot exceed {max} characters"
     },
     "reason": {
       "minLength": "Reason must be at least {min} characters",
@@ -2268,26 +2266,6 @@
       "nameMinLength": "Name must be at least {min} characters",
       "nameMaxLength": "Name cannot exceed {max} characters",
       "descriptionMaxLength": "Description cannot exceed {max} characters"
-    },
-    "organization": {
-      "nameMinLength": "Name must be at least {min} characters",
-      "nameMaxLength": "Name cannot exceed {max} characters",
-      "contactNameMinLength": "Contact name must be at least {min} characters",
-      "contactNameMaxLength": "Contact name cannot exceed {max} characters",
-      "contactEmailMaxLength": "Email cannot exceed {max} characters",
-      "contactPhoneMinLength": "Phone must be at least {min} characters",
-      "contactPhoneMaxLength": "Phone cannot exceed {max} characters",
-      "addressMaxLength": "Address cannot exceed {max} characters",
-      "monthlyFeeMin": "Monthly fee cannot be negative",
-      "monthlyFeeMax": "Monthly fee cannot exceed $1,000,000",
-      "limitInteger": "Must be an integer",
-      "limitMin": "Limit cannot be negative",
-      "limitMax": "Limit cannot exceed {max}",
-      "planLimitMaxAdminHRExceeded": "Admin HR limit exceeds the maximum allowed for this plan",
-      "planLimitMaxChiefsExceeded": "Chiefs limit exceeds the maximum allowed for this plan",
-      "planLimitMaxStaffExceeded": "Staff limit exceeds the maximum allowed for this plan",
-      "taxIdMinLength": "Tax ID must be at least {min} characters",
-      "taxIdMaxLength": "Tax ID cannot exceed {max} characters"
     },
     "adminHRUser": {
       "emailInvalid": "Invalid email"

@@ -87,10 +87,10 @@ export function DashboardSidebar({
               key={item.href}
               href={item.href}
               className={cn(
-                'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200',
                 active
                   ? 'bg-primary/10 text-primary border-l-2 border-primary font-semibold'
-                  : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                  : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground hover:translate-x-0.5'
               )}
             >
               <Icon className="h-5 w-5" />

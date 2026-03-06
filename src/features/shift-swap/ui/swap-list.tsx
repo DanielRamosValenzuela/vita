@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { startTransition, useCallback, useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { ArrowLeftRight, Loader2 } from 'lucide-react'
 
@@ -51,7 +51,7 @@ export function SwapList() {
   }, [filter])
 
   useEffect(() => {
-    loadRequests()
+    startTransition(() => { void loadRequests() })
   }, [loadRequests])
 
   return (

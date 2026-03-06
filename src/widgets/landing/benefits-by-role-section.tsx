@@ -2,18 +2,20 @@
 
 import { useState } from 'react'
 
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { CheckCircle2 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
-import { cn } from '@/src/shared/lib/utils'
 import { Badge } from '@/src/shared/ui/badge'
 import { Tabs, TabsList, TabsTrigger } from '@/src/shared/ui/tabs'
+import { MotionSection } from '@/src/shared/ui/motion'
 
 type RoleKey = 'hr' | 'chief' | 'staff'
 
 export function BenefitsByRoleSection() {
   const t = useTranslations('landing')
   const [activeTab, setActiveTab] = useState<RoleKey>('hr')
+  const shouldReduceMotion = useReducedMotion()
 
   const tabs: { key: RoleKey; label: string }[] = [
     { key: 'hr', label: t('benefits.hr.tab') },
@@ -63,7 +65,7 @@ export function BenefitsByRoleSection() {
   const active = content[activeTab]
 
   return (
-    <section className={cn('bg-background py-20')}>
+    <MotionSection className="bg-background py-20">
       <div className="container mx-auto max-w-4xl px-4">
         <div className="mb-12 flex flex-col items-center text-center">
           <Badge variant="outline" className="mb-4">
@@ -91,19 +93,28 @@ export function BenefitsByRoleSection() {
           </div>
         </Tabs>
 
-        <div className="bg-card rounded-xl border p-8 shadow-sm">
-          <h3 className="mb-2 text-xl font-semibold">{active.title}</h3>
-          <p className="text-muted-foreground mb-6 text-sm">{active.description}</p>
-          <ul className="space-y-3">
-            {active.benefits.map((benefit) => (
-              <li key={benefit} className="flex items-start gap-3">
-                <CheckCircle2 className="text-primary mt-0.5 h-5 w-5 shrink-0" />
-                <span className="text-sm">{benefit}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: -10 }}
+            transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.3, ease: 'easeInOut' }}
+            className="bg-card rounded-xl border p-8 shadow-sm"
+          >
+            <h3 className="mb-2 text-xl font-semibold">{active.title}</h3>
+            <p className="text-muted-foreground mb-6 text-sm">{active.description}</p>
+            <ul className="space-y-3">
+              {active.benefits.map((benefit) => (
+                <li key={benefit} className="flex items-start gap-3">
+                  <CheckCircle2 className="text-primary mt-0.5 h-5 w-5 shrink-0" />
+                  <span className="text-sm">{benefit}</span>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+        </AnimatePresence>
       </div>
-    </section>
+    </MotionSection>
   )
 }

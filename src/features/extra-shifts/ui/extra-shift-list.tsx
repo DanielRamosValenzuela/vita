@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { startTransition, useCallback, useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import type { Role } from '@prisma/client'
 import { Calendar, Loader2, Plus } from 'lucide-react'
@@ -62,7 +62,7 @@ export function ExtraShiftList({ userRole: _userRole }: ExtraShiftListProps) {
   }, [tab])
 
   useEffect(() => {
-    load()
+    startTransition(() => { void load() })
   }, [load])
 
   return (

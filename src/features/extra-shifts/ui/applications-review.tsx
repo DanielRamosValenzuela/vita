@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { startTransition, useCallback, useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Check, Loader2, X } from 'lucide-react'
 import { toast } from 'sonner'
@@ -74,7 +74,7 @@ export function ApplicationsReview() {
   }, [])
 
   useEffect(() => {
-    load()
+    startTransition(() => { void load() })
   }, [load])
 
   const handleApprove = async (applicationId: string) => {
