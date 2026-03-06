@@ -31,7 +31,7 @@ export type SwapRequestWithRelations = Prisma.ShiftSwapRequestGetPayload<{
   }
 }>
 
-type SwapOfferWithRelations = Prisma.ShiftSwapOfferGetPayload<{
+export type SwapOfferWithRelations = Prisma.ShiftSwapOfferGetPayload<{
   include: {
     offerer: { select: { id: true; name: true; email: true; image: true; customImage: true } }
     offeredShift: {
@@ -44,7 +44,7 @@ type SwapOfferWithRelations = Prisma.ShiftSwapOfferGetPayload<{
   }
 }>
 
-interface SwapRequestFilters {
+export interface SwapRequestFilters {
   status?: string
   type?: 'sent' | 'received' | 'open'
 }

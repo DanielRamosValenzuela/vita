@@ -42,10 +42,16 @@ Sistema de Gestion de Turnos Medicos — SaaS B2B Multi-Tenant.
 
 | Spec | Feature | Estado |
 |------|---------|--------|
-| [specs/005-staff-dashboard-calendar/](../specs/005-staff-dashboard-calendar/) | Staff Dashboard Calendar | Completado |
+| [specs/009-ui-ux-redesign/](../specs/009-ui-ux-redesign/) | Rediseno UI/UX con Framer Motion | Completado |
+| [specs/008-fix-qa-bugs/](../specs/008-fix-qa-bugs/) | Correccion de bugs QA | Completado |
+| [specs/007-qa-e2e-testing/](../specs/007-qa-e2e-testing/) | QA E2E Testing (122 test cases) | Completado |
+| [specs/006-payroll-billing-pdf/](../specs/006-payroll-billing-pdf/) | Nomina, Pagos y PDF | Completado |
+| [specs/005-staff-dashboard-calendar/](../specs/005-staff-dashboard-calendar/) | Staff Dashboard Calendar | Completado (US5 Google Cal pendiente) |
 | [specs/004-shift-rotations/](../specs/004-shift-rotations/) | Rotativas de Turno | Completado |
 | [specs/003-inbox-notifications/](../specs/003-inbox-notifications/) | Bandeja de Notificaciones | Completado |
-| [specs/001-area-sectors/](../specs/001-area-sectors/) | Areas y Sectores | Completado |
+| [specs/002-shifts-system-fix/](../specs/002-shifts-system-fix/) | Fix Sistema de Turnos | Completado (US4 Edit/Delete pendiente) |
+| [specs/001-org-calendar-ui/](../specs/001-org-calendar-ui/) | Calendario Organizacional UI | Completado |
+| [specs/001-area-sectors/](../specs/001-area-sectors/) | Sectores (Agrupacion de Areas) | Completado (US4 conteo real-time pendiente) |
 
 ## Para Agente IA
 

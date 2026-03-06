@@ -129,7 +129,7 @@ export async function createSwapOffer(
   return prisma.shiftSwapOffer.create({ data })
 }
 
-async function getOffersForRequest(swapRequestId: string) {
+export async function getOffersForRequest(swapRequestId: string) {
   return prisma.shiftSwapOffer.findMany({
     where: { swapRequestId },
     include: {
@@ -181,7 +181,7 @@ export async function getPendingSwapCountForUser(
   return peerPending + chiefPending
 }
 
-async function hasActiveSwapForShift(shiftId: string): Promise<boolean> {
+export async function hasActiveSwapForShift(shiftId: string): Promise<boolean> {
   const count = await prisma.shiftSwapRequest.count({
     where: {
       OR: [

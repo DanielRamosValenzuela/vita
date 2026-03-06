@@ -21,7 +21,7 @@ import {
 
 import { createNotification } from '@/src/features/notifications/lib/notification-service'
 
-async function createSwapOfferAction(
+export async function createSwapOfferAction(
   swapRequestId: string,
   offeredShiftId: string,
   note?: string
@@ -91,7 +91,7 @@ async function createSwapOfferAction(
   }
 }
 
-async function withdrawSwapOfferAction(
+export async function withdrawSwapOfferAction(
   offerId: string
 ): Promise<ActionResult> {
   try {

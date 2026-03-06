@@ -57,7 +57,7 @@ export async function validateSameArea(
   return { valid: true }
 }
 
-async function canUserSwapInArea(
+export async function canUserSwapInArea(
   userId: string,
   areaId: string
 ): Promise<boolean> {

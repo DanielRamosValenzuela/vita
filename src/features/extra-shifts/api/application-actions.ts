@@ -98,7 +98,7 @@ export async function applyToExtraShiftAction(
   }
 }
 
-async function withdrawApplicationAction(
+export async function withdrawApplicationAction(
   applicationId: string
 ): Promise<ActionResult> {
   try {
