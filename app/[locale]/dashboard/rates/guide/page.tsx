@@ -195,149 +195,8 @@ export default async function RatesGuidePage({ params }: RatesGuideProps) {
         </div>
       </section>
 
-      <section className="space-y-6">
-        <SectionHeader icon={Sparkles} title={t('componentTypes.title')} />
-        <p className="text-muted-foreground max-w-3xl">{t('componentTypes.description')}</p>
-
-        <div className="grid gap-6 lg:grid-cols-2">
-          <Card className="border-l-4 border-l-blue-500">
-            <CardHeader className="pb-3">
-              <div className="flex items-center gap-2">
-                <Banknote className="h-5 w-5 text-blue-500" />
-                <CardTitle className="text-lg">{t('componentTypes.fixed.title')}</CardTitle>
-              </div>
-              <CardDescription>{t('componentTypes.fixed.description')}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2">
-                {FIXED_COMPONENTS.map((comp, i) => (
-                  <ComponentItem key={comp} label={tf(`types.${comp}`)} description={t(`componentTypes.fixed.${FIXED_KEYS[i]}`)} />
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-
-          <Card className="border-l-4 border-l-emerald-500">
-            <CardHeader className="pb-3">
-              <div className="flex items-center gap-2">
-                <Clock className="h-5 w-5 text-emerald-500" />
-                <CardTitle className="text-lg">{t('componentTypes.timeBased.title')}</CardTitle>
-              </div>
-              <CardDescription>{t('componentTypes.timeBased.description')}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2">
-                {TIME_COMPONENTS.map((comp, i) => (
-                  <ComponentItem key={comp} label={tf(`types.${comp}`)} description={t(`componentTypes.timeBased.${TIME_KEYS[i]}`)} />
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-
-          <Card className="border-l-4 border-l-amber-500">
-            <CardHeader className="pb-3">
-              <div className="flex items-center gap-2">
-                <Gift className="h-5 w-5 text-amber-500" />
-                <CardTitle className="text-lg">{t('componentTypes.bonuses.title')}</CardTitle>
-              </div>
-              <CardDescription>{t('componentTypes.bonuses.description')}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2">
-                {BONUS_COMPONENTS.map((comp, i) => (
-                  <ComponentItem key={comp} label={tf(`types.${comp}`)} description={t(`componentTypes.bonuses.${BONUS_KEYS[i]}`)} />
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-
-          <Card className="border-l-4 border-l-violet-500">
-            <CardHeader className="pb-3">
-              <div className="flex items-center gap-2">
-                <Percent className="h-5 w-5 text-violet-500" />
-                <CardTitle className="text-lg">{t('componentTypes.multipliers.title')}</CardTitle>
-              </div>
-              <CardDescription>{t('componentTypes.multipliers.description')}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2">
-                {MULTIPLIER_COMPONENTS.map((comp, i) => (
-                  <ComponentItem
-                    key={comp}
-                    label={tf(`types.${comp}`)}
-                    description={t(`componentTypes.multipliers.${MULTIPLIER_KEYS[i]}`)}
-                  />
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-        </div>
-
-        <Card className="border-primary/30 bg-primary/5 border-dashed">
-          <CardHeader className="pb-3">
-            <div className="flex items-center gap-2">
-              <Zap className="text-primary h-5 w-5" />
-              <CardTitle className="text-lg">{t('componentTypes.custom.title')}</CardTitle>
-            </div>
-            <CardDescription>{t('componentTypes.custom.description')}</CardDescription>
-          </CardHeader>
-        </Card>
-      </section>
-
-      <section className="space-y-6">
-        <SectionHeader icon={Calculator} title={t('units.title')} />
-        <p className="text-muted-foreground max-w-3xl">{t('units.description')}</p>
-
-        <div className="grid gap-4 md:grid-cols-3">
-          <Card className="bg-muted/30">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">{t('units.periodic')}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground text-sm">{t('units.periodicDesc')}</p>
-              <div className="mt-3 flex flex-wrap gap-1.5">
-                {PERIODIC_UNITS.map((unit) => (
-                  <Badge key={unit} variant="secondary">
-                    {tf(`units.${unit}`)}
-                  </Badge>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-muted/30">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">{t('units.eventBased')}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground text-sm">{t('units.eventBasedDesc')}</p>
-              <div className="mt-3 flex flex-wrap gap-1.5">
-                {EVENT_UNITS.map((unit) => (
-                  <Badge key={unit} variant="secondary">
-                    {tf(`units.${unit}`)}
-                  </Badge>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-muted/30">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">{t('units.calculated')}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground text-sm">{t('units.calculatedDesc')}</p>
-              <div className="mt-3 flex flex-wrap gap-1.5">
-                {CALCULATED_UNITS.map((unit) => (
-                  <Badge key={unit} variant="secondary">
-                    {tf(`units.${unit}`)}
-                  </Badge>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
+      <ComponentTypesSection t={t} tf={tf} />
+      <UnitsSection t={t} tf={tf} />
 
       <section className="space-y-6">
         <SectionHeader icon={Calendar} title={t('conditions.title')} />
@@ -544,5 +403,157 @@ function TipCard({ number, title, description }: { number: number; title: string
         </div>
       </CardContent>
     </Card>
+  )
+}
+
+function ComponentTypesSection({ t, tf }: { t: (key: string) => string; tf: (key: string) => string }) {
+  return (
+    <section className="space-y-6">
+      <SectionHeader icon={Sparkles} title={t('componentTypes.title')} />
+      <p className="text-muted-foreground max-w-3xl">{t('componentTypes.description')}</p>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Card className="border-l-4 border-l-blue-500">
+          <CardHeader className="pb-3">
+            <div className="flex items-center gap-2">
+              <Banknote className="h-5 w-5 text-blue-500" />
+              <CardTitle className="text-lg">{t('componentTypes.fixed.title')}</CardTitle>
+            </div>
+            <CardDescription>{t('componentTypes.fixed.description')}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2">
+              {FIXED_COMPONENTS.map((comp, i) => (
+                <ComponentItem key={comp} label={tf(`types.${comp}`)} description={t(`componentTypes.fixed.${FIXED_KEYS[i]}`)} />
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+
+        <Card className="border-l-4 border-l-emerald-500">
+          <CardHeader className="pb-3">
+            <div className="flex items-center gap-2">
+              <Clock className="h-5 w-5 text-emerald-500" />
+              <CardTitle className="text-lg">{t('componentTypes.timeBased.title')}</CardTitle>
+            </div>
+            <CardDescription>{t('componentTypes.timeBased.description')}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2">
+              {TIME_COMPONENTS.map((comp, i) => (
+                <ComponentItem key={comp} label={tf(`types.${comp}`)} description={t(`componentTypes.timeBased.${TIME_KEYS[i]}`)} />
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+
+        <Card className="border-l-4 border-l-amber-500">
+          <CardHeader className="pb-3">
+            <div className="flex items-center gap-2">
+              <Gift className="h-5 w-5 text-amber-500" />
+              <CardTitle className="text-lg">{t('componentTypes.bonuses.title')}</CardTitle>
+            </div>
+            <CardDescription>{t('componentTypes.bonuses.description')}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2">
+              {BONUS_COMPONENTS.map((comp, i) => (
+                <ComponentItem key={comp} label={tf(`types.${comp}`)} description={t(`componentTypes.bonuses.${BONUS_KEYS[i]}`)} />
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+
+        <Card className="border-l-4 border-l-violet-500">
+          <CardHeader className="pb-3">
+            <div className="flex items-center gap-2">
+              <Percent className="h-5 w-5 text-violet-500" />
+              <CardTitle className="text-lg">{t('componentTypes.multipliers.title')}</CardTitle>
+            </div>
+            <CardDescription>{t('componentTypes.multipliers.description')}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2">
+              {MULTIPLIER_COMPONENTS.map((comp, i) => (
+                <ComponentItem
+                  key={comp}
+                  label={tf(`types.${comp}`)}
+                  description={t(`componentTypes.multipliers.${MULTIPLIER_KEYS[i]}`)}
+                />
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card className="border-primary/30 bg-primary/5 border-dashed">
+        <CardHeader className="pb-3">
+          <div className="flex items-center gap-2">
+            <Zap className="text-primary h-5 w-5" />
+            <CardTitle className="text-lg">{t('componentTypes.custom.title')}</CardTitle>
+          </div>
+          <CardDescription>{t('componentTypes.custom.description')}</CardDescription>
+        </CardHeader>
+      </Card>
+    </section>
+  )
+}
+
+function UnitsSection({ t, tf }: { t: (key: string) => string; tf: (key: string) => string }) {
+  return (
+    <section className="space-y-6">
+      <SectionHeader icon={Calculator} title={t('units.title')} />
+      <p className="text-muted-foreground max-w-3xl">{t('units.description')}</p>
+
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card className="bg-muted/30">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">{t('units.periodic')}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground text-sm">{t('units.periodicDesc')}</p>
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              {PERIODIC_UNITS.map((unit) => (
+                <Badge key={unit} variant="secondary">
+                  {tf(`units.${unit}`)}
+                </Badge>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-muted/30">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">{t('units.eventBased')}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground text-sm">{t('units.eventBasedDesc')}</p>
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              {EVENT_UNITS.map((unit) => (
+                <Badge key={unit} variant="secondary">
+                  {tf(`units.${unit}`)}
+                </Badge>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-muted/30">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">{t('units.calculated')}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground text-sm">{t('units.calculatedDesc')}</p>
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              {CALCULATED_UNITS.map((unit) => (
+                <Badge key={unit} variant="secondary">
+                  {tf(`units.${unit}`)}
+                </Badge>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </section>
   )
 }
