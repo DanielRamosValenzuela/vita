@@ -1,6 +1,6 @@
 'use client'
 
-import { motion, useReducedMotion } from 'framer-motion'
+import { m, useReducedMotion } from 'framer-motion'
 import { useTranslations } from 'next-intl'
 
 import { fadeInUp, staggerContainer } from '@/src/shared/lib/animations'
@@ -50,7 +50,7 @@ export function HowItWorksSection() {
           <p className="text-muted-foreground max-w-2xl text-lg">{t('howItWorks.description')}</p>
         </div>
 
-        <motion.div
+        <m.div
           className="relative flex flex-col gap-8 md:flex-row md:gap-0"
           initial="hidden"
           whileInView="visible"
@@ -58,7 +58,7 @@ export function HowItWorksSection() {
           variants={containerVariants}
         >
           {steps.map((step, index) => (
-            <motion.div
+            <m.div
               key={step.number}
               className="relative flex flex-1 flex-col items-center text-center"
               variants={itemVariants}
@@ -77,9 +77,9 @@ export function HowItWorksSection() {
                 <h3 className="mb-2 text-base font-semibold">{step.title}</h3>
                 <p className="text-muted-foreground text-sm">{step.description}</p>
               </div>
-            </motion.div>
+            </m.div>
           ))}
-        </motion.div>
+        </m.div>
       </div>
     </MotionSection>
   )

@@ -1,6 +1,6 @@
 'use client'
 
-import { motion, useReducedMotion } from 'framer-motion'
+import { m, useReducedMotion } from 'framer-motion'
 import { scaleIn } from '@/src/shared/lib/animations/motion-variants'
 
 const SHIFT_COLORS = [
@@ -30,7 +30,7 @@ export function HeroDashboardMockup() {
   const shouldReduceMotion = useReducedMotion()
 
   return (
-    <motion.div
+    <m.div
       initial="hidden"
       animate="visible"
       variants={
@@ -129,6 +129,6 @@ export function HeroDashboardMockup() {
           </div>
         </div>
       </div>
-    </motion.div>
+    </m.div>
   )
 }

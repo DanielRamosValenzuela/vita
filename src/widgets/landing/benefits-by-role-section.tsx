@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import { AnimatePresence, m, useReducedMotion } from 'framer-motion'
 import { CheckCircle2 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
@@ -94,7 +94,7 @@ export function BenefitsByRoleSection() {
         </Tabs>
 
         <AnimatePresence mode="wait">
-          <motion.div
+          <m.div
             key={activeTab}
             initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -112,7 +112,7 @@ export function BenefitsByRoleSection() {
                 </li>
               ))}
             </ul>
-          </motion.div>
+          </m.div>
         </AnimatePresence>
       </div>
     </MotionSection>

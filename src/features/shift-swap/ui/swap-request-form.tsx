@@ -1,6 +1,6 @@
 'use client'
 
-import { startTransition, useCallback, useEffect, useState } from 'react'
+import { startTransition, useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { ArrowLeftRight, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
@@ -56,29 +56,31 @@ export function SwapRequestForm({
     user: { id: string; name: string }
     shiftType: { id: string; name: string; color: string; icon: string | null }
   }>>([])
-  const [loading, setLoading] = useState(false)
+  const [status, setStatus] = useState<'idle' | 'loading' | 'submitting'>('idle')
   const [selectedShiftId, setSelectedShiftId] = useState<string | null>(null)
   const [reason, setReason] = useState('')
-  const [submitting, setSubmitting] = useState(false)
 
   const shiftLabel = `${shiftTypeName} \u2014 ${shiftDate}`
 
   const loadShifts = useCallback(async () => {
-    setLoading(true)
+    setStatus('loading')
     const result = await getAvailableShiftsForSwapAction(areaId)
     if (result.success && result.data)
       setShifts(result.data.shifts)
-    setLoading(false)
+    setStatus('idle')
   }, [areaId])
 
+  const prevOpenRef = useRef(false)
   useEffect(() => {
-    if (open)
+    const wasOpen = prevOpenRef.current
+    prevOpenRef.current = open
+    if (open && !wasOpen)
       startTransition(() => { void loadShifts() })
   }, [open, loadShifts])
 
   const handleSubmit = async () => {
     if (!selectedShiftId) return
-    setSubmitting(true)
+    setStatus('submitting')
     const result = await createDirectSwapAction(
       requesterShiftId,
       selectedShiftId,
@@ -91,7 +93,7 @@ export function SwapRequestForm({
       setReason('')
     } else
       toast.error(result.error)
-    setSubmitting(false)
+    setStatus('idle')
   }
 
   return (
@@ -114,7 +116,7 @@ export function SwapRequestForm({
 
           <div>
             <Label>{t('selectTargetShift')}</Label>
-            {loading ? (
+            {status === 'loading' ? (
               <div className="flex items-center justify-center py-6">
                 <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
               </div>
@@ -175,9 +177,9 @@ export function SwapRequestForm({
         <DialogFooter>
           <Button
             onClick={handleSubmit}
-            disabled={!selectedShiftId || submitting}
+            disabled={!selectedShiftId || status === 'submitting'}
           >
-            {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {status === 'submitting' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {t('confirm')}
           </Button>
         </DialogFooter>

@@ -55,9 +55,7 @@ export function ShiftDetailPanel({
   const tSwap = useTranslations('swap')
   const [data, setData] = useState<SectorPersonnelResult | null>(null)
   const [loading, setLoading] = useState(false)
-  const [swapOptionsOpen, setSwapOptionsOpen] = useState(false)
-  const [directSwapOpen, setDirectSwapOpen] = useState(false)
-  const [openSwapOpen, setOpenSwapOpen] = useState(false)
+  const [activeDialog, setActiveDialog] = useState<'options' | 'direct' | 'open' | null>(null)
 
   const fetchPersonnel = useCallback(async (id: string) => {
     setLoading(true)
@@ -194,7 +192,7 @@ export function ShiftDetailPanel({
                   variant="outline"
                   size="sm"
                   className="mt-2 w-full"
-                  onClick={() => setSwapOptionsOpen(true)}
+                  onClick={() => setActiveDialog('options')}
                 >
                   <ArrowLeftRight className="mr-2 h-4 w-4" />
                   {tSwap('requestSwap')}
@@ -214,7 +212,7 @@ export function ShiftDetailPanel({
       </SheetContent>
     </Sheet>
 
-    <Dialog open={swapOptionsOpen} onOpenChange={setSwapOptionsOpen}>
+    <Dialog open={activeDialog === 'options'} onOpenChange={(open) => { if (!open) setActiveDialog(null) }}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{tSwap('swapOptions')}</DialogTitle>
@@ -224,10 +222,7 @@ export function ShiftDetailPanel({
           <button
             type="button"
             className="w-full rounded-lg border p-4 text-left transition-colors hover:bg-muted/50"
-            onClick={() => {
-              setSwapOptionsOpen(false)
-              setDirectSwapOpen(true)
-            }}
+            onClick={() => setActiveDialog('direct')}
           >
             <p className="text-sm font-medium">{tSwap('directSwap')}</p>
             <p className="text-xs text-muted-foreground">{tSwap('directSwapDescription')}</p>
@@ -235,10 +230,7 @@ export function ShiftDetailPanel({
           <button
             type="button"
             className="w-full rounded-lg border p-4 text-left transition-colors hover:bg-muted/50"
-            onClick={() => {
-              setSwapOptionsOpen(false)
-              setOpenSwapOpen(true)
-            }}
+            onClick={() => setActiveDialog('open')}
           >
             <p className="text-sm font-medium">{tSwap('openSwap')}</p>
             <p className="text-xs text-muted-foreground">{tSwap('openSwapDescription')}</p>
@@ -250,16 +242,16 @@ export function ShiftDetailPanel({
     {data?.shift && shiftId && (
       <>
         <SwapRequestForm
-          open={directSwapOpen}
-          onOpenChange={setDirectSwapOpen}
+          open={activeDialog === 'direct'}
+          onOpenChange={(open) => { if (!open) setActiveDialog(null) }}
           requesterShiftId={shiftId}
           areaId={data.shift.area.id}
           shiftTypeName={data.shift.shiftType.name}
           shiftDate={shiftDateStr}
         />
         <OpenSwapForm
-          open={openSwapOpen}
-          onOpenChange={setOpenSwapOpen}
+          open={activeDialog === 'open'}
+          onOpenChange={(open) => { if (!open) setActiveDialog(null) }}
           requesterShiftId={shiftId}
           shiftTypeName={data.shift.shiftType.name}
           shiftDate={shiftDateStr}

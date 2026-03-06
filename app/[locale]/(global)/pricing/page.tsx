@@ -31,8 +31,10 @@ type PlanKey = 'plan1' | 'plan2' | 'plan3'
 
 export default async function PricingPage({ params }: PricingPageProps) {
   const { locale } = await params
-  const t = await getTranslations('pricingPage')
-  const tLanding = await getTranslations('landing')
+  const [t, tLanding] = await Promise.all([
+    getTranslations('pricingPage'),
+    getTranslations('landing'),
+  ])
 
   return (
     <PageAnimationWrapper className="flex flex-col">

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { motion, useReducedMotion } from 'framer-motion'
+import { m, useReducedMotion } from 'framer-motion'
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import { Menu } from 'lucide-react'
@@ -70,7 +70,7 @@ export function DashboardShell({ user, children, unreadNotificationCount, displa
       </div>
 
       <main className="bg-background flex-1 overflow-y-auto pt-14 lg:pt-0">
-        <motion.div
+        <m.div
           key={pathname}
           className="container mx-auto p-4 sm:p-6 lg:p-8"
           initial="hidden"
@@ -82,7 +82,7 @@ export function DashboardShell({ user, children, unreadNotificationCount, displa
           }
         >
           {children}
-        </motion.div>
+        </m.div>
       </main>
     </div>
   )

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import { AnimatePresence, m, useReducedMotion } from 'framer-motion'
 import { ChevronDown } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
@@ -50,16 +50,16 @@ export function FaqSection() {
                   className="flex w-full items-center justify-between px-5 py-4 text-left transition-colors hover:bg-accent/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   <span className="pr-4 text-sm font-medium">{item.q}</span>
-                  <motion.div
+                  <m.div
                     animate={{ rotate: isOpen ? 180 : 0 }}
                     transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.2 }}
                   >
                     <ChevronDown className="text-muted-foreground h-4 w-4 shrink-0" />
-                  </motion.div>
+                  </m.div>
                 </button>
                 <AnimatePresence initial={false}>
                   {isOpen && (
-                    <motion.div
+                    <m.div
                       initial={shouldReduceMotion ? { opacity: 1 } : { height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={shouldReduceMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
@@ -69,7 +69,7 @@ export function FaqSection() {
                       <div className="border-t px-5 pb-4 pt-3">
                         <p className="text-muted-foreground text-sm leading-relaxed">{item.a}</p>
                       </div>
-                    </motion.div>
+                    </m.div>
                   )}
                 </AnimatePresence>
               </div>

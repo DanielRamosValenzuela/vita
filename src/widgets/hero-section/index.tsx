@@ -1,6 +1,6 @@
 'use client'
 
-import { motion, useReducedMotion } from 'framer-motion'
+import { m, useReducedMotion } from 'framer-motion'
 import { ArrowRight, Calendar, Play, Shield, Users } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { useTranslations } from 'next-intl'
@@ -54,45 +54,45 @@ export function HeroSection({ locale }: HeroSectionProps) {
 
       <div className="relative z-10 container mx-auto max-w-7xl">
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
-          <motion.div
+          <m.div
             className="flex flex-col items-center text-center lg:items-start lg:text-left"
             initial="hidden"
             animate="visible"
             variants={containerVariants}
           >
-            <motion.div variants={itemVariants}>
+            <m.div variants={itemVariants}>
               <Badge
                 variant="secondary"
                 className="mb-6 text-sm transition-transform duration-300 hover:scale-105"
               >
                 {t('badge')}
               </Badge>
-            </motion.div>
+            </m.div>
 
-            <motion.h1
+            <m.h1
               variants={itemVariants}
               className="mb-6 text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl lg:text-7xl"
             >
               <span className="block">{t('title.line1')}</span>
               <span className="block text-primary">{t('title.line2')}</span>
-            </motion.h1>
+            </m.h1>
 
-            <motion.p
+            <m.p
               variants={itemVariants}
               className="mb-8 max-w-xl text-lg text-muted-foreground sm:text-xl"
             >
               {t('description')}
-            </motion.p>
+            </m.p>
 
             {isLoading && (
-              <motion.div variants={itemVariants} className="flex flex-col gap-4 sm:flex-row">
+              <m.div variants={itemVariants} className="flex flex-col gap-4 sm:flex-row">
                 <Skeleton className="h-12 w-48" />
                 <Skeleton className="h-12 w-40" />
-              </motion.div>
+              </m.div>
             )}
 
             {!isLoading && !isAuthenticated && (
-              <motion.div variants={itemVariants} className="flex flex-col gap-4 sm:flex-row">
+              <m.div variants={itemVariants} className="flex flex-col gap-4 sm:flex-row">
                 <Button
                   asChild
                   size="lg"
@@ -114,11 +114,11 @@ export function HeroSection({ locale }: HeroSectionProps) {
                     {t('cta.secondary')}
                   </Link>
                 </Button>
-              </motion.div>
+              </m.div>
             )}
 
             {!isLoading && isAuthenticated && (
-              <motion.div variants={itemVariants} className="flex flex-col gap-4 sm:flex-row">
+              <m.div variants={itemVariants} className="flex flex-col gap-4 sm:flex-row">
                 <Button
                   asChild
                   size="lg"
@@ -129,20 +129,20 @@ export function HeroSection({ locale }: HeroSectionProps) {
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
                 </Button>
-              </motion.div>
+              </m.div>
             )}
 
-            <motion.div
+            <m.div
               variants={itemVariants}
               className="mt-8 flex flex-wrap justify-center gap-4 lg:justify-start"
             >
               <TrustPill icon={<Calendar className="h-4 w-4" />} label={t('features.scheduling.title')} />
               <TrustPill icon={<Users className="h-4 w-4" />} label={t('features.staff.title')} />
               <TrustPill icon={<Shield className="h-4 w-4" />} label={t('features.security.title')} />
-            </motion.div>
-          </motion.div>
+            </m.div>
+          </m.div>
 
-          <motion.div
+          <m.div
             className="flex justify-center lg:justify-end"
             initial="hidden"
             animate="visible"
@@ -151,7 +151,7 @@ export function HeroSection({ locale }: HeroSectionProps) {
             <div className="w-full max-w-lg">
               <HeroDashboardMockup />
             </div>
-          </motion.div>
+          </m.div>
         </div>
       </div>
     </section>
