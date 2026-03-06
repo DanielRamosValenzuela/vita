@@ -158,9 +158,13 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
   const messages = await getMessages()
 
   return (
-    <html lang={locale} suppressHydrationWarning className="h-full">
+    <html
+      lang={locale}
+      suppressHydrationWarning
+      className={`h-full ${geistSans.variable} ${geistMono.variable} ${oxanium.variable} ${outfit.variable} ${sourceCodePro.variable} ${spaceMono.variable} ${poppins.variable} ${libreBaskerville.variable} ${ibmPlexMono.variable} ${nunito.variable} ${merriweather.variable} ${dmSans.variable} ${playfairDisplay.variable} ${spaceGrotesk.variable} ${crimsonPro.variable} ${quicksand.variable} ${cormorantGaramond.variable} ${bitter.variable}`}
+    >
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${oxanium.variable} ${outfit.variable} ${sourceCodePro.variable} ${spaceMono.variable} ${poppins.variable} ${libreBaskerville.variable} ${ibmPlexMono.variable} ${nunito.variable} ${merriweather.variable} ${dmSans.variable} ${playfairDisplay.variable} ${spaceGrotesk.variable} ${crimsonPro.variable} ${quicksand.variable} ${cormorantGaramond.variable} ${bitter.variable} h-full antialiased font-sans`}
+        className="h-full antialiased font-sans"
         suppressHydrationWarning
       >
         <NextIntlClientProvider locale={locale} messages={messages}>
