@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl'
 import { cn } from '@/src/shared/lib/utils'
 import { Badge } from '@/src/shared/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/src/shared/ui/card'
+import { MotionCard, MotionSection, MotionStagger } from '@/src/shared/ui/motion'
 
 export function FeaturesSection() {
   const t = useTranslations('landing')
@@ -50,7 +51,7 @@ export function FeaturesSection() {
   ]
 
   return (
-    <section className={cn('bg-background py-20')}>
+    <MotionSection className="bg-background py-20">
       <div className="container mx-auto max-w-6xl px-4">
         <div className="mb-12 flex flex-col items-center text-center">
           <Badge variant="outline" className="mb-4">
@@ -62,31 +63,30 @@ export function FeaturesSection() {
           <p className="text-muted-foreground max-w-2xl text-lg">{t('features.description')}</p>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <MotionStagger className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {features.map((feature) => {
             const Icon = feature.icon
             return (
-              <Card
+              <MotionCard
                 key={feature.title}
-                className={cn(
-                  'hover:border-primary/30 transition-colors',
-                  feature.large && 'md:col-span-1 lg:col-span-2'
-                )}
+                className={cn(feature.large && 'md:col-span-1 lg:col-span-2')}
               >
-                <CardHeader className="pb-2">
-                  <div className="bg-primary/10 text-primary mb-3 flex h-11 w-11 items-center justify-center rounded-lg">
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  <CardTitle className="text-base">{feature.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground text-sm">{feature.description}</p>
-                </CardContent>
-              </Card>
+                <Card className="h-full transition-all hover:border-primary/30 hover:shadow-[0_0_20px_rgba(var(--primary),0.08)]">
+                  <CardHeader className="pb-2">
+                    <div className="bg-primary/10 text-primary mb-3 flex h-11 w-11 items-center justify-center rounded-lg transition-transform duration-300 group-hover:scale-110">
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <CardTitle className="text-base">{feature.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground text-sm">{feature.description}</p>
+                  </CardContent>
+                </Card>
+              </MotionCard>
             )
           })}
-        </div>
+        </MotionStagger>
       </div>
-    </section>
+    </MotionSection>
   )
 }

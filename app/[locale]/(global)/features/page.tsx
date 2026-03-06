@@ -12,6 +12,7 @@ import {
 
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent } from '@/src/shared/ui/card'
+import { PageAnimationWrapper, PageSection } from '@/src/shared/ui/motion'
 
 interface FeaturesPageProps {
   params: Promise<{ locale: string }>
@@ -35,8 +36,8 @@ export default async function FeaturesPage({ params }: FeaturesPageProps) {
   const t = await getTranslations('featuresPage')
 
   return (
-    <div className="flex flex-col">
-      <section className="bg-background py-20 text-center">
+    <PageAnimationWrapper className="flex flex-col">
+      <PageSection className="bg-background py-20 text-center">
         <div className="container mx-auto max-w-4xl px-4">
           <h1 className="mb-4 text-4xl font-bold tracking-tight sm:text-5xl">
             {t('title')}
@@ -45,7 +46,7 @@ export default async function FeaturesPage({ params }: FeaturesPageProps) {
             {t('description')}
           </p>
         </div>
-      </section>
+      </PageSection>
 
       {featureSections.map((section, index) => {
         const { Icon, key, reverse } = section
@@ -53,7 +54,7 @@ export default async function FeaturesPage({ params }: FeaturesPageProps) {
         const isEven = index % 2 === 0
 
         return (
-          <section
+          <PageSection
             key={key}
             className={isEven ? 'bg-background py-20' : 'bg-muted/30 py-20'}
           >
@@ -64,7 +65,7 @@ export default async function FeaturesPage({ params }: FeaturesPageProps) {
                     className={`flex flex-col gap-12 lg:flex-row lg:items-center ${reverse ? 'lg:flex-row-reverse' : ''}`}
                   >
                     <div className="flex flex-1 items-center justify-center">
-                      <div className="bg-primary/10 text-primary flex h-40 w-40 items-center justify-center rounded-3xl">
+                      <div className="bg-primary/10 text-primary flex h-40 w-40 items-center justify-center rounded-3xl transition-transform duration-300 hover:scale-105">
                         <Icon className="h-20 w-20" />
                       </div>
                     </div>
@@ -91,11 +92,11 @@ export default async function FeaturesPage({ params }: FeaturesPageProps) {
                 </CardContent>
               </Card>
             </div>
-          </section>
+          </PageSection>
         )
       })}
 
-      <section className="bg-primary/5 py-20 text-center">
+      <PageSection className="bg-primary/5 py-20 text-center">
         <div className="container mx-auto max-w-3xl px-4">
           <h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl">
             {t('cta.title')}
@@ -107,7 +108,7 @@ export default async function FeaturesPage({ params }: FeaturesPageProps) {
             <Link href={`/${locale}/contact`}>{t('cta.button')}</Link>
           </Button>
         </div>
-      </section>
-    </div>
+      </PageSection>
+    </PageAnimationWrapper>
   )
 }

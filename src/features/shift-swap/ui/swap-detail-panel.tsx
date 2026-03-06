@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { startTransition, useCallback, useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { ArrowLeftRight, Check, Clock, Loader2, User, X } from 'lucide-react'
 import { toast } from 'sonner'
@@ -72,7 +72,7 @@ export function SwapDetailPanel({
 
   useEffect(() => {
     if (open && requestId)
-      load(requestId)
+      startTransition(() => { void load(requestId) })
   }, [open, requestId, load])
 
   const handleRespond = async (accept: boolean) => {

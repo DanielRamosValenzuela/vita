@@ -2,15 +2,17 @@
 
 import { useState } from 'react'
 
+import { AnimatePresence, m, useReducedMotion } from 'framer-motion'
 import { ChevronDown } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
-import { cn } from '@/src/shared/lib/utils'
 import { Badge } from '@/src/shared/ui/badge'
+import { MotionSection } from '@/src/shared/ui/motion'
 
 export function FaqSection() {
   const t = useTranslations('landing')
   const [openIndex, setOpenIndex] = useState<number | null>(null)
+  const shouldReduceMotion = useReducedMotion()
 
   type FaqKey = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8
 
@@ -24,7 +26,7 @@ export function FaqSection() {
   }
 
   return (
-    <section className={cn('bg-muted/30 py-20')}>
+    <MotionSection className="bg-muted/30 py-20">
       <div className="container mx-auto max-w-3xl px-4">
         <div className="mb-12 flex flex-col items-center text-center">
           <Badge variant="outline" className="mb-4">
@@ -48,23 +50,33 @@ export function FaqSection() {
                   className="flex w-full items-center justify-between px-5 py-4 text-left transition-colors hover:bg-accent/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   <span className="pr-4 text-sm font-medium">{item.q}</span>
-                  <ChevronDown
-                    className={cn(
-                      'text-muted-foreground h-4 w-4 shrink-0 transition-transform duration-200',
-                      isOpen && 'rotate-180'
-                    )}
-                  />
+                  <m.div
+                    animate={{ rotate: isOpen ? 180 : 0 }}
+                    transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.2 }}
+                  >
+                    <ChevronDown className="text-muted-foreground h-4 w-4 shrink-0" />
+                  </m.div>
                 </button>
-                {isOpen && (
-                  <div className="border-t px-5 pb-4 pt-3">
-                    <p className="text-muted-foreground text-sm leading-relaxed">{item.a}</p>
-                  </div>
-                )}
+                <AnimatePresence initial={false}>
+                  {isOpen && (
+                    <m.div
+                      initial={shouldReduceMotion ? { opacity: 1 } : { height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={shouldReduceMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
+                      transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.3, ease: 'easeInOut' }}
+                      className="overflow-hidden"
+                    >
+                      <div className="border-t px-5 pb-4 pt-3">
+                        <p className="text-muted-foreground text-sm leading-relaxed">{item.a}</p>
+                      </div>
+                    </m.div>
+                  )}
+                </AnimatePresence>
               </div>
             )
           })}
         </div>
       </div>
-    </section>
+    </MotionSection>
   )
 }

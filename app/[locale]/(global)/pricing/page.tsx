@@ -5,6 +5,7 @@ import { CheckCircle2 } from 'lucide-react'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardHeader } from '@/src/shared/ui/card'
 import { Badge } from '@/src/shared/ui/badge'
+import { PageAnimationWrapper, PageSection } from '@/src/shared/ui/motion'
 
 interface PricingPageProps {
   params: Promise<{ locale: string }>
@@ -30,12 +31,14 @@ type PlanKey = 'plan1' | 'plan2' | 'plan3'
 
 export default async function PricingPage({ params }: PricingPageProps) {
   const { locale } = await params
-  const t = await getTranslations('pricingPage')
-  const tLanding = await getTranslations('landing')
+  const [t, tLanding] = await Promise.all([
+    getTranslations('pricingPage'),
+    getTranslations('landing'),
+  ])
 
   return (
-    <div className="flex flex-col">
-      <section className="bg-background py-20 text-center">
+    <PageAnimationWrapper className="flex flex-col">
+      <PageSection className="bg-background py-20 text-center">
         <div className="container mx-auto max-w-4xl px-4">
           <h1 className="mb-4 text-4xl font-bold tracking-tight sm:text-5xl">
             {t('title')}
@@ -44,9 +47,9 @@ export default async function PricingPage({ params }: PricingPageProps) {
             {t('description')}
           </p>
         </div>
-      </section>
+      </PageSection>
 
-      <section className="bg-muted/30 py-20">
+      <PageSection className="bg-muted/30 py-20">
         <div className="container mx-auto max-w-6xl px-4">
           <div className="grid gap-8 md:grid-cols-3">
             {plans.map((plan) => {
@@ -54,7 +57,7 @@ export default async function PricingPage({ params }: PricingPageProps) {
               return (
                 <Card
                   key={plan.key}
-                  className={`relative flex flex-col ${plan.popular ? 'border-primary shadow-lg ring-2 ring-primary' : ''}`}
+                  className={`relative flex flex-col transition-shadow hover:shadow-lg ${plan.popular ? 'border-primary shadow-lg shadow-primary/10 ring-2 ring-primary' : ''}`}
                 >
                   {plan.popular && (
                     <div className="absolute -top-4 left-0 right-0 flex justify-center">
@@ -106,9 +109,9 @@ export default async function PricingPage({ params }: PricingPageProps) {
             })}
           </div>
         </div>
-      </section>
+      </PageSection>
 
-      <section className="bg-background py-20">
+      <PageSection className="bg-background py-20">
         <div className="container mx-auto max-w-4xl px-4">
           <h2 className="mb-10 text-center text-2xl font-bold">{t('allPlans')}</h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -120,9 +123,9 @@ export default async function PricingPage({ params }: PricingPageProps) {
             ))}
           </div>
         </div>
-      </section>
+      </PageSection>
 
-      <section className="bg-primary/5 py-20 text-center">
+      <PageSection className="bg-primary/5 py-20 text-center">
         <div className="container mx-auto max-w-3xl px-4">
           <h2 className="mb-4 text-3xl font-bold tracking-tight">
             {t('cta.title')}
@@ -134,7 +137,7 @@ export default async function PricingPage({ params }: PricingPageProps) {
             <Link href={`/${locale}/contact`}>{t('cta.button')}</Link>
           </Button>
         </div>
-      </section>
-    </div>
+      </PageSection>
+    </PageAnimationWrapper>
   )
 }

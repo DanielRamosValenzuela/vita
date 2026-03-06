@@ -1,5 +1,6 @@
 'use client'
 
+import { LazyMotion, domAnimation } from 'framer-motion'
 import { SessionProvider } from 'next-auth/react'
 import { ThemeProvider as NextThemesProvider, useTheme } from 'next-themes'
 import { Toaster } from 'sonner'
@@ -38,9 +39,11 @@ export function AppProviders({ children }: AppProvidersProps) {
     >
       <CustomThemeProvider>
         <SessionProvider>
-          <NavigationProgress />
-          <ThemedToaster />
-          {children}
+          <LazyMotion features={domAnimation}>
+            <NavigationProgress />
+            <ThemedToaster />
+            {children}
+          </LazyMotion>
         </SessionProvider>
       </CustomThemeProvider>
     </NextThemesProvider>

@@ -4,6 +4,7 @@ import { Lightbulb, Shield, Users } from 'lucide-react'
 
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardHeader } from '@/src/shared/ui/card'
+import { PageAnimationWrapper, PageSection } from '@/src/shared/ui/motion'
 
 interface AboutPageProps {
   params: Promise<{ locale: string }>
@@ -22,8 +23,8 @@ export default async function AboutPage({ params }: AboutPageProps) {
   const t = await getTranslations('aboutPage')
 
   return (
-    <div className="flex flex-col">
-      <section className="bg-background py-20 text-center">
+    <PageAnimationWrapper className="flex flex-col">
+      <PageSection className="bg-background py-20 text-center">
         <div className="container mx-auto max-w-4xl px-4">
           <h1 className="mb-4 text-4xl font-bold tracking-tight sm:text-5xl">
             {t('title')}
@@ -32,9 +33,9 @@ export default async function AboutPage({ params }: AboutPageProps) {
             {t('description')}
           </p>
         </div>
-      </section>
+      </PageSection>
 
-      <section className="bg-primary/5 py-20">
+      <PageSection className="bg-primary/5 py-20">
         <div className="container mx-auto max-w-4xl px-4 text-center">
           <h2 className="mb-6 text-3xl font-bold tracking-tight">
             {t('mission.title')}
@@ -43,9 +44,9 @@ export default async function AboutPage({ params }: AboutPageProps) {
             {t('mission.description')}
           </p>
         </div>
-      </section>
+      </PageSection>
 
-      <section className="bg-background py-20">
+      <PageSection className="bg-background py-20">
         <div className="container mx-auto max-w-4xl px-4">
           <h2 className="mb-10 text-3xl font-bold tracking-tight">
             {t('story.title')}
@@ -62,9 +63,9 @@ export default async function AboutPage({ params }: AboutPageProps) {
             </p>
           </div>
         </div>
-      </section>
+      </PageSection>
 
-      <section className="bg-muted/30 py-20">
+      <PageSection className="bg-muted/30 py-20">
         <div className="container mx-auto max-w-6xl px-4">
           <h2 className="mb-12 text-center text-3xl font-bold tracking-tight">
             {t('values.title')}
@@ -74,7 +75,7 @@ export default async function AboutPage({ params }: AboutPageProps) {
               const { Icon, key } = value
               const valueKey = key as ValueKey
               return (
-                <Card key={key} className="text-center">
+                <Card key={key} className="text-center transition-shadow hover:shadow-lg">
                   <CardHeader className="items-center pb-2">
                     <div className="bg-primary/10 text-primary mb-4 flex h-14 w-14 items-center justify-center rounded-2xl">
                       <Icon className="h-7 w-7" />
@@ -93,9 +94,9 @@ export default async function AboutPage({ params }: AboutPageProps) {
             })}
           </div>
         </div>
-      </section>
+      </PageSection>
 
-      <section className="bg-background py-20 text-center">
+      <PageSection className="bg-background py-20 text-center">
         <div className="container mx-auto max-w-3xl px-4">
           <h2 className="mb-4 text-3xl font-bold tracking-tight">
             {t('cta.title')}
@@ -107,7 +108,7 @@ export default async function AboutPage({ params }: AboutPageProps) {
             <Link href={`/${locale}/contact`}>{t('cta.button')}</Link>
           </Button>
         </div>
-      </section>
-    </div>
+      </PageSection>
+    </PageAnimationWrapper>
   )
 }

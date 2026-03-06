@@ -9,6 +9,7 @@ import { cn } from '@/src/shared/lib/utils'
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/src/shared/ui/card'
+import { MotionCard, MotionSection, MotionStagger } from '@/src/shared/ui/motion'
 
 export function PricingSection() {
   const t = useTranslations('landing')
@@ -24,7 +25,7 @@ export function PricingSection() {
   ]
 
   return (
-    <section className={cn('bg-background py-20')}>
+    <MotionSection className="bg-background py-20">
       <div className="container mx-auto max-w-5xl px-4">
         <div className="mb-12 flex flex-col items-center text-center">
           <Badge variant="outline" className="mb-4">
@@ -36,49 +37,50 @@ export function PricingSection() {
           <p className="text-muted-foreground max-w-2xl text-lg">{t('pricing.description')}</p>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <MotionStagger className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {plans.map(({ key, popular }) => (
-            <Card
-              key={key}
-              className={cn(
-                'relative flex flex-col',
-                popular && 'border-primary shadow-lg'
-              )}
-            >
-              {popular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <Badge className="px-3 py-1 text-xs">{t('pricing.popular')}</Badge>
-                </div>
-              )}
-              <CardHeader className="pb-4">
-                <CardTitle className="text-lg">{t(`pricing.${key}.name`)}</CardTitle>
-                <div className="mt-2 flex items-baseline gap-1">
-                  <span className="text-3xl font-bold">{t(`pricing.${key}.price`)}</span>
-                  <span className="text-muted-foreground text-sm">{t('pricing.monthly')}</span>
-                </div>
-                <p className="text-muted-foreground mt-1 text-sm">{t(`pricing.${key}.staff`)}</p>
-              </CardHeader>
-              <CardContent className="flex flex-1 flex-col">
-                <ul className="mb-6 flex-1 space-y-3">
-                  {(['feature1', 'feature2', 'feature3', 'feature4'] as const).map((feat) => (
-                    <li key={feat} className="flex items-start gap-2">
-                      <CheckCircle2 className="text-primary mt-0.5 h-4 w-4 shrink-0" />
-                      <span className="text-sm">{t(`pricing.${key}.${feat}`)}</span>
-                    </li>
-                  ))}
-                </ul>
-                <Button
-                  asChild
-                  variant={popular ? 'default' : 'outline'}
-                  className="w-full"
-                >
-                  <Link href={`/${locale}/contact`}>{t('pricing.cta')}</Link>
-                </Button>
-              </CardContent>
-            </Card>
+            <MotionCard key={key} hoverScale={popular ? 1.03 : 1.02}>
+              <Card
+                className={cn(
+                  'relative flex h-full flex-col transition-shadow',
+                  popular && 'border-primary shadow-lg shadow-primary/10'
+                )}
+              >
+                {popular && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                    <Badge className="px-3 py-1 text-xs">{t('pricing.popular')}</Badge>
+                  </div>
+                )}
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-lg">{t(`pricing.${key}.name`)}</CardTitle>
+                  <div className="mt-2 flex items-baseline gap-1">
+                    <span className="text-3xl font-bold">{t(`pricing.${key}.price`)}</span>
+                    <span className="text-muted-foreground text-sm">{t('pricing.monthly')}</span>
+                  </div>
+                  <p className="text-muted-foreground mt-1 text-sm">{t(`pricing.${key}.staff`)}</p>
+                </CardHeader>
+                <CardContent className="flex flex-1 flex-col">
+                  <ul className="mb-6 flex-1 space-y-3">
+                    {(['feature1', 'feature2', 'feature3', 'feature4'] as const).map((feat) => (
+                      <li key={feat} className="flex items-start gap-2">
+                        <CheckCircle2 className="text-primary mt-0.5 h-4 w-4 shrink-0" />
+                        <span className="text-sm">{t(`pricing.${key}.${feat}`)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <Button
+                    asChild
+                    variant={popular ? 'default' : 'outline'}
+                    className="w-full"
+                  >
+                    <Link href={`/${locale}/contact`}>{t('pricing.cta')}</Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            </MotionCard>
           ))}
-        </div>
+        </MotionStagger>
       </div>
-    </section>
+    </MotionSection>
   )
 }

@@ -1,5 +1,7 @@
 import { getTranslations } from 'next-intl/server'
 
+import { PageAnimationWrapper, PageSection } from '@/src/shared/ui/motion'
+
 interface TermsPageProps {
   params: Promise<{ locale: string }>
 }
@@ -21,33 +23,37 @@ export default async function TermsPage({ params }: TermsPageProps) {
   const t = await getTranslations('termsPage')
 
   return (
-    <div className="bg-background py-16">
+    <PageAnimationWrapper className="bg-background py-16">
       <div className="container mx-auto max-w-3xl px-4">
-        <header className="mb-10">
-          <h1 className="mb-2 text-4xl font-bold tracking-tight">{t('title')}</h1>
-          <p className="text-muted-foreground text-sm">{t('lastUpdated')}</p>
-        </header>
+        <PageSection>
+          <header className="mb-10">
+            <h1 className="mb-2 text-4xl font-bold tracking-tight">{t('title')}</h1>
+            <p className="text-muted-foreground text-sm">{t('lastUpdated')}</p>
+          </header>
 
-        <p className="text-muted-foreground mb-10 text-lg leading-relaxed">
-          {t('intro')}
-        </p>
+          <p className="text-muted-foreground mb-10 text-lg leading-relaxed">
+            {t('intro')}
+          </p>
+        </PageSection>
 
         <div className="space-y-10">
           {sections.map((section) => {
             const sectionKey = section as SectionKey
             return (
-              <article key={section}>
-                <h2 className="mb-3 text-xl font-semibold">
-                  {t(`${sectionKey}.title`)}
-                </h2>
-                <p className="text-muted-foreground leading-relaxed">
-                  {t(`${sectionKey}.content`)}
-                </p>
-              </article>
+              <PageSection key={section}>
+                <article>
+                  <h2 className="mb-3 text-xl font-semibold">
+                    {t(`${sectionKey}.title`)}
+                  </h2>
+                  <p className="text-muted-foreground leading-relaxed">
+                    {t(`${sectionKey}.content`)}
+                  </p>
+                </article>
+              </PageSection>
             )
           })}
         </div>
       </div>
-    </div>
+    </PageAnimationWrapper>
   )
 }

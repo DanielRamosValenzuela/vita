@@ -3,6 +3,7 @@ import nextVitals from 'eslint-config-next/core-web-vitals'
 import nextTs from 'eslint-config-next/typescript'
 import prettier from 'eslint-config-prettier'
 import noComments from 'eslint-plugin-no-comments'
+import reactHooks from 'eslint-plugin-react-hooks'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 const eslintConfig = defineConfig([
@@ -21,10 +22,11 @@ const eslintConfig = defineConfig([
     'app/globals.css',
     'specs/**',
     '.specify/**',
+    '.claude/**',
   ]),
 
   {
-    plugins: { 'no-comments': noComments },
+    plugins: { 'no-comments': noComments, 'react-hooks': reactHooks },
     rules: {
       '@typescript-eslint/no-unused-vars': [
         'error',
@@ -37,7 +39,6 @@ const eslintConfig = defineConfig([
       '@typescript-eslint/no-explicit-any': 'error',
       'react/no-unescaped-entities': 'off',
       'react-hooks/exhaustive-deps': 'warn',
-      'react-hooks/set-state-in-effect': 'off',
       'no-console': ['warn', { allow: ['warn', 'error'] }],
       curly: ['error', 'multi'],
       'no-comments/disallowComments': 'error',
@@ -91,6 +92,7 @@ const eslintConfig = defineConfig([
                   'defaultTheme',
                   'position',
                   'translationNamespace',
+                  'captionLayout',
                 ],
               },
             ],

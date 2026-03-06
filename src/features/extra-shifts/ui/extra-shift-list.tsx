@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { startTransition, useCallback, useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import type { Role } from '@prisma/client'
 import { Calendar, Loader2, Plus } from 'lucide-react'
@@ -42,8 +42,7 @@ interface ExtraShiftItem {
 export function ExtraShiftList({ userRole: _userRole }: ExtraShiftListProps) {
   const t = useTranslations('extraShifts')
   const [tab, setTab] = useState<'available' | 'applications'>('available')
-  const [shifts, setShifts] = useState<ExtraShiftItem[]>([])
-  const [applications, setApplications] = useState<ShiftApplicationWithRelations[]>([])
+  const [data, setData] = useState<{ shifts: ExtraShiftItem[]; applications: ShiftApplicationWithRelations[] }>({ shifts: [], applications: [] })
   const [loading, setLoading] = useState(true)
   const [applyShiftId, setApplyShiftId] = useState<string | null>(null)
 
@@ -52,17 +51,17 @@ export function ExtraShiftList({ userRole: _userRole }: ExtraShiftListProps) {
     if (tab === 'available') {
       const result = await getExtraShiftsForAreaAction()
       if (result.success && result.data)
-        setShifts(result.data.shifts)
+        setData(prev => ({ ...prev, shifts: result.data!.shifts }))
     } else {
       const result = await getMyApplicationsAction()
       if (result.success && result.data)
-        setApplications(result.data.applications)
+        setData(prev => ({ ...prev, applications: result.data!.applications }))
     }
     setLoading(false)
   }, [tab])
 
   useEffect(() => {
-    load()
+    startTransition(() => { void load() })
   }, [load])
 
   return (
@@ -79,7 +78,7 @@ export function ExtraShiftList({ userRole: _userRole }: ExtraShiftListProps) {
           <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
         </div>
       ) : tab === 'available' ? (
-        shifts.length === 0 ? (
+        data.shifts.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-2 py-12 text-center">
             <Calendar className="h-10 w-10 text-muted-foreground/40" />
             <p className="text-sm text-muted-foreground">{t('noExtraShifts')}</p>
@@ -87,7 +86,7 @@ export function ExtraShiftList({ userRole: _userRole }: ExtraShiftListProps) {
           </div>
         ) : (
           <div className="space-y-3">
-            {shifts.map((shift) => (
+            {data.shifts.map((shift) => (
               <div key={shift.id} className="flex items-center justify-between rounded-lg border p-4">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
@@ -124,7 +123,7 @@ export function ExtraShiftList({ userRole: _userRole }: ExtraShiftListProps) {
             ))}
           </div>
         )
-      ) : applications.length === 0 ? (
+      ) : data.applications.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-2 py-12 text-center">
           <Calendar className="h-10 w-10 text-muted-foreground/40" />
           <p className="text-sm text-muted-foreground">{t('noApplications')}</p>
@@ -132,7 +131,7 @@ export function ExtraShiftList({ userRole: _userRole }: ExtraShiftListProps) {
         </div>
       ) : (
         <div className="space-y-3">
-          {applications.map((app) => (
+          {data.applications.map((app) => (
             <div key={app.id} className="flex items-center justify-between rounded-lg border p-4">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
