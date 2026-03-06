@@ -1,4 +1,4 @@
-import { StyleSheet } from '@react-pdf/renderer'
+import { StyleSheet } from './react-pdf'
 
 const colors = {
   primary: '#1a1a2e',

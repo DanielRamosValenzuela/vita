@@ -25,18 +25,16 @@ export async function generateMetadata({ params }: RatesRouteProps) {
 
 export default async function RatesRoute({ params }: RatesRouteProps) {
   const { locale } = await params
-  const [session, t] = await Promise.all([
+  const [session, t, result] = await Promise.all([
     requireAdminHRWithOrg(locale),
     getTranslations('adminHR.rates'),
-  ])
-
-  const [organization, result] = await Promise.all([
-    prisma.organization.findUnique({
-      where: { id: session.organizationId },
-      select: { currency: true },
-    }),
     getContractsPageDataAction(),
   ])
+
+  const organization = await prisma.organization.findUnique({
+    where: { id: session.organizationId },
+    select: { currency: true },
+  })
 
   if (!organization)
     return (

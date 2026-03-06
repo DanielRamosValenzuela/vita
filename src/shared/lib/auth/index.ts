@@ -7,9 +7,4 @@ export {
   requireAdminHROrChief,
   requireDashboardUser,
 } from './session'
-export { isAdminHR, isChiefArea, isChiefSector, isChief, isStaff } from './rbac'
-export {
-  getChiefAccessibleAreaIds,
-  chiefHasAreaAccess,
-  resolveChiefOrganizationId,
-} from './chief-access'
+export { isAdminHR, isChiefArea, isStaff } from './rbac'

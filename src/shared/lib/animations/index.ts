@@ -1,9 +1,5 @@
 export {
   fadeInUp,
-  fadeIn,
-  scaleIn,
-  slideInLeft,
-  slideInRight,
   staggerContainer,
 } from './motion-variants'
 export { useScrollAnimation } from './use-scroll-animation'

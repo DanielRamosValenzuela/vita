@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-no-literals, @sanity/i18n/no-attribute-string-literals */
-import { Document, Page, Text, View } from '@react-pdf/renderer'
+import { Document, Page, Text, View } from '@/src/shared/ui/pdf/react-pdf'
 
 import { PdfHeader } from '@/src/shared/ui/pdf/pdf-header'
 import { pdfStyles } from '@/src/shared/ui/pdf/pdf-styles'

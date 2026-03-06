@@ -59,17 +59,20 @@ export function StaffDashboardContent({
     setUpcomingState({ data: initialUpcoming, prev: initialUpcoming })
 
   const [isPending, startTransition] = useTransition()
-  const [viewingShiftId, setViewingShiftId] = useState<string | null>(null)
-  const [currentMonthDate, setCurrentMonthDate] = useState(() => new Date(new Date().getFullYear(), new Date().getMonth(), 1))
-  const [filters, setFilters] = useState<{ sectorId: string | null; areaId: string | null }>({ sectorId: null, areaId: null })
+  const [nav, setNav] = useState({
+    viewingShiftId: null as string | null,
+    monthDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+    sectorId: null as string | null,
+    areaId: null as string | null,
+  })
 
   const shifts = shiftsState.data
   const upcoming = upcomingState.data
-  const currentMonth = currentMonthDate.getMonth()
-  const currentYear = currentMonthDate.getFullYear()
-  const selectedAreaId = filters.areaId
-  const selectedSectorId = filters.sectorId
-  const panelOpen = viewingShiftId !== null
+  const currentMonth = nav.monthDate.getMonth()
+  const currentYear = nav.monthDate.getFullYear()
+  const selectedAreaId = nav.areaId
+  const selectedSectorId = nav.sectorId
+  const panelOpen = nav.viewingShiftId !== null
 
   const [noteState, setNoteState] = useState<{
     notes: Map<string, CalendarNoteData>
@@ -123,41 +126,41 @@ export function StaffDashboardContent({
       startTransition(async () => {
         const { startDate, endDate } = getMonthRange(month)
         const filterParams = resolveFilterParams(
-          areaId ?? filters.areaId,
-          sectorId ?? filters.sectorId
+          areaId ?? nav.areaId,
+          sectorId ?? nav.sectorId
         )
         const result = await getMyShiftsAction({ startDate, endDate, ...filterParams })
         if (result.success && result.data)
           setShiftsState(prev => ({ ...prev, data: result.data!.shifts }))
       })
     },
-    [resolveFilterParams, filters.areaId, filters.sectorId]
+    [resolveFilterParams, nav.areaId, nav.sectorId]
   )
 
   const handleMonthChange = useCallback(
     (month: Date) => {
-      setCurrentMonthDate(new Date(month.getFullYear(), month.getMonth(), 1))
+      setNav(prev => ({ ...prev, monthDate: new Date(month.getFullYear(), month.getMonth(), 1) }))
       setNoteState(prev => ({ ...prev, popoverOpen: false, selectedDate: null }))
-      fetchShifts(month, filters.areaId, filters.sectorId)
+      fetchShifts(month, nav.areaId, nav.sectorId)
       fetchNotes(month.getMonth(), month.getFullYear())
     },
-    [fetchShifts, fetchNotes, filters.areaId, filters.sectorId]
+    [fetchShifts, fetchNotes, nav.areaId, nav.sectorId]
   )
 
   const handleSectorChange = useCallback(
     (sectorId: string | null) => {
-      setFilters({ sectorId, areaId: null })
-      fetchShifts(currentMonthDate, null, sectorId)
+      setNav(prev => ({ ...prev, sectorId, areaId: null }))
+      fetchShifts(nav.monthDate, null, sectorId)
     },
-    [currentMonthDate, fetchShifts]
+    [nav.monthDate, fetchShifts]
   )
 
   const handleAreaChange = useCallback(
     (areaId: string | null) => {
-      setFilters(prev => ({ ...prev, areaId }))
-      fetchShifts(currentMonthDate, areaId, filters.sectorId)
+      setNav(prev => ({ ...prev, areaId }))
+      fetchShifts(nav.monthDate, areaId, nav.sectorId)
     },
-    [currentMonthDate, filters.sectorId, fetchShifts]
+    [nav.monthDate, nav.sectorId, fetchShifts]
   )
 
   const handleDateSelect = useCallback(
@@ -216,13 +219,13 @@ export function StaffDashboardContent({
 
   const handleShiftClick = useCallback((event: CalendarEvent) => {
     if (event.kind === 'individual')
-      setViewingShiftId(event.id)
+      setNav(prev => ({ ...prev, viewingShiftId: event.id }))
     else if (event.kind === 'rotation-group')
-      setViewingShiftId(event.shiftIds?.[0] ?? event.id)
+      setNav(prev => ({ ...prev, viewingShiftId: event.shiftIds?.[0] ?? event.id }))
   }, [])
 
   const handleUpcomingClick = useCallback((shiftId: string) => {
-    setViewingShiftId(shiftId)
+    setNav(prev => ({ ...prev, viewingShiftId: shiftId }))
   }, [])
 
   const refreshUpcoming = useCallback(async () => {
@@ -232,9 +235,9 @@ export function StaffDashboardContent({
   }, [])
 
   useEffect(() => {
-    if (!viewingShiftId)
+    if (!nav.viewingShiftId)
       startTransition(() => { void refreshUpcoming() })
-  }, [viewingShiftId, refreshUpcoming])
+  }, [nav.viewingShiftId, refreshUpcoming])
 
   const notePopoverContent = selectedDate
     ? (
@@ -303,9 +306,9 @@ export function StaffDashboardContent({
         </div>
       </div>
       <ShiftDetailPanel
-        shiftId={viewingShiftId}
+        shiftId={nav.viewingShiftId}
         open={panelOpen}
-        onOpenChange={(open) => { if (!open) setViewingShiftId(null) }}
+        onOpenChange={(open) => { if (!open) setNav(prev => ({ ...prev, viewingShiftId: null })) }}
         currentUserId={currentUserId}
       />
     </div>

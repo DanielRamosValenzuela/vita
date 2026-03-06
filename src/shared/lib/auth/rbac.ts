@@ -15,7 +15,7 @@ export function isChiefArea(user: CurrentUser | null): boolean {
   return hasRole(user, Role.CHIEF_AREA)
 }
 
-export function isChiefSector(user: CurrentUser | null): boolean {
+function isChiefSector(user: CurrentUser | null): boolean {
   return hasRole(user, Role.CHIEF_SECTOR)
 }
 

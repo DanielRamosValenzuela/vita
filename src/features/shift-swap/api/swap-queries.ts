@@ -151,7 +151,7 @@ export async function getAvailableShiftsForSwapAction(
   }
 }
 
-export async function getPendingRequestsCountAction(): Promise<
+async function getPendingRequestsCountAction(): Promise<
   ActionResult<{ count: number }>
 > {
   try {
