@@ -2,7 +2,7 @@ import { Text, View } from '@react-pdf/renderer'
 
 import { pdfStyles } from './pdf-styles'
 
-export interface PdfColumnDef {
+interface PdfColumnDef {
   key: string
   header: string
   width: string | number

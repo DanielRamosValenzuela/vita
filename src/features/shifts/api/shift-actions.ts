@@ -358,7 +358,7 @@ const completeShiftSchema = z.object({
   notes: z.string().optional(),
 })
 
-export const completeShiftAction = async (
+const completeShiftAction = async (
   shiftId: string,
   data: z.infer<typeof completeShiftSchema>
 ): Promise<ActionResult<{ shiftId: string; paymentId?: string; finalAmount?: number }>> => {

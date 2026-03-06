@@ -42,20 +42,3 @@ export interface SectorPersonnelResult {
   totalStaff: number
 }
 
-export interface FeedTokenInfo {
-  id: string
-  organizationId: string | null
-  organizationName: string | null
-  feedUrl: string
-  isActive: boolean
-  createdAt: Date
-}
-
-export interface GoogleCalendarEvent {
-  id: string
-  summary: string
-  startTime: Date
-  endTime: Date
-  isAllDay: boolean
-  color?: string
-}

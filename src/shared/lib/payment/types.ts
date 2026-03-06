@@ -19,10 +19,6 @@ export interface ComponentEvaluationContext {
 
 
 
-export interface ShiftPaymentInput {
-  shiftId: string
-}
-
 export interface ComponentBreakdown {
   componentId: string
   componentName: string
@@ -44,13 +40,6 @@ export interface ShiftPaymentResult {
 }
 
 
-
-export interface PayrollCalculationInput {
-  userId: string
-  organizationId: string
-  month: number
-  year: number
-}
 
 export interface ContractPeriodInfo {
   contractId: string

@@ -1,5 +1,4 @@
 export { Logo } from './logo'
-export { LogoIcon } from './logo-icon'
 export { NavigationProgress } from './navigation-progress'
 export { LanguageSelector } from './language-selector'
 export { Spinner } from './spinner'

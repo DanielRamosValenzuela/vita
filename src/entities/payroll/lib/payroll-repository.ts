@@ -49,7 +49,7 @@ export async function updatePayrollPeriod(
   })
 }
 
-export async function getPayrollPeriod(
+async function getPayrollPeriod(
   id: string,
   organizationId: string
 ): Promise<PayrollPeriodWithDocuments | null> {

@@ -50,47 +50,49 @@ export function StaffDashboardContent({
   currentUserId,
 }: StaffDashboardContentProps) {
   const t = useTranslations('staffDashboard')
-  const [shifts, setShifts] = useState(initialShifts)
-  const [prevInitialShifts, setPrevInitialShifts] = useState(initialShifts)
-  if (initialShifts !== prevInitialShifts) {
-    setPrevInitialShifts(initialShifts)
-    setShifts(initialShifts)
-  }
-  const [upcoming, setUpcoming] = useState(initialUpcoming)
-  const [prevInitialUpcoming, setPrevInitialUpcoming] = useState(initialUpcoming)
-  if (initialUpcoming !== prevInitialUpcoming) {
-    setPrevInitialUpcoming(initialUpcoming)
-    setUpcoming(initialUpcoming)
-  }
+  const [shiftsState, setShiftsState] = useState({ data: initialShifts, prev: initialShifts })
+  if (initialShifts !== shiftsState.prev)
+    setShiftsState({ data: initialShifts, prev: initialShifts })
+
+  const [upcomingState, setUpcomingState] = useState({ data: initialUpcoming, prev: initialUpcoming })
+  if (initialUpcoming !== upcomingState.prev)
+    setUpcomingState({ data: initialUpcoming, prev: initialUpcoming })
+
   const [isPending, startTransition] = useTransition()
   const [viewingShiftId, setViewingShiftId] = useState<string | null>(null)
   const [currentMonthDate, setCurrentMonthDate] = useState(() => new Date(new Date().getFullYear(), new Date().getMonth(), 1))
   const [filters, setFilters] = useState<{ sectorId: string | null; areaId: string | null }>({ sectorId: null, areaId: null })
 
+  const shifts = shiftsState.data
+  const upcoming = upcomingState.data
   const currentMonth = currentMonthDate.getMonth()
   const currentYear = currentMonthDate.getFullYear()
   const selectedAreaId = filters.areaId
   const selectedSectorId = filters.sectorId
   const panelOpen = viewingShiftId !== null
 
-  const [notes, setNotes] = useState<Map<string, CalendarNoteData>>(() => {
+  const [noteState, setNoteState] = useState<{
+    notes: Map<string, CalendarNoteData>
+    selectedDate: Date | null
+    popoverOpen: boolean
+  }>(() => {
     const map = new Map<string, CalendarNoteData>()
     if (initialNotes)
       for (const n of initialNotes)
         map.set(n.date, { id: n.id, content: n.content })
-    return map
+    return { notes: map, selectedDate: null, popoverOpen: false }
   })
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null)
-  const [notePopoverOpen, setNotePopoverOpen] = useState(false)
   const [isSavingNote, startNoteTransition] = useTransition()
 
-  const noteDates = useMemo(() => new Set(notes.keys()), [notes])
+  const selectedDate = noteState.selectedDate
+  const notePopoverOpen = noteState.popoverOpen
+  const noteDates = useMemo(() => new Set(noteState.notes.keys()), [noteState.notes])
 
   const currentNote = useMemo(() => {
     if (!selectedDate) return null
     const key = format(selectedDate, 'yyyy-MM-dd')
-    return notes.get(key) ?? null
-  }, [selectedDate, notes])
+    return noteState.notes.get(key) ?? null
+  }, [selectedDate, noteState.notes])
 
   const fetchNotes = useCallback((month: number, year: number) => {
     startTransition(async () => {
@@ -99,7 +101,7 @@ export function StaffDashboardContent({
         const map = new Map<string, CalendarNoteData>()
         for (const n of result.data.notes)
           map.set(n.date, { id: n.id, content: n.content })
-        setNotes(map)
+        setNoteState(prev => ({ ...prev, notes: map }))
       }
     })
   }, [])
@@ -126,7 +128,7 @@ export function StaffDashboardContent({
         )
         const result = await getMyShiftsAction({ startDate, endDate, ...filterParams })
         if (result.success && result.data)
-          setShifts(result.data.shifts)
+          setShiftsState(prev => ({ ...prev, data: result.data!.shifts }))
       })
     },
     [resolveFilterParams, filters.areaId, filters.sectorId]
@@ -135,8 +137,7 @@ export function StaffDashboardContent({
   const handleMonthChange = useCallback(
     (month: Date) => {
       setCurrentMonthDate(new Date(month.getFullYear(), month.getMonth(), 1))
-      setNotePopoverOpen(false)
-      setSelectedDate(null)
+      setNoteState(prev => ({ ...prev, popoverOpen: false, selectedDate: null }))
       fetchShifts(month, filters.areaId, filters.sectorId)
       fetchNotes(month.getMonth(), month.getFullYear())
     },
@@ -161,14 +162,13 @@ export function StaffDashboardContent({
 
   const handleDateSelect = useCallback(
     (date: Date) => {
-      if (selectedDate && format(selectedDate, 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd'))
-        setNotePopoverOpen((prev) => !prev)
-      else {
-        setSelectedDate(date)
-        setNotePopoverOpen(true)
-      }
+      setNoteState(prev => {
+        if (prev.selectedDate && format(prev.selectedDate, 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd'))
+          return { ...prev, popoverOpen: !prev.popoverOpen }
+        return { ...prev, selectedDate: date, popoverOpen: true }
+      })
     },
-    [selectedDate]
+    []
   )
 
   const handleNoteSave = useCallback(
@@ -178,15 +178,14 @@ export function StaffDashboardContent({
       startNoteTransition(async () => {
         const result = await upsertNoteAction(dateKey, content)
         if (result.success && result.data) {
-          setNotes((prev) => {
-            const next = new Map(prev)
+          setNoteState(prev => {
+            const next = new Map(prev.notes)
             next.set(result.data!.note.date, {
               id: result.data!.note.id,
               content: result.data!.note.content,
             })
-            return next
+            return { ...prev, notes: next, popoverOpen: false }
           })
-          setNotePopoverOpen(false)
           toast.success(t('notes.saved'))
         } else
           toast.error(t('notes.error'))
@@ -202,12 +201,11 @@ export function StaffDashboardContent({
       startNoteTransition(async () => {
         const result = await deleteNoteAction(noteId)
         if (result.success) {
-          setNotes((prev) => {
-            const next = new Map(prev)
+          setNoteState(prev => {
+            const next = new Map(prev.notes)
             next.delete(dateKey)
-            return next
+            return { ...prev, notes: next, popoverOpen: false }
           })
-          setNotePopoverOpen(false)
           toast.success(t('notes.deleted'))
         } else
           toast.error(t('notes.error'))
@@ -230,7 +228,7 @@ export function StaffDashboardContent({
   const refreshUpcoming = useCallback(async () => {
     const result = await getUpcomingShiftsAction()
     if (result.success && result.data)
-      setUpcoming(result.data.shifts)
+      setUpcomingState(prev => ({ ...prev, data: result.data!.shifts }))
   }, [])
 
   useEffect(() => {
@@ -293,7 +291,7 @@ export function StaffDashboardContent({
             noteDates={noteDates}
             notePopoverContent={notePopoverContent}
             notePopoverOpen={notePopoverOpen}
-            onNotePopoverOpenChange={setNotePopoverOpen}
+            onNotePopoverOpenChange={(open) => setNoteState(prev => ({ ...prev, popoverOpen: open }))}
             headerExtra={headerExtra}
           />
         </div>

@@ -3,6 +3,5 @@ export type { ShiftWithRelations } from './types/shift-types'
 export {
   ShiftCalendar,
   type CalendarEvent,
-  type IndividualCalendarEvent,
   type RotationGroupCalendarEvent,
 } from './ui/shift-calendar'
