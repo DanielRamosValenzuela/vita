@@ -5,14 +5,13 @@ import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 
 import { Spinner } from '@/src/shared/ui/atoms'
-
-import { useRouter } from '@/i18n/navigation'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
 import { SearchableAddableList } from '@/src/shared/ui/molecules'
 
-import { assignChiefToSectorAction } from '../api'
-import type { ChiefSectorOption } from '../api'
+import { useRouter } from '@/i18n/navigation'
+
+import { assignChiefToSectorAction, type ChiefSectorOption } from '../api'
 
 interface SectorChiefsCardProps {
   sectorId: string
@@ -67,9 +66,7 @@ export function SectorChiefsCard({
                 selectedIds={selectedIds}
                 onSelectionChange={setSelectedIds}
                 getItemId={(c) => c.id}
-                getSearchableText={(c) =>
-                  `${c.name} ${c.email} ${c.docNumber ?? ''}`.trim()
-                }
+                getSearchableText={(c) => `${c.name} ${c.email} ${c.docNumber ?? ''}`.trim()}
                 renderItem={(c) => (
                   <span className="flex flex-col gap-0.5">
                     <span className="font-medium">{c.name}</span>
@@ -96,9 +93,7 @@ export function SectorChiefsCard({
         ) : (
           <>
             {chiefs.filter((c) => initialIds.has(c.id)).length === 0 ? (
-              <p className="text-muted-foreground text-sm">
-                {t('editForm.noChiefsAssigned')}
-              </p>
+              <p className="text-muted-foreground text-sm">{t('editForm.noChiefsAssigned')}</p>
             ) : (
               <ul className="space-y-2" role="list">
                 {chiefs

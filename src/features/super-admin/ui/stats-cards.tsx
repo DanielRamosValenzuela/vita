@@ -87,7 +87,9 @@ export function StatsCards({ data }: StatsCardsProps) {
                   <h3 className="mt-2 text-3xl font-bold">{stat.value}</h3>
                   <p className="text-muted-foreground mt-1 text-xs">{stat.subtitle}</p>
                 </div>
-                <div className={`rounded-lg p-3 transition-transform duration-200 group-hover:scale-110 ${stat.bg}`}>
+                <div
+                  className={`rounded-lg p-3 transition-transform duration-200 group-hover:scale-110 ${stat.bg}`}
+                >
                   <Icon className={`h-6 w-6 ${stat.color}`} />
                 </div>
               </div>

@@ -9,6 +9,7 @@ import { es } from 'date-fns/locale'
 import { UserMinus, UserPlus } from 'lucide-react'
 import { toast } from 'sonner'
 
+import { useClientPagination } from '@/src/shared/lib/hooks/use-client-pagination'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,7 +20,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/src/shared/ui/alert-dialog'
-import { useClientPagination } from '@/src/shared/lib/hooks/use-client-pagination'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
 import {
@@ -87,7 +87,12 @@ export function OrganizationTeamSection({
 
   const canCreateMore = currentCount < maxLimit
 
-  const { paginatedItems: paginatedUsers, page, totalPages, setPage } = useClientPagination({
+  const {
+    paginatedItems: paginatedUsers,
+    page,
+    totalPages,
+    setPage,
+  } = useClientPagination({
     items: users,
     pageSize: 10,
   })

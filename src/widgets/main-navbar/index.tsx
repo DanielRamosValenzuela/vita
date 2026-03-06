@@ -9,7 +9,6 @@ import { useParams } from 'next/navigation'
 import { Menu, Settings } from 'lucide-react'
 
 import { cn } from '@/src/shared/lib/utils'
-
 import { LanguageSelector, Logo, ThemeSelector, ThemeToggle } from '@/src/shared/ui/atoms'
 import { Button } from '@/src/shared/ui/button'
 import {
@@ -46,12 +45,14 @@ export function MainNavbar() {
   const navLinks = getNavLinks(t, locale)
 
   return (
-    <header className={cn(
-      'sticky top-0 z-50 w-full border-b backdrop-blur transition-all duration-300',
-      scrolled
-        ? 'bg-background/95 supports-backdrop-filter:bg-background/80 shadow-sm'
-        : 'bg-background/95 supports-backdrop-filter:bg-background/60'
-    )}>
+    <header
+      className={cn(
+        'sticky top-0 z-50 w-full border-b backdrop-blur transition-all duration-300',
+        scrolled
+          ? 'bg-background/95 supports-backdrop-filter:bg-background/80 shadow-sm'
+          : 'bg-background/95 supports-backdrop-filter:bg-background/60'
+      )}
+    >
       <nav className="container flex h-16 items-center justify-between px-4">
         <div className="flex items-center gap-6">
           <Logo locale={locale} size="sm" />

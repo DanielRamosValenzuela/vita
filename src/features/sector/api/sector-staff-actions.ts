@@ -1,6 +1,6 @@
 'use server'
 
-import { requireDashboardUser, isChiefArea, isStaff } from '@/src/shared/lib/auth'
+import { isChiefArea, isStaff, requireDashboardUser } from '@/src/shared/lib/auth'
 import { prisma } from '@/src/shared/lib/db'
 import { handleActionError } from '@/src/shared/lib/utils'
 
@@ -47,9 +47,7 @@ export async function getSectorStaffAction(input: SectorStaffInput) {
       orgId = firstArea?.area?.organizationId ?? null
     }
 
-    if (!orgId) 
-      return { success: false as const, error: 'No tienes una organización asignada' }
-    
+    if (!orgId) return { success: false as const, error: 'No tienes una organización asignada' }
 
     const sector = await prisma.sector.findFirst({
       where: { id: input.sectorId, organizationId: orgId },
@@ -64,9 +62,7 @@ export async function getSectorStaffAction(input: SectorStaffInput) {
       },
     })
 
-    if (!sector) 
-      return { success: false as const, error: 'Sector no encontrado' }
-    
+    if (!sector) return { success: false as const, error: 'Sector no encontrado' }
 
     if (isChiefArea(user) || isStaff(user)) {
       const userAreas = await prisma.userArea.findMany({
@@ -104,13 +100,11 @@ export async function getSectorStaffAction(input: SectorStaffInput) {
     })
 
     const areaMap = new Map<string, AreaStaffGroup>()
-    for (const sa of sector.sectorAreas) 
-      areaMap.set(sa.area.id, { area: sa.area, shifts: [] })
-    
+    for (const sa of sector.sectorAreas) areaMap.set(sa.area.id, { area: sa.area, shifts: [] })
 
     for (const shift of shifts) {
       const group = areaMap.get(shift.areaId)
-      if (group) 
+      if (group)
         group.shifts.push({
           id: shift.id,
           userId: shift.user.id,
@@ -122,7 +116,6 @@ export async function getSectorStaffAction(input: SectorStaffInput) {
           isExtra: shift.isExtra,
           status: shift.status,
         })
-      
     }
 
     const areas = [...areaMap.values()].filter((g) => g.shifts.length > 0)

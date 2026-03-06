@@ -7,12 +7,7 @@ import { AlertTriangle } from 'lucide-react'
 import { Alert, AlertDescription } from '@/src/shared/ui/alert'
 import { Button } from '@/src/shared/ui/button'
 import { Skeleton } from '@/src/shared/ui/skeleton'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/src/shared/ui/tooltip'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/src/shared/ui/tooltip'
 
 import { getCoverageOverviewAction } from '../api/generation-actions'
 import type { CoverageOverview } from '../types/rotation-types'
@@ -83,20 +78,18 @@ export function CoverageOverview({ rotationId, areaId }: CoverageOverviewProps) 
 
     startTransition(async () => {
       const result = await getCoverageOverviewAction(rotationId, startDate, endDate)
-      if (result.success && result.data)
-        setData(result.data)
+      if (result.success && result.data) setData(result.data)
     })
   }, [rotationId])
 
-  if (isPending)
-    return <CoverageGridSkeleton />
+  if (isPending) return <CoverageGridSkeleton />
 
-  if (!data)
-    return null
+  if (!data) return null
 
-  const groupNames = data.days.length > 0
-    ? data.days[0].groups.map((g) => ({ id: g.groupId, name: g.groupName }))
-    : []
+  const groupNames =
+    data.days.length > 0
+      ? data.days[0].groups.map((g) => ({ id: g.groupId, name: g.groupName }))
+      : []
 
   const dateRangeLabel = t('coverage.dateRange', {
     start: formatShortDate(data.dateRange.start),
@@ -151,8 +144,7 @@ export function CoverageOverview({ rotationId, areaId }: CoverageOverviewProps) 
                   const dayKey = day.date.toISOString()
                   const groupData = day.groups.find((g) => g.groupId === group.id)
 
-                  if (!groupData)
-                    return <td key={dayKey} className="px-1 py-1" />
+                  if (!groupData) return <td key={dayKey} className="px-1 py-1" />
 
                   if (groupData.stepType === 'rest')
                     return (
@@ -167,8 +159,7 @@ export function CoverageOverview({ rotationId, areaId }: CoverageOverviewProps) 
                       </td>
                     )
 
-                  if (!groupData.shiftType)
-                    return <td key={dayKey} className="px-1 py-1" />
+                  if (!groupData.shiftType) return <td key={dayKey} className="px-1 py-1" />
 
                   const cellContent = (
                     <span
@@ -202,17 +193,22 @@ export function CoverageOverview({ rotationId, areaId }: CoverageOverviewProps) 
                                 size="sm"
                                 className="h-auto p-0 hover:bg-transparent"
                                 onClick={() => {
-                                  const dayStart = new Date(Date.UTC(
-                                    day.date.getUTCFullYear(),
-                                    day.date.getUTCMonth(),
-                                    day.date.getUTCDate(),
-                                  ))
-                                  const dayEnd = new Date(Date.UTC(
-                                    day.date.getUTCFullYear(),
-                                    day.date.getUTCMonth(),
-                                    day.date.getUTCDate(),
-                                    23, 59,
-                                  ))
+                                  const dayStart = new Date(
+                                    Date.UTC(
+                                      day.date.getUTCFullYear(),
+                                      day.date.getUTCMonth(),
+                                      day.date.getUTCDate()
+                                    )
+                                  )
+                                  const dayEnd = new Date(
+                                    Date.UTC(
+                                      day.date.getUTCFullYear(),
+                                      day.date.getUTCMonth(),
+                                      day.date.getUTCDate(),
+                                      23,
+                                      59
+                                    )
+                                  )
                                   setExtrasState({
                                     areaId,
                                     date: day.date,
@@ -294,8 +290,7 @@ export function CoverageOverview({ rotationId, areaId }: CoverageOverviewProps) 
             )
             startTransition(async () => {
               const result = await getCoverageOverviewAction(rotationId, startDate, endDate)
-              if (result.success && result.data)
-                setData(result.data)
+              if (result.success && result.data) setData(result.data)
             })
           }}
         />

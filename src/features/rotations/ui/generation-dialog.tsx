@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 
 import { cn } from '@/src/shared/lib/utils'
 import { formatDateLong } from '@/src/shared/lib/utils/format'
+import { ProcessingOverlay } from '@/src/shared/ui/atoms/processing-overlay'
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 import { Calendar } from '@/src/shared/ui/calendar'
@@ -36,7 +37,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/src/shared/ui/table'
-import { ProcessingOverlay } from '@/src/shared/ui/atoms/processing-overlay'
 
 import {
   generateShiftsAction,
@@ -117,9 +117,10 @@ function genReducer(state: GenState, action: GenAction): GenState {
       return {
         ...state,
         startDate: action.payload,
-        endDate: action.payload && state.endDate && state.endDate < action.payload
-          ? undefined
-          : state.endDate,
+        endDate:
+          action.payload && state.endDate && state.endDate < action.payload
+            ? undefined
+            : state.endDate,
       }
     case 'SET_END_DATE':
       return { ...state, endDate: action.payload }
@@ -178,16 +179,16 @@ function DateStepContent({ state, dispatch, groups, locale, t }: DateStepContent
                 )}
               >
                 <CalendarIcon className="mr-2 h-4 w-4" aria-hidden />
-                {state.startDate
-                  ? formatDateLong(state.startDate, loc)
-                  : t('generation.startDate')}
+                {state.startDate ? formatDateLong(state.startDate, loc) : t('generation.startDate')}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
               <Calendar
                 mode="single"
                 selected={state.startDate}
-                onSelect={(date) => dispatch({ type: 'SET_START_DATE', payload: date ?? undefined })}
+                onSelect={(date) =>
+                  dispatch({ type: 'SET_START_DATE', payload: date ?? undefined })
+                }
                 initialFocus
               />
             </PopoverContent>
@@ -206,9 +207,7 @@ function DateStepContent({ state, dispatch, groups, locale, t }: DateStepContent
                 )}
               >
                 <CalendarIcon className="mr-2 h-4 w-4" aria-hidden />
-                {state.endDate
-                  ? formatDateLong(state.endDate, loc)
-                  : t('generation.endDate')}
+                {state.endDate ? formatDateLong(state.endDate, loc) : t('generation.endDate')}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
@@ -223,9 +222,7 @@ function DateStepContent({ state, dispatch, groups, locale, t }: DateStepContent
             </PopoverContent>
           </Popover>
           {!state.startDate && (
-            <p className="text-muted-foreground text-xs">
-              {t('generation.endDateDisabledHint')}
-            </p>
+            <p className="text-muted-foreground text-xs">{t('generation.endDateDisabledHint')}</p>
           )}
         </div>
       </div>
@@ -251,9 +248,7 @@ function DateStepContent({ state, dispatch, groups, locale, t }: DateStepContent
           </div>
         </div>
       ) : !state.loadingLastGen ? (
-        <p className="text-muted-foreground text-xs">
-          {t('generation.noExistingShifts')}
-        </p>
+        <p className="text-muted-foreground text-xs">{t('generation.noExistingShifts')}</p>
       ) : null}
 
       {groups.length > 1 && (
@@ -269,9 +264,7 @@ function DateStepContent({ state, dispatch, groups, locale, t }: DateStepContent
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="_default">
-                {t('generation.defaultGroupOrder')}
-              </SelectItem>
+              <SelectItem value="_default">{t('generation.defaultGroupOrder')}</SelectItem>
               {groups.map((g) => (
                 <SelectItem key={g.id} value={g.id}>
                   <span className="flex items-center gap-1.5">
@@ -286,9 +279,7 @@ function DateStepContent({ state, dispatch, groups, locale, t }: DateStepContent
               ))}
             </SelectContent>
           </Select>
-          <p className="text-muted-foreground text-xs">
-            {t('generation.startingGroupHint')}
-          </p>
+          <p className="text-muted-foreground text-xs">{t('generation.startingGroupHint')}</p>
         </div>
       )}
     </div>
@@ -303,7 +294,13 @@ interface PreviewStepContentProps {
   t: TranslationFn
 }
 
-function PreviewStepContent({ state, dispatch, preview, regenerateMode, t }: PreviewStepContentProps) {
+function PreviewStepContent({
+  state,
+  dispatch,
+  preview,
+  regenerateMode,
+  t,
+}: PreviewStepContentProps) {
   return (
     <div className="space-y-4">
       {regenerateMode && (
@@ -381,18 +378,13 @@ function PreviewStepContent({ state, dispatch, preview, regenerateMode, t }: Pre
                   {preview.conflicts.slice(0, 5).map((conflict) => (
                     <TableRow key={`${conflict.userName}-${conflict.date.toISOString()}`}>
                       <TableCell className="font-medium">{conflict.userName}</TableCell>
-                      <TableCell>
-                        {conflict.date.toLocaleDateString()}
-                      </TableCell>
+                      <TableCell>{conflict.date.toLocaleDateString()}</TableCell>
                       <TableCell>{conflict.existingShift.shiftType}</TableCell>
                     </TableRow>
                   ))}
                   {preview.conflicts.length > 5 && (
                     <TableRow>
-                      <TableCell
-                        colSpan={3}
-                        className="text-muted-foreground text-center text-xs"
-                      >
+                      <TableCell colSpan={3} className="text-muted-foreground text-center text-xs">
                         {t('generation.conflictsFound', {
                           count: preview.conflicts.length - 5,
                         })}
@@ -457,18 +449,24 @@ export function GenerationDialog({
     })
   }, [open, rotationId])
 
-  const previewMessages = useMemo(() => [
-    t('generation.processingPreviewMsg1'),
-    t('generation.processingPreviewMsg2'),
-    t('generation.processingPreviewMsg3'),
-  ], [t])
+  const previewMessages = useMemo(
+    () => [
+      t('generation.processingPreviewMsg1'),
+      t('generation.processingPreviewMsg2'),
+      t('generation.processingPreviewMsg3'),
+    ],
+    [t]
+  )
 
-  const generateMessages = useMemo(() => [
-    t('generation.processingGenerateMsg1'),
-    t('generation.processingGenerateMsg2'),
-    t('generation.processingGenerateMsg3'),
-    t('generation.processingGenerateMsg4'),
-  ], [t])
+  const generateMessages = useMemo(
+    () => [
+      t('generation.processingGenerateMsg1'),
+      t('generation.processingGenerateMsg2'),
+      t('generation.processingGenerateMsg3'),
+      t('generation.processingGenerateMsg4'),
+    ],
+    [t]
+  )
 
   const handleOpenChange = (isOpen: boolean) => {
     if (isPending) return
@@ -492,8 +490,7 @@ export function GenerationDialog({
       if (result.success && result.data) {
         dispatch({ type: 'SET_PREVIEW', payload: result.data })
         dispatch({ type: 'SET_STEP', payload: 'preview' })
-      } else
-        toast.error(result.error ?? t('loadError'))
+      } else toast.error(result.error ?? t('loadError'))
     })
   }
 
@@ -551,9 +548,11 @@ export function GenerationDialog({
         <ProcessingOverlay
           isActive={state.pendingOp === 'generate'}
           icon={
-            regenerateMode
-              ? <RefreshCw className="h-6 w-6" aria-hidden />
-              : <CalendarPlus className="h-6 w-6" aria-hidden />
+            regenerateMode ? (
+              <RefreshCw className="h-6 w-6" aria-hidden />
+            ) : (
+              <CalendarPlus className="h-6 w-6" aria-hidden />
+            )
           }
           title={t('generation.processingGenerateTitle')}
           messages={generateMessages}
@@ -603,11 +602,7 @@ export function GenerationDialog({
               >
                 {t('form.cancel')}
               </Button>
-              <Button
-                onClick={handlePreview}
-                disabled={!canPreview || isPending}
-                className="gap-2"
-              >
+              <Button onClick={handlePreview} disabled={!canPreview || isPending} className="gap-2">
                 {t('generation.previewButton')}
               </Button>
             </>
@@ -624,12 +619,15 @@ export function GenerationDialog({
               </Button>
               <Button
                 onClick={handleGenerate}
-                disabled={isPending || (!regenerateMode && (state.preview?.conflicts?.length ?? 0) > 0 && !state.overrideConflicts)}
+                disabled={
+                  isPending ||
+                  (!regenerateMode &&
+                    (state.preview?.conflicts?.length ?? 0) > 0 &&
+                    !state.overrideConflicts)
+                }
                 className="gap-2"
               >
-                {regenerateMode
-                  ? t('generation.regenerateButton')
-                  : t('generation.generateButton')}
+                {regenerateMode ? t('generation.regenerateButton') : t('generation.generateButton')}
               </Button>
             </>
           )}

@@ -24,7 +24,6 @@ export const pdfStyles = StyleSheet.create({
     color: colors.text,
   },
 
-  
   header: {
     marginBottom: 20,
     paddingBottom: 12,
@@ -47,7 +46,6 @@ export const pdfStyles = StyleSheet.create({
     marginTop: 2,
   },
 
-  
   sectionTitle: {
     fontSize: 12,
     fontFamily: 'Helvetica-Bold',
@@ -59,7 +57,6 @@ export const pdfStyles = StyleSheet.create({
     borderBottomColor: colors.border,
   },
 
-  
   table: {
     marginBottom: 12,
   },
@@ -113,7 +110,6 @@ export const pdfStyles = StyleSheet.create({
     textAlign: 'right',
   },
 
-  
   infoBox: {
     backgroundColor: colors.headerBg,
     padding: 10,
@@ -136,7 +132,6 @@ export const pdfStyles = StyleSheet.create({
     flex: 1,
   },
 
-  
   footer: {
     position: 'absolute',
     bottom: 20,
@@ -153,7 +148,6 @@ export const pdfStyles = StyleSheet.create({
     color: colors.textLight,
   },
 
-  
   badge: {
     fontSize: 8,
     paddingHorizontal: 6,

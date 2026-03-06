@@ -1,6 +1,5 @@
-import { Text, View } from './react-pdf'
-
 import { pdfStyles } from './pdf-styles'
+import { Text, View } from './react-pdf'
 
 interface PdfColumnDef {
   key: string
@@ -38,7 +37,10 @@ export function PdfTable({ columns, data, totalRow }: PdfTableProps) {
 
       {}
       {data.map((row, rowIdx) => (
-        <View key={`row-${columns.map(c => row[c.key]).join('-')}-${rowIdx}`} style={pdfStyles.tableRow}>
+        <View
+          key={`row-${columns.map((c) => row[c.key]).join('-')}-${rowIdx}`}
+          style={pdfStyles.tableRow}
+        >
           {columns.map((col) => (
             <Text
               key={col.key}
@@ -61,12 +63,10 @@ export function PdfTable({ columns, data, totalRow }: PdfTableProps) {
               pdfStyles.tableTotalLabel,
               {
                 width: totalRow.labelSpan
-                  ? columns
-                      .slice(0, totalRow.labelSpan)
-                      .reduce((sum, col) => {
-                        const w = typeof col.width === 'number' ? col.width : parseInt(col.width)
-                        return sum + (isNaN(w) ? 0 : w)
-                      }, 0)
+                  ? columns.slice(0, totalRow.labelSpan).reduce((sum, col) => {
+                      const w = typeof col.width === 'number' ? col.width : parseInt(col.width)
+                      return sum + (isNaN(w) ? 0 : w)
+                    }, 0)
                   : '70%',
               },
             ]}

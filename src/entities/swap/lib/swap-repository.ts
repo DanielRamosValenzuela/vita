@@ -71,13 +71,9 @@ export async function getSwapRequestsForUser(
 
   if (filter?.status) where.status = filter.status
 
-  if (filter?.type === 'sent')
-    where.requesterId = userId
+  if (filter?.type === 'sent') where.requesterId = userId
   else if (filter?.type === 'received')
-    where.OR = [
-      { targetUserId: userId },
-      { type: 'OPEN', offers: { some: { offererId: userId } } },
-    ]
+    where.OR = [{ targetUserId: userId }, { type: 'OPEN', offers: { some: { offererId: userId } } }]
   else if (filter?.type === 'open') {
     where.type = 'OPEN'
     where.status = 'PENDING_PEER'
@@ -123,9 +119,7 @@ export async function updateSwapStatus(
   })
 }
 
-export async function createSwapOffer(
-  data: Prisma.ShiftSwapOfferUncheckedCreateInput
-) {
+export async function createSwapOffer(data: Prisma.ShiftSwapOfferUncheckedCreateInput) {
   return prisma.shiftSwapOffer.create({ data })
 }
 
@@ -147,10 +141,7 @@ export async function getOffersForRequest(swapRequestId: string) {
   })
 }
 
-export async function updateOfferStatus(
-  id: string,
-  status: 'ACCEPTED' | 'REJECTED' | 'WITHDRAWN'
-) {
+export async function updateOfferStatus(id: string, status: 'ACCEPTED' | 'REJECTED' | 'WITHDRAWN') {
   return prisma.shiftSwapOffer.update({
     where: { id },
     data: { status },
@@ -184,10 +175,7 @@ export async function getPendingSwapCountForUser(
 export async function hasActiveSwapForShift(shiftId: string): Promise<boolean> {
   const count = await prisma.shiftSwapRequest.count({
     where: {
-      OR: [
-        { requesterShiftId: shiftId },
-        { targetShiftId: shiftId },
-      ],
+      OR: [{ requesterShiftId: shiftId }, { targetShiftId: shiftId }],
       status: {
         in: ['PENDING_PEER', 'PENDING_SELECTION', 'PENDING_CHIEF'],
       },

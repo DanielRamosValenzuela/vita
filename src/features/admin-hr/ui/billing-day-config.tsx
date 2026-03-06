@@ -3,11 +3,11 @@
 import { useEffect, useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 
+import { toastActionResult } from '@/src/shared/lib/utils/toast-action-result'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
 import { Input } from '@/src/shared/ui/input'
 import { Label } from '@/src/shared/ui/label'
-import { toastActionResult } from '@/src/shared/lib/utils/toast-action-result'
 
 import { getBillingConfigAction, updateBillingDayAction } from '../api/payroll-actions'
 
@@ -38,9 +38,7 @@ export function BillingDayConfig() {
     startTransition(async () => {
       const result = await updateBillingDayAction({ billingDay: day })
       toastActionResult(result)
-      if (result.success) 
-        setInitialValue(billingDay)
-      
+      if (result.success) setInitialValue(billingDay)
     })
   }
 

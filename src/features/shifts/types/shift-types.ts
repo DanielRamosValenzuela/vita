@@ -1,7 +1,8 @@
 import type { ShiftStatus } from '@prisma/client'
 
-export type { ShiftWithRelations } from '@/src/entities/shift/types/shift-types'
 import type { ShiftWithRelations } from '@/src/entities/shift/types/shift-types'
+
+export type { ShiftWithRelations } from '@/src/entities/shift/types/shift-types'
 
 export interface CreateShiftFormData {
   title?: string

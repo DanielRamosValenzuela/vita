@@ -256,8 +256,7 @@ export const duplicateRateTemplateAction = async (
       },
     })
 
-    if (!original)
-      return { success: false, error: 'Tarifa no encontrada' }
+    if (!original) return { success: false, error: 'Tarifa no encontrada' }
 
     if (original.organizationId !== session.organizationId)
       return { success: false, error: 'La tarifa no pertenece a tu organización' }
@@ -278,13 +277,14 @@ export const duplicateRateTemplateAction = async (
             description: comp.description,
             extraOnly: comp.extraOnly,
             order: comp.order ?? index,
-            applicableShiftTypes: comp.applicableShiftTypes.length > 0
-              ? {
-                  create: comp.applicableShiftTypes.map((st) => ({
-                    shiftTypeId: st.shiftTypeId,
-                  })),
-                }
-              : undefined,
+            applicableShiftTypes:
+              comp.applicableShiftTypes.length > 0
+                ? {
+                    create: comp.applicableShiftTypes.map((st) => ({
+                      shiftTypeId: st.shiftTypeId,
+                    })),
+                  }
+                : undefined,
           })),
         },
       },
@@ -360,4 +360,3 @@ export const deleteRateTemplateAction = async (id: string): Promise<ActionResult
     return handleActionError(error, 'deleteRateTemplateAction', 'Error al eliminar tarifa')
   }
 }
-

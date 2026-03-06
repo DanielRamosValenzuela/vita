@@ -1,11 +1,10 @@
 /* eslint-disable react/jsx-no-literals, @sanity/i18n/no-attribute-string-literals */
-import { Document, Page, Text, View } from '@/src/shared/ui/pdf/react-pdf'
-
+import type { PayrollCalculationResult, ShiftPaymentSummary } from '@/src/shared/lib/payment/types'
+import { formatCurrencyByCode } from '@/src/shared/lib/utils/format'
 import { PdfHeader } from '@/src/shared/ui/pdf/pdf-header'
 import { pdfStyles } from '@/src/shared/ui/pdf/pdf-styles'
 import { PdfTable } from '@/src/shared/ui/pdf/pdf-table'
-import { formatCurrencyByCode } from '@/src/shared/lib/utils/format'
-import type { PayrollCalculationResult, ShiftPaymentSummary } from '@/src/shared/lib/payment/types'
+import { Document, Page, Text, View } from '@/src/shared/ui/pdf/react-pdf'
 
 interface PayrollDocumentPdfProps {
   data: PayrollCalculationResult
@@ -27,8 +26,18 @@ function formatMinutesToHours(minutes: number): string {
 }
 
 const MONTH_NAMES = [
-  'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre',
+  'Enero',
+  'Febrero',
+  'Marzo',
+  'Abril',
+  'Mayo',
+  'Junio',
+  'Julio',
+  'Agosto',
+  'Septiembre',
+  'Octubre',
+  'Noviembre',
+  'Diciembre',
 ]
 
 const DAY_TYPE_LABELS: Record<string, string> = {
@@ -63,7 +72,6 @@ export function PayrollDocumentPdf({
   const currency = data.currency
   const periodLabel = `${MONTH_NAMES[data.month - 1]} ${data.year}`
 
-  
   const completedShifts = data.shifts.filter((s) => s.status !== 'DISPUTED')
   const disputedShifts = data.shifts.filter((s) => s.status === 'DISPUTED')
   const hasEstimatedShifts = completedShifts.some((s) => s.isEstimated)
@@ -71,7 +79,6 @@ export function PayrollDocumentPdf({
   const shiftRows = completedShifts.map((s) => buildShiftRow(s, currency))
   const disputedRows = disputedShifts.map((s) => buildShiftRow(s, currency))
 
-  
   const monthlyRows = data.monthlyComponents.map((mc) => ({
     component: mc.componentName,
     baseValue: formatCurrencyByCode(mc.baseValue, currency),
@@ -79,7 +86,6 @@ export function PayrollDocumentPdf({
     amount: formatCurrencyByCode(mc.proratedValue, currency),
   }))
 
-  
   const hasMultipleContracts = data.contracts.length > 1
   const hasCustomMultiplier = data.contracts.some(
     (c) => c.customMultiplier && c.customMultiplier !== 1
@@ -126,9 +132,7 @@ export function PayrollDocumentPdf({
           {!hasMultipleContracts && (
             <View style={pdfStyles.infoRow}>
               <Text style={pdfStyles.infoLabel}>Tarifa:</Text>
-              <Text style={pdfStyles.infoValue}>
-                {data.contracts[0]?.rateTemplateName ?? '-'}
-              </Text>
+              <Text style={pdfStyles.infoValue}>{data.contracts[0]?.rateTemplateName ?? '-'}</Text>
             </View>
           )}
           <View style={pdfStyles.infoRow}>
@@ -206,16 +210,11 @@ export function PayrollDocumentPdf({
         {}
         {disputedShifts.length > 0 && (
           <>
-            <Text style={pdfStyles.sectionTitle}>
-              Turnos en Disputa ({disputedShifts.length})
-            </Text>
+            <Text style={pdfStyles.sectionTitle}>Turnos en Disputa ({disputedShifts.length})</Text>
             <Text style={pdfStyles.note}>
               Los siguientes turnos no se incluyen en el total por estar en disputa.
             </Text>
-            <PdfTable
-              columns={shiftColumns}
-              data={disputedRows}
-            />
+            <PdfTable columns={shiftColumns} data={disputedRows} />
           </>
         )}
 
@@ -278,18 +277,14 @@ export function PayrollDocumentPdf({
 
         {}
         <View style={pdfStyles.footer} fixed>
-          <Text style={pdfStyles.footerText}>
-            Documento informativo — Sin validez tributaria
-          </Text>
+          <Text style={pdfStyles.footerText}>Documento informativo — Sin validez tributaria</Text>
           <Text style={pdfStyles.footerText}>
             Generado: {formatDate(new Date())}
             {documentId ? ` | ID: ${documentId}` : ''}
           </Text>
           <Text
             style={pdfStyles.footerText}
-            render={({ pageNumber, totalPages }) =>
-              `Pagina ${pageNumber} de ${totalPages}`
-            }
+            render={({ pageNumber, totalPages }) => `Pagina ${pageNumber} de ${totalPages}`}
             fixed
           />
         </View>

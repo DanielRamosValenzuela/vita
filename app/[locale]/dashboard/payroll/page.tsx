@@ -1,12 +1,12 @@
-import { redirect } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
+import { redirect } from 'next/navigation'
 import { Role } from '@prisma/client'
 
 import { requireDashboardUser } from '@/src/shared/lib/auth/session'
 import { prisma } from '@/src/shared/lib/db'
+import { PayrollGeneration } from '@/src/features/admin-hr/ui/payroll-generation'
 import { getPayrollPeriodsAction } from '@/src/features/payroll/api/payroll-history-actions'
 import { PayrollPage } from '@/src/features/payroll/ui/payroll-page'
-import { PayrollGeneration } from '@/src/features/admin-hr/ui/payroll-generation'
 
 interface PayrollRouteProps {
   params: Promise<{ locale: string }>
@@ -26,9 +26,7 @@ export default async function PayrollRoute({ params }: PayrollRouteProps) {
   const { locale } = await params
   const session = await requireDashboardUser(locale)
 
-  if (!session.organizationId) 
-    redirect(`/${locale}/dashboard`)
-  
+  if (!session.organizationId) redirect(`/${locale}/dashboard`)
 
   const currentYear = new Date().getFullYear()
   const [organization, periodsResult, t] = await Promise.all([
@@ -40,9 +38,7 @@ export default async function PayrollRoute({ params }: PayrollRouteProps) {
     getTranslations('payroll'),
   ])
 
-  if (!organization)
-    redirect(`/${locale}/dashboard`)
-
+  if (!organization) redirect(`/${locale}/dashboard`)
 
   const initialPeriods = periodsResult.success ? (periodsResult.data ?? []) : []
   const isAdmin = session.role === Role.ADMIN_HR

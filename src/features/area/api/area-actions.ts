@@ -79,7 +79,8 @@ export async function updateAreaAction(id: string, data: UpdateAreaInput) {
         const isSectorChief = await prisma.userSector.findFirst({
           where: { userId: user.id, sector: { sectorAreas: { some: { areaId: id } } } },
         })
-        if (!isSectorChief) return { success: false, error: 'No tienes permiso para editar esta área' }
+        if (!isSectorChief)
+          return { success: false, error: 'No tienes permiso para editar esta área' }
       }
     }
     const locale = await getLocaleFromHeaders()
@@ -135,10 +136,9 @@ export async function getAreasAction() {
           select: { areaId: true },
         }),
       ])
-      const areaIds = [...new Set([
-        ...chiefAreas.map((a) => a.areaId),
-        ...sectorAreas.map((sa) => sa.areaId),
-      ])]
+      const areaIds = [
+        ...new Set([...chiefAreas.map((a) => a.areaId), ...sectorAreas.map((sa) => sa.areaId)]),
+      ]
       if (areaIds.length === 0) return { success: true, data: [] }
       const areas = await prisma.area.findMany({
         where: { id: { in: areaIds }, organizationId: effectiveOrgId },
@@ -295,8 +295,7 @@ export async function assignChiefsToAreaAction(areaId: string, chiefUserIds: str
       })
       if (!isSectorChiefForArea)
         return { success: false, error: 'No tienes permiso para asignar jefes a esta área' }
-    } else if (!orgId)
-      throw new Error('No estás vinculado a una organización')
+    } else if (!orgId) throw new Error('No estás vinculado a una organización')
 
     const area = await prisma.area.findFirst({
       where: { id: areaId, organizationId: orgId },
@@ -451,7 +450,8 @@ export async function getStaffForAreaAction(areaId: string) {
         const isSectorChief = await prisma.userSector.findFirst({
           where: { userId: user.id, sector: { sectorAreas: { some: { areaId } } } },
         })
-        if (!isSectorChief) return { success: false, error: 'No tienes permiso para editar esta área' }
+        if (!isSectorChief)
+          return { success: false, error: 'No tienes permiso para editar esta área' }
       }
     }
 
@@ -514,7 +514,8 @@ export async function assignStaffToAreaAction(areaId: string, staffUserIds: stri
         const isSectorChief = await prisma.userSector.findFirst({
           where: { userId: user.id, sector: { sectorAreas: { some: { areaId } } } },
         })
-        if (!isSectorChief) return { success: false, error: 'No tienes permiso para editar esta área' }
+        if (!isSectorChief)
+          return { success: false, error: 'No tienes permiso para editar esta área' }
       }
     }
 

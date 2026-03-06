@@ -542,6 +542,18 @@
       "allAreas": "Todas las áreas",
       "noAreas": "Sin áreas asignadas"
     },
+    "detail": {
+      "title": "Detalle del Turno",
+      "area": "Área",
+      "shiftType": "Tipo de Turno",
+      "date": "Fecha",
+      "schedule": "Horario",
+      "rotation": "Rotación",
+      "notes": "Notas",
+      "nightShift": "Turno nocturno (continúa al día siguiente)",
+      "editAction": "Editar Turno",
+      "deleteAction": "Eliminar Turno"
+    },
     "deleteConfirm": {
       "title": "¿Eliminar turno?",
       "description": "Se eliminará este turno. Esta acción no se puede deshacer.",

@@ -1,14 +1,14 @@
 'use server'
 
-import { Role } from '@prisma/client'
 import { getTranslations } from 'next-intl/server'
+import { Role } from '@prisma/client'
 
 import {
-  requireAdminHRWithOrg,
-  requireDashboardUser,
   isAdminHR,
   isChiefArea,
   isStaff,
+  requireAdminHRWithOrg,
+  requireDashboardUser,
 } from '@/src/shared/lib/auth'
 import { prisma } from '@/src/shared/lib/db'
 import { handleActionError } from '@/src/shared/lib/utils'
@@ -52,21 +52,16 @@ export async function updateSectorAction(id: string, data: UpdateSectorInput) {
     let orgId: string | null = user.organizationId ?? null
 
     if (isChiefArea(user)) {
-      if (!orgId)
-        orgId = await resolveOrgIdFromUserArea(user.id)
+      if (!orgId) orgId = await resolveOrgIdFromUserArea(user.id)
       if (!orgId) return { success: false as const, error: t('noOrganization') }
 
       const isSectorChief = await prisma.userSector.findUnique({
         where: { userId_sectorId: { userId: user.id, sectorId: id } },
       })
       if (!isSectorChief) return { success: false as const, error: t('noPermission') }
-    } else if (isStaff(user))
-      return { success: false as const, error: t('noPermission') }
-    else if (!isAdminHR(user))
-      return { success: false as const, error: t('noPermission') }
-    else if (!orgId)
-      throw new Error('No estás vinculado a una organización')
-
+    } else if (isStaff(user)) return { success: false as const, error: t('noPermission') }
+    else if (!isAdminHR(user)) return { success: false as const, error: t('noPermission') }
+    else if (!orgId) throw new Error('No estás vinculado a una organización')
 
     const updateSchema = await getUpdateSectorSchema(locale)
     const validatedData = updateSchema.parse(data)
@@ -144,9 +139,7 @@ export async function getSectorsAction() {
         where: {
           organizationId: orgId,
           OR: [
-            ...(areaIds.length > 0
-              ? [{ sectorAreas: { some: { areaId: { in: areaIds } } } }]
-              : []),
+            ...(areaIds.length > 0 ? [{ sectorAreas: { some: { areaId: { in: areaIds } } } }] : []),
             ...(userSectorIds.length > 0 ? [{ id: { in: userSectorIds } }] : []),
           ],
         },
@@ -263,11 +256,7 @@ export async function getChiefsForSectorAction(sectorId: string) {
       },
     }
   } catch (error) {
-    return handleActionError(
-      error,
-      'getChiefsForSectorAction',
-      'Error al cargar jefes del sector'
-    )
+    return handleActionError(error, 'getChiefsForSectorAction', 'Error al cargar jefes del sector')
   }
 }
 
@@ -322,10 +311,6 @@ export async function assignChiefToSectorAction(sectorId: string, chiefUserIds: 
     revalidatePaths(...SECTOR_PATHS)
     return { success: true as const }
   } catch (error) {
-    return handleActionError(
-      error,
-      'assignChiefToSectorAction',
-      'Error al asignar jefes al sector'
-    )
+    return handleActionError(error, 'assignChiefToSectorAction', 'Error al asignar jefes al sector')
   }
 }

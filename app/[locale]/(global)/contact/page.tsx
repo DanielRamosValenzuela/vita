@@ -1,5 +1,5 @@
 import { getTranslations } from 'next-intl/server'
-import { Mail, Clock, MapPin } from 'lucide-react'
+import { Clock, Mail, MapPin } from 'lucide-react'
 
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardHeader } from '@/src/shared/ui/card'
@@ -17,12 +17,8 @@ export default async function ContactPage({ params }: ContactPageProps) {
     <PageAnimationWrapper className="bg-background py-16">
       <div className="container mx-auto max-w-6xl px-4">
         <PageSection className="mb-12 text-center">
-          <h1 className="mb-4 text-4xl font-bold tracking-tight sm:text-5xl">
-            {t('title')}
-          </h1>
-          <p className="text-muted-foreground text-lg sm:text-xl">
-            {t('description')}
-          </p>
+          <h1 className="mb-4 text-4xl font-bold tracking-tight sm:text-5xl">{t('title')}</h1>
+          <p className="text-muted-foreground text-lg sm:text-xl">{t('description')}</p>
         </PageSection>
 
         <div className="grid gap-12 lg:grid-cols-2">
@@ -86,9 +82,7 @@ export default async function ContactPage({ params }: ContactPageProps) {
                     {t('form.submit')}
                   </Button>
 
-                  <p className="text-muted-foreground text-xs">
-                    {t('form.disclaimer')}
-                  </p>
+                  <p className="text-muted-foreground text-xs">{t('form.disclaimer')}</p>
                 </form>
               </CardContent>
             </Card>
@@ -115,9 +109,7 @@ export default async function ContactPage({ params }: ContactPageProps) {
                     <Clock className="h-5 w-5" />
                   </div>
                   <div>
-                    <p className="text-muted-foreground text-sm">
-                      {t('info.schedule')}
-                    </p>
+                    <p className="text-muted-foreground text-sm">{t('info.schedule')}</p>
                   </div>
                 </div>
 
@@ -126,9 +118,7 @@ export default async function ContactPage({ params }: ContactPageProps) {
                     <MapPin className="h-5 w-5" />
                   </div>
                   <div>
-                    <p className="text-muted-foreground text-sm">
-                      {t('info.location')}
-                    </p>
+                    <p className="text-muted-foreground text-sm">{t('info.location')}</p>
                   </div>
                 </div>
               </CardContent>

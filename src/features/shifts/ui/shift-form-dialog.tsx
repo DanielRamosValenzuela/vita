@@ -16,8 +16,7 @@ import {
 import { useRouter } from '@/i18n/navigation'
 
 import { createShiftAction, updateShiftAction } from '../api/shift-actions'
-import type { CreateShiftData } from '../types/shift-types'
-import type { ShiftWithRelations } from '../types/shift-types'
+import type { CreateShiftData, ShiftWithRelations } from '../types/shift-types'
 import { ShiftForm, type ShiftTypeOption } from './shift-form'
 
 function shiftToInitialData(shift: ShiftWithRelations) {
@@ -72,8 +71,7 @@ export function ShiftFormDialog({
           onOpenChange(false)
           router.refresh()
           onSuccess?.()
-        } else
-          toast.error(result.error || tToast('toast.shifts.errorCreating'))
+        } else toast.error(result.error || tToast('toast.shifts.errorCreating'))
       } else {
         const result = await createShiftAction(data)
         if (result.success) {
@@ -81,8 +79,7 @@ export function ShiftFormDialog({
           onOpenChange(false)
           router.refresh()
           onSuccess?.()
-        } else
-          toast.error(result.error || tToast('toast.shifts.errorCreating'))
+        } else toast.error(result.error || tToast('toast.shifts.errorCreating'))
       }
     } catch (error) {
       toast.error(tToast('toast.shifts.errorCreating'))
@@ -104,26 +101,24 @@ export function ShiftFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>
-              {editingShift ? t('form.editTitle') : t('form.dialogTitle')}
-            </DialogTitle>
-            <DialogDescription>
-              {editingShift ? t('form.editDescription') : t('form.dialogDescription')}
-            </DialogDescription>
-          </DialogHeader>
-          <ShiftForm
-            _organizationId={organizationId}
-            users={users}
-            areas={areas}
-            shiftTypes={shiftTypes}
-            initialData={initialData}
-            onSubmit={handleSubmit}
-            onCancel={handleCancel}
-            isPending={isSubmitting}
-          />
-        </DialogContent>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>{editingShift ? t('form.editTitle') : t('form.dialogTitle')}</DialogTitle>
+          <DialogDescription>
+            {editingShift ? t('form.editDescription') : t('form.dialogDescription')}
+          </DialogDescription>
+        </DialogHeader>
+        <ShiftForm
+          _organizationId={organizationId}
+          users={users}
+          areas={areas}
+          shiftTypes={shiftTypes}
+          initialData={initialData}
+          onSubmit={handleSubmit}
+          onCancel={handleCancel}
+          isPending={isSubmitting}
+        />
+      </DialogContent>
     </Dialog>
   )
 }

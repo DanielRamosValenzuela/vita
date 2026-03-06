@@ -12,12 +12,7 @@ export async function getChiefAccessibleAreaIds(userId: string): Promise<string[
     }),
   ])
 
-  return [
-    ...new Set([
-      ...directAreas.map((a) => a.areaId),
-      ...sectorAreas.map((sa) => sa.areaId),
-    ]),
-  ]
+  return [...new Set([...directAreas.map((a) => a.areaId), ...sectorAreas.map((sa) => sa.areaId)])]
 }
 
 export async function chiefHasAreaAccess(userId: string, areaId: string): Promise<boolean> {

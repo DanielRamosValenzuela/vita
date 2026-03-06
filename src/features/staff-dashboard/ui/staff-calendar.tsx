@@ -1,14 +1,12 @@
 'use client'
 
-import type { ReactNode } from 'react'
-import { useMemo } from 'react'
+import { useMemo, type ReactNode } from 'react'
 import { useTranslations } from 'next-intl'
 import { Calendar } from 'lucide-react'
 
-import type { ShiftWithRelations } from '@/src/entities/shift/types/shift-types'
 import { groupShiftsForCalendar } from '@/src/entities/shift/lib/calendar-grouping'
-import type { CalendarEvent } from '@/src/entities/shift/ui/shift-calendar'
-import { ShiftCalendar } from '@/src/entities/shift/ui/shift-calendar'
+import type { ShiftWithRelations } from '@/src/entities/shift/types/shift-types'
+import { ShiftCalendar, type CalendarEvent } from '@/src/entities/shift/ui/shift-calendar'
 
 interface StaffCalendarProps {
   shifts: ShiftWithRelations[]
@@ -62,12 +60,8 @@ export function StaffCalendar({
       {!loading && shifts.length === 0 && (
         <div className="flex flex-col items-center gap-2 py-4">
           <Calendar className="h-8 w-8 text-muted-foreground" />
-          <p className="text-sm font-medium text-muted-foreground">
-            {t('emptyState')}
-          </p>
-          <p className="text-xs text-muted-foreground">
-            {t('emptyStateDescription')}
-          </p>
+          <p className="text-sm font-medium text-muted-foreground">{t('emptyState')}</p>
+          <p className="text-xs text-muted-foreground">{t('emptyStateDescription')}</p>
         </div>
       )}
     </div>

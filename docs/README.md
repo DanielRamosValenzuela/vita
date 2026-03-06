@@ -49,7 +49,7 @@ Sistema de Gestion de Turnos Medicos — SaaS B2B Multi-Tenant.
 | [specs/005-staff-dashboard-calendar/](../specs/005-staff-dashboard-calendar/) | Staff Dashboard Calendar | Completado (US5 Google Cal pendiente) |
 | [specs/004-shift-rotations/](../specs/004-shift-rotations/) | Rotativas de Turno | Completado |
 | [specs/003-inbox-notifications/](../specs/003-inbox-notifications/) | Bandeja de Notificaciones | Completado |
-| [specs/002-shifts-system-fix/](../specs/002-shifts-system-fix/) | Fix Sistema de Turnos | Completado (US4 Edit/Delete pendiente) |
+| [specs/002-shifts-system-fix/](../specs/002-shifts-system-fix/) | Fix Sistema de Turnos | Completado |
 | [specs/001-org-calendar-ui/](../specs/001-org-calendar-ui/) | Calendario Organizacional UI | Completado |
 | [specs/001-area-sectors/](../specs/001-area-sectors/) | Sectores (Agrupacion de Areas) | Completado (US4 conteo real-time pendiente) |
 

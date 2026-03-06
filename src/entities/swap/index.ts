@@ -1,6 +1,4 @@
-export type {
-  SwapRequestWithRelations,
-} from './types/swap-types'
+export type { SwapRequestWithRelations } from './types/swap-types'
 
 export {
   createSwapRequest,

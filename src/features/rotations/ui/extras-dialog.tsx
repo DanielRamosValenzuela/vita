@@ -4,6 +4,7 @@ import { useEffect, useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 import { AlertTriangle, Loader2 } from 'lucide-react'
 
+import { toastActionResult } from '@/src/shared/lib/utils/toast-action-result'
 import { Alert, AlertDescription } from '@/src/shared/ui/alert'
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
@@ -15,7 +16,6 @@ import {
   DialogTitle,
 } from '@/src/shared/ui/dialog'
 import { Skeleton } from '@/src/shared/ui/skeleton'
-import { toastActionResult } from '@/src/shared/lib/utils/toast-action-result'
 
 import { assignExtraShiftAction, getExtraCandidatesAction } from '../api/extras-actions'
 import type { ExtraCandidate, GetExtraCandidatesResult } from '../types/rotation-types'
@@ -82,9 +82,7 @@ function CandidateCard({ candidate, onAssign, isPending, assigningUserId, t }: C
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <div className="flex items-center gap-2">
           <span className="font-medium text-sm">{candidate.userName}</span>
-          <Badge variant={getTierVariant(candidate.tier)}>
-            {getTierLabel(candidate.tier, t)}
-          </Badge>
+          <Badge variant={getTierVariant(candidate.tier)}>{getTierLabel(candidate.tier, t)}</Badge>
           {!candidate.isFromSameArea && (
             <Badge variant="outline" className="text-xs">
               {t('extras.crossArea')}
@@ -98,9 +96,7 @@ function CandidateCard({ candidate, onAssign, isPending, assigningUserId, t }: C
           onClick={() => onAssign(candidate.userId)}
           aria-label={t('extras.assignConfirm', { name: candidate.userName })}
         >
-          {isAssigningThis ? (
-            <Loader2 className="h-3 w-3 animate-spin" aria-hidden />
-          ) : null}
+          {isAssigningThis ? <Loader2 className="h-3 w-3 animate-spin" aria-hidden /> : null}
           {t('extras.assign')}
         </Button>
       </div>
@@ -196,9 +192,7 @@ export function ExtrasDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg max-h-[80vh] flex flex-col">
         <DialogHeader>
-          <DialogTitle>
-            {t('extras.dialogTitle', { shiftTypeName })}
-          </DialogTitle>
+          <DialogTitle>{t('extras.dialogTitle', { shiftTypeName })}</DialogTitle>
           <DialogDescription>{t('extras.dialogDescription')}</DialogDescription>
         </DialogHeader>
 
@@ -224,29 +218,35 @@ export function ExtrasDialog({
             </Alert>
           )}
 
-          {!isLoading && !loadState.error && loadState.result && loadState.result.candidates.length === 0 && (
-            <p className="text-sm text-muted-foreground text-center py-4">
-              {t('extras.noCandidates')}
-            </p>
-          )}
-
-          {!isLoading && !loadState.error && loadState.result && loadState.result.candidates.length > 0 && (
-            <div className="space-y-2">
-              <p className="text-xs text-muted-foreground font-medium">
-                {t('extras.candidates')}
+          {!isLoading &&
+            !loadState.error &&
+            loadState.result &&
+            loadState.result.candidates.length === 0 && (
+              <p className="text-sm text-muted-foreground text-center py-4">
+                {t('extras.noCandidates')}
               </p>
-              {loadState.result.candidates.map((candidate) => (
-                <CandidateCard
-                  key={candidate.userId}
-                  candidate={candidate}
-                  onAssign={handleAssign}
-                  isPending={isPending}
-                  assigningUserId={assigningUserId}
-                  t={t}
-                />
-              ))}
-            </div>
-          )}
+            )}
+
+          {!isLoading &&
+            !loadState.error &&
+            loadState.result &&
+            loadState.result.candidates.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-xs text-muted-foreground font-medium">
+                  {t('extras.candidates')}
+                </p>
+                {loadState.result.candidates.map((candidate) => (
+                  <CandidateCard
+                    key={candidate.userId}
+                    candidate={candidate}
+                    onAssign={handleAssign}
+                    isPending={isPending}
+                    assigningUserId={assigningUserId}
+                    t={t}
+                  />
+                ))}
+              </div>
+            )}
         </div>
       </DialogContent>
     </Dialog>

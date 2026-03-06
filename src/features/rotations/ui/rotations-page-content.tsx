@@ -5,11 +5,7 @@ import { useTranslations } from 'next-intl'
 import { AlertTriangle, Pencil, Plus, RefreshCw, Search, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 
-import { Link } from '@/i18n/navigation'
-
 import { useClientPagination } from '@/src/shared/lib/hooks/use-client-pagination'
-import { DataTablePagination } from '@/src/shared/ui/molecules/data-table-pagination'
-
 import { Alert, AlertDescription } from '@/src/shared/ui/alert'
 import {
   AlertDialog,
@@ -25,6 +21,7 @@ import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/src/shared/ui/card'
 import { Input } from '@/src/shared/ui/input'
+import { DataTablePagination } from '@/src/shared/ui/molecules/data-table-pagination'
 import {
   Select,
   SelectContent,
@@ -41,6 +38,8 @@ import {
   TableRow,
 } from '@/src/shared/ui/table'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/src/shared/ui/tooltip'
+
+import { Link } from '@/i18n/navigation'
 
 import { checkCoverageAlertsAction, deleteRotationAction, getRotationsAction } from '../api'
 import type { CoverageAlert, RotationListItem } from '../types/rotation-types'
@@ -122,8 +121,10 @@ interface RotationsTableProps {
 }
 
 function RotationsTable({ rotations, onDelete, onCreate, t }: RotationsTableProps) {
-  const { paginatedItems, page, totalPages, setPage } =
-    useClientPagination({ items: rotations, pageSize: 10 })
+  const { paginatedItems, page, totalPages, setPage } = useClientPagination({
+    items: rotations,
+    pageSize: 10,
+  })
 
   if (rotations.length === 0)
     return (
@@ -215,7 +216,13 @@ interface DeleteRotationDialogProps {
   t: ReturnType<typeof useTranslations<'rotations'>>
 }
 
-function DeleteRotationDialog({ rotation, isPending, onClose, onDelete, t }: DeleteRotationDialogProps) {
+function DeleteRotationDialog({
+  rotation,
+  isPending,
+  onClose,
+  onDelete,
+  t,
+}: DeleteRotationDialogProps) {
   return (
     <AlertDialog
       open={rotation !== null}
@@ -270,16 +277,14 @@ export function RotationsPageContent({
 
       if (result.success && result.data)
         dispatch({ type: 'SET_DATA', rotations: result.data.rotations, total: result.data.total })
-      else
-        toast.error(result.error ?? t('loadError'))
+      else toast.error(result.error ?? t('loadError'))
     })
   }
 
   const handleSearchChange = (value: string) => {
     dispatch({ type: 'SET_SEARCH', searchTerm: value })
 
-    if (debounceRef.current)
-      clearTimeout(debounceRef.current)
+    if (debounceRef.current) clearTimeout(debounceRef.current)
 
     debounceRef.current = setTimeout(() => {
       fetchRotations(value, state.areaFilter, state.statusFilter)
@@ -300,15 +305,13 @@ export function RotationsPageContent({
 
   useEffect(() => {
     return () => {
-      if (debounceRef.current)
-        clearTimeout(debounceRef.current)
+      if (debounceRef.current) clearTimeout(debounceRef.current)
     }
   }, [])
 
   useEffect(() => {
     checkCoverageAlertsAction().then((result) => {
-      if (result.success && result.data)
-        dispatch({ type: 'SET_ALERTS', alerts: result.data })
+      if (result.success && result.data) dispatch({ type: 'SET_ALERTS', alerts: result.data })
     })
   }, [])
 
@@ -323,8 +326,7 @@ export function RotationsPageContent({
         toast.success(t('detail.deleteSuccess'))
         dispatch({ type: 'SET_DELETE', rotation: null })
         fetchRotations(state.searchTerm, state.areaFilter, state.statusFilter)
-      } else
-        toast.error(result.error ?? t('loadError'))
+      } else toast.error(result.error ?? t('loadError'))
     })
   }
 

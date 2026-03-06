@@ -42,16 +42,15 @@ export function SwapList() {
 
   const loadRequests = useCallback(async () => {
     setLoading(true)
-    const result = await getMySwapRequestsAction(
-      filter === 'all' ? undefined : { type: filter }
-    )
-    if (result.success && result.data)
-      setRequests(result.data.requests)
+    const result = await getMySwapRequestsAction(filter === 'all' ? undefined : { type: filter })
+    if (result.success && result.data) setRequests(result.data.requests)
     setLoading(false)
   }, [filter])
 
   useEffect(() => {
-    startTransition(() => { void loadRequests() })
+    startTransition(() => {
+      void loadRequests()
+    })
   }, [loadRequests])
 
   return (
@@ -89,15 +88,13 @@ export function SwapList() {
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <ArrowLeftRight className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm font-medium">
-                      {req.requesterShift.shiftType.name}
-                    </span>
+                    <span className="text-sm font-medium">{req.requesterShift.shiftType.name}</span>
                     <span className="text-sm text-muted-foreground">
                       {formatShortDate(req.requesterShift.startTime)}
                     </span>
                     {req.targetShift && (
                       <>
-                        <span className="text-muted-foreground">{String.fromCharCode(0x21C4)}</span>
+                        <span className="text-muted-foreground">{String.fromCharCode(0x21c4)}</span>
                         <span className="text-sm font-medium">
                           {req.targetShift.shiftType.name}
                         </span>
@@ -123,9 +120,7 @@ export function SwapList() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Badge
-                    variant={STATUS_VARIANT[req.status] ?? 'secondary'}
-                  >
+                  <Badge variant={STATUS_VARIANT[req.status] ?? 'secondary'}>
                     {t(`status.${req.status}`)}
                   </Badge>
                 </div>
@@ -138,7 +133,9 @@ export function SwapList() {
       <SwapDetailPanel
         requestId={selectedId}
         open={!!selectedId}
-        onOpenChange={(open) => { if (!open) setSelectedId(null) }}
+        onOpenChange={(open) => {
+          if (!open) setSelectedId(null)
+        }}
         onUpdated={loadRequests}
       />
     </div>

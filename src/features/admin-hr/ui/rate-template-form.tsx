@@ -7,8 +7,6 @@ import type { Currency } from '@prisma/client'
 import { Info, Plus } from 'lucide-react'
 import { toast } from 'sonner'
 
-import { getAreasAction } from '@/src/features/area/api'
-import { getShiftTypesAction } from '@/src/features/shifts/api/shift-type-actions'
 import { APPLY_CONDITIONS, COMPONENT_TYPES, COMPONENT_UNITS } from '@/src/shared/lib/constants'
 import { Button } from '@/src/shared/ui/button'
 import {
@@ -22,6 +20,8 @@ import { Input } from '@/src/shared/ui/input'
 import { Label } from '@/src/shared/ui/label'
 import { Textarea } from '@/src/shared/ui/textarea'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/src/shared/ui/tooltip'
+import { getAreasAction } from '@/src/features/area/api'
+import { getShiftTypesAction } from '@/src/features/shifts/api/shift-type-actions'
 
 import {
   createRateTemplateAction,
@@ -90,10 +90,7 @@ export function RateTemplateForm({
 
   const loadShiftTypesAndAreas = useCallback(async () => {
     setIsLoadingShiftTypes(true)
-    const [shiftResult, areasResult] = await Promise.all([
-      getShiftTypesAction(),
-      getAreasAction(),
-    ])
+    const [shiftResult, areasResult] = await Promise.all([getShiftTypesAction(), getAreasAction()])
     if (shiftResult.success && shiftResult.data)
       setShiftTypes(
         shiftResult.data.map((st) => ({
@@ -126,16 +123,19 @@ export function RateTemplateForm({
   }, [t])
 
   useEffect(() => {
-    if (mode === 'edit' && existingTemplate) startTransition(() => setFormState(mapTemplateToState(existingTemplate)))
+    if (mode === 'edit' && existingTemplate)
+      startTransition(() => setFormState(mapTemplateToState(existingTemplate)))
   }, [mode, existingTemplate, open])
 
   useEffect(() => {
-    if (open && shiftTypes.length === 0 && !isLoadingShiftTypes) startTransition(() => { void loadShiftTypesAndAreas() })
+    if (open && shiftTypes.length === 0 && !isLoadingShiftTypes)
+      startTransition(() => {
+        void loadShiftTypesAndAreas()
+      })
   }, [open, shiftTypes.length, isLoadingShiftTypes, loadShiftTypesAndAreas])
 
   const handleDialogOpenChange = (nextOpen: boolean) => {
-    if (nextOpen && shiftTypes.length === 0 && !isLoadingShiftTypes)
-      void loadShiftTypesAndAreas()
+    if (nextOpen && shiftTypes.length === 0 && !isLoadingShiftTypes) void loadShiftTypesAndAreas()
     onOpenChange(nextOpen)
   }
 

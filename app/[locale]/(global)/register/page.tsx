@@ -27,9 +27,7 @@ export default async function RegisterPage({ params }: { params: Promise<{ local
             <h1 className="text-foreground text-3xl font-bold tracking-tight">
               {t('createAccountTitle')}
             </h1>
-            <p className="text-muted-foreground mt-2 text-sm">
-              {t('createAccountSubtitle')}
-            </p>
+            <p className="text-muted-foreground mt-2 text-sm">{t('createAccountSubtitle')}</p>
           </header>
           <section className="bg-card rounded-xl border px-8 py-8 pb-12 shadow-sm">
             <RegisterForm />

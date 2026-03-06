@@ -19,7 +19,6 @@ import {
   syncPrimaryEmailAction,
   unlinkGoogleAction,
 } from '../api'
-
 import { EmailDialogs } from './email-dialogs'
 import { EmailListItem, type UserEmail } from './email-list-item'
 
@@ -47,26 +46,15 @@ const initialState: EmailsState = {
 }
 
 function emailsReducer(state: EmailsState, action: EmailsAction): EmailsState {
-  if (action.type === 'SET_EMAILS')
-    return { ...state, emails: action.payload }
-  else if (action.type === 'SET_NEW_EMAIL')
-    return { ...state, newEmail: action.payload }
-  else if (action.type === 'SET_DELETE_EMAIL_ID')
-    return { ...state, deleteEmailId: action.payload }
-  else if (action.type === 'SET_UNLINK_EMAIL_ID')
-    return { ...state, unlinkEmailId: action.payload }
-  else if (action.type === 'SET_LOADING')
-    return { ...state, isLoading: action.payload }
+  if (action.type === 'SET_EMAILS') return { ...state, emails: action.payload }
+  else if (action.type === 'SET_NEW_EMAIL') return { ...state, newEmail: action.payload }
+  else if (action.type === 'SET_DELETE_EMAIL_ID') return { ...state, deleteEmailId: action.payload }
+  else if (action.type === 'SET_UNLINK_EMAIL_ID') return { ...state, unlinkEmailId: action.payload }
+  else if (action.type === 'SET_LOADING') return { ...state, isLoading: action.payload }
   return state
 }
 
-export function EmailsManagementSection({
-  success,
-  error,
-}: {
-  success?: string
-  error?: string
-}) {
+export function EmailsManagementSection({ success, error }: { success?: string; error?: string }) {
   const t = useTranslations('profile.emails')
   const [state, dispatch] = useReducer(emailsReducer, initialState)
   const [isPending, startTransition] = useTransition()
@@ -194,11 +182,7 @@ export function EmailsManagementSection({
             />
           </div>
           <Button onClick={handleAddEmail} disabled={isPending || !newEmail.trim()}>
-            {isPending ? (
-              <Spinner size="sm" className="mr-2" />
-            ) : (
-              <Plus className="mr-2 h-4 w-4" />
-            )}
+            {isPending ? <Spinner size="sm" className="mr-2" /> : <Plus className="mr-2 h-4 w-4" />}
             {t('addEmail')}
           </Button>
         </div>

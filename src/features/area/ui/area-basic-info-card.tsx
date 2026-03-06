@@ -65,9 +65,7 @@ export function AreaBasicInfoCard({
             ariaLabel={t('form.iconAria')}
             searchPlaceholder={t('form.iconSearch')}
             statusLabel={(showing, total, hasSearch) =>
-              hasSearch
-                ? t('form.iconShowing', { showing, total })
-                : t('form.iconTotal', { total })
+              hasSearch ? t('form.iconShowing', { showing, total }) : t('form.iconTotal', { total })
             }
           />
         </div>

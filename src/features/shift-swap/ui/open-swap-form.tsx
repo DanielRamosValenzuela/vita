@@ -47,8 +47,7 @@ export function OpenSwapForm({
       toast.success(t('success.created'))
       onOpenChange(false)
       setReason('')
-    } else
-      toast.error(result.error)
+    } else toast.error(result.error)
     setSubmitting(false)
   }
 

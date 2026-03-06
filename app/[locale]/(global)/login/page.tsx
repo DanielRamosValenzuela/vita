@@ -35,11 +35,7 @@ export default async function LoginPage({
               {t('signInTitle')}
             </h1>
             {registered === 'true' && (
-              <p
-                className="mt-2 text-sm text-green-600"
-                role="status"
-                aria-live="polite"
-              >
+              <p className="mt-2 text-sm text-green-600" role="status" aria-live="polite">
                 {t('registrationSuccess')}
               </p>
             )}

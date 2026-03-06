@@ -2,34 +2,37 @@
 
 import type { SwapRequestStatus } from '@prisma/client'
 
-import { getChiefAccessibleAreaIds, resolveChiefOrganizationId } from '@/src/shared/lib/auth/chief-access'
+import {
+  getChiefAccessibleAreaIds,
+  resolveChiefOrganizationId,
+} from '@/src/shared/lib/auth/chief-access'
 import { isChief } from '@/src/shared/lib/auth/rbac'
 import { requireDashboardUser } from '@/src/shared/lib/auth/session'
 import { prisma } from '@/src/shared/lib/db'
 import type { ActionResult } from '@/src/shared/lib/types'
 import { handleActionError } from '@/src/shared/lib/utils/action-error-handler'
 
+import { getPendingApplicationCountForChief } from '@/src/entities/shift-application'
 import {
-  getSwapRequestById,
-  getSwapRequestsForUser,
-  getSwapRequestsForChief,
   getPendingSwapCountForUser,
+  getSwapRequestById,
+  getSwapRequestsForChief,
+  getSwapRequestsForUser,
   type SwapRequestWithRelations,
 } from '@/src/entities/swap'
-import { getPendingApplicationCountForChief } from '@/src/entities/shift-application'
 
-export async function getMySwapRequestsAction(
-  filter?: { type?: 'sent' | 'received' | 'open'; status?: SwapRequestStatus }
-): Promise<ActionResult<{ requests: SwapRequestWithRelations[] }>> {
+export async function getMySwapRequestsAction(filter?: {
+  type?: 'sent' | 'received' | 'open'
+  status?: SwapRequestStatus
+}): Promise<ActionResult<{ requests: SwapRequestWithRelations[] }>> {
   try {
     const session = await requireDashboardUser()
 
     const organizationId = isChief(session)
       ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
-      : session.organizationId ?? null
+      : (session.organizationId ?? null)
 
-    if (!organizationId)
-      return { success: true, data: { requests: [] } }
+    if (!organizationId) return { success: true, data: { requests: [] } }
 
     const requests = await getSwapRequestsForUser(session.id, organizationId, filter)
     return { success: true, data: { requests } }
@@ -46,14 +49,12 @@ export async function getSwapDetailAction(
 
     const organizationId = isChief(session)
       ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
-      : session.organizationId ?? null
+      : (session.organizationId ?? null)
 
-    if (!organizationId)
-      return { success: false, error: 'Sin organización' }
+    if (!organizationId) return { success: false, error: 'Sin organización' }
 
     const request = await getSwapRequestById(requestId, organizationId)
-    if (!request)
-      return { success: false, error: 'Solicitud no encontrada' }
+    if (!request) return { success: false, error: 'Solicitud no encontrada' }
 
     const canView =
       request.requesterId === session.id ||
@@ -62,10 +63,8 @@ export async function getSwapDetailAction(
 
     if (!canView && isChief(session)) {
       const areaIds = await getChiefAccessibleAreaIds(session.id)
-      if (!areaIds.includes(request.areaId))
-        return { success: false, error: 'Sin acceso' }
-    } else if (!canView)
-      return { success: false, error: 'Sin acceso' }
+      if (!areaIds.includes(request.areaId)) return { success: false, error: 'Sin acceso' }
+    } else if (!canView) return { success: false, error: 'Sin acceso' }
 
     return { success: true, data: request }
   } catch (error) {
@@ -81,10 +80,9 @@ export async function getPendingChiefSwapsAction(): Promise<
 
     const organizationId = isChief(session)
       ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
-      : session.organizationId ?? null
+      : (session.organizationId ?? null)
 
-    if (!organizationId)
-      return { success: true, data: { requests: [] } }
+    if (!organizationId) return { success: true, data: { requests: [] } }
 
     if (!isChief(session) && session.role !== 'ADMIN_HR')
       return { success: true, data: { requests: [] } }
@@ -103,24 +101,25 @@ export async function getPendingChiefSwapsAction(): Promise<
   }
 }
 
-export async function getAvailableShiftsForSwapAction(
-  areaId: string
-): Promise<ActionResult<{ shifts: Array<{
-  id: string
-  startTime: Date
-  endTime: Date
-  user: { id: string; name: string }
-  shiftType: { id: string; name: string; color: string; icon: string | null }
-}> }>> {
+export async function getAvailableShiftsForSwapAction(areaId: string): Promise<
+  ActionResult<{
+    shifts: Array<{
+      id: string
+      startTime: Date
+      endTime: Date
+      user: { id: string; name: string }
+      shiftType: { id: string; name: string; color: string; icon: string | null }
+    }>
+  }>
+> {
   try {
     const session = await requireDashboardUser()
 
     const organizationId = isChief(session)
       ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
-      : session.organizationId ?? null
+      : (session.organizationId ?? null)
 
-    if (!organizationId)
-      return { success: true, data: { shifts: [] } }
+    if (!organizationId) return { success: true, data: { shifts: [] } }
 
     const twentyFourHoursFromNow = new Date(Date.now() + 24 * 60 * 60 * 1000)
     const thirtyDaysFromNow = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
@@ -132,8 +131,12 @@ export async function getAvailableShiftsForSwapAction(
         userId: { not: session.id },
         status: 'SCHEDULED',
         startTime: { gte: twentyFourHoursFromNow, lte: thirtyDaysFromNow },
-        swapRequestsAsRequester: { none: { status: { in: ['PENDING_PEER', 'PENDING_SELECTION', 'PENDING_CHIEF'] } } },
-        swapRequestsAsTarget: { none: { status: { in: ['PENDING_PEER', 'PENDING_SELECTION', 'PENDING_CHIEF'] } } },
+        swapRequestsAsRequester: {
+          none: { status: { in: ['PENDING_PEER', 'PENDING_SELECTION', 'PENDING_CHIEF'] } },
+        },
+        swapRequestsAsTarget: {
+          none: { status: { in: ['PENDING_PEER', 'PENDING_SELECTION', 'PENDING_CHIEF'] } },
+        },
       },
       select: {
         id: true,
@@ -147,22 +150,23 @@ export async function getAvailableShiftsForSwapAction(
 
     return { success: true, data: { shifts } }
   } catch (error) {
-    return handleActionError(error, 'getAvailableShiftsForSwapAction', 'Error al obtener turnos disponibles')
+    return handleActionError(
+      error,
+      'getAvailableShiftsForSwapAction',
+      'Error al obtener turnos disponibles'
+    )
   }
 }
 
-export async function getPendingRequestsCountAction(): Promise<
-  ActionResult<{ count: number }>
-> {
+export async function getPendingRequestsCountAction(): Promise<ActionResult<{ count: number }>> {
   try {
     const session = await requireDashboardUser()
 
     const organizationId = isChief(session)
       ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
-      : session.organizationId ?? null
+      : (session.organizationId ?? null)
 
-    if (!organizationId)
-      return { success: true, data: { count: 0 } }
+    if (!organizationId) return { success: true, data: { count: 0 } }
 
     let count = await getPendingSwapCountForUser(session.id, organizationId)
 

@@ -92,9 +92,7 @@ export function OrganizationTableRow({
 
       <TableCell className="text-right">{formatCurrency(org.monthlyFee)}</TableCell>
 
-      <TableCell>
-        {org.nextPayment ? formatDate(new Date(org.nextPayment), locale) : '-'}
-      </TableCell>
+      <TableCell>{org.nextPayment ? formatDate(new Date(org.nextPayment), locale) : '-'}</TableCell>
 
       <TableCell className="text-right">
         <div className="hidden md:flex items-center justify-end gap-2">

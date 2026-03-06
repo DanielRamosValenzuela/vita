@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 
+import { toastActionResult } from '@/src/shared/lib/utils/toast-action-result'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,7 +24,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/src/shared/ui/select'
-import { toastActionResult } from '@/src/shared/lib/utils/toast-action-result'
 
 import { generatePayrollAction } from '../api/payroll-actions'
 

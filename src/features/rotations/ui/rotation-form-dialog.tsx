@@ -5,6 +5,8 @@ import { useTranslations } from 'next-intl'
 import { ChevronDown, ChevronUp, Loader2, Minus, Plus, X } from 'lucide-react'
 import { toast } from 'sonner'
 
+import { AREA_ICONS } from '@/src/shared/lib/constants/icons'
+import { cn } from '@/src/shared/lib/utils'
 import { Button } from '@/src/shared/ui/button'
 import { Checkbox } from '@/src/shared/ui/checkbox'
 import {
@@ -15,8 +17,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/src/shared/ui/dialog'
+import { IconDisplay, IconPicker } from '@/src/shared/ui/icon-picker'
 import { Input } from '@/src/shared/ui/input'
 import { Label } from '@/src/shared/ui/label'
+import { Popover, PopoverContent, PopoverTrigger } from '@/src/shared/ui/popover'
 import {
   Select,
   SelectContent,
@@ -24,12 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/src/shared/ui/select'
-import { Popover, PopoverContent, PopoverTrigger } from '@/src/shared/ui/popover'
 import { Textarea } from '@/src/shared/ui/textarea'
-import { AREA_ICONS } from '@/src/shared/lib/constants/icons'
-import { cn } from '@/src/shared/lib/utils'
-import { IconDisplay, IconPicker } from '@/src/shared/ui/icon-picker'
-
 import { getShiftTypesAction } from '@/src/features/shifts/api/shift-type-actions'
 import { PREDEFINED_COLORS } from '@/src/features/shifts/ui/shift-types-utils'
 
@@ -230,10 +229,7 @@ function StepRow({
           onCheckedChange={(checked) => onToggleRest(index, checked === true)}
           disabled={isPending}
         />
-        <Label
-          htmlFor={`step-rest-${index}`}
-          className="cursor-pointer text-xs font-normal"
-        >
+        <Label htmlFor={`step-rest-${index}`} className="cursor-pointer text-xs font-normal">
           {t('steps.restDay')}
         </Label>
       </div>
@@ -250,9 +246,7 @@ function StepRow({
               {t('form.loadingShiftTypes')}
             </span>
           ) : shiftTypes.length === 0 ? (
-            <span className="text-muted-foreground text-xs italic">
-              {t('form.noShiftTypes')}
-            </span>
+            <span className="text-muted-foreground text-xs italic">{t('form.noShiftTypes')}</span>
           ) : (
             <Select
               value={step.shiftTypeId ?? ''}
@@ -661,9 +655,7 @@ export function RotationFormDialog({
       .then((result) => {
         if (result.success && result.data) {
           const areaTypes = result.data.filter(
-            (st) =>
-              st.isGlobal ||
-              st.areaShiftTypes?.some((ast) => ast.areaId === value)
+            (st) => st.isGlobal || st.areaShiftTypes?.some((ast) => ast.areaId === value)
           )
           dispatch({
             type: 'SET_SHIFT_TYPES',
@@ -675,11 +667,7 @@ export function RotationFormDialog({
   }
 
   const usedShiftTypeIds = Array.from(
-    new Set(
-      steps
-        .filter((s) => !s.isRestDay && s.shiftTypeId)
-        .map((s) => s.shiftTypeId as string)
-    )
+    new Set(steps.filter((s) => !s.isRestDay && s.shiftTypeId).map((s) => s.shiftTypeId as string))
   )
 
   const handleStepToggleRest = (index: number, checked: boolean) => {
@@ -772,8 +760,7 @@ export function RotationFormDialog({
       if (result.success) {
         toast.success(t('form.created'))
         onCreated()
-      } else
-        toast.error(result.error ?? t('loadError'))
+      } else toast.error(result.error ?? t('loadError'))
     })
   }
 
@@ -815,11 +802,7 @@ export function RotationFormDialog({
           >
             {t('form.cancel')}
           </Button>
-          <Button
-            type="button"
-            onClick={handleSubmit}
-            disabled={!isValid || isPending}
-          >
+          <Button type="button" onClick={handleSubmit} disabled={!isValid || isPending}>
             {isPending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden />

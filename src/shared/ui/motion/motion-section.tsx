@@ -1,14 +1,15 @@
 'use client'
 
 import { m, useReducedMotion } from 'framer-motion'
-import { useScrollAnimation } from '@/src/shared/lib/animations/use-scroll-animation'
+
 import {
-  fadeInUp,
   fadeIn,
+  fadeInUp,
   scaleIn,
   slideInLeft,
   slideInRight,
 } from '@/src/shared/lib/animations/motion-variants'
+import { useScrollAnimation } from '@/src/shared/lib/animations/use-scroll-animation'
 
 const variantMap = {
   fadeInUp,
@@ -51,8 +52,7 @@ export function MotionSection({
               visible: {
                 ...(selectedVariant.visible as object),
                 transition: {
-                  ...((selectedVariant.visible as Record<string, unknown>)
-                    ?.transition as object),
+                  ...((selectedVariant.visible as Record<string, unknown>)?.transition as object),
                   delay,
                 },
               },

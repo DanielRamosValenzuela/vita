@@ -1,13 +1,11 @@
 import { NextResponse } from 'next/server'
 
-import { getFeedTokenByToken } from '@/src/entities/calendar-feed'
 import { getShiftsForFeed } from '@/src/features/staff-dashboard/api/staff-shifts-actions'
 import { generateICalContent } from '@/src/features/staff-dashboard/lib/ical-generator'
 
-export async function GET(
-  _request: Request,
-  { params }: { params: Promise<{ token: string }> }
-) {
+import { getFeedTokenByToken } from '@/src/entities/calendar-feed'
+
+export async function GET(_request: Request, { params }: { params: Promise<{ token: string }> }) {
   const { token } = await params
 
   const feedToken = await getFeedTokenByToken(token)
@@ -27,11 +25,7 @@ export async function GET(
   const threeMonthsAgo = new Date()
   threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3)
 
-  const shifts = await getShiftsForFeed(
-    feedToken.userId,
-    feedToken.organizationId,
-    threeMonthsAgo
-  )
+  const shifts = await getShiftsForFeed(feedToken.userId, feedToken.organizationId, threeMonthsAgo)
 
   const icsContent = generateICalContent(
     shifts.map((s) => ({
@@ -46,9 +40,7 @@ export async function GET(
       organizationName: s.organization?.name,
     })),
     {
-      calendarName: feedToken.organizationId
-        ? 'VITA Turnos'
-        : 'VITA Turnos (Todas)',
+      calendarName: feedToken.organizationId ? 'VITA Turnos' : 'VITA Turnos (Todas)',
     }
   )
 

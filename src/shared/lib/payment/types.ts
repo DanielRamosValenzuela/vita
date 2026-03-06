@@ -7,8 +7,6 @@ import type {
   PaymentStatus,
 } from '@prisma/client'
 
-
-
 export interface ComponentEvaluationContext {
   dayType: DayType
   shiftTypeId: string
@@ -16,8 +14,6 @@ export interface ComponentEvaluationContext {
   isExtra: boolean
   classification: 'DAY' | 'NIGHT' | 'MIXED'
 }
-
-
 
 export interface ComponentBreakdown {
   componentId: string
@@ -38,8 +34,6 @@ export interface ShiftPaymentResult {
   isPartialCompletion: boolean
   breakdowns: ComponentBreakdown[]
 }
-
-
 
 export interface ContractPeriodInfo {
   contractId: string

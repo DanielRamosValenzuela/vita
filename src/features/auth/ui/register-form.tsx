@@ -54,7 +54,7 @@ const initialState: RegisterFormState = {
 
 function registerFormReducer(
   state: RegisterFormState,
-  action: RegisterFormAction,
+  action: RegisterFormAction
 ): RegisterFormState {
   switch (action.type) {
     case 'SET_LOADING':
@@ -135,7 +135,10 @@ export function RegisterForm() {
     dispatch({ type: 'SET_DOC_NUMBER', value: formatted })
 
     if (formatted && !validateTaxId(formatted, country))
-      dispatch({ type: 'SET_DOC_NUMBER_ERROR', error: t('taxIdInvalid', { label: taxIdConfig.label }) })
+      dispatch({
+        type: 'SET_DOC_NUMBER_ERROR',
+        error: t('taxIdInvalid', { label: taxIdConfig.label }),
+      })
     else dispatch({ type: 'SET_DOC_NUMBER_ERROR', error: null })
   }
 
@@ -267,16 +270,35 @@ export function RegisterForm() {
             </TooltipTrigger>
             <TooltipContent side="right" className="max-w-xs">
               <ul className="space-y-1 text-xs">
-                <li>{'• '}{t('passwordMinLength')}</li>
-                <li>{'• '}{t('passwordUppercase')}</li>
-                <li>{'• '}{t('passwordLowercase')}</li>
-                <li>{'• '}{t('passwordNumber')}</li>
+                <li>
+                  {'• '}
+                  {t('passwordMinLength')}
+                </li>
+                <li>
+                  {'• '}
+                  {t('passwordUppercase')}
+                </li>
+                <li>
+                  {'• '}
+                  {t('passwordLowercase')}
+                </li>
+                <li>
+                  {'• '}
+                  {t('passwordNumber')}
+                </li>
               </ul>
             </TooltipContent>
           </Tooltip>
         </div>
         <div className="relative">
-          <Input type={showPassword ? 'text' : 'password'} id="password" name="password" required placeholder="••••••••" className="pr-10" />
+          <Input
+            type={showPassword ? 'text' : 'password'}
+            id="password"
+            name="password"
+            required
+            placeholder="••••••••"
+            className="pr-10"
+          />
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
@@ -296,7 +318,13 @@ export function RegisterForm() {
       <div className="space-y-2">
         <Label htmlFor="confirmPassword">{t('confirmPassword')}</Label>
         <div className="relative">
-          <Input type={showConfirmPassword ? 'text' : 'password'} id="confirmPassword" name="confirmPassword" required className="pr-10" />
+          <Input
+            type={showConfirmPassword ? 'text' : 'password'}
+            id="confirmPassword"
+            name="confirmPassword"
+            required
+            className="pr-10"
+          />
           <button
             type="button"
             onClick={() => setShowConfirmPassword(!showConfirmPassword)}

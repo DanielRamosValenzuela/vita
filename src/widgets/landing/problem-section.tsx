@@ -1,7 +1,7 @@
 'use client'
 
-import { XCircle } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { XCircle } from 'lucide-react'
 
 import { Badge } from '@/src/shared/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/src/shared/ui/card'

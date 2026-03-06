@@ -72,7 +72,12 @@ const OrganizationDetailsPage = async ({ params }: PageProps) => {
   }
 
   const getRoleLabel = (role: string) => {
-    const key = `roles.${role}` as 'roles.SUPER_ADMIN' | 'roles.ADMIN_HR' | 'roles.CHIEF_AREA' | 'roles.CHIEF_SECTOR' | 'roles.STAFF'
+    const key = `roles.${role}` as
+      | 'roles.SUPER_ADMIN'
+      | 'roles.ADMIN_HR'
+      | 'roles.CHIEF_AREA'
+      | 'roles.CHIEF_SECTOR'
+      | 'roles.STAFF'
     return tCommon(key) || role
   }
 

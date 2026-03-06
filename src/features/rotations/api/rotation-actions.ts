@@ -4,7 +4,11 @@ import { revalidatePath } from 'next/cache'
 import type { Prisma } from '@prisma/client'
 import { z } from 'zod'
 
-import { chiefHasAreaAccess, getChiefAccessibleAreaIds, resolveChiefOrganizationId } from '@/src/shared/lib/auth/chief-access'
+import {
+  chiefHasAreaAccess,
+  getChiefAccessibleAreaIds,
+  resolveChiefOrganizationId,
+} from '@/src/shared/lib/auth/chief-access'
 import { isChiefArea } from '@/src/shared/lib/auth/rbac'
 import { requireAdminHROrChief } from '@/src/shared/lib/auth/session'
 import { prisma } from '@/src/shared/lib/db'
@@ -101,9 +105,8 @@ export const createRotationAction = async (
 
     const derivedOrgId = isChiefArea(session)
       ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
-      : session.organizationId ?? null
-    if (!derivedOrgId)
-      return { success: false, error: 'No tienes una organización asignada' }
+      : (session.organizationId ?? null)
+    if (!derivedOrgId) return { success: false, error: 'No tienes una organización asignada' }
     const organizationId = derivedOrgId
 
     const validatedData = createRotationSchema.parse(data)
@@ -111,7 +114,10 @@ export const createRotationAction = async (
     if (isChiefArea(session)) {
       const hasAccess = await chiefHasAreaAccess(session.id, validatedData.areaId)
       if (!hasAccess)
-        return { success: false, error: 'Solo puedes gestionar rotativas en las áreas que tienes asignadas' }
+        return {
+          success: false,
+          error: 'Solo puedes gestionar rotativas en las áreas que tienes asignadas',
+        }
     }
 
     const area = await prisma.area.findUnique({
@@ -137,7 +143,10 @@ export const createRotationAction = async (
       const activeIds = new Set(activeShiftTypes.map((st) => st.id))
       const invalidId = shiftTypeIds.find((id) => !activeIds.has(id))
       if (invalidId)
-        return { success: false, error: 'Uno o más tipos de turno no están activos o no pertenecen a tu organización' }
+        return {
+          success: false,
+          error: 'Uno o más tipos de turno no están activos o no pertenecen a tu organización',
+        }
 
       const areaAssignments = await prisma.areaShiftType.findMany({
         where: { areaId: validatedData.areaId, shiftTypeId: { in: shiftTypeIds } },
@@ -197,7 +206,11 @@ export const createRotationAction = async (
 
     revalidatePath('/dashboard/rotations')
 
-    return { success: true, data: rotation as RotationWithRelations, message: 'Rotativa creada exitosamente' }
+    return {
+      success: true,
+      data: rotation as RotationWithRelations,
+      message: 'Rotativa creada exitosamente',
+    }
   } catch (error) {
     console.error('[createRotationAction] Error:', error)
     return {
@@ -215,9 +228,8 @@ export const getRotationsAction = async (
 
     const derivedOrgId = isChiefArea(session)
       ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
-      : session.organizationId ?? null
-    if (!derivedOrgId)
-      return { success: false, error: 'No tienes una organización asignada' }
+      : (session.organizationId ?? null)
+    if (!derivedOrgId) return { success: false, error: 'No tienes una organización asignada' }
     const organizationId = derivedOrgId
 
     const { page = 1, pageSize = 20, areaId, status, search } = params
@@ -237,8 +249,7 @@ export const getRotationsAction = async (
       organizationId,
     }
 
-    if (chiefAreaIds !== null)
-      where.areaId = { in: chiefAreaIds }
+    if (chiefAreaIds !== null) where.areaId = { in: chiefAreaIds }
 
     if (areaId) {
       if (chiefAreaIds !== null && !chiefAreaIds.includes(areaId))
@@ -251,8 +262,7 @@ export const getRotationsAction = async (
 
     if (status) where.status = status
 
-    if (search)
-      where.name = { contains: search, mode: 'insensitive' }
+    if (search) where.name = { contains: search, mode: 'insensitive' }
 
     const skip = (page - 1) * pageSize
 
@@ -349,9 +359,8 @@ export const getRotationAction = async (
 
     const derivedOrgId = isChiefArea(session)
       ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
-      : session.organizationId ?? null
-    if (!derivedOrgId)
-      return { success: false, error: 'No tienes una organización asignada' }
+      : (session.organizationId ?? null)
+    if (!derivedOrgId) return { success: false, error: 'No tienes una organización asignada' }
     const organizationId = derivedOrgId
 
     const rotation = await prisma.rotation.findFirst({
@@ -359,13 +368,15 @@ export const getRotationAction = async (
       include: rotationInclude,
     })
 
-    if (!rotation)
-      return { success: false, error: 'Rotativa no encontrada' }
+    if (!rotation) return { success: false, error: 'Rotativa no encontrada' }
 
     if (isChiefArea(session)) {
       const hasAccess = await chiefHasAreaAccess(session.id, rotation.areaId)
       if (!hasAccess)
-        return { success: false, error: 'Solo puedes ver rotativas de las áreas que tienes asignadas' }
+        return {
+          success: false,
+          error: 'Solo puedes ver rotativas de las áreas que tienes asignadas',
+        }
     }
 
     return { success: true, data: rotation as RotationWithRelations }
@@ -387,26 +398,26 @@ export const deleteRotationAction = async (
 
     const derivedOrgId = isChiefArea(session)
       ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
-      : session.organizationId ?? null
-    if (!derivedOrgId)
-      return { success: false, error: 'No tienes una organización asignada' }
+      : (session.organizationId ?? null)
+    if (!derivedOrgId) return { success: false, error: 'No tienes una organización asignada' }
     const organizationId = derivedOrgId
 
     const rotation = await prisma.rotation.findFirst({
       where: { id: rotationId, organizationId },
       select: { id: true, areaId: true },
     })
-    if (!rotation)
-      return { success: false, error: 'Rotativa no encontrada' }
+    if (!rotation) return { success: false, error: 'Rotativa no encontrada' }
 
     if (isChiefArea(session)) {
       const hasAccess = await chiefHasAreaAccess(session.id, rotation.areaId)
       if (!hasAccess)
-        return { success: false, error: 'Solo puedes eliminar rotativas de las áreas que tienes asignadas' }
+        return {
+          success: false,
+          error: 'Solo puedes eliminar rotativas de las áreas que tienes asignadas',
+        }
     }
 
-    if (deleteLinkedShifts)
-      await prisma.shift.deleteMany({ where: { rotationId } })
+    if (deleteLinkedShifts) await prisma.shift.deleteMany({ where: { rotationId } })
     else
       await prisma.shift.updateMany({
         where: { rotationId },
@@ -436,9 +447,8 @@ export const updateRotationAction = async (
 
     const derivedOrgId = isChiefArea(session)
       ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
-      : session.organizationId ?? null
-    if (!derivedOrgId)
-      return { success: false, error: 'No tienes una organización asignada' }
+      : (session.organizationId ?? null)
+    if (!derivedOrgId) return { success: false, error: 'No tienes una organización asignada' }
     const organizationId = derivedOrgId
 
     const validatedData = updateRotationSchema.parse(data)
@@ -447,13 +457,15 @@ export const updateRotationAction = async (
       where: { id: rotationId, organizationId },
       select: { id: true, areaId: true },
     })
-    if (!existing)
-      return { success: false, error: 'Rotativa no encontrada' }
+    if (!existing) return { success: false, error: 'Rotativa no encontrada' }
 
     if (isChiefArea(session)) {
       const hasAccess = await chiefHasAreaAccess(session.id, existing.areaId)
       if (!hasAccess)
-        return { success: false, error: 'Solo puedes gestionar rotativas en las áreas que tienes asignadas' }
+        return {
+          success: false,
+          error: 'Solo puedes gestionar rotativas en las áreas que tienes asignadas',
+        }
     }
 
     if (validatedData.status === 'ACTIVE') {
@@ -527,7 +539,11 @@ export const updateRotationAction = async (
 
     revalidatePath('/dashboard/rotations')
 
-    return { success: true, data: rotation as RotationWithRelations, message: 'Rotativa actualizada exitosamente' }
+    return {
+      success: true,
+      data: rotation as RotationWithRelations,
+      message: 'Rotativa actualizada exitosamente',
+    }
   } catch (error) {
     console.error('[updateRotationAction] Error:', error)
     return {

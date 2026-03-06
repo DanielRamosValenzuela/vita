@@ -2,7 +2,6 @@
 
 import { useCallback, useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
-import { Link } from '@/i18n/navigation'
 import { Eye, Plus, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -23,7 +22,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src
 import { IconDisplay } from '@/src/shared/ui/icon-picker'
 import { DataTablePagination } from '@/src/shared/ui/molecules/data-table-pagination'
 import { DataTableToolbar } from '@/src/shared/ui/molecules/data-table-toolbar'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/src/shared/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/src/shared/ui/select'
 import {
   Table,
   TableBody,
@@ -35,7 +40,7 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/src/shared/ui/tooltip'
 import { deleteAreaAction } from '@/src/features/area/api'
 
-import { useRouter } from '@/i18n/navigation'
+import { Link, useRouter } from '@/i18n/navigation'
 
 const DEFAULT_AREA_ICON = 'Building2'
 
@@ -156,58 +161,58 @@ export function AreasTable({ areas, canCreate = true, canDelete = true }: AreasT
               </TableHeader>
               <TableBody>
                 {paginatedItems.map((area) => (
-                <TableRow key={area.id}>
-                  <TableCell>
-                    <span className="flex items-center gap-2">
-                      <span style={{ color: area.color }}>
-                        <IconDisplay iconName={area.icon ?? DEFAULT_AREA_ICON} size={18} />
+                  <TableRow key={area.id}>
+                    <TableCell>
+                      <span className="flex items-center gap-2">
+                        <span style={{ color: area.color }}>
+                          <IconDisplay iconName={area.icon ?? DEFAULT_AREA_ICON} size={18} />
+                        </span>
+                        <span className="font-medium">{area.name}</span>
                       </span>
-                      <span className="font-medium">{area.name}</span>
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-muted-foreground text-sm">
-                    {area.description || '-'}
-                  </TableCell>
-                  <TableCell className="text-sm">{area._count?.shiftTypes ?? 0}</TableCell>
-                  <TableCell className="text-sm">{area.chiefsCount ?? 0}</TableCell>
-                  <TableCell className="text-sm">{area.staffCount ?? 0}</TableCell>
-                  <TableCell>
-                    <Badge variant={area.isActive ? 'default' : 'secondary'}>
-                      {area.isActive ? t('status.active') : t('status.inactive')}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button asChild variant="ghost" size="sm">
-                            <Link href={`/dashboard/areas/${area.id}/edit`}>
-                              <Eye className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                            </Link>
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent side="top">{t('table.view')}</TooltipContent>
-                      </Tooltip>
-                      {canDelete && (
+                    </TableCell>
+                    <TableCell className="text-muted-foreground text-sm">
+                      {area.description || '-'}
+                    </TableCell>
+                    <TableCell className="text-sm">{area._count?.shiftTypes ?? 0}</TableCell>
+                    <TableCell className="text-sm">{area.chiefsCount ?? 0}</TableCell>
+                    <TableCell className="text-sm">{area.staffCount ?? 0}</TableCell>
+                    <TableCell>
+                      <Badge variant={area.isActive ? 'default' : 'secondary'}>
+                        {area.isActive ? t('status.active') : t('status.inactive')}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2">
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setDeleteTarget({ id: area.id, name: area.name })}
-                              className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                              aria-label={t('delete')}
-                            >
-                              <Trash2 className="h-4 w-4" />
+                            <Button asChild variant="ghost" size="sm">
+                              <Link href={`/dashboard/areas/${area.id}/edit`}>
+                                <Eye className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                              </Link>
                             </Button>
                           </TooltipTrigger>
-                          <TooltipContent side="top">{t('delete')}</TooltipContent>
+                          <TooltipContent side="top">{t('table.view')}</TooltipContent>
                         </Tooltip>
-                      )}
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
+                        {canDelete && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setDeleteTarget({ id: area.id, name: area.name })}
+                                className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                                aria-label={t('delete')}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="top">{t('delete')}</TooltipContent>
+                          </Tooltip>
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
             <DataTablePagination page={page} totalPages={totalPages} onPageChange={setPage} />

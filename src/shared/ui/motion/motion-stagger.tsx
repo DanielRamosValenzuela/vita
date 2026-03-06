@@ -1,6 +1,7 @@
 'use client'
 
 import { m, useReducedMotion } from 'framer-motion'
+
 import { useScrollAnimation } from '@/src/shared/lib/animations/use-scroll-animation'
 
 interface MotionStaggerProps {
@@ -9,11 +10,7 @@ interface MotionStaggerProps {
   className?: string
 }
 
-export function MotionStagger({
-  children,
-  staggerDelay = 0.1,
-  className,
-}: MotionStaggerProps) {
+export function MotionStagger({ children, staggerDelay = 0.1, className }: MotionStaggerProps) {
   const { ref, isInView } = useScrollAnimation()
   const shouldReduceMotion = useReducedMotion()
 

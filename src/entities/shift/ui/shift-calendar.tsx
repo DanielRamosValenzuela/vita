@@ -24,7 +24,6 @@ import { Popover, PopoverAnchor, PopoverContent } from '@/src/shared/ui/popover'
 import { Skeleton } from '@/src/shared/ui/skeleton'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/src/shared/ui/tooltip'
 
-
 interface CalendarEventBase {
   id: string
   title: string
@@ -77,7 +76,10 @@ interface ShiftCalendarDayCellProps {
   onRotationBlockClick?: (block: RotationGroupCalendarEvent) => void
 }
 
-const SKELETON_PATTERN = [2, 0, 1, 3, 0, 2, 1, 0, 3, 1, 2, 0, 0, 1, 2, 3, 0, 1, 0, 2, 1, 3, 0, 0, 2, 1, 0, 3, 1, 2, 0, 1, 2, 0, 3, 1, 0, 2, 1, 0, 3, 2]
+const SKELETON_PATTERN = [
+  2, 0, 1, 3, 0, 2, 1, 0, 3, 1, 2, 0, 0, 1, 2, 3, 0, 1, 0, 2, 1, 3, 0, 0, 2, 1, 0, 3, 1, 2, 0, 1, 2,
+  0, 3, 1, 0, 2, 1, 0, 3, 2,
+]
 const SKELETON_WIDTHS = ['w-3/4', 'w-1/2', 'w-2/3', 'w-5/6']
 const SKELETON_SLOT_IDS = ['a', 'b', 'c']
 
@@ -95,7 +97,10 @@ function ShiftCalendarDayCellSkeleton({ date, dayIndex }: { date: Date; dayIndex
           {SKELETON_SLOT_IDS.slice(0, barCount).map((slotId, pos) => (
             <Skeleton
               key={`sk-${dayIndex}-${slotId}`}
-              className={cn('h-4 rounded', SKELETON_WIDTHS[(dayIndex + pos) % SKELETON_WIDTHS.length])}
+              className={cn(
+                'h-4 rounded',
+                SKELETON_WIDTHS[(dayIndex + pos) % SKELETON_WIDTHS.length]
+              )}
             />
           ))}
         </div>
@@ -160,8 +165,12 @@ function ShiftCalendarDayCell({
                       }}
                     >
                       <RefreshCw className="h-2.5 w-2.5 shrink-0" />
-                      <span className="font-medium shrink-0">{format(shift.startTime, 'HH:mm')}</span>
-                      <span className="truncate">{t('calendar.rotationBlockPersons', { count: shift.personCount })}</span>
+                      <span className="font-medium shrink-0">
+                        {format(shift.startTime, 'HH:mm')}
+                      </span>
+                      <span className="truncate">
+                        {t('calendar.rotationBlockPersons', { count: shift.personCount })}
+                      </span>
                     </button>
                   </TooltipTrigger>
                   <TooltipContent side="top" className="text-xs">
@@ -226,9 +235,7 @@ function ShiftCalendarDayCell({
                   </p>
                   <p className="text-muted-foreground">{shift.areaName}</p>
                   {shift.title && <p className="text-muted-foreground">{shift.title}</p>}
-                  {shift.isExtra && (
-                    <p className="font-medium text-amber-600">{t('extraBadge')}</p>
-                  )}
+                  {shift.isExtra && <p className="font-medium text-amber-600">{t('extraBadge')}</p>}
                 </TooltipContent>
               </Tooltip>
             </div>
@@ -328,9 +335,16 @@ export function ShiftCalendar({
         <CardHeader className="px-4 py-3 sm:px-6 sm:py-4">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-base sm:text-lg">{formatMonthTitle(currentMonth)}</CardTitle>
+              <CardTitle className="text-base sm:text-lg">
+                {formatMonthTitle(currentMonth)}
+              </CardTitle>
               <div className="flex items-center gap-1 sm:hidden">
-                <Button variant="outline" size="icon" className="h-8 w-8" onClick={handlePreviousMonth}>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-8 w-8"
+                  onClick={handlePreviousMonth}
+                >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
                 <Button variant="outline" size="icon" className="h-8 w-8" onClick={handleNextMonth}>
@@ -383,8 +397,7 @@ export function ShiftCalendar({
                         const isTodayCell = isSameDay(date, today)
                         const isWeekend = date.getDay() === 0 || date.getDay() === 6
                         const isHoliday = holidayDatesSet.has(dateKey)
-                        const isSelected =
-                          selectedDate != null && isSameDay(date, selectedDate)
+                        const isSelected = selectedDate != null && isSameDay(date, selectedDate)
                         const hasNote = noteDates?.has(dateKey)
 
                         const cellContent = (
@@ -395,17 +408,17 @@ export function ShiftCalendar({
                                 <span className="sr-only">{t('legend.note')}</span>
                               </>
                             )}
-                            {loading
-                              ? <ShiftCalendarDayCellSkeleton date={date} dayIndex={dayIndex} />
-                              : (
-                                <ShiftCalendarDayCell
-                                  date={date}
-                                  shifts={getEventsForDay(date)}
-                                  onShiftClick={onShiftClick}
-                                  onShiftDelete={onShiftDelete}
-                                  onRotationBlockClick={onRotationBlockClick}
-                                />
-                              )}
+                            {loading ? (
+                              <ShiftCalendarDayCellSkeleton date={date} dayIndex={dayIndex} />
+                            ) : (
+                              <ShiftCalendarDayCell
+                                date={date}
+                                shifts={getEventsForDay(date)}
+                                onShiftClick={onShiftClick}
+                                onShiftDelete={onShiftDelete}
+                                onRotationBlockClick={onRotationBlockClick}
+                              />
+                            )}
                           </div>
                         )
 
@@ -415,8 +428,7 @@ export function ShiftCalendar({
                             className={cn(
                               'relative h-20 min-h-20 border-b border-r p-0 align-top last:border-r-0 cursor-pointer transition-colors duration-150 hover:bg-foreground/5 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-[-2px] sm:h-24 sm:min-h-24 md:h-32 md:min-h-32',
                               !isCurrentMonth && 'text-muted-foreground/60',
-                              isTodayCell &&
-                                'bg-primary/25 ring-2 ring-primary/50 ring-inset',
+                              isTodayCell && 'bg-primary/25 ring-2 ring-primary/50 ring-inset',
                               isHoliday && !isTodayCell && 'bg-calendar-holiday',
                               isWeekend && !isHoliday && !isTodayCell && 'bg-calendar-weekend',
                               isSelected && 'bg-accent'
@@ -429,9 +441,11 @@ export function ShiftCalendar({
                             tabIndex={0}
                             aria-selected={isSelected}
                           >
-                            {isSelected
-                              ? <PopoverAnchor asChild>{cellContent}</PopoverAnchor>
-                              : cellContent}
+                            {isSelected ? (
+                              <PopoverAnchor asChild>{cellContent}</PopoverAnchor>
+                            ) : (
+                              cellContent
+                            )}
                           </td>
                         )
                       })}
@@ -440,7 +454,12 @@ export function ShiftCalendar({
                 </tbody>
               </table>
             </div>
-            <PopoverContent side="bottom" align="center" className="w-[calc(100vw-2rem)] sm:w-80 sm:max-w-80" sideOffset={4}>
+            <PopoverContent
+              side="bottom"
+              align="center"
+              className="w-[calc(100vw-2rem)] sm:w-80 sm:max-w-80"
+              sideOffset={4}
+            >
               {notePopoverContent}
             </PopoverContent>
           </Popover>

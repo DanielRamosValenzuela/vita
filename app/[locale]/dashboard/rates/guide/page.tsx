@@ -1,3 +1,5 @@
+import { getTranslations } from 'next-intl/server'
+import Link from 'next/link'
 import {
   ArrowDown,
   ArrowLeft,
@@ -20,8 +22,6 @@ import {
   Users,
   Zap,
 } from 'lucide-react'
-import { getTranslations } from 'next-intl/server'
-import Link from 'next/link'
 
 import { requireAdminHRWithOrg } from '@/src/shared/lib/auth/session'
 import { Badge } from '@/src/shared/ui/badge'
@@ -56,7 +56,16 @@ const BONUS_COMPONENTS = [
   'EMERGENCY_BONUS',
   'ON_CALL_BONUS',
 ] as const
-const BONUS_KEYS = ['night', 'weekend', 'holiday', 'seniority', 'performance', 'area', 'emergency', 'onCall'] as const
+const BONUS_KEYS = [
+  'night',
+  'weekend',
+  'holiday',
+  'seniority',
+  'performance',
+  'area',
+  'emergency',
+  'onCall',
+] as const
 
 const MULTIPLIER_COMPONENTS = [
   'WEEKEND_MULTIPLIER',
@@ -228,7 +237,14 @@ export default async function RatesGuidePage({ params }: RatesGuideProps) {
           <CardContent className="space-y-3 p-6">
             {EXAMPLE_COLORS.map((color, i) => {
               const num = i + 1
-              return <ExampleRow key={num} number={num} text={t(`example.component${num}`)} colorClass={color} />
+              return (
+                <ExampleRow
+                  key={num}
+                  number={num}
+                  text={t(`example.component${num}`)}
+                  colorClass={color}
+                />
+              )
             })}
           </CardContent>
         </Card>
@@ -277,7 +293,13 @@ export default async function RatesGuidePage({ params }: RatesGuideProps) {
   )
 }
 
-function SectionHeader({ icon: Icon, title }: { icon: React.ComponentType<{ className?: string }>; title: string }) {
+function SectionHeader({
+  icon: Icon,
+  title,
+}: {
+  icon: React.ComponentType<{ className?: string }>
+  title: string
+}) {
   return (
     <div className="flex items-center gap-3">
       <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-lg">
@@ -368,7 +390,15 @@ function ConditionCard({
   )
 }
 
-function ExampleRow({ number, text, colorClass }: { number: number; text: string; colorClass: string }) {
+function ExampleRow({
+  number,
+  text,
+  colorClass,
+}: {
+  number: number
+  text: string
+  colorClass: string
+}) {
   return (
     <div className="flex items-center gap-3">
       <div
@@ -390,7 +420,15 @@ function ResultLine({ text }: { text: string }) {
   )
 }
 
-function TipCard({ number, title, description }: { number: number; title: string; description: string }) {
+function TipCard({
+  number,
+  title,
+  description,
+}: {
+  number: number
+  title: string
+  description: string
+}) {
   return (
     <Card className="bg-muted/20">
       <CardContent className="flex items-start gap-4 p-5">
@@ -406,7 +444,13 @@ function TipCard({ number, title, description }: { number: number; title: string
   )
 }
 
-function ComponentTypesSection({ t, tf }: { t: (key: string) => string; tf: (key: string) => string }) {
+function ComponentTypesSection({
+  t,
+  tf,
+}: {
+  t: (key: string) => string
+  tf: (key: string) => string
+}) {
   return (
     <section className="space-y-6">
       <SectionHeader icon={Sparkles} title={t('componentTypes.title')} />
@@ -424,7 +468,11 @@ function ComponentTypesSection({ t, tf }: { t: (key: string) => string; tf: (key
           <CardContent>
             <ul className="space-y-2">
               {FIXED_COMPONENTS.map((comp, i) => (
-                <ComponentItem key={comp} label={tf(`types.${comp}`)} description={t(`componentTypes.fixed.${FIXED_KEYS[i]}`)} />
+                <ComponentItem
+                  key={comp}
+                  label={tf(`types.${comp}`)}
+                  description={t(`componentTypes.fixed.${FIXED_KEYS[i]}`)}
+                />
               ))}
             </ul>
           </CardContent>
@@ -441,7 +489,11 @@ function ComponentTypesSection({ t, tf }: { t: (key: string) => string; tf: (key
           <CardContent>
             <ul className="space-y-2">
               {TIME_COMPONENTS.map((comp, i) => (
-                <ComponentItem key={comp} label={tf(`types.${comp}`)} description={t(`componentTypes.timeBased.${TIME_KEYS[i]}`)} />
+                <ComponentItem
+                  key={comp}
+                  label={tf(`types.${comp}`)}
+                  description={t(`componentTypes.timeBased.${TIME_KEYS[i]}`)}
+                />
               ))}
             </ul>
           </CardContent>
@@ -458,7 +510,11 @@ function ComponentTypesSection({ t, tf }: { t: (key: string) => string; tf: (key
           <CardContent>
             <ul className="space-y-2">
               {BONUS_COMPONENTS.map((comp, i) => (
-                <ComponentItem key={comp} label={tf(`types.${comp}`)} description={t(`componentTypes.bonuses.${BONUS_KEYS[i]}`)} />
+                <ComponentItem
+                  key={comp}
+                  label={tf(`types.${comp}`)}
+                  description={t(`componentTypes.bonuses.${BONUS_KEYS[i]}`)}
+                />
               ))}
             </ul>
           </CardContent>

@@ -6,14 +6,7 @@ interface PrivacyPageProps {
   params: Promise<{ locale: string }>
 }
 
-const sections = [
-  'section1',
-  'section2',
-  'section3',
-  'section4',
-  'section5',
-  'section6',
-] as const
+const sections = ['section1', 'section2', 'section3', 'section4', 'section5', 'section6'] as const
 
 type SectionKey = (typeof sections)[number]
 
@@ -30,9 +23,7 @@ export default async function PrivacyPage({ params }: PrivacyPageProps) {
             <p className="text-muted-foreground text-sm">{t('lastUpdated')}</p>
           </header>
 
-          <p className="text-muted-foreground mb-10 text-lg leading-relaxed">
-            {t('intro')}
-          </p>
+          <p className="text-muted-foreground mb-10 text-lg leading-relaxed">{t('intro')}</p>
         </PageSection>
 
         <div className="space-y-10">
@@ -41,9 +32,7 @@ export default async function PrivacyPage({ params }: PrivacyPageProps) {
             return (
               <PageSection key={section}>
                 <article>
-                  <h2 className="mb-3 text-xl font-semibold">
-                    {t(`${sectionKey}.title`)}
-                  </h2>
+                  <h2 className="mb-3 text-xl font-semibold">{t(`${sectionKey}.title`)}</h2>
                   <p className="text-muted-foreground leading-relaxed">
                     {t(`${sectionKey}.content`)}
                   </p>

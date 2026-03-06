@@ -1,7 +1,7 @@
 'use client'
 
-import { Quote } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { Quote } from 'lucide-react'
 
 import { Badge } from '@/src/shared/ui/badge'
 import { Card, CardContent } from '@/src/shared/ui/card'
@@ -20,17 +20,23 @@ export function TestimonialsSection() {
     {
       quote: t('testimonials.testimonial1.quote'),
       name: t('testimonials.testimonial1.name'),
-      roleOrg: [t('testimonials.testimonial1.role'), t('testimonials.testimonial1.org')].join(' · '),
+      roleOrg: [t('testimonials.testimonial1.role'), t('testimonials.testimonial1.org')].join(
+        ' · '
+      ),
     },
     {
       quote: t('testimonials.testimonial2.quote'),
       name: t('testimonials.testimonial2.name'),
-      roleOrg: [t('testimonials.testimonial2.role'), t('testimonials.testimonial2.org')].join(' · '),
+      roleOrg: [t('testimonials.testimonial2.role'), t('testimonials.testimonial2.org')].join(
+        ' · '
+      ),
     },
     {
       quote: t('testimonials.testimonial3.quote'),
       name: t('testimonials.testimonial3.name'),
-      roleOrg: [t('testimonials.testimonial3.role'), t('testimonials.testimonial3.org')].join(' · '),
+      roleOrg: [t('testimonials.testimonial3.role'), t('testimonials.testimonial3.org')].join(
+        ' · '
+      ),
     },
   ]
 

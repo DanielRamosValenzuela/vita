@@ -14,8 +14,7 @@ function subscribe(callback: () => void) {
     isClient = true
     callback()
   }
-  if (document.readyState === 'complete')
-    queueMicrotask(onReady)
+  if (document.readyState === 'complete') queueMicrotask(onReady)
   else {
     window.addEventListener('load', onReady)
     return () => window.removeEventListener('load', onReady)

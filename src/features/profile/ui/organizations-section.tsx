@@ -4,9 +4,9 @@ import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Building2 } from 'lucide-react'
 
-import { Spinner } from '@/src/shared/ui/atoms'
 import { ORGANIZATION_STATUS_BADGE_VARIANTS } from '@/src/shared/lib/constants'
 import type { ActionResult } from '@/src/shared/lib/types'
+import { Spinner } from '@/src/shared/ui/atoms'
 import { Badge } from '@/src/shared/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
 

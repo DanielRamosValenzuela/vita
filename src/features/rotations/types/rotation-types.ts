@@ -181,11 +181,7 @@ export type CoverageOverview = {
 export type ExtraTier = 'TIER_1' | 'TIER_2' | 'TIER_3' | 'NEVER_RECOMMEND'
 
 export type CandidateWarning = {
-  type:
-    | 'max_consecutive_hours'
-    | 'min_rest_hours'
-    | 'noche_to_largo'
-    | 'came_from_noche'
+  type: 'max_consecutive_hours' | 'min_rest_hours' | 'noche_to_largo' | 'came_from_noche'
   message: string
   severity: 'warning' | 'error'
 }
@@ -197,12 +193,7 @@ export type ExtraCandidate = {
   tier: ExtraTier
   tierLabel: string
   isFromSameArea: boolean
-  currentStatus:
-    | 'on_largo'
-    | 'on_noche'
-    | 'libre_rested'
-    | 'libre_from_noche'
-    | 'other'
+  currentStatus: 'on_largo' | 'on_noche' | 'libre_rested' | 'libre_from_noche' | 'other'
   previousShift?: {
     shiftTypeName: string
     endTime: Date

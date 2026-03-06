@@ -36,7 +36,12 @@ interface ViewContractsDialogProps {
   target: ViewContractsTarget | null
   isPending: boolean
   onClose: () => void
-  onEditContract: (contractId: string, contract: ContractSummary, userId: string, userName: string) => void
+  onEditContract: (
+    contractId: string,
+    contract: ContractSummary,
+    userId: string,
+    userName: string
+  ) => void
   onEndContract: (contractId: string, userName: string) => void
 }
 
@@ -50,7 +55,12 @@ export function ViewContractsDialog({
   const t = useTranslations('adminHR.rates')
 
   return (
-    <Dialog open={!!target} onOpenChange={(open) => { if (!open) onClose() }}>
+    <Dialog
+      open={!!target}
+      onOpenChange={(open) => {
+        if (!open) onClose()
+      }}
+    >
       <DialogContent>
         <DialogHeader>
           <DialogTitle>

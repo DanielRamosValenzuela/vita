@@ -31,7 +31,6 @@ import {
   TableRow,
 } from '@/src/shared/ui/table'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/src/shared/ui/tooltip'
-
 import { deleteSectorAction } from '@/src/features/sector/api'
 
 import { useRouter } from '@/i18n/navigation'
@@ -89,9 +88,7 @@ export function SectorsTable({
         toast.success(result.message)
         setDeleteTarget(null)
         router.refresh()
-      } else 
-        toast.error(result.error)
-      
+      } else toast.error(result.error)
     })
   }
 
@@ -147,10 +144,7 @@ export function SectorsTable({
                     <TableCell>
                       <span className="flex items-center gap-2">
                         <span style={{ color: sector.color }}>
-                          <IconDisplay
-                            iconName={sector.icon ?? DEFAULT_SECTOR_ICON}
-                            size={18}
-                          />
+                          <IconDisplay iconName={sector.icon ?? DEFAULT_SECTOR_ICON} size={18} />
                         </span>
                         <span className="font-medium">{sector.name}</span>
                       </span>
@@ -158,9 +152,7 @@ export function SectorsTable({
                     <TableCell className="text-muted-foreground text-sm">
                       {sector.description || '-'}
                     </TableCell>
-                    <TableCell className="text-sm">
-                      {sector._count?.sectorAreas ?? 0}
-                    </TableCell>
+                    <TableCell className="text-sm">{sector._count?.sectorAreas ?? 0}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
                         {canEdit && (

@@ -36,11 +36,9 @@ export const formatPercentage = (value: number, total: number): string => {
 }
 
 export function formatCurrencyByCode(amount: number, currency: string): string {
-  if (currency === 'CLP') 
-    return `$${Math.round(amount).toLocaleString('es-CL')}`
-  
-  if (currency === 'UF') 
-    return `${amount.toFixed(4)} UF`
-  
+  if (currency === 'CLP') return `$${Math.round(amount).toLocaleString('es-CL')}`
+
+  if (currency === 'UF') return `${amount.toFixed(4)} UF`
+
   return `$${amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`
 }

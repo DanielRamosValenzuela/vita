@@ -4,11 +4,22 @@ import { useTranslations } from 'next-intl'
 
 import { Badge } from '@/src/shared/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/src/shared/ui/card'
+
 import type { PayrollPeriodSummary } from '@/src/entities/payroll/lib/types'
 
 const MONTH_NAMES = [
-  'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre',
+  'Enero',
+  'Febrero',
+  'Marzo',
+  'Abril',
+  'Mayo',
+  'Junio',
+  'Julio',
+  'Agosto',
+  'Septiembre',
+  'Octubre',
+  'Noviembre',
+  'Diciembre',
 ]
 
 const STATUS_VARIANT: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
@@ -26,9 +37,8 @@ interface PayrollPeriodsListProps {
 }
 
 function formatCurrency(amount: number, currency: string): string {
-  if (currency === 'CLP') 
-    return `$${Math.round(amount).toLocaleString('es-CL')}`
-  
+  if (currency === 'CLP') return `$${Math.round(amount).toLocaleString('es-CL')}`
+
   return `$${amount.toFixed(2)}`
 }
 
@@ -40,7 +50,7 @@ export function PayrollPeriodsList({
 }: PayrollPeriodsListProps) {
   const t = useTranslations('payroll')
 
-  if (periods.length === 0) 
+  if (periods.length === 0)
     return (
       <Card>
         <CardContent className="py-8 text-center">
@@ -48,7 +58,6 @@ export function PayrollPeriodsList({
         </CardContent>
       </Card>
     )
-  
 
   return (
     <div className="space-y-2">

@@ -1,11 +1,11 @@
 'use client'
 
-import { m, useReducedMotion } from 'framer-motion'
-import { ArrowRight, Calendar, Play, Shield, Users } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
+import { m, useReducedMotion } from 'framer-motion'
+import { ArrowRight, Calendar, Play, Shield, Users } from 'lucide-react'
 
 import { fadeInUp, staggerContainer } from '@/src/shared/lib/animations/motion-variants'
 import { Badge } from '@/src/shared/ui/badge'
@@ -136,9 +136,15 @@ export function HeroSection({ locale }: HeroSectionProps) {
               variants={itemVariants}
               className="mt-8 flex flex-wrap justify-center gap-4 lg:justify-start"
             >
-              <TrustPill icon={<Calendar className="h-4 w-4" />} label={t('features.scheduling.title')} />
+              <TrustPill
+                icon={<Calendar className="h-4 w-4" />}
+                label={t('features.scheduling.title')}
+              />
               <TrustPill icon={<Users className="h-4 w-4" />} label={t('features.staff.title')} />
-              <TrustPill icon={<Shield className="h-4 w-4" />} label={t('features.security.title')} />
+              <TrustPill
+                icon={<Shield className="h-4 w-4" />}
+                label={t('features.security.title')}
+              />
             </m.div>
           </m.div>
 

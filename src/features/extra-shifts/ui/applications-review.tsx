@@ -8,10 +8,13 @@ import { toast } from 'sonner'
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 
-import { getExtraShiftsForAreaAction } from '../api/extra-shift-queries'
-import { getApplicationsForShiftAction } from '../api/extra-shift-queries'
-import { approveApplicationAction, rejectApplicationAction } from '../api/application-actions'
 import type { ShiftApplicationWithRelations } from '@/src/entities/shift-application'
+
+import { approveApplicationAction, rejectApplicationAction } from '../api/application-actions'
+import {
+  getApplicationsForShiftAction,
+  getExtraShiftsForAreaAction,
+} from '../api/extra-shift-queries'
 
 function formatShortDate(date: Date) {
   return new Date(date).toLocaleDateString([], {
@@ -47,9 +50,7 @@ export function ApplicationsReview() {
       return
     }
 
-    const shiftsWithPending = shiftsResult.data.shifts.filter(
-      (s) => s._count.applications > 0
-    )
+    const shiftsWithPending = shiftsResult.data.shifts.filter((s) => s._count.applications > 0)
 
     const results = await Promise.all(
       shiftsWithPending.map(async (shift) => {
@@ -62,9 +63,10 @@ export function ApplicationsReview() {
           areaColor: shift.area.color,
           startTime: shift.startTime,
           endTime: shift.endTime,
-          applications: appsResult.success && appsResult.data
-            ? appsResult.data.applications.filter((a) => a.status === 'PENDING')
-            : [],
+          applications:
+            appsResult.success && appsResult.data
+              ? appsResult.data.applications.filter((a) => a.status === 'PENDING')
+              : [],
         }
       })
     )
@@ -74,7 +76,9 @@ export function ApplicationsReview() {
   }, [])
 
   useEffect(() => {
-    startTransition(() => { void load() })
+    startTransition(() => {
+      void load()
+    })
   }, [load])
 
   const handleApprove = async (applicationId: string) => {
@@ -83,8 +87,7 @@ export function ApplicationsReview() {
     if (result.success) {
       toast.success(t('success.approved'))
       load()
-    } else
-      toast.error(result.error)
+    } else toast.error(result.error)
     setActing(false)
   }
 
@@ -94,8 +97,7 @@ export function ApplicationsReview() {
     if (result.success) {
       toast.success(t('success.rejected'))
       load()
-    } else
-      toast.error(result.error)
+    } else toast.error(result.error)
     setActing(false)
   }
 
@@ -132,15 +134,10 @@ export function ApplicationsReview() {
 
             <div className="space-y-2">
               {shift.applications.map((app) => (
-                <div
-                  key={app.id}
-                  className="flex items-center justify-between rounded border p-2"
-                >
+                <div key={app.id} className="flex items-center justify-between rounded border p-2">
                   <div>
                     <p className="text-sm font-medium">{app.user.name}</p>
-                    {app.note && (
-                      <p className="text-xs text-muted-foreground">{app.note}</p>
-                    )}
+                    {app.note && <p className="text-xs text-muted-foreground">{app.note}</p>}
                   </div>
                   <div className="flex gap-1">
                     <Button

@@ -1,10 +1,10 @@
-import { Role } from '@prisma/client'
 import { getTranslations } from 'next-intl/server'
+import { Role } from '@prisma/client'
 
+import { requireAdminHROrChief } from '@/src/shared/lib/auth/session'
 import { getAreasAction } from '@/src/features/area/api'
 import { getShiftTypesAction } from '@/src/features/shifts/api'
 import { ShiftTypesPage } from '@/src/features/shifts/ui'
-import { requireAdminHROrChief } from '@/src/shared/lib/auth/session'
 
 interface ShiftTypesProps {
   params: Promise<{ locale: string }>

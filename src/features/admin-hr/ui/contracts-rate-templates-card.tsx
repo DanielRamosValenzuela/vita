@@ -90,67 +90,67 @@ export function ContractsRateTemplatesCard({
                 </TableHeader>
                 <TableBody>
                   {paginatedItems.map((template) => (
-                  <TableRow key={template.id}>
-                    <TableCell>
-                      <div>
-                        <div className="font-medium">{template.name}</div>
-                        {template.description && (
-                          <div className="text-sm text-muted-foreground">
-                            {template.description}
-                          </div>
+                    <TableRow key={template.id}>
+                      <TableCell>
+                        <div>
+                          <div className="font-medium">{template.name}</div>
+                          {template.description && (
+                            <div className="text-sm text-muted-foreground">
+                              {template.description}
+                            </div>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="secondary">
+                          {template.componentsCount} {t('rateTemplates.table.componentsCount')}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {template._count.contracts > 0 ? (
+                          <Badge>{template._count.contracts}</Badge>
+                        ) : (
+                          <span className="text-muted-foreground text-sm">
+                            {t('rateTemplates.table.noContracts')}
+                          </span>
                         )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="secondary">
-                        {template.componentsCount} {t('rateTemplates.table.componentsCount')}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      {template._count.contracts > 0 ? (
-                        <Badge>{template._count.contracts}</Badge>
-                      ) : (
-                        <span className="text-muted-foreground text-sm">
-                          {t('rateTemplates.table.noContracts')}
-                        </span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => onEditTemplate(template.id)}
-                        >
-                          <Edit className="mr-1 h-4 w-4" />
-                          {t('rateTemplates.table.edit')}
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => onDuplicateTemplate(template.id, template.name)}
-                          disabled={isPending}
-                        >
-                          <Copy className="mr-1 h-4 w-4" />
-                          {t('rateTemplates.table.duplicate')}
-                        </Button>
-                        {template._count.contracts === 0 && (
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="text-destructive hover:text-destructive"
-                            onClick={() =>
-                              onDeleteTemplate({ id: template.id, name: template.name })
-                            }
+                            onClick={() => onEditTemplate(template.id)}
                           >
-                            <Trash2 className="mr-1 h-4 w-4" />
-                            {t('rateTemplates.table.delete')}
+                            <Edit className="mr-1 h-4 w-4" />
+                            {t('rateTemplates.table.edit')}
                           </Button>
-                        )}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => onDuplicateTemplate(template.id, template.name)}
+                            disabled={isPending}
+                          >
+                            <Copy className="mr-1 h-4 w-4" />
+                            {t('rateTemplates.table.duplicate')}
+                          </Button>
+                          {template._count.contracts === 0 && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-destructive hover:text-destructive"
+                              onClick={() =>
+                                onDeleteTemplate({ id: template.id, name: template.name })
+                              }
+                            >
+                              <Trash2 className="mr-1 h-4 w-4" />
+                              {t('rateTemplates.table.delete')}
+                            </Button>
+                          )}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
             </div>

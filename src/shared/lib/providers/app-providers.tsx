@@ -1,8 +1,8 @@
 'use client'
 
-import { LazyMotion, domAnimation } from 'framer-motion'
 import { SessionProvider } from 'next-auth/react'
 import { ThemeProvider as NextThemesProvider, useTheme } from 'next-themes'
+import { domAnimation, LazyMotion } from 'framer-motion'
 import { Toaster } from 'sonner'
 
 import { NavigationProgress } from '@/src/shared/ui/atoms'
@@ -11,8 +11,7 @@ import { CustomThemeProvider } from './custom-theme-provider'
 
 function ThemedToaster() {
   const { resolvedTheme } = useTheme()
-  const toasterTheme: 'light' | 'dark' | 'system' =
-    (resolvedTheme as 'light' | 'dark') ?? 'system'
+  const toasterTheme: 'light' | 'dark' | 'system' = (resolvedTheme as 'light' | 'dark') ?? 'system'
   return (
     <Toaster
       position="top-right"

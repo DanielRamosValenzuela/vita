@@ -1,13 +1,13 @@
-import { BookOpen } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
 import Link from 'next/link'
+import { BookOpen } from 'lucide-react'
 
 import { requireAdminHRWithOrg } from '@/src/shared/lib/auth/session'
 import { prisma } from '@/src/shared/lib/db'
+import { Button } from '@/src/shared/ui/button'
 import { getContractsPageDataAction } from '@/src/features/admin-hr/api'
 import { ContractsPage } from '@/src/features/admin-hr/ui'
 import { BillingDayConfig } from '@/src/features/admin-hr/ui/billing-day-config'
-import { Button } from '@/src/shared/ui/button'
 
 interface RatesRouteProps {
   params: Promise<{ locale: string }>
@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: RatesRouteProps) {
 export default async function RatesRoute({ params }: RatesRouteProps) {
   const { locale } = await params
   const [organization, t, result] = await Promise.all([
-    requireAdminHRWithOrg(locale).then(session =>
+    requireAdminHRWithOrg(locale).then((session) =>
       prisma.organization.findUnique({
         where: { id: session.organizationId },
         select: { currency: true },

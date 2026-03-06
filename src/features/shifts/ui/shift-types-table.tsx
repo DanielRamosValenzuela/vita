@@ -1,6 +1,6 @@
 'use client'
 
-import { type ReactNode, useCallback, useState } from 'react'
+import { useCallback, useState, type ReactNode } from 'react'
 import { useTranslations } from 'next-intl'
 import { Edit, Trash2 } from 'lucide-react'
 
@@ -9,7 +9,13 @@ import { Button } from '@/src/shared/ui/button'
 import { IconDisplay } from '@/src/shared/ui/icon-picker'
 import { DataTablePagination } from '@/src/shared/ui/molecules/data-table-pagination'
 import { DataTableToolbar } from '@/src/shared/ui/molecules/data-table-toolbar'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/src/shared/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/src/shared/ui/select'
 import {
   Table,
   TableBody,
@@ -110,63 +116,63 @@ export function ShiftTypesTable({
         </TableHeader>
         <TableBody>
           {paginatedItems.map((shiftType) => (
-          <TableRow key={shiftType.id}>
-            <TableCell className="font-medium">{shiftType.name}</TableCell>
-            <TableCell>
-              <span style={{ color: shiftType.color }}>
-                <IconDisplay iconName={shiftType.icon ?? DEFAULT_SHIFT_TYPE_ICON} size={18} />
-              </span>
-            </TableCell>
-            <TableCell>{formatDuration(shiftType.durationMinutes)}</TableCell>
-            <TableCell>{t(`classification.${shiftType.classification}`)}</TableCell>
-            <TableCell>
-              <span className="flex items-center gap-2">
-                <span
-                  className="w-4 h-4 rounded-full border shrink-0"
-                  style={{ backgroundColor: shiftType.color }}
-                  aria-hidden
-                />
-                <span className="text-xs text-muted-foreground">{shiftType.color}</span>
-              </span>
-            </TableCell>
-            <TableCell>{shiftType.description || '-'}</TableCell>
-            <TableCell>{getStatusBadge(shiftType.isActive)}</TableCell>
-            <TableCell>
-              <span className="text-muted-foreground text-sm">
-                {shiftType.isGlobal ? t('table.globalYes') : t('table.globalNo')}
-              </span>
-            </TableCell>
-            <TableCell>
-              <span className="text-sm">{shiftType._count?.shifts || 0}</span>
-            </TableCell>
-            <TableCell>
-              <span className="text-sm">
-                {shiftType.isGlobal
-                  ? '-'
-                  : (shiftType._count?.areaShiftTypes ?? shiftType.areaShiftTypes?.length ?? 0)}
-              </span>
-            </TableCell>
-            <TableCell>
-              {isChief && shiftType.isGlobal ? (
-                <span className="text-muted-foreground text-sm">{t('table.notAvailable')}</span>
-              ) : (
-                <span className="flex items-center gap-2">
-                  <Button variant="outline" size="sm" onClick={() => onEdit(shiftType)}>
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => onDelete(shiftType)}
-                    className="text-destructive hover:text-destructive"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+            <TableRow key={shiftType.id}>
+              <TableCell className="font-medium">{shiftType.name}</TableCell>
+              <TableCell>
+                <span style={{ color: shiftType.color }}>
+                  <IconDisplay iconName={shiftType.icon ?? DEFAULT_SHIFT_TYPE_ICON} size={18} />
                 </span>
-              )}
-            </TableCell>
-          </TableRow>
-        ))}
+              </TableCell>
+              <TableCell>{formatDuration(shiftType.durationMinutes)}</TableCell>
+              <TableCell>{t(`classification.${shiftType.classification}`)}</TableCell>
+              <TableCell>
+                <span className="flex items-center gap-2">
+                  <span
+                    className="w-4 h-4 rounded-full border shrink-0"
+                    style={{ backgroundColor: shiftType.color }}
+                    aria-hidden
+                  />
+                  <span className="text-xs text-muted-foreground">{shiftType.color}</span>
+                </span>
+              </TableCell>
+              <TableCell>{shiftType.description || '-'}</TableCell>
+              <TableCell>{getStatusBadge(shiftType.isActive)}</TableCell>
+              <TableCell>
+                <span className="text-muted-foreground text-sm">
+                  {shiftType.isGlobal ? t('table.globalYes') : t('table.globalNo')}
+                </span>
+              </TableCell>
+              <TableCell>
+                <span className="text-sm">{shiftType._count?.shifts || 0}</span>
+              </TableCell>
+              <TableCell>
+                <span className="text-sm">
+                  {shiftType.isGlobal
+                    ? '-'
+                    : (shiftType._count?.areaShiftTypes ?? shiftType.areaShiftTypes?.length ?? 0)}
+                </span>
+              </TableCell>
+              <TableCell>
+                {isChief && shiftType.isGlobal ? (
+                  <span className="text-muted-foreground text-sm">{t('table.notAvailable')}</span>
+                ) : (
+                  <span className="flex items-center gap-2">
+                    <Button variant="outline" size="sm" onClick={() => onEdit(shiftType)}>
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => onDelete(shiftType)}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </span>
+                )}
+              </TableCell>
+            </TableRow>
+          ))}
         </TableBody>
       </Table>
       <DataTablePagination page={page} totalPages={totalPages} onPageChange={setPage} />

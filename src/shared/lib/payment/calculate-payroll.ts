@@ -21,19 +21,16 @@ export async function calculatePayrollForUser(
   const periodEnd = endOfMonth(new Date(year, month - 1))
   const totalDaysInPeriod = getDaysInMonth(new Date(year, month - 1))
 
-  
   const user = await prisma.user.findUniqueOrThrow({
     where: { id: userId },
     select: { id: true, name: true, email: true },
   })
 
-  
   const org = await prisma.organization.findUniqueOrThrow({
     where: { id: organizationId },
     select: { currency: true },
   })
 
-  
   const contracts = await prisma.contract.findMany({
     where: {
       userId,
@@ -56,10 +53,10 @@ export async function calculatePayrollForUser(
 
   if (contracts.length === 0) return null
 
-  
   const contractInfos = contracts.map((contract) => {
     const contractStart = contract.startDate > periodStart ? contract.startDate : periodStart
-    const effectiveEnd = contract.endDate && contract.endDate < periodEnd ? contract.endDate : periodEnd
+    const effectiveEnd =
+      contract.endDate && contract.endDate < periodEnd ? contract.endDate : periodEnd
     const daysInPeriod = Math.max(
       0,
       Math.ceil((effectiveEnd.getTime() - contractStart.getTime()) / (1000 * 60 * 60 * 24)) + 1
@@ -80,7 +77,6 @@ export async function calculatePayrollForUser(
     }
   })
 
-  
   let baseSalaryAmount = 0
   const monthlyComponents: MonthlyComponentSummary[] = []
 
@@ -94,7 +90,6 @@ export async function calculatePayrollForUser(
         continue
       }
 
-      
       if (
         component.unit === 'MONTHLY' ||
         component.unit === 'BIWEEKLY' ||
@@ -121,12 +116,8 @@ export async function calculatePayrollForUser(
     }
   }
 
-  const monthlyComponentsAmount = monthlyComponents.reduce(
-    (sum, mc) => sum + mc.proratedValue,
-    0
-  )
+  const monthlyComponentsAmount = monthlyComponents.reduce((sum, mc) => sum + mc.proratedValue, 0)
 
-  
   const completedShifts = await prisma.shift.findMany({
     where: {
       userId,
@@ -177,16 +168,12 @@ export async function calculatePayrollForUser(
 
   const shiftsAmount = shifts.reduce((sum, s) => sum + s.finalAmount, 0)
 
-  
   const totalAmount =
     Math.round(baseSalaryAmount * 100) / 100 +
     Math.round(shiftsAmount * 100) / 100 +
     Math.round(monthlyComponentsAmount * 100) / 100
 
-  
-  const contractDaysInPeriod = Math.max(
-    ...contractInfos.map((c) => c.daysInPeriod)
-  )
+  const contractDaysInPeriod = Math.max(...contractInfos.map((c) => c.daysInPeriod))
 
   return {
     userId: user.id,

@@ -22,10 +22,7 @@ interface PageProps {
 
 const OrganizationsPage = async ({ searchParams }: PageProps) => {
   await requireSuperAdmin()
-  const [t, params] = await Promise.all([
-    getTranslations('superAdmin.organizations'),
-    searchParams,
-  ])
+  const [t, params] = await Promise.all([getTranslations('superAdmin.organizations'), searchParams])
   const search = params.search || ''
   const status =
     params.status && params.status !== 'ALL' ? (params.status as OrganizationStatus) : undefined

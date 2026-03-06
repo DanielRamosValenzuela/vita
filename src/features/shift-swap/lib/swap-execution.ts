@@ -1,10 +1,7 @@
 import { prisma } from '@/src/shared/lib/db'
 import { revalidatePaths } from '@/src/shared/lib/utils/revalidate-paths'
 
-export async function executeSwap(
-  requesterShiftId: string,
-  targetShiftId: string
-): Promise<void> {
+export async function executeSwap(requesterShiftId: string, targetShiftId: string): Promise<void> {
   await prisma.$transaction(async (tx) => {
     const [requesterShift, targetShift] = await Promise.all([
       tx.shift.findUniqueOrThrow({

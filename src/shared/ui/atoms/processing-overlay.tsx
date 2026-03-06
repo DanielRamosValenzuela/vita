@@ -79,8 +79,7 @@ export function ProcessingOverlay({
   const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([])
 
   const clearAllTimeouts = useCallback(() => {
-    for (const id of timeoutsRef.current)
-      clearTimeout(id)
+    for (const id of timeoutsRef.current) clearTimeout(id)
     timeoutsRef.current = []
   }, [])
 
@@ -155,10 +154,8 @@ export function ProcessingOverlay({
       className={cn(
         'absolute inset-0 z-50 flex items-center justify-center overflow-hidden rounded-[inherit]',
         'bg-background/80 backdrop-blur-sm',
-        state.exiting
-          ? 'animate-out fade-out duration-300'
-          : 'animate-in fade-in duration-300',
-        className,
+        state.exiting ? 'animate-out fade-out duration-300' : 'animate-in fade-in duration-300',
+        className
       )}
     >
       <div
@@ -166,7 +163,7 @@ export function ProcessingOverlay({
           'flex w-full max-w-xs flex-col items-center gap-5 px-4',
           state.exiting
             ? 'animate-out fade-out zoom-out-95 duration-300'
-            : 'animate-in fade-in zoom-in-95 duration-400',
+            : 'animate-in fade-in zoom-in-95 duration-400'
         )}
       >
         <div className="relative flex items-center justify-center">
@@ -176,7 +173,7 @@ export function ProcessingOverlay({
               'border-2 border-primary/20',
               isComplete
                 ? 'scale-110 opacity-0 transition-all duration-500'
-                : 'animate-[processing-orbit_3s_linear_infinite]',
+                : 'animate-[processing-orbit_3s_linear_infinite]'
             )}
           >
             <span
@@ -190,26 +187,22 @@ export function ProcessingOverlay({
               'relative flex h-12 w-12 items-center justify-center rounded-xl transition-all duration-500',
               isComplete
                 ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400'
-                : 'bg-primary/10 text-primary animate-vita-pulse',
+                : 'bg-primary/10 text-primary animate-vita-pulse'
             )}
           >
-            {isComplete
-              ? <Check className="h-6 w-6" aria-hidden />
-              : activeIcon}
+            {isComplete ? <Check className="h-6 w-6" aria-hidden /> : activeIcon}
           </div>
         </div>
 
         <div className="flex w-full flex-col items-center gap-3">
-          <p className="text-foreground text-sm font-semibold tracking-tight">
-            {title}
-          </p>
+          <p className="text-foreground text-sm font-semibold tracking-tight">{title}</p>
 
           <div className="w-full">
             <Progress
               value={state.progress}
               className={cn(
                 'h-1.5 transition-all duration-700',
-                isComplete && 'bg-emerald-500/20 [&_[data-slot=progress-indicator]]:bg-emerald-500',
+                isComplete && 'bg-emerald-500/20 [&_[data-slot=progress-indicator]]:bg-emerald-500'
               )}
             />
           </div>
@@ -219,7 +212,7 @@ export function ProcessingOverlay({
               key={state.messageIndex}
               className={cn(
                 'text-muted-foreground absolute inset-x-0 text-center text-xs',
-                'animate-in fade-in slide-in-from-bottom-1 duration-300',
+                'animate-in fade-in slide-in-from-bottom-1 duration-300'
               )}
             >
               {messages[state.messageIndex]}

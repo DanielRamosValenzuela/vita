@@ -14,8 +14,7 @@ import { IconDisplay } from '@/src/shared/ui/icon-picker'
 import { Input } from '@/src/shared/ui/input'
 import { Label } from '@/src/shared/ui/label'
 
-import { getSectorStaffAction } from '../api'
-import type { SectorStaffResult } from '../api'
+import { getSectorStaffAction, type SectorStaffResult } from '../api'
 
 const DEFAULT_AREA_ICON = 'Building2'
 
@@ -41,11 +40,8 @@ export function SectorStaffQuery({ sectorId }: SectorStaffQueryProps) {
         startTime,
         endTime,
       })
-      if (response.success && response.data)
-        setResult(response.data as SectorStaffResult)
-       else
-        toast.error(response.error)
-      
+      if (response.success && response.data) setResult(response.data as SectorStaffResult)
+      else toast.error(response.error)
     })
   }
 
@@ -60,12 +56,7 @@ export function SectorStaffQuery({ sectorId }: SectorStaffQueryProps) {
           <div className="flex flex-wrap items-end gap-4">
             <div className="space-y-2">
               <Label htmlFor="date">{t('dateLabel')}</Label>
-              <Input
-                id="date"
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-              />
+              <Input id="date" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="startTime">{t('startTimeLabel')}</Label>

@@ -100,7 +100,7 @@ export const INITIAL_STATE: ShiftTypesState = {
 
 export const shiftTypesReducer = (
   state: ShiftTypesState,
-  action: ShiftTypesAction,
+  action: ShiftTypesAction
 ): ShiftTypesState => {
   switch (action.type) {
     case 'OPEN_CREATE':
@@ -176,7 +176,7 @@ export const PREDEFINED_COLORS = [
 
 export function hasShiftTypeFormChanged(
   formData: ShiftTypeFormData,
-  editingShiftType: ShiftType | null,
+  editingShiftType: ShiftType | null
 ): boolean {
   if (editingShiftType) {
     const h = Math.floor(editingShiftType.durationMinutes / 60)
@@ -202,8 +202,7 @@ export function hasShiftTypeFormChanged(
 
     const sameAreaConfigs = formData.areaConfigs.every(
       (c, i) =>
-        initialAreaConfigs[i]?.areaId === c.areaId &&
-        initialAreaConfigs[i]?.isActive === c.isActive,
+        initialAreaConfigs[i]?.areaId === c.areaId && initialAreaConfigs[i]?.isActive === c.isActive
     )
     if (!sameAreaConfigs) return true
 

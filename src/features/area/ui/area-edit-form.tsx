@@ -18,19 +18,13 @@ import {
   updateAreaAction,
 } from '../api'
 import type { ChiefOption, StaffOption } from '../api/area-actions'
-
 import { AreaBasicInfoCard } from './area-basic-info-card'
 import { AreaChiefsCard } from './area-chiefs-card'
-import { AreaShiftTypesCard } from './area-shift-types-card'
-import type { ShiftTypeOption } from './area-shift-types-card'
+import { areaFormReducer, createInitialState, hasAreaFormChanged } from './area-edit-utils'
+import { AreaShiftTypesCard, type ShiftTypeOption } from './area-shift-types-card'
 import { AreaStaffCard } from './area-staff-card'
 import { AreaStatusCard } from './area-status-card'
 import { AreaWorkLimitsCard } from './area-work-limits-card'
-import {
-  areaFormReducer,
-  createInitialState,
-  hasAreaFormChanged,
-} from './area-edit-utils'
 
 interface AreaEditFormProps {
   area: {
@@ -205,11 +199,7 @@ export function AreaEditForm({
         dispatch={dispatch}
       />
 
-      <AreaStaffCard
-        staff={staff}
-        selectedStaffIds={state.selectedStaffIds}
-        dispatch={dispatch}
-      />
+      <AreaStaffCard staff={staff} selectedStaffIds={state.selectedStaffIds} dispatch={dispatch} />
 
       <AreaWorkLimitsCard
         maxConsecutiveHours={state.maxConsecutiveHours}

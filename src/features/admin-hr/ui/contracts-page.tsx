@@ -24,11 +24,11 @@ import {
   type StaffWithContract,
 } from '../api/contract-actions'
 import { deleteRateTemplateAction, duplicateRateTemplateAction } from '../api/rate-template-actions'
-import { RateTemplateForm } from './rate-template-form'
 import { ContractsRateTemplatesCard } from './contracts-rate-templates-card'
 import { ContractsStaffTable } from './contracts-staff-table'
-import { ViewContractsDialog } from './view-contracts-dialog'
 import { CreateContractDialog } from './create-contract-dialog'
+import { RateTemplateForm } from './rate-template-form'
+import { ViewContractsDialog } from './view-contracts-dialog'
 
 interface ContractsPageProps {
   data: ContractsPageData
@@ -51,8 +51,16 @@ type DialogState = {
   deleteTemplateTarget: { id: string; name: string } | null
   endContractTarget: { id: string; userName: string } | null
   createContractTarget: CreateContractTarget | null
-  multipleContractWarningTarget: { userId: string; userName: string; primaryAreaId: string | null } | null
-  viewContractsTarget: { userId: string; userName: string; contracts: StaffWithContract['contracts'] } | null
+  multipleContractWarningTarget: {
+    userId: string
+    userName: string
+    primaryAreaId: string | null
+  } | null
+  viewContractsTarget: {
+    userId: string
+    userName: string
+    contracts: StaffWithContract['contracts']
+  } | null
 }
 
 type DialogAction =
@@ -61,8 +69,18 @@ type DialogAction =
   | { type: 'SET_DELETE_TEMPLATE_TARGET'; payload: { id: string; name: string } | null }
   | { type: 'SET_END_CONTRACT_TARGET'; payload: { id: string; userName: string } | null }
   | { type: 'SET_CREATE_CONTRACT_TARGET'; payload: CreateContractTarget | null }
-  | { type: 'SET_MULTIPLE_CONTRACT_WARNING_TARGET'; payload: { userId: string; userName: string; primaryAreaId: string | null } | null }
-  | { type: 'SET_VIEW_CONTRACTS_TARGET'; payload: { userId: string; userName: string; contracts: StaffWithContract['contracts'] } | null }
+  | {
+      type: 'SET_MULTIPLE_CONTRACT_WARNING_TARGET'
+      payload: { userId: string; userName: string; primaryAreaId: string | null } | null
+    }
+  | {
+      type: 'SET_VIEW_CONTRACTS_TARGET'
+      payload: {
+        userId: string
+        userName: string
+        contracts: StaffWithContract['contracts']
+      } | null
+    }
 
 const initialDialogState: DialogState = {
   createTemplateOpen: false,
@@ -208,7 +226,9 @@ export function ContractsPage({ data, currency }: ContractsPageProps) {
         isPending={isPending}
         onCreateTemplate={() => dispatch({ type: 'SET_CREATE_TEMPLATE_OPEN', payload: true })}
         onEditTemplate={(id) => dispatch({ type: 'SET_EDIT_TEMPLATE_ID', payload: id })}
-        onDeleteTemplate={(target) => dispatch({ type: 'SET_DELETE_TEMPLATE_TARGET', payload: target })}
+        onDeleteTemplate={(target) =>
+          dispatch({ type: 'SET_DELETE_TEMPLATE_TARGET', payload: target })
+        }
         onDuplicateTemplate={handleDuplicateTemplate}
       />
 
@@ -218,11 +238,19 @@ export function ContractsPage({ data, currency }: ContractsPageProps) {
         rateTemplateOptions={data.rateTemplates.map((tpl) => ({ id: tpl.id, name: tpl.name }))}
         hasRateTemplates={data.rateTemplates.length > 0}
         isPending={isPending}
-        onEditContract={(target) => dispatch({ type: 'SET_CREATE_CONTRACT_TARGET', payload: target })}
+        onEditContract={(target) =>
+          dispatch({ type: 'SET_CREATE_CONTRACT_TARGET', payload: target })
+        }
         onEndContract={(target) => dispatch({ type: 'SET_END_CONTRACT_TARGET', payload: target })}
-        onAddContract={(target) => dispatch({ type: 'SET_MULTIPLE_CONTRACT_WARNING_TARGET', payload: target })}
-        onCreateContract={(target) => dispatch({ type: 'SET_CREATE_CONTRACT_TARGET', payload: target })}
-        onViewContracts={(target) => dispatch({ type: 'SET_VIEW_CONTRACTS_TARGET', payload: target })}
+        onAddContract={(target) =>
+          dispatch({ type: 'SET_MULTIPLE_CONTRACT_WARNING_TARGET', payload: target })
+        }
+        onCreateContract={(target) =>
+          dispatch({ type: 'SET_CREATE_CONTRACT_TARGET', payload: target })
+        }
+        onViewContracts={(target) =>
+          dispatch({ type: 'SET_VIEW_CONTRACTS_TARGET', payload: target })
+        }
       />
 
       <RateTemplateForm
@@ -235,7 +263,9 @@ export function ContractsPage({ data, currency }: ContractsPageProps) {
       {editTemplateId && editingTemplate && (
         <RateTemplateForm
           open={!!editTemplateId}
-          onOpenChange={(open) => !open && dispatch({ type: 'SET_EDIT_TEMPLATE_ID', payload: null })}
+          onOpenChange={(open) =>
+            !open && dispatch({ type: 'SET_EDIT_TEMPLATE_ID', payload: null })
+          }
           currency={currency}
           existingTemplate={editingTemplate as never}
           mode="edit"
@@ -244,7 +274,9 @@ export function ContractsPage({ data, currency }: ContractsPageProps) {
 
       <AlertDialog
         open={!!deleteTemplateTarget}
-        onOpenChange={(open) => !open && dispatch({ type: 'SET_DELETE_TEMPLATE_TARGET', payload: null })}
+        onOpenChange={(open) =>
+          !open && dispatch({ type: 'SET_DELETE_TEMPLATE_TARGET', payload: null })
+        }
       >
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -273,7 +305,9 @@ export function ContractsPage({ data, currency }: ContractsPageProps) {
 
       <AlertDialog
         open={!!endContractTarget}
-        onOpenChange={(open) => !open && dispatch({ type: 'SET_END_CONTRACT_TARGET', payload: null })}
+        onOpenChange={(open) =>
+          !open && dispatch({ type: 'SET_END_CONTRACT_TARGET', payload: null })
+        }
       >
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -302,7 +336,9 @@ export function ContractsPage({ data, currency }: ContractsPageProps) {
 
       <AlertDialog
         open={!!multipleContractWarningTarget}
-        onOpenChange={(open) => { if (!open) dispatch({ type: 'SET_MULTIPLE_CONTRACT_WARNING_TARGET', payload: null }) }}
+        onOpenChange={(open) => {
+          if (!open) dispatch({ type: 'SET_MULTIPLE_CONTRACT_WARNING_TARGET', payload: null })
+        }}
       >
         <AlertDialogContent>
           <AlertDialogHeader>

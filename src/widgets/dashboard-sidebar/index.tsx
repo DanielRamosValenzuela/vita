@@ -66,7 +66,9 @@ export function DashboardSidebar({
         />
         <div>
           <h2 className="text-primary text-xl font-bold">{tCommon('appName')}</h2>
-          <p className="text-muted-foreground text-sm">{tCommon(`roles.${displayRole ?? user.role}`)}</p>
+          <p className="text-muted-foreground text-sm">
+            {tCommon(`roles.${displayRole ?? user.role}`)}
+          </p>
         </div>
       </Link>
 

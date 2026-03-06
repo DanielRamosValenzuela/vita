@@ -39,7 +39,7 @@ Documento de referencia de **flujos funcionales** por rol. Marca `[x]` = impleme
 - [x] **Crear y gestionar turnos** — `/dashboard/shifts` > filtrar por sus areas, crear/editar con tipos globales o de area
 - [x] **Gestionar rotativas de turno** — `/dashboard/rotations` > solo de sus areas, misma funcionalidad que ADMIN_HR
 - [x] **Ver nomina de sus areas** — `/dashboard/payroll` > documentos de nomina filtrados por personal de sus areas, descarga de PDFs
-- [ ] **Editar/eliminar turnos** — Click en turno del calendario o tabla > Sheet lateral con detalle editable, cancelar turno con AlertDialog
+- [x] **Editar/eliminar turnos** — Click en turno del calendario o tabla > Sheet lateral con detalle, editar via Dialog, eliminar con AlertDialog
 - [ ] **Vinculacion directa de staff** — Flujo donde CHIEF vincula staff mediante codigo de vinculacion
 - [ ] **Aprobacion de intercambios de turno** — Aprobar/rechazar solicitudes de intercambio
 - [ ] **Gestion de asistencia** — Marcar asistencia manual, gestionar ausencias y reemplazos
@@ -174,5 +174,4 @@ Documento de referencia de **flujos funcionales** por rol. Marca `[x]` = impleme
 - [ ] **App movil / PWA para Staff** — Calendario movil, notificaciones push, postulacion/intercambio
 - [ ] **Reportes de Cumplimiento Legal** — Horas trabajadas vs limites legales por pais
 - [ ] **Intercambio de turnos (Shift Swap)** — Ver `PLAN-SHIFT-SWAP-AND-EXTRA.md`
-- [ ] **Editar/eliminar turnos desde calendario** — ShiftDetailSheet para edicion y cancelacion (spec 002 US4 pendiente)
 - [ ] **Google Calendar import** — OAuth + fetch events + conflictos (spec 005 US5 pendiente)

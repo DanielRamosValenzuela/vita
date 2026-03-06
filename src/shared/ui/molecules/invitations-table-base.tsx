@@ -13,7 +13,13 @@ import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
 import { DataTablePagination } from '@/src/shared/ui/molecules/data-table-pagination'
 import { DataTableToolbar } from '@/src/shared/ui/molecules/data-table-toolbar'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/src/shared/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/src/shared/ui/select'
 import {
   Table,
   TableBody,
@@ -124,18 +130,10 @@ export function InvitationsTableBase({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">{tFilters('allStatuses')}</SelectItem>
-              <SelectItem value="PENDING">
-                {t('statuses.PENDING')}
-              </SelectItem>
-              <SelectItem value="ACCEPTED">
-                {t('statuses.ACCEPTED')}
-              </SelectItem>
-              <SelectItem value="REJECTED">
-                {t('statuses.REJECTED')}
-              </SelectItem>
-              <SelectItem value="EXPIRED">
-                {t('statuses.EXPIRED')}
-              </SelectItem>
+              <SelectItem value="PENDING">{t('statuses.PENDING')}</SelectItem>
+              <SelectItem value="ACCEPTED">{t('statuses.ACCEPTED')}</SelectItem>
+              <SelectItem value="REJECTED">{t('statuses.REJECTED')}</SelectItem>
+              <SelectItem value="EXPIRED">{t('statuses.EXPIRED')}</SelectItem>
             </SelectContent>
           </Select>
         </DataTableToolbar>

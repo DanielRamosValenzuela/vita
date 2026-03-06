@@ -3,8 +3,6 @@
 import { useMemo } from 'react'
 import { useTranslations } from 'next-intl'
 
-import type { AreaFilterOption, SectorFilterOption } from '../api/staff-filter-actions'
-
 import {
   Select,
   SelectContent,
@@ -12,6 +10,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/src/shared/ui/select'
+
+import type { AreaFilterOption, SectorFilterOption } from '../api/staff-filter-actions'
 
 interface CalendarFiltersProps {
   areas: AreaFilterOption[]

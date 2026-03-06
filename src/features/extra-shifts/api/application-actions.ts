@@ -2,18 +2,20 @@
 
 import { getTranslations } from 'next-intl/server'
 
-import { getChiefAccessibleAreaIds, resolveChiefOrganizationId } from '@/src/shared/lib/auth/chief-access'
+import {
+  getChiefAccessibleAreaIds,
+  resolveChiefOrganizationId,
+} from '@/src/shared/lib/auth/chief-access'
 import { isChief } from '@/src/shared/lib/auth/rbac'
 import { requireAdminHROrChief, requireDashboardUser } from '@/src/shared/lib/auth/session'
 import { prisma } from '@/src/shared/lib/db'
 import type { ActionResult } from '@/src/shared/lib/types'
 import { handleActionError } from '@/src/shared/lib/utils/action-error-handler'
 import { revalidatePaths } from '@/src/shared/lib/utils/revalidate-paths'
+import { createNotification } from '@/src/features/notifications/lib/notification-service'
 
 import { createApplication, updateApplicationStatus } from '@/src/entities/shift-application'
 import { validateNoShiftConflict } from '@/src/entities/swap'
-
-import { createNotification } from '@/src/features/notifications/lib/notification-service'
 
 export async function applyToExtraShiftAction(
   shiftId: string,
@@ -25,41 +27,32 @@ export async function applyToExtraShiftAction(
 
     const organizationId = isChief(session)
       ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
-      : session.organizationId ?? null
+      : (session.organizationId ?? null)
 
-    if (!organizationId)
-      return { success: false, error: tExtra('errors.noOrganization') }
+    if (!organizationId) return { success: false, error: tExtra('errors.noOrganization') }
 
     const shift = await prisma.shift.findFirst({
       where: { id: shiftId, organizationId, coverageStatus: 'OPEN_FOR_APPLICATIONS' },
       select: { id: true, areaId: true, startTime: true, endTime: true },
     })
-    if (!shift)
-      return { success: false, error: tExtra('errors.shiftNotAvailable') }
+    if (!shift) return { success: false, error: tExtra('errors.shiftNotAvailable') }
 
     const userArea = await prisma.userArea.findUnique({
       where: { userId_areaId: { userId: session.id, areaId: shift.areaId } },
     })
-    if (!userArea)
-      return { success: false, error: tExtra('errors.notInArea') }
+    if (!userArea) return { success: false, error: tExtra('errors.notInArea') }
 
     const twentyFourHoursFromNow = new Date(Date.now() + 24 * 60 * 60 * 1000)
     if (shift.startTime < twentyFourHoursFromNow)
       return { success: false, error: tExtra('errors.shiftTooSoon') }
 
-    const conflict = await validateNoShiftConflict(
-      session.id,
-      shift.startTime,
-      shift.endTime
-    )
-    if (!conflict.valid)
-      return { success: false, error: tExtra('errors.scheduleConflict') }
+    const conflict = await validateNoShiftConflict(session.id, shift.startTime, shift.endTime)
+    if (!conflict.valid) return { success: false, error: tExtra('errors.scheduleConflict') }
 
     const existing = await prisma.shiftApplication.findUnique({
       where: { shiftId_userId: { shiftId, userId: session.id } },
     })
-    if (existing)
-      return { success: false, error: tExtra('errors.alreadyApplied') }
+    if (existing) return { success: false, error: tExtra('errors.alreadyApplied') }
 
     await createApplication({
       shiftId,
@@ -98,9 +91,7 @@ export async function applyToExtraShiftAction(
   }
 }
 
-export async function withdrawApplicationAction(
-  applicationId: string
-): Promise<ActionResult> {
+export async function withdrawApplicationAction(applicationId: string): Promise<ActionResult> {
   try {
     const session = await requireDashboardUser()
     const tExtra = await getTranslations('extraShifts')
@@ -108,14 +99,11 @@ export async function withdrawApplicationAction(
     const app = await prisma.shiftApplication.findUnique({
       where: { id: applicationId },
     })
-    if (!app)
-      return { success: false, error: tExtra('errors.applicationNotFound') }
+    if (!app) return { success: false, error: tExtra('errors.applicationNotFound') }
 
-    if (app.userId !== session.id)
-      return { success: false, error: tExtra('errors.unauthorized') }
+    if (app.userId !== session.id) return { success: false, error: tExtra('errors.unauthorized') }
 
-    if (app.status !== 'PENDING')
-      return { success: false, error: tExtra('errors.invalidStatus') }
+    if (app.status !== 'PENDING') return { success: false, error: tExtra('errors.invalidStatus') }
 
     await updateApplicationStatus(applicationId, app.organizationId, 'WITHDRAWN')
 
@@ -126,23 +114,19 @@ export async function withdrawApplicationAction(
   }
 }
 
-export async function approveApplicationAction(
-  applicationId: string
-): Promise<ActionResult> {
+export async function approveApplicationAction(applicationId: string): Promise<ActionResult> {
   try {
     const session = await requireAdminHROrChief()
     const tExtra = await getTranslations('extraShifts')
 
     const organizationId = session.organizationId
-    if (!organizationId)
-      return { success: false, error: tExtra('errors.noOrganization') }
+    if (!organizationId) return { success: false, error: tExtra('errors.noOrganization') }
 
     const app = await prisma.shiftApplication.findUnique({
       where: { id: applicationId },
       include: { shift: { select: { id: true, areaId: true } } },
     })
-    if (!app)
-      return { success: false, error: tExtra('errors.applicationNotFound') }
+    if (!app) return { success: false, error: tExtra('errors.applicationNotFound') }
 
     if (app.organizationId !== organizationId)
       return { success: false, error: tExtra('errors.unauthorized') }
@@ -151,12 +135,10 @@ export async function approveApplicationAction(
       const hasAccess = await prisma.userArea.findUnique({
         where: { userId_areaId: { userId: session.id, areaId: app.shift.areaId } },
       })
-      if (!hasAccess)
-        return { success: false, error: tExtra('errors.noAreaAccess') }
+      if (!hasAccess) return { success: false, error: tExtra('errors.noAreaAccess') }
     }
 
-    if (app.status !== 'PENDING')
-      return { success: false, error: tExtra('errors.invalidStatus') }
+    if (app.status !== 'PENDING') return { success: false, error: tExtra('errors.invalidStatus') }
 
     await prisma.$transaction(async (tx) => {
       await tx.shift.update({
@@ -197,23 +179,19 @@ export async function approveApplicationAction(
   }
 }
 
-export async function rejectApplicationAction(
-  applicationId: string
-): Promise<ActionResult> {
+export async function rejectApplicationAction(applicationId: string): Promise<ActionResult> {
   try {
     const session = await requireAdminHROrChief()
     const tExtra = await getTranslations('extraShifts')
 
     const organizationId = session.organizationId
-    if (!organizationId)
-      return { success: false, error: tExtra('errors.noOrganization') }
+    if (!organizationId) return { success: false, error: tExtra('errors.noOrganization') }
 
     const app = await prisma.shiftApplication.findUnique({
       where: { id: applicationId },
       include: { shift: { select: { areaId: true } } },
     })
-    if (!app)
-      return { success: false, error: tExtra('errors.applicationNotFound') }
+    if (!app) return { success: false, error: tExtra('errors.applicationNotFound') }
 
     if (app.organizationId !== organizationId)
       return { success: false, error: tExtra('errors.unauthorized') }

@@ -99,22 +99,23 @@ export const getAvailableStaffAction = async (
 
     const derivedOrgId = isChiefArea(session)
       ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
-      : session.organizationId ?? null
-    if (!derivedOrgId)
-      return { success: false, error: 'No tienes una organización asignada' }
+      : (session.organizationId ?? null)
+    if (!derivedOrgId) return { success: false, error: 'No tienes una organización asignada' }
     const organizationId = derivedOrgId
 
     const rotation = await prisma.rotation.findFirst({
       where: { id: rotationId, organizationId },
       select: { id: true, areaId: true },
     })
-    if (!rotation)
-      return { success: false, error: 'Rotativa no encontrada' }
+    if (!rotation) return { success: false, error: 'Rotativa no encontrada' }
 
     if (isChiefArea(session)) {
       const hasAccess = await chiefHasAreaAccess(session.id, rotation.areaId)
       if (!hasAccess)
-        return { success: false, error: 'Solo puedes gestionar rotativas en las áreas que tienes asignadas' }
+        return {
+          success: false,
+          error: 'Solo puedes gestionar rotativas en las áreas que tienes asignadas',
+        }
     }
 
     const activeMemberships = await prisma.rotationMember.findMany({
@@ -174,9 +175,8 @@ export const addMembersBulkAction = async (
 
     const derivedOrgId = isChiefArea(session)
       ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
-      : session.organizationId ?? null
-    if (!derivedOrgId)
-      return { success: false, error: 'No tienes una organización asignada' }
+      : (session.organizationId ?? null)
+    if (!derivedOrgId) return { success: false, error: 'No tienes una organización asignada' }
     const organizationId = derivedOrgId
 
     const validatedData = addMembersBulkSchema.parse(data)
@@ -201,7 +201,10 @@ export const addMembersBulkAction = async (
     if (isChiefArea(session)) {
       const hasAccess = await chiefHasAreaAccess(session.id, group.rotation.areaId)
       if (!hasAccess)
-        return { success: false, error: 'Solo puedes gestionar rotativas en las áreas que tienes asignadas' }
+        return {
+          success: false,
+          error: 'Solo puedes gestionar rotativas en las áreas que tienes asignadas',
+        }
     }
 
     const targetUsers = await prisma.user.findMany({
@@ -305,9 +308,8 @@ export const removeMemberAction = async (
 
     const derivedOrgId = isChiefArea(session)
       ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
-      : session.organizationId ?? null
-    if (!derivedOrgId)
-      return { success: false, error: 'No tienes una organización asignada' }
+      : (session.organizationId ?? null)
+    if (!derivedOrgId) return { success: false, error: 'No tienes una organización asignada' }
     const organizationId = derivedOrgId
 
     const validatedData = removeMemberSchema.parse(data)
@@ -332,7 +334,10 @@ export const removeMemberAction = async (
     if (isChiefArea(session)) {
       const hasAccess = await chiefHasAreaAccess(session.id, group.rotation.areaId)
       if (!hasAccess)
-        return { success: false, error: 'Solo puedes gestionar rotativas en las áreas que tienes asignadas' }
+        return {
+          success: false,
+          error: 'Solo puedes gestionar rotativas en las áreas que tienes asignadas',
+        }
     }
 
     const member = await prisma.rotationMember.findFirst({
@@ -344,8 +349,7 @@ export const removeMemberAction = async (
       select: { id: true },
     })
 
-    if (!member)
-      return { success: false, error: 'El usuario no es miembro activo de este grupo' }
+    if (!member) return { success: false, error: 'El usuario no es miembro activo de este grupo' }
 
     await prisma.rotationMember.update({
       where: { id: member.id },

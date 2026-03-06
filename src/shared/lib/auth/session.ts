@@ -89,4 +89,3 @@ export async function requireDashboardUser(
 
   return user as CurrentUser & { organizationId: string | null }
 }
-

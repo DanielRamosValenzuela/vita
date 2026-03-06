@@ -29,7 +29,7 @@ interface UseOrganizationFiltersReturn {
 }
 
 export function useOrganizationFilters(
-  initialFilters: OrganizationFiltersState,
+  initialFilters: OrganizationFiltersState
 ): UseOrganizationFiltersReturn {
   const router = useRouter()
   const pathname = usePathname()

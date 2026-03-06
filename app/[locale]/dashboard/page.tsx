@@ -8,16 +8,19 @@ import { isChief } from '@/src/shared/lib/auth/rbac'
 import { requireSuperAdmin } from '@/src/shared/lib/auth/session'
 import { prisma } from '@/src/shared/lib/db'
 import { CalendarView } from '@/src/widgets/calendar-view'
+import { getNotesForMonthAction } from '@/src/features/staff-dashboard/api/calendar-note-actions'
+import { getMyAreasAndSectorsAction } from '@/src/features/staff-dashboard/api/staff-filter-actions'
+import {
+  getMyShiftsAction,
+  getUpcomingShiftsAction,
+} from '@/src/features/staff-dashboard/api/staff-shifts-actions'
+import { StaffDashboardContent } from '@/src/features/staff-dashboard/ui/staff-dashboard-content'
 import {
   formatAlertsData,
   formatStatsData,
   getDashboardData,
 } from '@/src/features/super-admin/lib/helpers/server/dashboard-helpers'
 import { AlertsPanel, OrganizationsTable, StatsCards } from '@/src/features/super-admin/ui'
-import { getNotesForMonthAction } from '@/src/features/staff-dashboard/api/calendar-note-actions'
-import { getMyAreasAndSectorsAction } from '@/src/features/staff-dashboard/api/staff-filter-actions'
-import { getMyShiftsAction, getUpcomingShiftsAction } from '@/src/features/staff-dashboard/api/staff-shifts-actions'
-import { StaffDashboardContent } from '@/src/features/staff-dashboard/ui/staff-dashboard-content'
 
 interface DashboardPageProps {
   params: Promise<{ locale: string }>
@@ -77,7 +80,7 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
 
   const organizationId = isChief(user)
     ? await resolveChiefOrganizationId(user.id, user.organizationId ?? null)
-    : user.organizationId ?? null
+    : (user.organizationId ?? null)
 
   const now = new Date()
   const startDate = new Date(now.getFullYear(), now.getMonth(), 1)
@@ -92,7 +95,8 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
       : null,
   ])
   const initialShifts = shiftsResult.success && shiftsResult.data ? shiftsResult.data.shifts : []
-  const initialUpcoming = upcomingResult.success && upcomingResult.data ? upcomingResult.data.shifts : []
+  const initialUpcoming =
+    upcomingResult.success && upcomingResult.data ? upcomingResult.data.shifts : []
   const initialNotes = notesResult.success && notesResult.data ? notesResult.data.notes : []
   const filterOptions = filtersResult.success && filtersResult.data ? filtersResult.data : undefined
 

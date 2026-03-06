@@ -34,9 +34,7 @@ export default function CalendarLoading() {
               {Array.from({ length: 7 }).map((_, col) => (
                 <div key={col} className="border-r p-2 last:border-r-0 min-h-20">
                   <Skeleton className="mb-1 h-4 w-6" />
-                  {row % 2 === 0 && col % 3 === 0 && (
-                    <Skeleton className="h-5 w-full rounded" />
-                  )}
+                  {row % 2 === 0 && col % 3 === 0 && <Skeleton className="h-5 w-full rounded" />}
                 </div>
               ))}
             </div>

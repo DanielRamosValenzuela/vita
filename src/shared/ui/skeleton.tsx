@@ -13,7 +13,7 @@ function Skeleton({
       className={cn(
         'rounded-md',
         variant === 'wave' ? 'animate-skeleton-wave' : 'bg-accent animate-pulse',
-        className,
+        className
       )}
       {...props}
     />

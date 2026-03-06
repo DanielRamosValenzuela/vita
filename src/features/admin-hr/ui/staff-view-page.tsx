@@ -10,7 +10,13 @@ import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
 import { DataTablePagination } from '@/src/shared/ui/molecules/data-table-pagination'
 import { DataTableToolbar } from '@/src/shared/ui/molecules/data-table-toolbar'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/src/shared/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/src/shared/ui/select'
 import {
   Table,
   TableBody,
@@ -55,8 +61,7 @@ export function StaffViewPage({ staff, canManageRates = false }: StaffViewPagePr
       items: staff,
       pageSize: 10,
       searchFn: (person, query) =>
-        person.name.toLowerCase().includes(query) ||
-        person.email.toLowerCase().includes(query),
+        person.name.toLowerCase().includes(query) || person.email.toLowerCase().includes(query),
       filterFn,
     })
 
@@ -131,65 +136,65 @@ export function StaffViewPage({ staff, canManageRates = false }: StaffViewPagePr
                   </TableHeader>
                   <TableBody>
                     {paginatedItems.map((person) => {
-                    const currentContract = person.contracts[0] ?? null
-                    const areaName = currentContract?.areaName || person.primaryAreaName
+                      const currentContract = person.contracts[0] ?? null
+                      const areaName = currentContract?.areaName || person.primaryAreaName
 
-                    return (
-                      <TableRow key={person.id}>
-                        <TableCell>
-                          <div>
-                            <div className="font-medium">{person.name}</div>
-                            <div className="text-sm text-muted-foreground">{person.email}</div>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="outline">
-                            {person.role === 'CHIEF_AREA'
-                              ? t('roles.chiefArea')
-                              : person.role === 'CHIEF_SECTOR'
-                                ? t('roles.chiefSector')
-                                : t('roles.staff')}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          {areaName ? (
-                            <span>{areaName}</span>
-                          ) : (
-                            <span className="text-muted-foreground">-</span>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {currentContract ? (
-                            <div className="flex items-center gap-2">
-                              <span>{currentContract.rateTemplateName}</span>
-                              {currentContract.customMultiplier && (
-                                <Badge variant="secondary" className="text-xs">
-                                  {t('table.multiplierBadge', {
-                                    value: currentContract.customMultiplier,
-                                  })}
-                                </Badge>
-                              )}
+                      return (
+                        <TableRow key={person.id}>
+                          <TableCell>
+                            <div>
+                              <div className="font-medium">{person.name}</div>
+                              <div className="text-sm text-muted-foreground">{person.email}</div>
                             </div>
-                          ) : (
-                            <span className="text-muted-foreground">{t('table.noContract')}</span>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {currentContract ? (
-                            <div className="flex items-center gap-2 text-green-600">
-                              <CheckCircle2 className="h-4 w-4" />
-                              <span className="text-sm">{t('table.hasContract')}</span>
-                            </div>
-                          ) : (
-                            <div className="flex items-center gap-2 text-muted-foreground">
-                              <XCircle className="h-4 w-4" />
-                              <span className="text-sm">{t('table.noContractStatus')}</span>
-                            </div>
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    )
-                  })}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline">
+                              {person.role === 'CHIEF_AREA'
+                                ? t('roles.chiefArea')
+                                : person.role === 'CHIEF_SECTOR'
+                                  ? t('roles.chiefSector')
+                                  : t('roles.staff')}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            {areaName ? (
+                              <span>{areaName}</span>
+                            ) : (
+                              <span className="text-muted-foreground">-</span>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {currentContract ? (
+                              <div className="flex items-center gap-2">
+                                <span>{currentContract.rateTemplateName}</span>
+                                {currentContract.customMultiplier && (
+                                  <Badge variant="secondary" className="text-xs">
+                                    {t('table.multiplierBadge', {
+                                      value: currentContract.customMultiplier,
+                                    })}
+                                  </Badge>
+                                )}
+                              </div>
+                            ) : (
+                              <span className="text-muted-foreground">{t('table.noContract')}</span>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {currentContract ? (
+                              <div className="flex items-center gap-2 text-green-600">
+                                <CheckCircle2 className="h-4 w-4" />
+                                <span className="text-sm">{t('table.hasContract')}</span>
+                              </div>
+                            ) : (
+                              <div className="flex items-center gap-2 text-muted-foreground">
+                                <XCircle className="h-4 w-4" />
+                                <span className="text-sm">{t('table.noContractStatus')}</span>
+                              </div>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      )
+                    })}
                   </TableBody>
                 </Table>
               </div>

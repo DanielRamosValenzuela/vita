@@ -16,10 +16,7 @@ import {
   rejectInvitation,
   updateUserDocument,
 } from '../data/profile-repository'
-import {
-  getChangePasswordSchema,
-  getUpdateDocumentSchema,
-} from '../lib/schemas'
+import { getChangePasswordSchema, getUpdateDocumentSchema } from '../lib/schemas'
 
 export async function changePasswordAction(data: {
   currentPassword: string

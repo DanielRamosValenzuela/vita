@@ -45,8 +45,7 @@ export function useClientPagination<T>({
 
     const query = search.trim().toLowerCase()
     if (query)
-      if (searchFn)
-        result = result.filter((item) => searchFn(item, query))
+      if (searchFn) result = result.filter((item) => searchFn(item, query))
       else if (searchFields)
         result = result.filter((item) =>
           searchFields.some((field) => {

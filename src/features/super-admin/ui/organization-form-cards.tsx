@@ -1,7 +1,7 @@
 'use client'
 
-import type { Country } from '@prisma/client'
 import { useTranslations } from 'next-intl'
+import type { Country } from '@prisma/client'
 import type { FieldErrors, UseFormRegister, UseFormSetValue } from 'react-hook-form'
 
 import { formatTaxId, getTaxIdConfig } from '@/src/shared/lib/utils/tax-id-config'
@@ -55,9 +55,7 @@ export function OrgBasicInfoCard({
             {...register('name')}
             aria-invalid={!!errors.name}
           />
-          {errors.name && (
-            <p className="text-destructive text-sm">{String(errors.name.message)}</p>
-          )}
+          {errors.name && <p className="text-destructive text-sm">{String(errors.name.message)}</p>}
         </div>
 
         <div className="space-y-2">

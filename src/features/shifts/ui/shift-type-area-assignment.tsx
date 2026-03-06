@@ -4,8 +4,8 @@ import type { Dispatch } from 'react'
 import { useTranslations } from 'next-intl'
 import { Info } from 'lucide-react'
 
-import { SearchableAddableList } from '@/src/shared/ui/molecules'
 import { Label } from '@/src/shared/ui/label'
+import { SearchableAddableList } from '@/src/shared/ui/molecules'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/src/shared/ui/tooltip'
 
 import type { AreaOption, ShiftTypeFormData, ShiftTypesAction } from './shift-types-utils'

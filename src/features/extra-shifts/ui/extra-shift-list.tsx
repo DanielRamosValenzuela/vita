@@ -11,8 +11,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/src/shared/ui/tabs'
 
 import type { ShiftApplicationWithRelations } from '@/src/entities/shift-application'
 
-import { getExtraShiftsForAreaAction } from '../api/extra-shift-queries'
-import { getMyApplicationsAction } from '../api/extra-shift-queries'
+import { getExtraShiftsForAreaAction, getMyApplicationsAction } from '../api/extra-shift-queries'
 import { ApplicationForm } from './application-form'
 
 interface ExtraShiftListProps {
@@ -42,7 +41,10 @@ interface ExtraShiftItem {
 export function ExtraShiftList({ userRole: _userRole }: ExtraShiftListProps) {
   const t = useTranslations('extraShifts')
   const [tab, setTab] = useState<'available' | 'applications'>('available')
-  const [data, setData] = useState<{ shifts: ExtraShiftItem[]; applications: ShiftApplicationWithRelations[] }>({ shifts: [], applications: [] })
+  const [data, setData] = useState<{
+    shifts: ExtraShiftItem[]
+    applications: ShiftApplicationWithRelations[]
+  }>({ shifts: [], applications: [] })
   const [loading, setLoading] = useState(true)
   const [applyShiftId, setApplyShiftId] = useState<string | null>(null)
 
@@ -51,17 +53,19 @@ export function ExtraShiftList({ userRole: _userRole }: ExtraShiftListProps) {
     if (tab === 'available') {
       const result = await getExtraShiftsForAreaAction()
       if (result.success && result.data)
-        setData(prev => ({ ...prev, shifts: result.data!.shifts }))
+        setData((prev) => ({ ...prev, shifts: result.data!.shifts }))
     } else {
       const result = await getMyApplicationsAction()
       if (result.success && result.data)
-        setData(prev => ({ ...prev, applications: result.data!.applications }))
+        setData((prev) => ({ ...prev, applications: result.data!.applications }))
     }
     setLoading(false)
   }, [tab])
 
   useEffect(() => {
-    startTransition(() => { void load() })
+    startTransition(() => {
+      void load()
+    })
   }, [load])
 
   return (
@@ -87,12 +91,13 @@ export function ExtraShiftList({ userRole: _userRole }: ExtraShiftListProps) {
         ) : (
           <div className="space-y-3">
             {data.shifts.map((shift) => (
-              <div key={shift.id} className="flex items-center justify-between rounded-lg border p-4">
+              <div
+                key={shift.id}
+                className="flex items-center justify-between rounded-lg border p-4"
+              >
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <Badge
-                      style={{ backgroundColor: shift.area.color, color: '#fff' }}
-                    >
+                    <Badge style={{ backgroundColor: shift.area.color, color: '#fff' }}>
                       {shift.area.name}
                     </Badge>
                     <Badge
@@ -112,10 +117,7 @@ export function ExtraShiftList({ userRole: _userRole }: ExtraShiftListProps) {
                     {t('applicants', { count: shift._count.applications })}
                   </p>
                 </div>
-                <Button
-                  size="sm"
-                  onClick={() => setApplyShiftId(shift.id)}
-                >
+                <Button size="sm" onClick={() => setApplyShiftId(shift.id)}>
                   <Plus className="mr-1 h-3 w-3" />
                   {t('apply')}
                 </Button>
@@ -135,9 +137,7 @@ export function ExtraShiftList({ userRole: _userRole }: ExtraShiftListProps) {
             <div key={app.id} className="flex items-center justify-between rounded-lg border p-4">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <Badge
-                    style={{ backgroundColor: app.shift.area.color, color: '#fff' }}
-                  >
+                  <Badge style={{ backgroundColor: app.shift.area.color, color: '#fff' }}>
                     {app.shift.area.name}
                   </Badge>
                   <Badge
@@ -154,11 +154,15 @@ export function ExtraShiftList({ userRole: _userRole }: ExtraShiftListProps) {
                   {formatShortDate(app.shift.startTime)} - {formatShortDate(app.shift.endTime)}
                 </p>
               </div>
-              <Badge variant={
-                app.status === 'APPROVED' ? 'default' :
-                app.status === 'REJECTED' ? 'destructive' :
-                'secondary'
-              }>
+              <Badge
+                variant={
+                  app.status === 'APPROVED'
+                    ? 'default'
+                    : app.status === 'REJECTED'
+                      ? 'destructive'
+                      : 'secondary'
+                }
+              >
                 {t(`status.${app.status}`)}
               </Badge>
             </div>
@@ -168,7 +172,9 @@ export function ExtraShiftList({ userRole: _userRole }: ExtraShiftListProps) {
 
       <ApplicationForm
         open={!!applyShiftId}
-        onOpenChange={(open) => { if (!open) setApplyShiftId(null) }}
+        onOpenChange={(open) => {
+          if (!open) setApplyShiftId(null)
+        }}
         shiftId={applyShiftId ?? ''}
         onApplied={load}
       />

@@ -2,8 +2,8 @@
 
 import { useCallback, useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
-import { toast } from 'sonner'
 import { Copy, Download, Link, Loader2, Rss, Trash2 } from 'lucide-react'
+import { toast } from 'sonner'
 
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
@@ -44,10 +44,7 @@ interface FeedToken {
   createdAt: Date
 }
 
-export function CalendarExportMenu({
-  currentMonth,
-  currentYear,
-}: CalendarExportMenuProps) {
+export function CalendarExportMenu({ currentMonth, currentYear }: CalendarExportMenuProps) {
   const t = useTranslations('staffDashboard.export')
   const [isPending, startTransition] = useTransition()
   const [feedDialogOpen, setFeedDialogOpen] = useState(false)
@@ -71,8 +68,7 @@ export function CalendarExportMenu({
         a.click()
         URL.revokeObjectURL(url)
         toast.success(t('downloadSuccess'), { id: toastId })
-      } else
-        toast.error(t('downloadError'), { id: toastId })
+      } else toast.error(t('downloadError'), { id: toastId })
     })
   }, [currentMonth, currentYear, t])
 
@@ -84,8 +80,7 @@ export function CalendarExportMenu({
           await navigator.clipboard.writeText(result.data.feedUrl)
           toast.success(t('feedCreated'), { description: t('urlCopied') })
           const feedsResult = await getMyFeedTokensAction()
-          if (feedsResult.success && feedsResult.data)
-            setFeeds(feedsResult.data.tokens)
+          if (feedsResult.success && feedsResult.data) setFeeds(feedsResult.data.tokens)
         }
       })
     },
@@ -95,8 +90,7 @@ export function CalendarExportMenu({
   const handleManageFeeds = useCallback(() => {
     startTransition(async () => {
       const result = await getMyFeedTokensAction()
-      if (result.success && result.data)
-        setFeeds(result.data.tokens)
+      if (result.success && result.data) setFeeds(result.data.tokens)
       setFeedDialogOpen(true)
     })
   }, [])
@@ -108,8 +102,7 @@ export function CalendarExportMenu({
         if (revokeResult.success) toast.success(t('feedRevoked'))
         else toast.error(revokeResult.error ?? t('revokeError'))
         const result = await getMyFeedTokensAction()
-        if (result.success && result.data)
-          setFeeds(result.data.tokens)
+        if (result.success && result.data) setFeeds(result.data.tokens)
       })
     },
     [t]
@@ -153,9 +146,7 @@ export function CalendarExportMenu({
             {t('feedUnified')}
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleManageFeeds}>
-            {t('manageFeeds')}
-          </DropdownMenuItem>
+          <DropdownMenuItem onClick={handleManageFeeds}>{t('manageFeeds')}</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
@@ -167,37 +158,22 @@ export function CalendarExportMenu({
           </DialogHeader>
           <div className="space-y-3">
             {feeds.filter((f) => f.isActive).length === 0 ? (
-              <p className="py-4 text-center text-sm text-muted-foreground">
-                {t('noFeeds')}
-              </p>
+              <p className="py-4 text-center text-sm text-muted-foreground">{t('noFeeds')}</p>
             ) : (
               feeds
                 .filter((f) => f.isActive)
                 .map((feed) => (
-                  <div
-                    key={feed.id}
-                    className="flex items-center gap-2 rounded-md border p-3"
-                  >
+                  <div key={feed.id} className="flex items-center gap-2 rounded-md border p-3">
                     <div className="min-w-0 flex-1">
                       <Badge variant="outline" className="mb-1">
                         {feed.organizationName ?? t('unifiedLabel')}
                       </Badge>
-                      <p className="truncate text-xs text-muted-foreground">
-                        {feed.feedUrl}
-                      </p>
+                      <p className="truncate text-xs text-muted-foreground">{feed.feedUrl}</p>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleCopyUrl(feed.feedUrl)}
-                    >
+                    <Button variant="ghost" size="icon" onClick={() => handleCopyUrl(feed.feedUrl)}>
                       <Copy className="h-4 w-4" />
                     </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleRevokeFeed(feed.id)}
-                    >
+                    <Button variant="ghost" size="icon" onClick={() => handleRevokeFeed(feed.id)}>
                       <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>
                   </div>

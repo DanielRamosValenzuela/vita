@@ -8,6 +8,7 @@ import { CalendarIcon, Clock, Search } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
+import { formatDateLong } from '@/src/shared/lib/utils/format'
 import { Button } from '@/src/shared/ui/button'
 import { Calendar } from '@/src/shared/ui/calendar'
 import { Input } from '@/src/shared/ui/input'
@@ -23,7 +24,6 @@ import {
 import { Textarea } from '@/src/shared/ui/textarea'
 
 import { checkShiftConflictsClient } from '@/src/entities/shift/lib/shift-validation-client'
-import { formatDateLong } from '@/src/shared/lib/utils/format'
 
 import { createShiftSchema, type ShiftFormData } from '../lib/shift-form-schemas'
 import type { CreateShiftData, CreateShiftFormData } from '../types/shift-types'
@@ -136,8 +136,7 @@ function DateTimeFields({
 }) {
   const endDateDisplay = (() => {
     const endDate = form.watch('endDate')
-    if (!endDate)
-      return selectedShiftType ? t('endDate.calculated') : t('endDate.selectShiftType')
+    if (!endDate) return selectedShiftType ? t('endDate.calculated') : t('endDate.selectShiftType')
     const [year, month, day] = endDate.split('-').map(Number)
     return formatDateLong(new Date(year, month - 1, day), locale)
   })()
@@ -241,7 +240,7 @@ export function ShiftForm({
       title:
         initialData?.title ||
         (initialData?.shiftTypeId
-          ? shiftTypes.find((st) => st.id === initialData.shiftTypeId)?.name ?? ''
+          ? (shiftTypes.find((st) => st.id === initialData.shiftTypeId)?.name ?? '')
           : ''),
       userId: initialData?.userId || '',
       areaId: initialData?.areaId || '',
@@ -320,8 +319,7 @@ export function ShiftForm({
   }, [availableUsers, form])
 
   useEffect(() => {
-    if (!areaId)
-      form.setValue('userId', '')
+    if (!areaId) form.setValue('userId', '')
   }, [areaId, form])
 
   const selectedArea = areas.find((area) => area.id === areaId)
@@ -424,12 +422,7 @@ export function ShiftForm({
         />
       </div>
 
-      <DateTimeFields
-        form={form}
-        selectedShiftType={selectedShiftType}
-        locale={locale}
-        t={t}
-      />
+      <DateTimeFields form={form} selectedShiftType={selectedShiftType} locale={locale} t={t} />
 
       <div className="space-y-2">
         <Label htmlFor="notes">{t('notes.label')}</Label>

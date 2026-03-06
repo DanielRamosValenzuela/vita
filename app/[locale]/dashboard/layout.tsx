@@ -1,5 +1,4 @@
 import { redirect } from 'next/navigation'
-
 import { Role } from '@prisma/client'
 
 import { getCurrentUser } from '@/src/shared/lib/auth'
@@ -18,19 +17,24 @@ interface DashboardLayoutProps {
 export default async function DashboardLayout({ children, params }: DashboardLayoutProps) {
   const [resolvedParams, user] = await Promise.all([params, getCurrentUser()])
 
-  if (!user)
-    redirect(`/${resolvedParams.locale}/login`)
+  if (!user) redirect(`/${resolvedParams.locale}/login`)
 
   const [pendingNotifications, unreadNotificationCount, displayRole] = await Promise.all([
     getUserPendingNotifications({ userId: user.id }),
     getUnreadCount(user.id),
     user.role === Role.CHIEF_AREA
-      ? prisma.userSector.count({ where: { userId: user.id } }).then((c) => c > 0 ? Role.CHIEF_SECTOR : undefined)
+      ? prisma.userSector
+          .count({ where: { userId: user.id } })
+          .then((c) => (c > 0 ? Role.CHIEF_SECTOR : undefined))
       : Promise.resolve(undefined),
   ])
 
   return (
-    <DashboardShell user={user} unreadNotificationCount={unreadNotificationCount} displayRole={displayRole}>
+    <DashboardShell
+      user={user}
+      unreadNotificationCount={unreadNotificationCount}
+      displayRole={displayRole}
+    >
       <PendingNotificationsToaster notifications={pendingNotifications} />
       {children}
     </DashboardShell>

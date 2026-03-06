@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 import { Download, MoreHorizontal, RefreshCw, Trash2 } from 'lucide-react'
 
+import { toastActionResult } from '@/src/shared/lib/utils/toast-action-result'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,13 +31,13 @@ import {
   TableHeader,
   TableRow,
 } from '@/src/shared/ui/table'
-import { toastActionResult } from '@/src/shared/lib/utils/toast-action-result'
-import type { PayrollDocumentSummary } from '@/src/entities/payroll/lib/types'
 import {
   deletePayrollDocumentAction,
   regeneratePayrollDocumentAction,
 } from '@/src/features/admin-hr/api/payroll-actions'
 import { downloadPayrollDocumentAction } from '@/src/features/payroll/api/payroll-history-actions'
+
+import type { PayrollDocumentSummary } from '@/src/entities/payroll/lib/types'
 
 interface PayrollDocumentsTableProps {
   documents: PayrollDocumentSummary[]
@@ -47,9 +48,8 @@ interface PayrollDocumentsTableProps {
 }
 
 function formatCurrency(amount: number, currency: string): string {
-  if (currency === 'CLP') 
-    return `$${Math.round(amount).toLocaleString('es-CL')}`
-  
+  if (currency === 'CLP') return `$${Math.round(amount).toLocaleString('es-CL')}`
+
   return `$${amount.toFixed(2)}`
 }
 
@@ -70,11 +70,8 @@ export function PayrollDocumentsTable({
   const handleDownload = (documentId: string) => {
     startTransition(async () => {
       const result = await downloadPayrollDocumentAction({ documentId })
-      if (result.success && result.data) 
-        window.open(result.data.signedUrl, '_blank')
-       else 
-        toastActionResult(result)
-      
+      if (result.success && result.data) window.open(result.data.signedUrl, '_blank')
+      else toastActionResult(result)
     })
   }
 
@@ -108,9 +105,8 @@ export function PayrollDocumentsTable({
 
   const confirmBulkDelete = () => {
     startTransition(async () => {
-      for (const docId of selectedIds) 
-        await deletePayrollDocumentAction({ documentId: docId })
-      
+      for (const docId of selectedIds) await deletePayrollDocumentAction({ documentId: docId })
+
       setSelectedIds(new Set())
       setBulkDeleteOpen(false)
       onRefresh()
@@ -120,28 +116,20 @@ export function PayrollDocumentsTable({
   const toggleSelect = (id: string) => {
     setSelectedIds((prev) => {
       const next = new Set(prev)
-      if (next.has(id)) 
-        next.delete(id)
-       else 
-        next.add(id)
-      
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+
       return next
     })
   }
 
   const toggleSelectAll = () => {
-    if (selectedIds.size === documents.length) 
-      setSelectedIds(new Set())
-     else 
-      setSelectedIds(new Set(documents.map((d) => d.id)))
-    
+    if (selectedIds.size === documents.length) setSelectedIds(new Set())
+    else setSelectedIds(new Set(documents.map((d) => d.id)))
   }
 
-  if (documents.length === 0) 
-    return (
-      <p className="text-muted-foreground py-8 text-center">{t('documents.empty')}</p>
-    )
-  
+  if (documents.length === 0)
+    return <p className="text-muted-foreground py-8 text-center">{t('documents.empty')}</p>
 
   return (
     <div className="space-y-4">

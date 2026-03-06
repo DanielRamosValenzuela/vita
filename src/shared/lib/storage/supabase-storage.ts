@@ -72,8 +72,6 @@ export async function uploadUserAvatar({
   }
 }
 
-
-
 export async function uploadPayrollDocument(
   organizationId: string,
   year: number,
@@ -108,9 +106,7 @@ export async function deletePayrollDocument(
   storagePath: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const { error } = await supabaseStorage.storage
-      .from(PAYROLL_BUCKET)
-      .remove([storagePath])
+    const { error } = await supabaseStorage.storage.from(PAYROLL_BUCKET).remove([storagePath])
 
     if (error) {
       console.error('Error deleting payroll document:', error)
@@ -144,8 +140,6 @@ export async function getPayrollDocumentSignedUrl(
     return { success: false, error: 'Error inesperado al generar enlace' }
   }
 }
-
-
 
 export async function deleteUserAvatar(
   userId: string

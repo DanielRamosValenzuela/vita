@@ -10,10 +10,7 @@ import {
   deleteAdminHRUser,
   updateAdminHRUser,
 } from '../data/admin-hr-user-repository'
-import {
-  getUpdateAdminHRUserSchema,
-  type UpdateAdminHRUserInput,
-} from '../lib/schemas'
+import { getUpdateAdminHRUserSchema, type UpdateAdminHRUserInput } from '../lib/schemas'
 
 export async function updateAdminHRUserAction(id: string, data: UpdateAdminHRUserInput) {
   try {

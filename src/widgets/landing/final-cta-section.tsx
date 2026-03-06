@@ -1,10 +1,10 @@
 'use client'
 
-import { m, useReducedMotion } from 'framer-motion'
-import { ArrowRight } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
+import { m, useReducedMotion } from 'framer-motion'
+import { ArrowRight } from 'lucide-react'
 
 import { fadeInUp, staggerContainer } from '@/src/shared/lib/animations'
 import { Button } from '@/src/shared/ui/button'
@@ -39,10 +39,7 @@ export function FinalCtaSection() {
         >
           {t('finalCta.title')}
         </m.h2>
-        <m.p
-          variants={itemVariants}
-          className="mx-auto mb-10 max-w-2xl text-lg text-white/80"
-        >
+        <m.p variants={itemVariants} className="mx-auto mb-10 max-w-2xl text-lg text-white/80">
           {t('finalCta.description')}
         </m.p>
         <m.div

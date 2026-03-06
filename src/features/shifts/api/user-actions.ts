@@ -19,7 +19,7 @@ export const getUsersForShiftsAction = async (): Promise<ActionResult<ShiftUser[
     const session = await requireAdminHROrChief()
     const organizationId = isChiefArea(session)
       ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
-      : session.organizationId ?? null
+      : (session.organizationId ?? null)
     if (!organizationId)
       return {
         success: false,

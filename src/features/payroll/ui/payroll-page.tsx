@@ -12,13 +12,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/src/shared/ui/select'
+
 import type { PayrollDocumentSummary, PayrollPeriodSummary } from '@/src/entities/payroll/lib/types'
 
-import {
-  getPayrollDocumentsAction,
-  getPayrollPeriodsAction,
-} from '../api/payroll-history-actions'
-
+import { getPayrollDocumentsAction, getPayrollPeriodsAction } from '../api/payroll-history-actions'
 import { PayrollDocumentsTable } from './payroll-documents-table'
 import { PayrollPeriodsList } from './payroll-periods-list'
 
@@ -80,8 +77,7 @@ export function PayrollPage({ role, initialPeriods, currency }: PayrollPageProps
   }
 
   const handleRefresh = () => {
-    if (selection.periodId)
-      loadDocuments(selection.periodId)
+    if (selection.periodId) loadDocuments(selection.periodId)
 
     loadPeriods(year)
   }

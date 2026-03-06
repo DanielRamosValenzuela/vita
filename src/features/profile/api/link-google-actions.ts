@@ -123,4 +123,3 @@ export async function unlinkGoogleAction(emailId: string): Promise<ActionResult<
     return handleActionError(error, 'unlinkGoogleAction', 'Error al desvincular Google')
   }
 }
-

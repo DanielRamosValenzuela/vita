@@ -154,17 +154,31 @@ interface DateRangeFiltersProps {
   t: ReturnType<typeof useTranslations<'shifts.filters'>>
 }
 
-function DateRangeFilters({ filters, quickRange, locale, updateFilters, setQuickRange, t }: DateRangeFiltersProps) {
+function DateRangeFilters({
+  filters,
+  quickRange,
+  locale,
+  updateFilters,
+  setQuickRange,
+  t,
+}: DateRangeFiltersProps) {
   return (
     <div className="col-span-2 grid grid-cols-1 gap-4 border-t border-border/60 pt-4 lg:col-span-4 lg:grid-cols-3">
       <div className="space-y-1.5">
-        <label className="text-xs font-medium text-muted-foreground">{t('startDatePlaceholder')}</label>
+        <label className="text-xs font-medium text-muted-foreground">
+          {t('startDatePlaceholder')}
+        </label>
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline" className="h-9 w-full justify-start bg-background text-left font-normal">
+            <Button
+              variant="outline"
+              className="h-9 w-full justify-start bg-background text-left font-normal"
+            >
               <CalendarIcon className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" />
               <span className="truncate">
-                {filters.startDate ? formatDateLong(filters.startDate, locale) : t('startDatePlaceholder')}
+                {filters.startDate
+                  ? formatDateLong(filters.startDate, locale)
+                  : t('startDatePlaceholder')}
               </span>
             </Button>
           </PopoverTrigger>
@@ -180,13 +194,20 @@ function DateRangeFilters({ filters, quickRange, locale, updateFilters, setQuick
       </div>
 
       <div className="space-y-1.5">
-        <label className="text-xs font-medium text-muted-foreground">{t('endDatePlaceholder')}</label>
+        <label className="text-xs font-medium text-muted-foreground">
+          {t('endDatePlaceholder')}
+        </label>
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline" className="h-9 w-full justify-start bg-background text-left font-normal">
+            <Button
+              variant="outline"
+              className="h-9 w-full justify-start bg-background text-left font-normal"
+            >
               <CalendarIcon className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" />
               <span className="truncate">
-                {filters.endDate ? formatDateLong(filters.endDate, locale) : t('endDatePlaceholder')}
+                {filters.endDate
+                  ? formatDateLong(filters.endDate, locale)
+                  : t('endDatePlaceholder')}
               </span>
             </Button>
           </PopoverTrigger>
@@ -202,7 +223,9 @@ function DateRangeFilters({ filters, quickRange, locale, updateFilters, setQuick
       </div>
 
       <div className="space-y-1.5">
-        <label className="text-xs font-medium text-muted-foreground">{t('quickDatePlaceholder')}</label>
+        <label className="text-xs font-medium text-muted-foreground">
+          {t('quickDatePlaceholder')}
+        </label>
         <Select
           value={quickRange || FILTER_CUSTOM}
           onValueChange={(value) => {
@@ -350,7 +373,12 @@ export function ShiftFilters({
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="text-base font-semibold">{t('title')}</h2>
         {hasActiveFilters && (
-          <Button variant="ghost" size="sm" onClick={clearFilters} className="gap-1.5 text-muted-foreground hover:text-foreground">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={clearFilters}
+            className="gap-1.5 text-muted-foreground hover:text-foreground"
+          >
             <X className="h-4 w-4" />
             {t('clear')}
           </Button>
@@ -360,7 +388,9 @@ export function ShiftFilters({
       <div className="rounded-lg border bg-muted/20 p-4">
         <div className="grid grid-cols-2 gap-x-4 gap-y-4 lg:grid-cols-4">
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-muted-foreground">{t('statusPlaceholder')}</label>
+            <label className="text-xs font-medium text-muted-foreground">
+              {t('statusPlaceholder')}
+            </label>
             <Select
               value={filters.status || FILTER_ALL}
               onValueChange={(value) =>
@@ -373,7 +403,10 @@ export function ShiftFilters({
               <SelectContent>
                 <SelectItem value={FILTER_ALL}>{t('allStatuses')}</SelectItem>
                 <StatusSelectItem status={SHIFT_STATUS.SCHEDULED} label={t('status.scheduled')} />
-                <StatusSelectItem status={SHIFT_STATUS.IN_PROGRESS} label={t('status.inProgress')} />
+                <StatusSelectItem
+                  status={SHIFT_STATUS.IN_PROGRESS}
+                  label={t('status.inProgress')}
+                />
                 <StatusSelectItem status={SHIFT_STATUS.COMPLETED} label={t('status.completed')} />
                 <StatusSelectItem status={SHIFT_STATUS.CANCELLED} label={t('status.cancelled')} />
                 <StatusSelectItem status={SHIFT_STATUS.NO_SHOW} label={t('status.noShow')} />
@@ -382,10 +415,14 @@ export function ShiftFilters({
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-muted-foreground">{t('userPlaceholder')}</label>
+            <label className="text-xs font-medium text-muted-foreground">
+              {t('userPlaceholder')}
+            </label>
             <Select
               value={filters.userId || FILTER_ALL}
-              onValueChange={(value) => updateFilters({ userId: value === FILTER_ALL ? '' : value })}
+              onValueChange={(value) =>
+                updateFilters({ userId: value === FILTER_ALL ? '' : value })
+              }
             >
               <SelectTrigger className="h-9 bg-background">
                 <SelectValue placeholder={t('allUsers')} />
@@ -406,10 +443,14 @@ export function ShiftFilters({
 
           {showAreaFilter ? (
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">{t('areaPlaceholder')}</label>
+              <label className="text-xs font-medium text-muted-foreground">
+                {t('areaPlaceholder')}
+              </label>
               <Select
                 value={filters.areaId || FILTER_ALL}
-                onValueChange={(value) => updateFilters({ areaId: value === FILTER_ALL ? '' : value })}
+                onValueChange={(value) =>
+                  updateFilters({ areaId: value === FILTER_ALL ? '' : value })
+                }
               >
                 <SelectTrigger className="h-9 bg-background">
                   <SelectValue placeholder={t('allAreas')} />
@@ -429,7 +470,9 @@ export function ShiftFilters({
           )}
 
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-muted-foreground">{t('shiftTypePlaceholder')}</label>
+            <label className="text-xs font-medium text-muted-foreground">
+              {t('shiftTypePlaceholder')}
+            </label>
             <Select
               value={filters.shiftTypeId || FILTER_ALL}
               onValueChange={(value) =>
@@ -444,7 +487,10 @@ export function ShiftFilters({
                 {shiftTypes.map((type) => (
                   <SelectItem key={type.id} value={type.id}>
                     <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: type.color }} />
+                      <div
+                        className="w-3 h-3 rounded-full"
+                        style={{ backgroundColor: type.color }}
+                      />
                       {type.name}
                     </div>
                   </SelectItem>

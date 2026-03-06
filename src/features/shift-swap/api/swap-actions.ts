@@ -9,17 +9,16 @@ import { prisma } from '@/src/shared/lib/db'
 import type { ActionResult } from '@/src/shared/lib/types'
 import { handleActionError } from '@/src/shared/lib/utils/action-error-handler'
 import { revalidatePaths } from '@/src/shared/lib/utils/revalidate-paths'
+import { createNotification } from '@/src/features/notifications/lib/notification-service'
 
 import {
   createSwapRequest,
   getSwapRequestById,
   updateSwapStatus,
-  validateSwapEligibility,
   validateSameArea,
+  validateSwapEligibility,
   type SwapRequestWithRelations,
 } from '@/src/entities/swap'
-
-import { createNotification } from '@/src/features/notifications/lib/notification-service'
 
 export async function createDirectSwapAction(
   requesterShiftId: string,
@@ -32,36 +31,31 @@ export async function createDirectSwapAction(
 
     const organizationId = isChief(session)
       ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
-      : session.organizationId ?? null
+      : (session.organizationId ?? null)
 
-    if (!organizationId)
-      return { success: false, error: tSwap('errors.noOrganization') }
+    if (!organizationId) return { success: false, error: tSwap('errors.noOrganization') }
 
     const requesterShift = await prisma.shift.findFirst({
       where: { id: requesterShiftId, userId: session.id, organizationId },
       select: { id: true, areaId: true, userId: true },
     })
-    if (!requesterShift)
-      return { success: false, error: tSwap('errors.shiftNotFound') }
+    if (!requesterShift) return { success: false, error: tSwap('errors.shiftNotFound') }
 
     const eligibility = await validateSwapEligibility(requesterShiftId, organizationId)
-    if (!eligibility.valid)
-      return { success: false, error: tSwap(`errors.${eligibility.error}`) }
+    if (!eligibility.valid) return { success: false, error: tSwap(`errors.${eligibility.error}`) }
 
     const targetEligibility = await validateSwapEligibility(targetShiftId, organizationId)
     if (!targetEligibility.valid)
       return { success: false, error: tSwap(`errors.${targetEligibility.error}`) }
 
     const sameArea = await validateSameArea(requesterShiftId, targetShiftId)
-    if (!sameArea.valid)
-      return { success: false, error: tSwap('errors.different_area') }
+    if (!sameArea.valid) return { success: false, error: tSwap('errors.different_area') }
 
     const targetShift = await prisma.shift.findFirst({
       where: { id: targetShiftId, organizationId },
       select: { userId: true },
     })
-    if (!targetShift)
-      return { success: false, error: tSwap('errors.shiftNotFound') }
+    if (!targetShift) return { success: false, error: tSwap('errors.shiftNotFound') }
 
     if (targetShift.userId === session.id)
       return { success: false, error: tSwap('errors.cannotSwapOwn') }
@@ -92,7 +86,11 @@ export async function createDirectSwapAction(
     revalidatePaths('/dashboard/requests')
     return { success: true, data: request }
   } catch (error) {
-    return handleActionError(error, 'createDirectSwapAction', 'Error al crear solicitud de intercambio')
+    return handleActionError(
+      error,
+      'createDirectSwapAction',
+      'Error al crear solicitud de intercambio'
+    )
   }
 }
 
@@ -106,14 +104,12 @@ export async function respondToSwapAction(
 
     const organizationId = isChief(session)
       ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
-      : session.organizationId ?? null
+      : (session.organizationId ?? null)
 
-    if (!organizationId)
-      return { success: false, error: tSwap('errors.noOrganization') }
+    if (!organizationId) return { success: false, error: tSwap('errors.noOrganization') }
 
     const request = await getSwapRequestById(requestId, organizationId)
-    if (!request)
-      return { success: false, error: tSwap('errors.requestNotFound') }
+    if (!request) return { success: false, error: tSwap('errors.requestNotFound') }
 
     if (request.targetUserId !== session.id)
       return { success: false, error: tSwap('errors.unauthorized') }
@@ -174,14 +170,12 @@ export async function cancelSwapAction(
 
     const organizationId = isChief(session)
       ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
-      : session.organizationId ?? null
+      : (session.organizationId ?? null)
 
-    if (!organizationId)
-      return { success: false, error: tSwap('errors.noOrganization') }
+    if (!organizationId) return { success: false, error: tSwap('errors.noOrganization') }
 
     const request = await getSwapRequestById(requestId, organizationId)
-    if (!request)
-      return { success: false, error: tSwap('errors.requestNotFound') }
+    if (!request) return { success: false, error: tSwap('errors.requestNotFound') }
 
     if (request.requesterId !== session.id)
       return { success: false, error: tSwap('errors.unauthorized') }
@@ -224,21 +218,18 @@ export async function createOpenSwapAction(
 
     const organizationId = isChief(session)
       ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
-      : session.organizationId ?? null
+      : (session.organizationId ?? null)
 
-    if (!organizationId)
-      return { success: false, error: tSwap('errors.noOrganization') }
+    if (!organizationId) return { success: false, error: tSwap('errors.noOrganization') }
 
     const requesterShift = await prisma.shift.findFirst({
       where: { id: requesterShiftId, userId: session.id, organizationId },
       select: { id: true, areaId: true },
     })
-    if (!requesterShift)
-      return { success: false, error: tSwap('errors.shiftNotFound') }
+    if (!requesterShift) return { success: false, error: tSwap('errors.shiftNotFound') }
 
     const eligibility = await validateSwapEligibility(requesterShiftId, organizationId)
-    if (!eligibility.valid)
-      return { success: false, error: tSwap(`errors.${eligibility.error}`) }
+    if (!eligibility.valid) return { success: false, error: tSwap(`errors.${eligibility.error}`) }
 
     const expiresAt = new Date()
     expiresAt.setDate(expiresAt.getDate() + expiresInDays)
@@ -277,6 +268,10 @@ export async function createOpenSwapAction(
     revalidatePaths('/dashboard/requests')
     return { success: true, data: request }
   } catch (error) {
-    return handleActionError(error, 'createOpenSwapAction', 'Error al publicar turno para intercambio')
+    return handleActionError(
+      error,
+      'createOpenSwapAction',
+      'Error al publicar turno para intercambio'
+    )
   }
 }

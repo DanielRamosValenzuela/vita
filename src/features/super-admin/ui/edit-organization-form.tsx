@@ -5,12 +5,17 @@ import { useTranslations } from 'next-intl'
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { Organization } from '@prisma/client'
 import { ArrowLeft } from 'lucide-react'
-import { useForm, useWatch } from 'react-hook-form'
-import type { FieldErrors, UseFormRegister, UseFormSetValue } from 'react-hook-form'
+import {
+  useForm,
+  useWatch,
+  type FieldErrors,
+  type UseFormRegister,
+  type UseFormSetValue,
+} from 'react-hook-form'
 import { toast } from 'sonner'
 
-import { Spinner } from '@/src/shared/ui/atoms'
 import { ROLES } from '@/src/shared/lib/constants'
+import { Spinner } from '@/src/shared/ui/atoms'
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'

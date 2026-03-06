@@ -7,7 +7,6 @@ import { useRouter } from 'next/navigation'
 import { AlertCircle, Camera, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 
-import { Spinner } from '@/src/shared/ui/atoms'
 import { getUserInitials } from '@/src/shared/lib/utils/profile-image'
 import {
   AlertDialog,
@@ -18,6 +17,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/src/shared/ui/alert-dialog'
+import { Spinner } from '@/src/shared/ui/atoms'
 import { Avatar, AvatarFallback, AvatarImage } from '@/src/shared/ui/avatar'
 import { Button } from '@/src/shared/ui/button'
 

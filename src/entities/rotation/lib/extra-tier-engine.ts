@@ -52,10 +52,9 @@ function buildMinRestWarning(): CandidateWarningType {
 function checkMinRest(
   previousShiftEnd: Date | undefined,
   minRestHours: number | undefined,
-  now: Date,
+  now: Date
 ): CandidateWarningType | null {
-  if (minRestHours === undefined || previousShiftEnd === undefined)
-    return null
+  if (minRestHours === undefined || previousShiftEnd === undefined) return null
   const restHours = hoursBetween(previousShiftEnd, now)
   return restHours < minRestHours ? buildMinRestWarning() : null
 }
@@ -64,15 +63,12 @@ export function calculateTier(
   candidateHistory: CandidateShiftHistory,
   requestedShiftClassification: ShiftClassificationType,
   maxConsecutiveHours?: number,
-  minRestHours?: number,
+  minRestHours?: number
 ): TierResult {
   const { currentShift, previousShift } = candidateHistory
   const now = new Date()
 
-  if (
-    previousShift?.classification === 'NIGHT' &&
-    requestedShiftClassification === 'DAY'
-  )
+  if (previousShift?.classification === 'NIGHT' && requestedShiftClassification === 'DAY')
     return {
       tier: 'NEVER_RECOMMEND',
       label: 'Post-noche, no asignar turno diurno',
@@ -93,17 +89,17 @@ export function calculateTier(
     const warnings: CandidateWarningType[] = []
 
     if (maxConsecutiveHours !== undefined) {
-      const projectedEnd = new Date(
-        now.getTime() + ASSUMED_EXTRA_SHIFT_HOURS * MS_PER_HOUR,
-      )
+      const projectedEnd = new Date(now.getTime() + ASSUMED_EXTRA_SHIFT_HOURS * MS_PER_HOUR)
       const totalHours = hoursBetween(currentShift.startTime, projectedEnd)
-      if (totalHours > maxConsecutiveHours)
-        warnings.push(buildMaxConsecutiveWarning())
+      if (totalHours > maxConsecutiveHours) warnings.push(buildMaxConsecutiveWarning())
     }
 
-    const minRestWarning = checkMinRest(previousShift?.endTime, minRestHours, currentShift.startTime)
-    if (minRestWarning !== null)
-      warnings.push(minRestWarning)
+    const minRestWarning = checkMinRest(
+      previousShift?.endTime,
+      minRestHours,
+      currentShift.startTime
+    )
+    if (minRestWarning !== null) warnings.push(minRestWarning)
 
     return {
       tier: 'TIER_1',
@@ -119,13 +115,11 @@ export function calculateTier(
     const warnings: CandidateWarningType[] = []
 
     const minRestWarning = checkMinRest(previousShift?.endTime, minRestHours, now)
-    if (minRestWarning !== null)
-      warnings.push(minRestWarning)
+    if (minRestWarning !== null) warnings.push(minRestWarning)
 
     if (maxConsecutiveHours !== undefined) {
       const projectedHours = ASSUMED_EXTRA_SHIFT_HOURS
-      if (projectedHours > maxConsecutiveHours)
-        warnings.push(buildMaxConsecutiveWarning())
+      if (projectedHours > maxConsecutiveHours) warnings.push(buildMaxConsecutiveWarning())
     }
 
     return {
@@ -145,8 +139,7 @@ export function calculateTier(
     ]
 
     const minRestWarning = checkMinRest(previousShift.endTime, minRestHours, now)
-    if (minRestWarning !== null)
-      warnings.push(minRestWarning)
+    if (minRestWarning !== null) warnings.push(minRestWarning)
 
     return {
       tier: 'TIER_3',

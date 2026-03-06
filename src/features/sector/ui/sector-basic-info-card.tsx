@@ -4,17 +4,17 @@ import { useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 
-import { Spinner } from '@/src/shared/ui/atoms'
 import { AREA_ICONS } from '@/src/shared/lib/constants'
+import { Spinner } from '@/src/shared/ui/atoms'
 import { Badge } from '@/src/shared/ui/badge'
-
-import { useRouter } from '@/i18n/navigation'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
 import { IconDisplay, IconPicker } from '@/src/shared/ui/icon-picker'
 import { Input } from '@/src/shared/ui/input'
 import { Label } from '@/src/shared/ui/label'
 import { Textarea } from '@/src/shared/ui/textarea'
+
+import { useRouter } from '@/i18n/navigation'
 
 import { updateSectorAction } from '../api'
 
@@ -58,8 +58,7 @@ export function SectorBasicInfoCard({ sector, canEdit = true }: SectorBasicInfoC
       if (result.success) {
         toast.success(result.message)
         router.push('/dashboard/sectors')
-      } else
-        toast.error(result.error)
+      } else toast.error(result.error)
     })
   }
 
@@ -139,9 +138,7 @@ export function SectorBasicInfoCard({ sector, canEdit = true }: SectorBasicInfoC
             ariaLabel={t('editForm.iconAria')}
             searchPlaceholder={t('form.iconSearch')}
             statusLabel={(showing, total, hasSearch) =>
-              hasSearch
-                ? t('form.iconShowing', { showing, total })
-                : t('form.iconTotal', { total })
+              hasSearch ? t('form.iconShowing', { showing, total }) : t('form.iconTotal', { total })
             }
           />
         </div>

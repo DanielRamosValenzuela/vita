@@ -6,8 +6,11 @@ import { useTranslations } from 'next-intl'
 import { Input } from '@/src/shared/ui/input'
 import { Label } from '@/src/shared/ui/label'
 
-import type { ShiftTypeFormData, ShiftTypesAction } from './shift-types-utils'
-import { PREDEFINED_COLORS } from './shift-types-utils'
+import {
+  PREDEFINED_COLORS,
+  type ShiftTypeFormData,
+  type ShiftTypesAction,
+} from './shift-types-utils'
 
 interface ShiftTypeColorPickerProps {
   formData: ShiftTypeFormData
@@ -25,9 +28,7 @@ export function ShiftTypeColorPicker({ formData, dispatch }: ShiftTypeColorPicke
           id="color"
           type="color"
           value={formData.color}
-          onChange={(e) =>
-            dispatch({ type: 'UPDATE_FORM', field: 'color', value: e.target.value })
-          }
+          onChange={(e) => dispatch({ type: 'UPDATE_FORM', field: 'color', value: e.target.value })}
           className="h-10 w-20"
         />
         <div className="flex gap-1">
@@ -37,9 +38,7 @@ export function ShiftTypeColorPicker({ formData, dispatch }: ShiftTypeColorPicke
               type="button"
               className="w-6 h-6 cursor-pointer rounded-full border-2 border-transparent hover:border-gray-300"
               style={{ backgroundColor: color }}
-              onClick={() =>
-                dispatch({ type: 'UPDATE_FORM', field: 'color', value: color })
-              }
+              onClick={() => dispatch({ type: 'UPDATE_FORM', field: 'color', value: color })}
             />
           ))}
         </div>

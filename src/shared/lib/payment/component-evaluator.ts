@@ -17,9 +17,7 @@ export function evaluateComponent(
   component: EvaluableComponent,
   context: ComponentEvaluationContext
 ): boolean {
-  if (component.extraOnly && !context.isExtra) 
-    return false
-  
+  if (component.extraOnly && !context.isExtra) return false
 
   switch (component.applyCondition) {
     case 'ALWAYS':
@@ -53,11 +51,9 @@ export function evaluateComponent(
       return component.conditionValue === context.areaId
 
     case 'SPECIFIC_SHIFT_TYPE':
-      if (component.applicableShiftTypes && component.applicableShiftTypes.length > 0) 
-        return component.applicableShiftTypes.some(
-          (ast) => ast.shiftTypeId === context.shiftTypeId
-        )
-      
+      if (component.applicableShiftTypes && component.applicableShiftTypes.length > 0)
+        return component.applicableShiftTypes.some((ast) => ast.shiftTypeId === context.shiftTypeId)
+
       return component.conditionValue === context.shiftTypeId
 
     case 'CUSTOM_RULE':

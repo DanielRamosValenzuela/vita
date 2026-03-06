@@ -3,10 +3,10 @@
 import { useCallback, useReducer, useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 import {
+  ArrowLeft,
   CalendarPlus,
   ChevronDown,
   ChevronUp,
-  ArrowLeft,
   Loader2,
   Lock,
   Pencil,
@@ -19,8 +19,6 @@ import {
   X,
 } from 'lucide-react'
 import { toast } from 'sonner'
-
-import { Link, useRouter } from '@/i18n/navigation'
 
 import {
   AlertDialog,
@@ -54,8 +52,9 @@ import {
   TableRow,
 } from '@/src/shared/ui/table'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/src/shared/ui/tooltip'
-
 import { getShiftTypesAction } from '@/src/features/shifts/api/shift-type-actions'
+
+import { Link, useRouter } from '@/i18n/navigation'
 
 import {
   deleteRotationAction,
@@ -96,11 +95,7 @@ function getStatusVariant(status: string): 'default' | 'secondary' | 'outline' {
   return 'outline'
 }
 
-function PatternStep({
-  step,
-}: {
-  step: RotationWithRelations['steps'][number]
-}) {
+function PatternStep({ step }: { step: RotationWithRelations['steps'][number] }) {
   const t = useTranslations('rotations')
 
   if (step.isRestDay)
@@ -247,16 +242,19 @@ function PatternEditView({
 }: PatternEditViewProps) {
   const usedShiftTypeIds = Array.from(
     new Set(
-      editSteps
-        .filter((s) => !s.isRestDay && s.shiftTypeId)
-        .map((s) => s.shiftTypeId as string)
+      editSteps.filter((s) => !s.isRestDay && s.shiftTypeId).map((s) => s.shiftTypeId as string)
     )
   )
 
   const isPatternValid = (() => {
     if (editSteps.length < 2) return false
     if (editSteps.some((s) => !s.isRestDay && !s.shiftTypeId)) return false
-    if (usedShiftTypeIds.some((id) => !editShiftConfigs[id] || !/^\d{2}:\d{2}$/.test(editShiftConfigs[id]))) return false
+    if (
+      usedShiftTypeIds.some(
+        (id) => !editShiftConfigs[id] || !/^\d{2}:\d{2}$/.test(editShiftConfigs[id])
+      )
+    )
+      return false
     return true
   })()
 
@@ -324,9 +322,7 @@ function PatternEditView({
               <Checkbox
                 id={`edit-step-rest-${index}`}
                 checked={step.isRestDay}
-                onCheckedChange={(checked) =>
-                  handleStepToggleRest(index, checked === true)
-                }
+                onCheckedChange={(checked) => handleStepToggleRest(index, checked === true)}
                 disabled={isPending}
               />
               <Label
@@ -437,9 +433,7 @@ function PatternEditView({
                     style={{ backgroundColor: st.color }}
                     aria-hidden
                   />
-                  <Label className="min-w-0 flex-1 truncate text-sm">
-                    {st.name}
-                  </Label>
+                  <Label className="min-w-0 flex-1 truncate text-sm">{st.name}</Label>
                   <Input
                     type="time"
                     value={editShiftConfigs[stId] ?? ''}
@@ -516,8 +510,7 @@ function ShiftConfigsCard({
                   className="h-7 w-7"
                   onClick={() => {
                     const times: Record<string, string> = {}
-                    for (const cfg of shiftConfigs)
-                      times[cfg.shiftTypeId] = cfg.startTime
+                    for (const cfg of shiftConfigs) times[cfg.shiftTypeId] = cfg.startTime
                     dispatch({ type: 'START_EDIT_CONFIGS', configTimes: times })
                   }}
                   disabled={isPending}
@@ -542,9 +535,7 @@ function ShiftConfigsCard({
             <TableBody>
               {shiftConfigs.map((cfg) => (
                 <TableRow key={cfg.id}>
-                  <TableCell className="font-medium">
-                    {cfg.shiftType.name}
-                  </TableCell>
+                  <TableCell className="font-medium">{cfg.shiftType.name}</TableCell>
                   <TableCell>
                     {editingConfigs ? (
                       <Input
@@ -579,12 +570,7 @@ function ShiftConfigsCard({
             >
               {t('form.cancel')}
             </Button>
-            <Button
-              size="sm"
-              onClick={onSave}
-              disabled={isPending}
-              className="gap-1.5"
-            >
+            <Button size="sm" onClick={onSave} disabled={isPending} className="gap-1.5">
               {isPending ? (
                 <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
               ) : (
@@ -626,12 +612,7 @@ function DetailFooter({
     <>
       <footer className="flex flex-wrap items-center justify-end gap-2 border-t pt-4">
         {rotation.status === 'ACTIVE' ? (
-          <Button
-            variant="outline"
-            onClick={onDeactivate}
-            disabled={isPending}
-            className="gap-2"
-          >
+          <Button variant="outline" onClick={onDeactivate} disabled={isPending} className="gap-2">
             {isPending ? (
               <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
             ) : (
@@ -640,12 +621,7 @@ function DetailFooter({
             {t('detail.deactivate')}
           </Button>
         ) : (
-          <Button
-            variant="outline"
-            onClick={onActivate}
-            disabled={isPending}
-            className="gap-2"
-          >
+          <Button variant="outline" onClick={onActivate} disabled={isPending} className="gap-2">
             {isPending ? (
               <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
             ) : (
@@ -749,9 +725,7 @@ function DetailFooter({
   )
 }
 
-export function RotationDetailContent({
-  initialRotation,
-}: RotationDetailContentProps) {
+export function RotationDetailContent({ initialRotation }: RotationDetailContentProps) {
   const t = useTranslations('rotations')
   const router = useRouter()
 
@@ -763,14 +737,15 @@ export function RotationDetailContent({
   const hasShifts = rotation._count.shifts > 0
   const canEditPattern = !hasShifts
 
-  const fetchRotation = useCallback(async (id: string) => {
-    const result = await getRotationAction(id)
+  const fetchRotation = useCallback(
+    async (id: string) => {
+      const result = await getRotationAction(id)
 
-    if (result.success && result.data)
-      setRotation(result.data)
-    else
-      toast.error(result.error ?? t('loadError'))
-  }, [t])
+      if (result.success && result.data) setRotation(result.data)
+      else toast.error(result.error ?? t('loadError'))
+    },
+    [t]
+  )
 
   const handleMemberChanged = () => {
     fetchRotation(rotation.id)
@@ -783,8 +758,7 @@ export function RotationDetailContent({
       if (result.success) {
         toast.success(t('detail.activateSuccess'))
         if (result.data) setRotation(result.data)
-      } else
-        toast.error(result.error ?? t('loadError'))
+      } else toast.error(result.error ?? t('loadError'))
     })
   }
 
@@ -795,8 +769,7 @@ export function RotationDetailContent({
       if (result.success) {
         toast.success(t('detail.deactivateSuccess'))
         if (result.data) setRotation(result.data)
-      } else
-        toast.error(result.error ?? t('loadError'))
+      } else toast.error(result.error ?? t('loadError'))
     })
   }
 
@@ -808,8 +781,7 @@ export function RotationDetailContent({
         toast.success(t('detail.deleteSuccess'))
         dispatch({ type: 'CLOSE_DELETE_DIALOG' })
         router.push('/dashboard/rotations')
-      } else
-        toast.error(result.error ?? t('loadError'))
+      } else toast.error(result.error ?? t('loadError'))
     })
   }
 
@@ -826,8 +798,7 @@ export function RotationDetailContent({
         toast.success(t('detail.configsSaved'))
         if (result.data) setRotation(result.data)
         dispatch({ type: 'CONFIGS_SAVED' })
-      } else
-        toast.error(result.error ?? t('loadError'))
+      } else toast.error(result.error ?? t('loadError'))
     })
   }
 
@@ -841,8 +812,7 @@ export function RotationDetailContent({
     }))
 
     const configs: Record<string, string> = {}
-    for (const cfg of rotation.shiftConfigs)
-      configs[cfg.shiftTypeId] = cfg.startTime
+    for (const cfg of rotation.shiftConfigs) configs[cfg.shiftTypeId] = cfg.startTime
 
     dispatch({ type: 'START_EDIT_PATTERN', steps, configs })
 
@@ -851,9 +821,7 @@ export function RotationDetailContent({
       .then((result) => {
         if (result.success && result.data) {
           const areaTypes = result.data.filter(
-            (st) =>
-              st.isGlobal ||
-              st.areaShiftTypes?.some((ast) => ast.areaId === rotation.areaId)
+            (st) => st.isGlobal || st.areaShiftTypes?.some((ast) => ast.areaId === rotation.areaId)
           )
           dispatch({
             type: 'SET_SHIFT_TYPES',
@@ -891,8 +859,7 @@ export function RotationDetailContent({
         toast.success(t('detail.patternSaved'))
         if (result.data) setRotation(result.data)
         dispatch({ type: 'PATTERN_SAVED' })
-      } else
-        toast.error(result.error ?? t('loadError'))
+      } else toast.error(result.error ?? t('loadError'))
     })
   }
 
@@ -964,7 +931,7 @@ export function RotationDetailContent({
           </CardContent>
         </Card>
 
-        {(rotation.shiftConfigs.length > 0 && !state.editingPattern) && (
+        {rotation.shiftConfigs.length > 0 && !state.editingPattern && (
           <ShiftConfigsCard
             shiftConfigs={rotation.shiftConfigs}
             editingConfigs={state.editingConfigs}
@@ -983,10 +950,7 @@ export function RotationDetailContent({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <RotationGroupsSection
-              rotation={rotation}
-              onMemberChanged={handleMemberChanged}
-            />
+            <RotationGroupsSection rotation={rotation} onMemberChanged={handleMemberChanged} />
           </CardContent>
         </Card>
 

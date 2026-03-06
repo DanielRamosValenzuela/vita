@@ -20,11 +20,7 @@ function formatTime(date: Date) {
   })
 }
 
-export function SectorPersonnelList({
-  areas,
-  totalStaff,
-  sectorName,
-}: SectorPersonnelListProps) {
+export function SectorPersonnelList({ areas, totalStaff, sectorName }: SectorPersonnelListProps) {
   const t = useTranslations('staffDashboard.personnel')
 
   if (areas.length === 0)
@@ -38,18 +34,13 @@ export function SectorPersonnelList({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold">
-          {sectorName ? t('title') : t('titleNoSector')}
-        </h3>
+        <h3 className="text-sm font-semibold">{sectorName ? t('title') : t('titleNoSector')}</h3>
         <Badge variant="secondary">{t('totalStaff', { count: totalStaff })}</Badge>
       </div>
 
       <div className="space-y-3">
         {areas.map((areaEntry) => (
-          <div
-            key={areaEntry.area.id}
-            className="rounded-lg border p-3"
-          >
+          <div key={areaEntry.area.id} className="rounded-lg border p-3">
             <div className="mb-2 flex items-center gap-2">
               <div
                 className="h-3 w-3 rounded-full"
@@ -67,9 +58,7 @@ export function SectorPersonnelList({
                   key={shift.id}
                   className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-muted/50"
                 >
-                  <span className="flex-1 truncate font-medium">
-                    {shift.userName}
-                  </span>
+                  <span className="flex-1 truncate font-medium">{shift.userName}</span>
                   <Badge
                     variant="outline"
                     className="text-xs"

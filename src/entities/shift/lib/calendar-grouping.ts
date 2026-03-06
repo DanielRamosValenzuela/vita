@@ -1,7 +1,11 @@
 import { format } from 'date-fns'
 
 import type { ShiftWithRelations } from '../types/shift-types'
-import type { CalendarEvent, IndividualCalendarEvent, RotationGroupCalendarEvent } from '../ui/shift-calendar'
+import type {
+  CalendarEvent,
+  IndividualCalendarEvent,
+  RotationGroupCalendarEvent,
+} from '../ui/shift-calendar'
 
 export function groupShiftsForCalendar(
   shifts: ShiftWithRelations[],
@@ -31,10 +35,8 @@ export function groupShiftsForCalendar(
       const groupKey = `${dateKey}:${shift.rotationId}:${shift.shiftTypeId}`
 
       const existing = rotationMap.get(groupKey)
-      if (existing)
-        existing.shifts.push(shift)
-      else
-        rotationMap.set(groupKey, { shifts: [shift], first: shift })
+      if (existing) existing.shifts.push(shift)
+      else rotationMap.set(groupKey, { shifts: [shift], first: shift })
     }
 
   const rotationGroups: RotationGroupCalendarEvent[] = []

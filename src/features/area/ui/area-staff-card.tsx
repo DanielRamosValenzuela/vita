@@ -6,7 +6,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src
 import { SearchableAddableList } from '@/src/shared/ui/molecules'
 
 import type { StaffOption } from '../api/area-actions'
-
 import type { AreaFormAction } from './area-edit-utils'
 
 interface AreaStaffCardProps {

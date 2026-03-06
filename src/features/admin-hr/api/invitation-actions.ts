@@ -212,12 +212,7 @@ export const inviteStaffAction = async (
         }
     }
 
-    const invitationResult = await createInvitation(
-      organizationId,
-      userId,
-      ROLES.STAFF,
-      session.id
-    )
+    const invitationResult = await createInvitation(organizationId, userId, ROLES.STAFF, session.id)
 
     if (!invitationResult.success) return invitationResult
 

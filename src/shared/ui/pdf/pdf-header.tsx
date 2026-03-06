@@ -1,6 +1,5 @@
-import { Text, View } from './react-pdf'
-
 import { pdfStyles } from './pdf-styles'
+import { Text, View } from './react-pdf'
 
 interface PdfHeaderProps {
   organizationName: string

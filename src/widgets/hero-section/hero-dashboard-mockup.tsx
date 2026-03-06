@@ -1,6 +1,7 @@
 'use client'
 
 import { m, useReducedMotion } from 'framer-motion'
+
 import { scaleIn } from '@/src/shared/lib/animations/motion-variants'
 
 const SHIFT_COLORS = [
@@ -88,7 +89,9 @@ export function HeroDashboardMockup() {
                 {Array.from({ length: 28 }).map((_, i) => {
                   const row = Math.floor(i / 7)
                   const col = i % 7
-                  const shift = SHIFTS.find((s) => s.row === row && col >= s.col && col < s.col + s.span)
+                  const shift = SHIFTS.find(
+                    (s) => s.row === row && col >= s.col && col < s.col + s.span
+                  )
 
                   if (!shift || col !== shift.col) return <div key={`s-${i}`} className="h-6" />
 
@@ -106,21 +109,27 @@ export function HeroDashboardMockup() {
             <div className="mt-3 flex gap-2">
               <div className="flex-1 rounded-lg border border-gray-200 bg-gray-50/50 p-2 dark:border-white/10 dark:bg-slate-800/50">
                 <div className="mb-1.5 h-1.5 w-8 rounded-full bg-gray-200 dark:bg-white/15" />
-                <div className="font-mono text-sm font-bold text-blue-500 dark:text-blue-400">{247}</div>
+                <div className="font-mono text-sm font-bold text-blue-500 dark:text-blue-400">
+                  {247}
+                </div>
                 <div className="mt-1.5 h-1 w-full rounded-full bg-gray-200 dark:bg-white/10">
                   <div className="h-full w-3/4 rounded-full bg-blue-400/60" />
                 </div>
               </div>
               <div className="flex-1 rounded-lg border border-gray-200 bg-gray-50/50 p-2 dark:border-white/10 dark:bg-slate-800/50">
                 <div className="mb-1.5 h-1.5 w-8 rounded-full bg-gray-200 dark:bg-white/15" />
-                <div className="font-mono text-sm font-bold text-emerald-500 dark:text-emerald-400">{89}</div>
+                <div className="font-mono text-sm font-bold text-emerald-500 dark:text-emerald-400">
+                  {89}
+                </div>
                 <div className="mt-1.5 h-1 w-full rounded-full bg-gray-200 dark:bg-white/10">
                   <div className="h-full w-3/5 rounded-full bg-emerald-400/60" />
                 </div>
               </div>
               <div className="flex-1 rounded-lg border border-gray-200 bg-gray-50/50 p-2 dark:border-white/10 dark:bg-slate-800/50">
                 <div className="mb-1.5 h-1.5 w-8 rounded-full bg-gray-200 dark:bg-white/15" />
-                <div className="font-mono text-sm font-bold text-purple-500 dark:text-purple-400">{156}</div>
+                <div className="font-mono text-sm font-bold text-purple-500 dark:text-purple-400">
+                  {156}
+                </div>
                 <div className="mt-1.5 h-1 w-full rounded-full bg-gray-200 dark:bg-white/10">
                   <div className="h-full w-4/5 rounded-full bg-purple-400/60" />
                 </div>

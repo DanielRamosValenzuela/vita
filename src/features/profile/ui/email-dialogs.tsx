@@ -1,7 +1,7 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { Spinner } from '@/src/shared/ui/atoms'
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,6 +12,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/src/shared/ui/alert-dialog'
+import { Spinner } from '@/src/shared/ui/atoms'
 
 interface EmailDialogsProps {
   deleteEmailId: string | null

@@ -1,6 +1,6 @@
 'use server'
 
-import type { Currency, Prisma, PayrollPeriodStatus } from '@prisma/client'
+import type { Currency, PayrollPeriodStatus, Prisma } from '@prisma/client'
 
 import { prisma } from '@/src/shared/lib/db'
 
@@ -10,8 +10,6 @@ import type {
   PayrollPeriodSummary,
   PayrollPeriodWithDocuments,
 } from './types'
-
-
 
 export async function createPayrollPeriod(data: {
   organizationId: string
@@ -113,8 +111,6 @@ export async function getPayrollPeriods(
   return periods
 }
 
-
-
 export async function createPayrollDocument(data: {
   payrollPeriodId: string
   userId: string
@@ -162,17 +158,14 @@ export async function getPayrollDocuments(
     organizationId,
   }
 
-  if (options?.userId) 
-    where.userId = options.userId
-  
+  if (options?.userId) where.userId = options.userId
 
-  if (options?.areaIds) 
+  if (options?.areaIds)
     where.user = {
       userAreas: {
         some: { areaId: { in: options.areaIds } },
       },
     }
-  
 
   const docs = await prisma.payrollDocument.findMany({
     where,
@@ -182,7 +175,7 @@ export async function getPayrollDocuments(
     orderBy: { user: { name: 'asc' } },
   })
 
-  return docs.map((doc: typeof docs[number]) => ({
+  return docs.map((doc: (typeof docs)[number]) => ({
     id: doc.id,
     userId: doc.userId,
     userName: doc.user.name,

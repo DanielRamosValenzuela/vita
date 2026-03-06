@@ -25,13 +25,7 @@ export function VitaLoader({ size = 'md', showText = true, className }: VitaLoad
       {/* eslint-disable-next-line react/jsx-no-literals */}
       <span className="sr-only">Loading</span>
       <div className="animate-logo-shimmer">
-        <Image
-          src="/logo-icon.png"
-          alt=""
-          width={s.icon}
-          height={s.icon}
-          priority
-        />
+        <Image src="/logo-icon.png" alt="" width={s.icon} height={s.icon} priority />
       </div>
       {showText && (
         // eslint-disable-next-line react/jsx-no-literals

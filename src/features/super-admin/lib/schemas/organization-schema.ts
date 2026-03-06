@@ -255,4 +255,3 @@ export function createDeleteOrganizationSchema(messages: OrganizationValidationM
       .max(500, messages.reason.maxLength(500)),
   })
 }
-

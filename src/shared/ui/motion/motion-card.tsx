@@ -1,6 +1,7 @@
 'use client'
 
 import { m, useReducedMotion } from 'framer-motion'
+
 import { fadeInUp } from '@/src/shared/lib/animations/motion-variants'
 
 interface MotionCardProps {

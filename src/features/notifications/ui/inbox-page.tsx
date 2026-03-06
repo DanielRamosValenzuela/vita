@@ -40,8 +40,9 @@ export function InboxPage({ initialNotifications, nextCursor, unreadCount }: Inb
   const [isPending, startTransition] = useTransition()
   const [statusFilter, setStatusFilter] = useState<'all' | 'unread' | 'read'>('all')
   const [selectedTypeKeys, setSelectedTypeKeys] = useState<string[]>([])
-  const [filteredNotifications, setFilteredNotifications] =
-    useState<NotificationWithActor[]>(() => initialNotifications)
+  const [filteredNotifications, setFilteredNotifications] = useState<NotificationWithActor[]>(
+    () => initialNotifications
+  )
   const [filteredCursor, setFilteredCursor] = useState<string | null>(() => nextCursor)
   const [isFiltering, startFilterTransition] = useTransition()
 

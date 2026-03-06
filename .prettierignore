@@ -15,6 +15,7 @@ prisma/migrations
 # Carpetas de IA / herramientas
 .cursor
 .claude
+.claude-flow
 specs
 .specify
 docs

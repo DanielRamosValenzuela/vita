@@ -28,8 +28,8 @@ import {
   addMembersBulkAction,
   getAvailableStaffAction,
   removeMemberAction,
+  type AvailableStaffMember,
 } from '../api/group-actions'
-import type { AvailableStaffMember } from '../api/group-actions'
 import type { RotationWithRelations } from '../types/rotation-types'
 
 const DEFAULT_GROUP_ICON = 'Users'
@@ -87,10 +87,8 @@ function popoverReducer(state: PopoverState, action: PopoverAction): PopoverStat
       return { ...state, search: action.search }
     case 'TOGGLE_MEMBER': {
       const next = new Set(state.selectedIds)
-      if (next.has(action.userId))
-        next.delete(action.userId)
-      else
-        next.add(action.userId)
+      if (next.has(action.userId)) next.delete(action.userId)
+      else next.add(action.userId)
       return { ...state, selectedIds: next }
     }
     default:
@@ -120,8 +118,7 @@ function AddMemberPopover({ groupId, rotationId, onAdded }: AddMemberPopoverProp
     dispatch({ type: 'OPEN' })
     const result = await getAvailableStaffAction(rotationId)
 
-    if (result.success && result.data)
-      dispatch({ type: 'SET_STAFF', staff: result.data })
+    if (result.success && result.data) dispatch({ type: 'SET_STAFF', staff: result.data })
     else {
       dispatch({ type: 'SET_STAFF', staff: [] })
       toast.error(result.error ?? t('loadError'))
@@ -141,8 +138,7 @@ function AddMemberPopover({ groupId, rotationId, onAdded }: AddMemberPopoverProp
         toast.success(result.message ?? t('groups.addMember'))
         dispatch({ type: 'CLOSE' })
         onAdded()
-      } else
-        toast.error(result.error ?? t('loadError'))
+      } else toast.error(result.error ?? t('loadError'))
     })
   }
 
@@ -186,7 +182,12 @@ function AddMemberPopover({ groupId, rotationId, onAdded }: AddMemberPopoverProp
                   {t('groups.noSearchResults')}
                 </p>
               ) : (
-                <ul role="listbox" aria-label={t('groups.selectUser')} aria-multiselectable className="space-y-0.5">
+                <ul
+                  role="listbox"
+                  aria-label={t('groups.selectUser')}
+                  aria-multiselectable
+                  className="space-y-0.5"
+                >
                   {filteredStaff.map((member) => {
                     const isSelected = state.selectedIds.has(member.id)
                     return (
@@ -197,7 +198,9 @@ function AddMemberPopover({ groupId, rotationId, onAdded }: AddMemberPopoverProp
                           disabled={isPending}
                           onClick={() => dispatch({ type: 'TOGGLE_MEMBER', userId: member.id })}
                         >
-                          <div className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border ${isSelected ? 'border-primary bg-primary text-primary-foreground' : 'border-muted-foreground/40'}`}>
+                          <div
+                            className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border ${isSelected ? 'border-primary bg-primary text-primary-foreground' : 'border-muted-foreground/40'}`}
+                          >
                             {isSelected && <Check className="h-3 w-3" aria-hidden />}
                           </div>
                           <Avatar size="sm">
@@ -254,8 +257,7 @@ export function RotationGroupsSection({ rotation, onMemberChanged }: RotationGro
         toast.success(result.message ?? t('groups.removeMember'))
         setRemoveState(null)
         onMemberChanged()
-      } else
-        toast.error(result.error ?? t('loadError'))
+      } else toast.error(result.error ?? t('loadError'))
     })
   }
 
@@ -275,7 +277,11 @@ export function RotationGroupsSection({ rotation, onMemberChanged }: RotationGro
                     className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
                     style={{ backgroundColor: group.color + '20' }}
                   >
-                    <IconDisplay iconName={group.icon ?? DEFAULT_GROUP_ICON} className="text-foreground" size={16} />
+                    <IconDisplay
+                      iconName={group.icon ?? DEFAULT_GROUP_ICON}
+                      className="text-foreground"
+                      size={16}
+                    />
                   </div>
                   <div>
                     <CardTitle className="text-base">{group.name}</CardTitle>
@@ -295,14 +301,9 @@ export function RotationGroupsSection({ rotation, onMemberChanged }: RotationGro
               ) : (
                 <ul className="space-y-1" role="list">
                   {group.members.map((member) => (
-                    <li
-                      key={member.id}
-                      className="flex items-center gap-2 rounded-md px-1 py-1"
-                    >
+                    <li key={member.id} className="flex items-center gap-2 rounded-md px-1 py-1">
                       <Avatar size="sm">
-                        <AvatarFallback>
-                          {member.user.name.charAt(0).toUpperCase()}
-                        </AvatarFallback>
+                        <AvatarFallback>{member.user.name.charAt(0).toUpperCase()}</AvatarFallback>
                       </Avatar>
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-medium">{member.user.name}</p>

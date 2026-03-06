@@ -1,10 +1,11 @@
-import { notFound } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
+import { notFound } from 'next/navigation'
 
-import { requireDashboardUser, isChiefArea, isStaff } from '@/src/shared/lib/auth'
+import { isChiefArea, isStaff, requireDashboardUser } from '@/src/shared/lib/auth'
 import { prisma } from '@/src/shared/lib/db'
-import { getSectorById } from '@/src/entities/sector'
 import { SectorStaffQuery } from '@/src/features/sector/ui'
+
+import { getSectorById } from '@/src/entities/sector'
 
 interface StaffPageProps {
   params: Promise<{ locale: string; id: string }>
@@ -56,9 +57,7 @@ export default async function SectorStaffPage({ params }: StaffPageProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">
-          {pageTitle}
-        </h1>
+        <h1 className="text-2xl font-bold tracking-tight">{pageTitle}</h1>
         <p className="text-muted-foreground mt-1">{t('staffQuery.description')}</p>
       </div>
 

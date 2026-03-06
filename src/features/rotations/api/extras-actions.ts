@@ -8,11 +8,13 @@ import { isChiefArea } from '@/src/shared/lib/auth/rbac'
 import { requireAdminHROrChief } from '@/src/shared/lib/auth/session'
 import { prisma } from '@/src/shared/lib/db'
 import type { ActionResult } from '@/src/shared/lib/types'
-
-import { calculateTier } from '@/src/entities/rotation'
-import type { CandidateShiftHistory, ShiftClassificationType } from '@/src/entities/rotation'
-
 import { createNotification } from '@/src/features/notifications/lib/notification-service'
+
+import {
+  calculateTier,
+  type CandidateShiftHistory,
+  type ShiftClassificationType,
+} from '@/src/entities/rotation'
 
 import { assignExtraShiftSchema, getExtraCandidatesSchema } from '../lib/rotation-schemas'
 import type { ExtraCandidate, GetExtraCandidatesResult } from '../types/rotation-types'
@@ -26,10 +28,8 @@ const TIER_ORDER: Record<string, number> = {
 
 function classifyShiftName(name: string): ShiftClassificationType {
   const lower = name.toLowerCase()
-  if (lower.includes('noche'))
-    return 'NIGHT'
-  if (lower.includes('largo'))
-    return 'DAY'
+  if (lower.includes('noche')) return 'NIGHT'
+  if (lower.includes('largo')) return 'DAY'
   return 'MIXED'
 }
 
@@ -41,9 +41,8 @@ export const getExtraCandidatesAction = async (
 
     const derivedOrgId = isChiefArea(session)
       ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
-      : session.organizationId ?? null
-    if (!derivedOrgId)
-      return { success: false, error: 'No tienes una organización asignada' }
+      : (session.organizationId ?? null)
+    if (!derivedOrgId) return { success: false, error: 'No tienes una organización asignada' }
     const organizationId = derivedOrgId
 
     const validatedData = getExtraCandidatesSchema.parse(data)
@@ -52,8 +51,7 @@ export const getExtraCandidatesAction = async (
       where: { id: validatedData.shiftTypeId, organizationId },
       select: { id: true, name: true, durationMinutes: true, minStaffRequired: true },
     })
-    if (!shiftType)
-      return { success: false, error: 'Tipo de turno no encontrado' }
+    if (!shiftType) return { success: false, error: 'Tipo de turno no encontrado' }
 
     let currentStaffCount = 0
     let excludedUserIds: string[] = []
@@ -120,9 +118,7 @@ export const getExtraCandidatesAction = async (
         },
       })
 
-      const activeShift = recentShifts.find(
-        (s) => s.startTime <= now && s.endTime > now
-      )
+      const activeShift = recentShifts.find((s) => s.startTime <= now && s.endTime > now)
       const previousShift = recentShifts
         .filter((s) => s.endTime <= now)
         .sort((a, b) => b.endTime.getTime() - a.endTime.getTime())[0]
@@ -131,20 +127,14 @@ export const getExtraCandidatesAction = async (
 
       if (activeShift) {
         const classification = classifyShiftName(activeShift.shiftType.name)
-        if (classification === 'DAY')
-          currentStatus = 'on_largo'
-        else if (classification === 'NIGHT')
-          currentStatus = 'on_noche'
-        else
-          currentStatus = 'other'
+        if (classification === 'DAY') currentStatus = 'on_largo'
+        else if (classification === 'NIGHT') currentStatus = 'on_noche'
+        else currentStatus = 'other'
       } else if (previousShift) {
         const classification = classifyShiftName(previousShift.shiftType.name)
-        if (classification === 'NIGHT')
-          currentStatus = 'libre_from_noche'
-        else
-          currentStatus = 'libre_rested'
-      } else
-        currentStatus = 'libre_rested'
+        if (classification === 'NIGHT') currentStatus = 'libre_from_noche'
+        else currentStatus = 'libre_rested'
+      } else currentStatus = 'libre_rested'
 
       const history: CandidateShiftHistory = {}
 
@@ -197,9 +187,7 @@ export const getExtraCandidatesAction = async (
       candidates.push(candidate)
     }
 
-    candidates.sort(
-      (a, b) => (TIER_ORDER[a.tier] ?? 3) - (TIER_ORDER[b.tier] ?? 3)
-    )
+    candidates.sort((a, b) => (TIER_ORDER[a.tier] ?? 3) - (TIER_ORDER[b.tier] ?? 3))
 
     return {
       success: true,
@@ -232,9 +220,8 @@ export const assignExtraShiftAction = async (
 
     const derivedOrgId = isChiefArea(session)
       ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
-      : session.organizationId ?? null
-    if (!derivedOrgId)
-      return { success: false, error: 'No tienes una organización asignada' }
+      : (session.organizationId ?? null)
+    if (!derivedOrgId) return { success: false, error: 'No tienes una organización asignada' }
     const organizationId = derivedOrgId
 
     const validatedData = assignExtraShiftSchema.parse(data)
@@ -251,7 +238,10 @@ export const assignExtraShiftAction = async (
       select: { id: true },
     })
     if (!shiftType)
-      return { success: false, error: 'Tipo de turno no encontrado o no pertenece a esta organización' }
+      return {
+        success: false,
+        error: 'Tipo de turno no encontrado o no pertenece a esta organización',
+      }
 
     const contract = await prisma.contract.findFirst({
       where: {

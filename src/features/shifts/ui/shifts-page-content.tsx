@@ -23,7 +23,6 @@ import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/src/shared/ui/card'
 import { DataTablePagination } from '@/src/shared/ui/molecules/data-table-pagination'
 import { Skeleton } from '@/src/shared/ui/skeleton'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/src/shared/ui/tooltip'
 import {
   Table,
   TableBody,
@@ -32,16 +31,20 @@ import {
   TableHeader,
   TableRow,
 } from '@/src/shared/ui/table'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/src/shared/ui/tooltip'
 
 import { useRouter } from '@/i18n/navigation'
-
-import { deleteShiftAction, getShiftsAction } from '../api/shift-actions'
 import { groupShiftsForCalendar } from '@/src/entities/shift/lib/calendar-grouping'
 import type { ShiftWithRelations } from '@/src/entities/shift/types/shift-types'
-import type { RotationGroupCalendarEvent } from '@/src/entities/shift/ui/shift-calendar'
-import { ShiftCalendar } from '@/src/entities/shift/ui/shift-calendar'
+import {
+  ShiftCalendar,
+  type RotationGroupCalendarEvent,
+} from '@/src/entities/shift/ui/shift-calendar'
+
+import { deleteShiftAction, getShiftsAction } from '../api/shift-actions'
 import { AreaSwitcher } from './area-switcher'
 import { RotationShiftsDetailDialog } from './rotation-shifts-detail-dialog'
+import { ShiftDetailSheet } from './shift-detail-sheet'
 import { ShiftFilters } from './shift-filters'
 import type { ShiftTypeOption } from './shift-form'
 import { ShiftFormDialog } from './shift-form-dialog'
@@ -63,7 +66,10 @@ function getStatusColor(status: ShiftStatus): string {
   }
 }
 
-function getStatusLabel(status: ShiftStatus, t: ReturnType<typeof useTranslations<'shifts'>>): string {
+function getStatusLabel(
+  status: ShiftStatus,
+  t: ReturnType<typeof useTranslations<'shifts'>>
+): string {
   switch (status) {
     case 'SCHEDULED':
       return t('status.scheduled')
@@ -83,6 +89,8 @@ function getStatusLabel(status: ShiftStatus, t: ReturnType<typeof useTranslation
 type PageState = {
   dialogOpen: boolean
   editingShift: ShiftWithRelations | null
+  detailShift: ShiftWithRelations | null
+  detailOpen: boolean
   shiftToDelete: ShiftWithRelations | null
   isDeleting: boolean
   rotationDetail: {
@@ -105,10 +113,15 @@ type PageAction =
   | { type: 'OPEN_CREATE_DIALOG' }
   | { type: 'OPEN_EDIT_DIALOG'; payload: ShiftWithRelations }
   | { type: 'CLOSE_DIALOG' }
+  | { type: 'OPEN_DETAIL'; payload: ShiftWithRelations }
+  | { type: 'CLOSE_DETAIL' }
   | { type: 'SET_DELETE_TARGET'; payload: ShiftWithRelations }
   | { type: 'CLEAR_DELETE_TARGET' }
   | { type: 'SET_DELETING'; payload: boolean }
-  | { type: 'OPEN_ROTATION_DETAIL'; payload: { shifts: ShiftWithRelations[]; meta: { shiftTypeName: string; date: string } } }
+  | {
+      type: 'OPEN_ROTATION_DETAIL'
+      payload: { shifts: ShiftWithRelations[]; meta: { shiftTypeName: string; date: string } }
+    }
   | { type: 'CLOSE_ROTATION_DETAIL' }
   | { type: 'SET_FILTERS'; payload: PageState['currentFilters'] }
   | { type: 'SET_MONTH'; payload: Date }
@@ -116,6 +129,8 @@ type PageAction =
 const initialPageState: PageState = {
   dialogOpen: false,
   editingShift: null,
+  detailShift: null,
+  detailOpen: false,
   shiftToDelete: null,
   isDeleting: false,
   rotationDetail: {
@@ -135,6 +150,10 @@ function pageReducer(state: PageState, action: PageAction): PageState {
       return { ...state, dialogOpen: true, editingShift: action.payload }
     case 'CLOSE_DIALOG':
       return { ...state, dialogOpen: false, editingShift: null }
+    case 'OPEN_DETAIL':
+      return { ...state, detailOpen: true, detailShift: action.payload }
+    case 'CLOSE_DETAIL':
+      return { ...state, detailOpen: false }
     case 'SET_DELETE_TARGET':
       return { ...state, shiftToDelete: action.payload }
     case 'CLEAR_DELETE_TARGET':
@@ -142,7 +161,10 @@ function pageReducer(state: PageState, action: PageAction): PageState {
     case 'SET_DELETING':
       return { ...state, isDeleting: action.payload }
     case 'OPEN_ROTATION_DETAIL':
-      return { ...state, rotationDetail: { open: true, shifts: action.payload.shifts, meta: action.payload.meta } }
+      return {
+        ...state,
+        rotationDetail: { open: true, shifts: action.payload.shifts, meta: action.payload.meta },
+      }
     case 'CLOSE_ROTATION_DETAIL':
       return { ...state, rotationDetail: { ...state.rotationDetail, open: false } }
     case 'SET_FILTERS':
@@ -170,9 +192,11 @@ function ShiftStatsCards({
           <CardTitle className="text-sm font-medium">{t('stats.totalShifts')}</CardTitle>
         </CardHeader>
         <CardContent>
-          {isPending
-            ? <Skeleton className="h-8 w-12" />
-            : <div className="text-2xl font-bold">{shifts.length}</div>}
+          {isPending ? (
+            <Skeleton className="h-8 w-12" />
+          ) : (
+            <div className="text-2xl font-bold">{shifts.length}</div>
+          )}
         </CardContent>
       </Card>
 
@@ -181,20 +205,22 @@ function ShiftStatsCards({
           <CardTitle className="text-sm font-medium">{t('stats.thisMonth')}</CardTitle>
         </CardHeader>
         <CardContent>
-          {isPending
-            ? <Skeleton className="h-8 w-12" />
-            : (
-              <div className="text-2xl font-bold">
-                {shifts.filter((s) => {
+          {isPending ? (
+            <Skeleton className="h-8 w-12" />
+          ) : (
+            <div className="text-2xl font-bold">
+              {
+                shifts.filter((s) => {
                   const shiftDate = new Date(s.startTime)
                   const now = new Date()
                   return (
                     shiftDate.getMonth() === now.getMonth() &&
                     shiftDate.getFullYear() === now.getFullYear()
                   )
-                }).length}
-              </div>
-            )}
+                }).length
+              }
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -203,13 +229,13 @@ function ShiftStatsCards({
           <CardTitle className="text-sm font-medium">{t('stats.inProgress')}</CardTitle>
         </CardHeader>
         <CardContent>
-          {isPending
-            ? <Skeleton className="h-8 w-12" />
-            : (
-              <div className="text-2xl font-bold">
-                {shifts.filter((s) => s.status === 'IN_PROGRESS').length}
-              </div>
-            )}
+          {isPending ? (
+            <Skeleton className="h-8 w-12" />
+          ) : (
+            <div className="text-2xl font-bold">
+              {shifts.filter((s) => s.status === 'IN_PROGRESS').length}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
@@ -220,13 +246,17 @@ function ShiftsTableSection({
   shifts,
   isPending,
   t,
+  onShiftClick,
 }: {
   shifts: ShiftWithRelations[]
   isPending: boolean
   t: ReturnType<typeof useTranslations<'shifts'>>
+  onShiftClick?: (shift: ShiftWithRelations) => void
 }) {
-  const { paginatedItems, page, totalPages, setPage } =
-    useClientPagination({ items: shifts, pageSize: 10 })
+  const { paginatedItems, page, totalPages, setPage } = useClientPagination({
+    items: shifts,
+    pageSize: 10,
+  })
 
   return (
     <Card>
@@ -262,12 +292,19 @@ function ShiftsTableSection({
               </TableHeader>
               <TableBody>
                 {paginatedItems.map((shift) => (
-                  <TableRow key={shift.id}>
+                  <TableRow
+                    key={shift.id}
+                    className={onShiftClick ? 'cursor-pointer hover:bg-muted/50' : ''}
+                    onClick={() => onShiftClick?.(shift)}
+                  >
                     <TableCell className="font-medium">
                       <span className="inline-flex items-center gap-1.5">
                         {shift.user.name}
                         {shift.isExtra && (
-                          <Badge variant="outline" className="text-[10px] px-1 py-0 border-amber-400 text-amber-600">
+                          <Badge
+                            variant="outline"
+                            className="text-[10px] px-1 py-0 border-amber-400 text-amber-600"
+                          >
                             <Star className="h-2.5 w-2.5 mr-0.5 fill-amber-500 text-amber-500" />
                             {t('extraBadge')}
                           </Badge>
@@ -352,7 +389,17 @@ export function ShiftsPageContent({
   const [isPending, startTransition] = useTransition()
   const [state, dispatch] = useReducer(pageReducer, initialPageState)
 
-  const { dialogOpen, editingShift, shiftToDelete, isDeleting, rotationDetail, currentFilters, currentMonth } = state
+  const {
+    dialogOpen,
+    editingShift,
+    detailShift,
+    detailOpen,
+    shiftToDelete,
+    isDeleting,
+    rotationDetail,
+    currentFilters,
+    currentMonth,
+  } = state
 
   const calendarShifts = useMemo(
     () => groupShiftsForCalendar(shifts, t('table.noTitle')),
@@ -453,7 +500,7 @@ export function ShiftsPageContent({
 
   const handleShiftClick = (calendarEvent: { id: string }) => {
     const fullShift = shifts.find((s) => s.id === calendarEvent.id)
-    if (fullShift) dispatch({ type: 'OPEN_EDIT_DIALOG', payload: fullShift })
+    if (fullShift) dispatch({ type: 'OPEN_DETAIL', payload: fullShift })
   }
 
   const handleShiftDeleteClick = (calendarEvent: { id: string }) => {
@@ -487,9 +534,7 @@ export function ShiftsPageContent({
         dispatch({ type: 'CLEAR_DELETE_TARGET' })
         router.refresh()
         fetchShifts({ ...currentFilters })
-      } else
-        toast.error(result.error || tToast('toast.shifts.errorDeleting'))
-
+      } else toast.error(result.error || tToast('toast.shifts.errorDeleting'))
     } catch {
       toast.error(tToast('toast.shifts.errorDeleting'))
     } finally {
@@ -505,10 +550,7 @@ export function ShiftsPageContent({
           <p className="text-muted-foreground mt-2">{t('description')}</p>
         </div>
 
-        <Button
-          type="button"
-          onClick={() => dispatch({ type: 'OPEN_CREATE_DIALOG' })}
-        >
+        <Button type="button" onClick={() => dispatch({ type: 'OPEN_CREATE_DIALOG' })}>
           <CalendarDays className="mr-2 h-4 w-4" />
           {t('newShift')}
         </Button>
@@ -532,14 +574,10 @@ export function ShiftsPageContent({
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>{t('deleteConfirm.title')}</AlertDialogTitle>
-              <AlertDialogDescription>
-                {t('deleteConfirm.description')}
-              </AlertDialogDescription>
+              <AlertDialogDescription>{t('deleteConfirm.description')}</AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel disabled={isDeleting}>
-                {t('form.cancel')}
-              </AlertDialogCancel>
+              <AlertDialogCancel disabled={isDeleting}>{t('form.cancel')}</AlertDialogCancel>
               <AlertDialogAction
                 onClick={handleDeleteConfirm}
                 disabled={isDeleting}
@@ -550,6 +588,15 @@ export function ShiftsPageContent({
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+        <ShiftDetailSheet
+          shift={detailShift}
+          open={detailOpen}
+          onOpenChange={(open) => {
+            if (!open) dispatch({ type: 'CLOSE_DETAIL' })
+          }}
+          onEdit={(shift) => dispatch({ type: 'OPEN_EDIT_DIALOG', payload: shift })}
+          onDelete={(shift) => dispatch({ type: 'SET_DELETE_TARGET', payload: shift })}
+        />
       </div>
 
       <AreaSwitcher
@@ -593,7 +640,12 @@ export function ShiftsPageContent({
           getStatusLabel={(status) => getStatusLabel(status as ShiftStatus, t)}
         />
 
-        <ShiftsTableSection shifts={shifts} isPending={isPending} t={t} />
+        <ShiftsTableSection
+          shifts={shifts}
+          isPending={isPending}
+          t={t}
+          onShiftClick={(shift) => dispatch({ type: 'OPEN_DETAIL', payload: shift })}
+        />
       </div>
     </div>
   )

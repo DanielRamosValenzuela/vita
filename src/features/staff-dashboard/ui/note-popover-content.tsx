@@ -66,11 +66,7 @@ export function NotePopoverContent({
               {t('delete')}
             </Button>
           )}
-          <Button
-            size="sm"
-            onClick={() => onSave(content.trim())}
-            disabled={!canSave || isSaving}
-          >
+          <Button size="sm" onClick={() => onSave(content.trim())} disabled={!canSave || isSaving}>
             {isSaving && <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />}
             {isSaving ? t('saving') : t('save')}
           </Button>

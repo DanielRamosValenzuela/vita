@@ -87,8 +87,7 @@ export function Footer() {
         <div className="mt-8 border-t pt-6">
           <p className="text-muted-foreground text-center text-xs">
             © {new Date().getFullYear()}{' '}
-            <span className="text-primary font-medium">{tCommon('appName')}</span>
-            {' '}{t('copyright')}
+            <span className="text-primary font-medium">{tCommon('appName')}</span> {t('copyright')}
           </p>
         </div>
       </div>

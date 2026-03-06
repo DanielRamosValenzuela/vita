@@ -1,14 +1,14 @@
 import { HeroSection } from '@/src/widgets/hero-section'
 import {
-  SocialProofBar,
-  ProblemSection,
-  FeaturesSection,
-  HowItWorksSection,
   BenefitsByRoleSection,
-  TestimonialsSection,
-  PricingSection,
   FaqSection,
+  FeaturesSection,
   FinalCtaSection,
+  HowItWorksSection,
+  PricingSection,
+  ProblemSection,
+  SocialProofBar,
+  TestimonialsSection,
 } from '@/src/widgets/landing'
 
 interface HomePageProps {

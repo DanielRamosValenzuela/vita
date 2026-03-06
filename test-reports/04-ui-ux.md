@@ -6,6 +6,7 @@
 ---
 
 ### [ALTO] UX-001: Clave i18n expuesta al usuario en pagina de Tarifas -- RESUELTO (pre-existente)
+
 - **Ubicacion:** `/es/dashboard/rates` - seccion "Fecha de facturacion"
 - **Rol:** ADMIN_HR
 - **Test Case:** TC-UX-004
@@ -17,6 +18,7 @@
 ---
 
 ### [MEDIO] UX-002: Signout page en ingles (NextAuth default) -- RESUELTO (fix: signOut redirect:true callbackUrl login)
+
 - **Ubicacion:** `/api/auth/signout`
 - **Rol:** Todos
 - **Test Case:** TC-AUTH-004
@@ -30,6 +32,7 @@
 ---
 
 ### [MEDIO] UX-003: Tabla de personal en Organizacion sin paginacion -- RESUELTO (fix: useClientPagination 10/page)
+
 - **Ubicacion:** `/es/dashboard/admin-hr/organization` - seccion "Personal de Salud"
 - **Rol:** ADMIN_HR
 - **Test Case:** TC-AH-002
@@ -41,6 +44,7 @@
 ---
 
 ### [BAJO] UX-004: Encabezado de pagina duplicado en varias secciones -- RESUELTO (fix: eliminados headers duplicados en areas, shift-types, sectors)
+
 - **Ubicacion:** `/es/dashboard/areas`, `/es/dashboard/shift-types`, `/es/dashboard/sectors`
 - **Rol:** ADMIN_HR
 - **Test Case:** TC-UX General
@@ -52,6 +56,7 @@
 ---
 
 ### [BAJO] UX-005: Sidebar muestra "Jefe de Sector" en vez de "Jefe de Area" para CHIEF_AREA -- NO ES BUG (comportamiento correcto: UserSector asignado = Jefe de Sector)
+
 - **Ubicacion:** Sidebar del dashboard
 - **Rol:** CHIEF_AREA (javer@hospital.infierno.com)
 - **Test Case:** TC-CA-001
@@ -63,6 +68,7 @@
 ---
 
 ### [ALTO] UX-006: Seccion de documento/RUT al final del perfil en vez de arriba -- RESUELTO (fix: DocumentSection movido antes de PersonalInfoForm)
+
 - **Ubicacion:** `/es/dashboard/profile`
 - **Rol:** Todos
 - **Test Case:** TC-ST-019
@@ -88,6 +94,7 @@
 ---
 
 ### [ALTO] UX-007: Calendario de fecha de nacimiento sin selector de ano - imposible elegir fecha lejana -- RESUELTO (fix: captionLayout dropdown + fromYear/toYear)
+
 - **Ubicacion:** `/es/dashboard/profile` - campo "Fecha de Nacimiento"
 - **Rol:** Todos
 - **Test Case:** TC-ST-019
@@ -121,6 +128,7 @@
 ---
 
 ### [MEDIO] UX-008: Input de telefono acepta letras y caracteres invalidos -- RESUELTO (fix: onInput filter + maxLength 20)
+
 - **Ubicacion:** `/es/dashboard/profile` - campo "Telefono"
 - **Rol:** Todos
 - **Test Case:** TC-ST-019
@@ -136,6 +144,7 @@
   - `src/features/profile/ui/personal-info-form.tsx:99-104` — Input con `type="tel"` (no previene letras en browsers)
   - `src/features/profile/lib/schemas/personal-info-schema.ts:5-11` — Zod valida pero solo en submit
 - **Correccion sugerida:**
+
   ```tsx
   // Opcion A: Agregar inputMode y pattern
   <Input
@@ -160,6 +169,7 @@
 ---
 
 ### [MEDIO] UX-009: Placeholder de telefono en formato US para usuario chileno -- RESUELTO (fix: placeholder cambiado a +56 9 1234 5678)
+
 - **Ubicacion:** `/es/dashboard/profile` - campo "Telefono"
 - **Rol:** Todos
 - **Test Case:** TC-ST-019
@@ -178,6 +188,7 @@
 ---
 
 ### [BAJO] UX-010: Input de telefono sin maxLength -- RESUELTO (fix: maxLength=20 en Input)
+
 - **Ubicacion:** `/es/dashboard/profile` - campo "Telefono"
 - **Rol:** Todos
 - **Descripcion:** El input de telefono no tiene atributo `maxLength`, permitiendo escribir un numero infinito de caracteres.

@@ -13,9 +13,8 @@ import {
 } from 'date-fns'
 import { Calendar as CalendarIcon } from 'lucide-react'
 
-import { Spinner } from '@/src/shared/ui/atoms'
-
 import { DAY_TYPES, getDayTypeColor, getLocaleByCountry } from '@/src/shared/lib/constants'
+import { Spinner } from '@/src/shared/ui/atoms'
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/src/shared/ui/card'

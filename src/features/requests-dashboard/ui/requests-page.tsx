@@ -5,11 +5,10 @@ import { useTranslations } from 'next-intl'
 import type { Role } from '@prisma/client'
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/src/shared/ui/tabs'
-
-import { SwapList } from '@/src/features/shift-swap/ui/swap-list'
-import { SwapChiefReview } from '@/src/features/shift-swap/ui/swap-chief-review'
-import { ExtraShiftList } from '@/src/features/extra-shifts/ui/extra-shift-list'
 import { ApplicationsReview } from '@/src/features/extra-shifts/ui/applications-review'
+import { ExtraShiftList } from '@/src/features/extra-shifts/ui/extra-shift-list'
+import { SwapChiefReview } from '@/src/features/shift-swap/ui/swap-chief-review'
+import { SwapList } from '@/src/features/shift-swap/ui/swap-list'
 
 interface RequestsPageProps {
   showApprovals: boolean
@@ -22,8 +21,7 @@ export function RequestsPage({ showApprovals, userRole }: RequestsPageProps) {
     if (typeof window === 'undefined') return 'swaps'
     const params = new URLSearchParams(window.location.search)
     const tab = params.get('tab')
-    if (tab && ['swaps', 'extraShifts', 'approvals'].includes(tab))
-      return tab
+    if (tab && ['swaps', 'extraShifts', 'approvals'].includes(tab)) return tab
     return 'swaps'
   })
 
@@ -37,9 +35,7 @@ export function RequestsPage({ showApprovals, userRole }: RequestsPageProps) {
         <TabsList>
           <TabsTrigger value="swaps">{t('tabs.swaps')}</TabsTrigger>
           <TabsTrigger value="extraShifts">{t('tabs.extraShifts')}</TabsTrigger>
-          {showApprovals && (
-            <TabsTrigger value="approvals">{t('tabs.approvals')}</TabsTrigger>
-          )}
+          {showApprovals && <TabsTrigger value="approvals">{t('tabs.approvals')}</TabsTrigger>}
         </TabsList>
 
         <TabsContent value="swaps" className="mt-4">

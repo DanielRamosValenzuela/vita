@@ -36,10 +36,8 @@ export function generateICalContent(
       : `${shift.shiftTypeName} - ${shift.areaName}`
 
     const descriptionParts: string[] = []
-    if (shift.rotationName)
-      descriptionParts.push(`Rotativa: ${shift.rotationName}`)
-    if (shift.isExtra)
-      descriptionParts.push('Turno Extra')
+    if (shift.rotationName) descriptionParts.push(`Rotativa: ${shift.rotationName}`)
+    if (shift.isExtra) descriptionParts.push('Turno Extra')
     descriptionParts.push(`Estado: ${shift.status}`)
 
     calendar.createEvent({

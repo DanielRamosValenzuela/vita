@@ -1,6 +1,6 @@
 import { getTranslations } from 'next-intl/server'
 
-import { requireDashboardUser, isAdminHR, isChiefArea, isStaff } from '@/src/shared/lib/auth'
+import { isAdminHR, isChiefArea, isStaff, requireDashboardUser } from '@/src/shared/lib/auth'
 import { prisma } from '@/src/shared/lib/db'
 import { getSectorsAction } from '@/src/features/sector/api'
 import { SectorsTable } from '@/src/features/sector/ui'
@@ -63,10 +63,10 @@ export default async function SectorsPage({ params }: SectorsPageProps) {
 
   return (
     <SectorsTable
-        sectors={sectors}
-        canCreate={isAdminHR(user)}
-        canDelete={isAdminHR(user)}
-        canEdit={!isStaff(user)}
+      sectors={sectors}
+      canCreate={isAdminHR(user)}
+      canDelete={isAdminHR(user)}
+      canEdit={!isStaff(user)}
     />
   )
 }

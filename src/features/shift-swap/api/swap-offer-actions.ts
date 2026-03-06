@@ -9,17 +9,16 @@ import { prisma } from '@/src/shared/lib/db'
 import type { ActionResult } from '@/src/shared/lib/types'
 import { handleActionError } from '@/src/shared/lib/utils/action-error-handler'
 import { revalidatePaths } from '@/src/shared/lib/utils/revalidate-paths'
+import { createNotification } from '@/src/features/notifications/lib/notification-service'
 
 import {
   createSwapOffer,
   getSwapRequestById,
   updateOfferStatus,
   updateSwapStatus,
-  validateSwapEligibility,
   validateSameArea,
+  validateSwapEligibility,
 } from '@/src/entities/swap'
-
-import { createNotification } from '@/src/features/notifications/lib/notification-service'
 
 export async function createSwapOfferAction(
   swapRequestId: string,
@@ -32,14 +31,12 @@ export async function createSwapOfferAction(
 
     const organizationId = isChief(session)
       ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
-      : session.organizationId ?? null
+      : (session.organizationId ?? null)
 
-    if (!organizationId)
-      return { success: false, error: tSwap('errors.noOrganization') }
+    if (!organizationId) return { success: false, error: tSwap('errors.noOrganization') }
 
     const request = await getSwapRequestById(swapRequestId, organizationId)
-    if (!request)
-      return { success: false, error: tSwap('errors.requestNotFound') }
+    if (!request) return { success: false, error: tSwap('errors.requestNotFound') }
 
     if (request.type !== 'OPEN' || request.status !== 'PENDING_PEER')
       return { success: false, error: tSwap('errors.invalidStatus') }
@@ -50,16 +47,13 @@ export async function createSwapOfferAction(
     const offeredShift = await prisma.shift.findFirst({
       where: { id: offeredShiftId, userId: session.id, organizationId },
     })
-    if (!offeredShift)
-      return { success: false, error: tSwap('errors.shiftNotFound') }
+    if (!offeredShift) return { success: false, error: tSwap('errors.shiftNotFound') }
 
     const eligibility = await validateSwapEligibility(offeredShiftId, organizationId)
-    if (!eligibility.valid)
-      return { success: false, error: tSwap(`errors.${eligibility.error}`) }
+    if (!eligibility.valid) return { success: false, error: tSwap(`errors.${eligibility.error}`) }
 
     const sameArea = await validateSameArea(request.requesterShiftId, offeredShiftId)
-    if (!sameArea.valid)
-      return { success: false, error: tSwap('errors.different_area') }
+    if (!sameArea.valid) return { success: false, error: tSwap('errors.different_area') }
 
     await createSwapOffer({
       swapRequestId,
@@ -91,9 +85,7 @@ export async function createSwapOfferAction(
   }
 }
 
-export async function withdrawSwapOfferAction(
-  offerId: string
-): Promise<ActionResult> {
+export async function withdrawSwapOfferAction(offerId: string): Promise<ActionResult> {
   try {
     const session = await requireDashboardUser()
     const tSwap = await getTranslations('swap')
@@ -102,14 +94,12 @@ export async function withdrawSwapOfferAction(
       where: { id: offerId },
       include: { swapRequest: { select: { organizationId: true } } },
     })
-    if (!offer)
-      return { success: false, error: tSwap('errors.offerNotFound') }
+    if (!offer) return { success: false, error: tSwap('errors.offerNotFound') }
 
     if (offer.offererId !== session.id)
       return { success: false, error: tSwap('errors.unauthorized') }
 
-    if (offer.status !== 'PENDING')
-      return { success: false, error: tSwap('errors.invalidStatus') }
+    if (offer.status !== 'PENDING') return { success: false, error: tSwap('errors.invalidStatus') }
 
     await updateOfferStatus(offerId, 'WITHDRAWN')
 
@@ -120,19 +110,16 @@ export async function withdrawSwapOfferAction(
   }
 }
 
-export async function selectSwapOfferAction(
-  offerId: string
-): Promise<ActionResult> {
+export async function selectSwapOfferAction(offerId: string): Promise<ActionResult> {
   try {
     const session = await requireDashboardUser()
     const tSwap = await getTranslations('swap')
 
     const organizationId = isChief(session)
       ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
-      : session.organizationId ?? null
+      : (session.organizationId ?? null)
 
-    if (!organizationId)
-      return { success: false, error: tSwap('errors.noOrganization') }
+    if (!organizationId) return { success: false, error: tSwap('errors.noOrganization') }
 
     const offer = await prisma.shiftSwapOffer.findUnique({
       where: { id: offerId },
@@ -141,16 +128,17 @@ export async function selectSwapOfferAction(
         offeredShift: { select: { userId: true } },
       },
     })
-    if (!offer)
-      return { success: false, error: tSwap('errors.offerNotFound') }
+    if (!offer) return { success: false, error: tSwap('errors.offerNotFound') }
 
     if (offer.swapRequest.requesterId !== session.id)
       return { success: false, error: tSwap('errors.unauthorized') }
 
-    if (offer.status !== 'PENDING')
-      return { success: false, error: tSwap('errors.invalidStatus') }
+    if (offer.status !== 'PENDING') return { success: false, error: tSwap('errors.invalidStatus') }
 
-    if (offer.swapRequest.status !== 'PENDING_PEER' && offer.swapRequest.status !== 'PENDING_SELECTION')
+    if (
+      offer.swapRequest.status !== 'PENDING_PEER' &&
+      offer.swapRequest.status !== 'PENDING_SELECTION'
+    )
       return { success: false, error: tSwap('errors.invalidStatus') }
 
     await prisma.$transaction(async (tx) => {

@@ -6,7 +6,11 @@ import type { Prisma } from '@prisma/client'
 import { format } from 'date-fns'
 import { z } from 'zod'
 
-import { chiefHasAreaAccess, getChiefAccessibleAreaIds, resolveChiefOrganizationId } from '@/src/shared/lib/auth/chief-access'
+import {
+  chiefHasAreaAccess,
+  getChiefAccessibleAreaIds,
+  resolveChiefOrganizationId,
+} from '@/src/shared/lib/auth/chief-access'
 import { isChiefArea } from '@/src/shared/lib/auth/rbac'
 import { requireAdminHROrChief } from '@/src/shared/lib/auth/session'
 import { prisma } from '@/src/shared/lib/db'
@@ -36,7 +40,7 @@ export const createShiftAction = async (
 
     const derivedOrgId = isChiefArea(session)
       ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
-      : session.organizationId ?? null
+      : (session.organizationId ?? null)
     if (!derivedOrgId)
       return {
         success: false,
@@ -209,17 +213,15 @@ export const updateShiftAction = async (
 
     const derivedOrgId = isChiefArea(session)
       ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
-      : session.organizationId ?? null
-    if (!derivedOrgId)
-      return { success: false, error: 'No tienes una organización asignada' }
+      : (session.organizationId ?? null)
+    if (!derivedOrgId) return { success: false, error: 'No tienes una organización asignada' }
     const organizationId = derivedOrgId
 
     const existing = await prisma.shift.findFirst({
       where: { id: shiftId, organizationId },
       include: { user: true, area: true, shiftType: true },
     })
-    if (!existing)
-      return { success: false, error: 'Turno no encontrado' }
+    if (!existing) return { success: false, error: 'Turno no encontrado' }
 
     if (isChiefArea(session)) {
       const hasAccess = await chiefHasAreaAccess(session.id, existing.areaId)
@@ -255,14 +257,12 @@ export const updateShiftAction = async (
       validatedData.endTime,
       shiftId
     )
-    if (conflictCheck.hasConflict)
-      return { success: false, error: conflictCheck.message }
+    if (conflictCheck.hasConflict) return { success: false, error: conflictCheck.message }
 
     const area = await prisma.area.findUnique({
       where: { id: validatedData.areaId, organizationId },
     })
-    if (!area)
-      return { success: false, error: 'El área no pertenece a tu organización' }
+    if (!area) return { success: false, error: 'El área no pertenece a tu organización' }
 
     const shiftType = await prisma.shiftType.findUnique({
       where: { id: validatedData.shiftTypeId, organizationId },
@@ -367,17 +367,15 @@ export const completeShiftAction = async (
 
     const derivedOrgId = isChiefArea(session)
       ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
-      : session.organizationId ?? null
-    if (!derivedOrgId)
-      return { success: false, error: 'No tienes una organización asignada' }
+      : (session.organizationId ?? null)
+    if (!derivedOrgId) return { success: false, error: 'No tienes una organización asignada' }
     const organizationId = derivedOrgId
 
     const existing = await prisma.shift.findFirst({
       where: { id: shiftId, organizationId },
       include: { payment: true },
     })
-    if (!existing)
-      return { success: false, error: 'Turno no encontrado' }
+    if (!existing) return { success: false, error: 'Turno no encontrado' }
 
     if (existing.status === 'COMPLETED')
       return { success: false, error: 'El turno ya está completado' }
@@ -393,7 +391,6 @@ export const completeShiftAction = async (
 
     const validatedData = completeShiftSchema.parse(data)
 
-    
     await prisma.shift.update({
       where: { id: shiftId },
       data: {
@@ -404,20 +401,17 @@ export const completeShiftAction = async (
       },
     })
 
-    
     let paymentId: string | undefined
     let finalAmount: number | undefined
 
-    if (existing.contractId && !existing.payment) 
+    if (existing.contractId && !existing.payment)
       try {
         const paymentResult = await calculateShiftPayment(shiftId)
         paymentId = paymentResult.paymentId
         finalAmount = paymentResult.finalAmount
       } catch (paymentError) {
         console.error('[completeShiftAction] Payment calculation failed:', paymentError)
-        
       }
-    
 
     revalidatePath('/dashboard/shifts')
     revalidatePath('/dashboard/shifts/calendar')
@@ -436,23 +430,19 @@ export const completeShiftAction = async (
   }
 }
 
-export const deleteShiftAction = async (
-  shiftId: string
-): Promise<ActionResult<null>> => {
+export const deleteShiftAction = async (shiftId: string): Promise<ActionResult<null>> => {
   try {
     const session = await requireAdminHROrChief()
 
     const derivedOrgId = isChiefArea(session)
       ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
-      : session.organizationId ?? null
-    if (!derivedOrgId)
-      return { success: false, error: 'No tienes una organización asignada' }
+      : (session.organizationId ?? null)
+    if (!derivedOrgId) return { success: false, error: 'No tienes una organización asignada' }
 
     const existing = await prisma.shift.findFirst({
       where: { id: shiftId, organizationId: derivedOrgId },
     })
-    if (!existing)
-      return { success: false, error: 'Turno no encontrado' }
+    if (!existing) return { success: false, error: 'Turno no encontrado' }
 
     if (isChiefArea(session)) {
       const hasAccess = await chiefHasAreaAccess(session.id, existing.areaId)
@@ -485,7 +475,7 @@ export const getShiftsAction = async (
 
     const organizationId = isChiefArea(session)
       ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
-      : session.organizationId ?? null
+      : (session.organizationId ?? null)
 
     if (!organizationId)
       return {

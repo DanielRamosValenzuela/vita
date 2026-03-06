@@ -2,9 +2,9 @@ import { getTranslations } from 'next-intl/server'
 import Link from 'next/link'
 import { CheckCircle2 } from 'lucide-react'
 
+import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardHeader } from '@/src/shared/ui/card'
-import { Badge } from '@/src/shared/ui/badge'
 import { PageAnimationWrapper, PageSection } from '@/src/shared/ui/motion'
 
 interface PricingPageProps {
@@ -40,12 +40,8 @@ export default async function PricingPage({ params }: PricingPageProps) {
     <PageAnimationWrapper className="flex flex-col">
       <PageSection className="bg-background py-20 text-center">
         <div className="container mx-auto max-w-4xl px-4">
-          <h1 className="mb-4 text-4xl font-bold tracking-tight sm:text-5xl">
-            {t('title')}
-          </h1>
-          <p className="text-muted-foreground text-lg sm:text-xl">
-            {t('description')}
-          </p>
+          <h1 className="mb-4 text-4xl font-bold tracking-tight sm:text-5xl">{t('title')}</h1>
+          <p className="text-muted-foreground text-lg sm:text-xl">{t('description')}</p>
         </div>
       </PageSection>
 
@@ -61,9 +57,7 @@ export default async function PricingPage({ params }: PricingPageProps) {
                 >
                   {plan.popular && (
                     <div className="absolute -top-4 left-0 right-0 flex justify-center">
-                      <Badge className="px-4 py-1 text-sm">
-                        {tLanding('pricing.popular')}
-                      </Badge>
+                      <Badge className="px-4 py-1 text-sm">{tLanding('pricing.popular')}</Badge>
                     </div>
                   )}
                   <CardHeader className="pb-4 pt-8">
@@ -99,9 +93,7 @@ export default async function PricingPage({ params }: PricingPageProps) {
                       variant={plan.popular ? 'default' : 'outline'}
                       className="mt-4 w-full"
                     >
-                      <Link href={`/${locale}/contact`}>
-                        {tLanding('pricing.cta')}
-                      </Link>
+                      <Link href={`/${locale}/contact`}>{tLanding('pricing.cta')}</Link>
                     </Button>
                   </CardContent>
                 </Card>
@@ -127,12 +119,8 @@ export default async function PricingPage({ params }: PricingPageProps) {
 
       <PageSection className="bg-primary/5 py-20 text-center">
         <div className="container mx-auto max-w-3xl px-4">
-          <h2 className="mb-4 text-3xl font-bold tracking-tight">
-            {t('cta.title')}
-          </h2>
-          <p className="text-muted-foreground mb-8 text-lg">
-            {t('cta.description')}
-          </p>
+          <h2 className="mb-4 text-3xl font-bold tracking-tight">{t('cta.title')}</h2>
+          <p className="text-muted-foreground mb-8 text-lg">{t('cta.description')}</p>
           <Button asChild size="lg" className="text-base">
             <Link href={`/${locale}/contact`}>{t('cta.button')}</Link>
           </Button>

@@ -6,6 +6,7 @@
 ---
 
 ### [CRITICO] BUG-001: Dashboard accesible sin autenticacion - No hay proteccion de rutas -- RESUELTO (pre-existente: proxy.ts + layout.tsx redirect)
+
 - **Ubicacion:** Pagina de dashboard
 - **Rol:** No autenticado
 - **Test Case:** TC-AUTH-006
@@ -23,6 +24,7 @@
   ```typescript
   // En app/[locale]/dashboard/layout.tsx linea 19, reemplazar el bloque if(!user)
   import { redirect } from 'next/navigation'
+
   // ...
   if (!user) {
     const { locale } = await params
@@ -34,6 +36,7 @@
 ---
 
 ### [ALTO] BUG-002: Login exitoso redirige a landing en vez de dashboard -- RESUELTO (pre-existente: callbackUrl ya usa /${locale}/dashboard)
+
 - **Ubicacion:** Formulario de login
 - **Rol:** Todos
 - **Test Case:** TC-AUTH-001
@@ -60,6 +63,7 @@
 ---
 
 ### [ALTO] BUG-003: Clave i18n sin traducir en boton de tarifas -- RESUELTO (pre-existente)
+
 - **Ubicacion:** Pagina de tarifas - seccion "Fecha de facturacion"
 - **Rol:** ADMIN_HR
 - **Test Case:** TC-UX-004
@@ -74,12 +78,15 @@
   - `src/features/admin-hr/ui/billing-day-config.tsx:68` — Usa `t('~common.save')` dentro del namespace `payroll.billingDay`
   - `messages/es.json` — No existe la clave `payroll.billingDay.~common.save`
 - **Correccion sugerida:**
+
   ```typescript
   // En src/features/admin-hr/ui/billing-day-config.tsx
   // Opcion A: Agregar useTranslations para common
   const tCommon = useTranslations('common')
   // Y en linea 68:
-  {isPending ? tCommon('saving') : tCommon('save')}
+  {
+    isPending ? tCommon('saving') : tCommon('save')
+  }
 
   // Opcion B: Agregar la clave en messages/es.json bajo payroll.billingDay
   // "payroll": { "billingDay": { "save": "Guardar" } }
@@ -88,6 +95,7 @@
 ---
 
 ### [MEDIO] BUG-004: Formulario de login vacio no muestra errores de validacion -- RESUELTO (ya funcionaba: Zod retorna fieldErrors correctamente)
+
 - **Ubicacion:** Pagina de login
 - **Rol:** No autenticado
 - **Test Case:** TC-AUTH-005, TC-UX-009
@@ -106,6 +114,7 @@
 ---
 
 ### [BAJO] BUG-005: Boton "Iniciar sesion" duplica logica identica en ambos estados -- RESUELTO (pre-existente)
+
 - **Ubicacion:** Formulario de login
 - **Rol:** No autenticado
 - **Test Case:** TC-UX-007
@@ -117,7 +126,9 @@
   - `src/features/admin-hr/ui/billing-day-config.tsx:68` — `{isPending ? t('~common.save') : t('~common.save')}`
 - **Correccion sugerida:**
   ```typescript
-  {isPending ? t('saving') : t('save')}
+  {
+    isPending ? t('saving') : t('save')
+  }
   ```
 
 ---
@@ -127,6 +138,7 @@
 ---
 
 ### [MEDIO] BUG-006: Links de edicion en tablas no incluyen prefijo de locale -- RESUELTO (fix: import Link from @/i18n/navigation)
+
 - **Ubicacion:** Tabla de areas `/es/dashboard/areas`, potencialmente otras tablas
 - **Rol:** ADMIN_HR
 - **Test Case:** TC-AH-004-CRUD
@@ -153,6 +165,7 @@
 ---
 
 ### [BAJO] BUG-007: Tabla de rate templates no se revalida despues de crear nueva plantilla -- RESUELTO (pre-existente)
+
 - **Ubicacion:** `/es/dashboard/rates` - seccion "Plantillas de Tarifa"
 - **Rol:** ADMIN_HR
 - **Test Case:** TC-AH-008-CRUD
@@ -173,6 +186,7 @@
   ```typescript
   // En la server action de crear rate template, agregar:
   import { revalidatePath } from 'next/cache'
+
   // Al final de la accion exitosa:
   revalidatePath('/[locale]/dashboard/rates', 'page')
   ```
@@ -180,6 +194,7 @@
 ---
 
 ### [MEDIO] BUG-008: Personal de Salud excede limite configurado (52/50) -- RESUELTO (fix: checkOrganizationRoleLimit en acceptInvitation)
+
 - **Ubicacion:** `/es/dashboard/admin-hr/organization` - seccion Personal de Salud
 - **Rol:** ADMIN_HR
 - **Test Case:** TC-AH-009-CRUD
@@ -205,6 +220,7 @@
 ---
 
 ### [ALTO] BUG-009: Navegacion del calendario STAFF remonta componente y pierde mes seleccionado -- RESUELTO (fix: instancia unica ShiftCalendar + empty state overlay)
+
 - **Ubicacion:** Dashboard STAFF - calendario
 - **Rol:** STAFF
 - **Test Case:** TC-ST-002
@@ -227,7 +243,7 @@
   return (
     <div className="flex flex-col items-center">
       <ShiftCalendar
-        shifts={shifts}  // puede ser []
+        shifts={shifts} // puede ser []
         loading={loading}
         onMonthChange={onMonthChange}
         // ... props
@@ -244,6 +260,7 @@
 ---
 
 ### [MEDIO] BUG-010: Clicks en turnos de rotacion en el calendario no abren detalle -- RESUELTO (fix: handleShiftClick maneja rotation-group)
+
 - **Ubicacion:** Dashboard STAFF - calendario grid
 - **Rol:** STAFF
 - **Test Case:** TC-ST-003
@@ -280,6 +297,7 @@
 ---
 
 ### [ALTO] BUG-011: Multiples claves i18n sin traducir en modulo SUPER_ADMIN -- RESUELTO (fix: es.json/en.json actions object + address object, removed duplicate keys)
+
 - **Ubicacion:** Paginas de organizaciones SUPER_ADMIN
 - **Rol:** SUPER_ADMIN
 - **Test Case:** TC-SA-002, TC-SA-003, TC-SA-005, TC-SA-006, TC-SA-007

@@ -5,8 +5,6 @@ import { useTranslations } from 'next-intl'
 import { ArrowLeftRight, Check, Loader2, X } from 'lucide-react'
 import { toast } from 'sonner'
 
-import { Badge } from '@/src/shared/ui/badge'
-import { Button } from '@/src/shared/ui/button'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,13 +16,15 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/src/shared/ui/alert-dialog'
+import { Badge } from '@/src/shared/ui/badge'
+import { Button } from '@/src/shared/ui/button'
 import { Label } from '@/src/shared/ui/label'
 import { Textarea } from '@/src/shared/ui/textarea'
 
 import type { SwapRequestWithRelations } from '@/src/entities/swap'
 
-import { getPendingChiefSwapsAction } from '../api/swap-queries'
 import { reviewSwapAction } from '../api/swap-chief-actions'
+import { getPendingChiefSwapsAction } from '../api/swap-queries'
 
 function formatShortDate(date: Date) {
   return new Date(date).toLocaleDateString([], {
@@ -45,13 +45,14 @@ export function SwapChiefReview() {
   const load = useCallback(async () => {
     setLoading(true)
     const result = await getPendingChiefSwapsAction()
-    if (result.success && result.data)
-      setRequests(result.data.requests)
+    if (result.success && result.data) setRequests(result.data.requests)
     setLoading(false)
   }, [])
 
   useEffect(() => {
-    startTransition(() => { void load() })
+    startTransition(() => {
+      void load()
+    })
   }, [load])
 
   const handleReview = async (requestId: string, approve: boolean, note?: string) => {
@@ -60,8 +61,7 @@ export function SwapChiefReview() {
     if (result.success) {
       toast.success(approve ? t('success.approved') : t('success.rejected'))
       load()
-    } else
-      toast.error(result.error)
+    } else toast.error(result.error)
     setActing(false)
     setRejectNote('')
   }
@@ -85,13 +85,9 @@ export function SwapChiefReview() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <ArrowLeftRight className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium">
-                  {req.requester.name}
-                </span>
-                <span className="text-muted-foreground">{String.fromCharCode(0x21C4)}</span>
-                <span className="text-sm font-medium">
-                  {req.targetUser?.name}
-                </span>
+                <span className="text-sm font-medium">{req.requester.name}</span>
+                <span className="text-muted-foreground">{String.fromCharCode(0x21c4)}</span>
+                <span className="text-sm font-medium">{req.targetUser?.name}</span>
               </div>
               <Badge>{t(`type.${req.type}`)}</Badge>
             </div>
@@ -108,9 +104,7 @@ export function SwapChiefReview() {
                 >
                   {req.requesterShift.shiftType.name}
                 </Badge>
-                <p className="text-xs">
-                  {formatShortDate(req.requesterShift.startTime)}
-                </p>
+                <p className="text-xs">{formatShortDate(req.requesterShift.startTime)}</p>
               </div>
 
               {req.targetShift && (
@@ -125,15 +119,15 @@ export function SwapChiefReview() {
                   >
                     {req.targetShift.shiftType.name}
                   </Badge>
-                  <p className="text-xs">
-                    {formatShortDate(req.targetShift.startTime)}
-                  </p>
+                  <p className="text-xs">{formatShortDate(req.targetShift.startTime)}</p>
                 </div>
               )}
             </div>
 
             {req.reason && (
-              <p className="text-xs text-muted-foreground">{t('detail.reason')}: {req.reason}</p>
+              <p className="text-xs text-muted-foreground">
+                {t('detail.reason')}: {req.reason}
+              </p>
             )}
 
             <div className="flex gap-2">

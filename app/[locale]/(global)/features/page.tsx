@@ -1,13 +1,13 @@
 import { getTranslations } from 'next-intl/server'
 import Link from 'next/link'
 import {
-  Calendar,
-  Calculator,
-  Scale,
-  RefreshCw,
   Building2,
-  Smartphone,
+  Calculator,
+  Calendar,
   CheckCircle2,
+  RefreshCw,
+  Scale,
+  Smartphone,
 } from 'lucide-react'
 
 import { Button } from '@/src/shared/ui/button'
@@ -39,12 +39,8 @@ export default async function FeaturesPage({ params }: FeaturesPageProps) {
     <PageAnimationWrapper className="flex flex-col">
       <PageSection className="bg-background py-20 text-center">
         <div className="container mx-auto max-w-4xl px-4">
-          <h1 className="mb-4 text-4xl font-bold tracking-tight sm:text-5xl">
-            {t('title')}
-          </h1>
-          <p className="text-muted-foreground text-lg sm:text-xl">
-            {t('description')}
-          </p>
+          <h1 className="mb-4 text-4xl font-bold tracking-tight sm:text-5xl">{t('title')}</h1>
+          <p className="text-muted-foreground text-lg sm:text-xl">{t('description')}</p>
         </div>
       </PageSection>
 
@@ -54,10 +50,7 @@ export default async function FeaturesPage({ params }: FeaturesPageProps) {
         const isEven = index % 2 === 0
 
         return (
-          <PageSection
-            key={key}
-            className={isEven ? 'bg-background py-20' : 'bg-muted/30 py-20'}
-          >
+          <PageSection key={key} className={isEven ? 'bg-background py-20' : 'bg-muted/30 py-20'}>
             <div className="container mx-auto max-w-6xl px-4">
               <Card className="border-0 bg-transparent shadow-none">
                 <CardContent className="p-0">
@@ -81,9 +74,7 @@ export default async function FeaturesPage({ params }: FeaturesPageProps) {
                         {featureItems.map((feature) => (
                           <li key={feature} className="flex items-start gap-3">
                             <CheckCircle2 className="text-primary mt-0.5 h-5 w-5 shrink-0" />
-                            <span className="text-base">
-                              {t(`${sectionKey}.${feature}`)}
-                            </span>
+                            <span className="text-base">{t(`${sectionKey}.${feature}`)}</span>
                           </li>
                         ))}
                       </ul>
@@ -98,12 +89,8 @@ export default async function FeaturesPage({ params }: FeaturesPageProps) {
 
       <PageSection className="bg-primary/5 py-20 text-center">
         <div className="container mx-auto max-w-3xl px-4">
-          <h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl">
-            {t('cta.title')}
-          </h2>
-          <p className="text-muted-foreground mb-8 text-lg">
-            {t('cta.description')}
-          </p>
+          <h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl">{t('cta.title')}</h2>
+          <p className="text-muted-foreground mb-8 text-lg">{t('cta.description')}</p>
           <Button asChild size="lg" className="text-base">
             <Link href={`/${locale}/contact`}>{t('cta.button')}</Link>
           </Button>

@@ -1,10 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-
+import { useTranslations } from 'next-intl'
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion'
 import { ChevronDown } from 'lucide-react'
-import { useTranslations } from 'next-intl'
 
 import { Badge } from '@/src/shared/ui/badge'
 import { MotionSection } from '@/src/shared/ui/motion'
@@ -39,10 +38,7 @@ export function FaqSection() {
           {items.map((item, index) => {
             const isOpen = openIndex === index
             return (
-              <div
-                key={item.q}
-                className="bg-card overflow-hidden rounded-lg border"
-              >
+              <div key={item.q} className="bg-card overflow-hidden rounded-lg border">
                 <button
                   type="button"
                   onClick={() => handleToggle(index)}
@@ -63,7 +59,9 @@ export function FaqSection() {
                       initial={shouldReduceMotion ? { opacity: 1 } : { height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={shouldReduceMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
-                      transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.3, ease: 'easeInOut' }}
+                      transition={
+                        shouldReduceMotion ? { duration: 0 } : { duration: 0.3, ease: 'easeInOut' }
+                      }
                       className="overflow-hidden"
                     >
                       <div className="border-t px-5 pb-4 pt-3">

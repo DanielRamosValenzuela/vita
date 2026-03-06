@@ -41,4 +41,3 @@ export interface SectorPersonnelResult {
   areas: SectorAreaPersonnel[]
   totalStaff: number
 }
-

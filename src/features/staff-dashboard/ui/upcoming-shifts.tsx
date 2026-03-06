@@ -17,9 +17,7 @@ function getRelativeDay(date: Date, t: (key: string) => string): string {
   const now = new Date()
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
   const target = new Date(date.getFullYear(), date.getMonth(), date.getDate())
-  const diffDays = Math.round(
-    (target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
-  )
+  const diffDays = Math.round((target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
 
   if (diffDays === 0) return t('today')
   if (diffDays === 1) return t('tomorrow')
@@ -64,9 +62,7 @@ export function UpcomingShifts({ shifts, onShiftClick }: UpcomingShiftsProps) {
                   style={{ backgroundColor: shift.shiftType.color }}
                 />
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium">
-                    {shift.shiftType.name}
-                  </p>
+                  <p className="truncate text-sm font-medium">{shift.shiftType.name}</p>
                   <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                     <span>{getRelativeDay(shift.startTime, t)}</span>
                     <span className="h-1 w-1 rounded-full bg-muted-foreground/50" />

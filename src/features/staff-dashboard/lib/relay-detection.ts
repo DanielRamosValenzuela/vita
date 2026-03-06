@@ -10,11 +10,10 @@ export function detectRelays(shifts: PersonnelShift[]): PersonnelShift[] {
   for (let i = 0; i < result.length - 1; i++) {
     const current = result[i]
     const next = result[i + 1]
-    const gapMs =
-      new Date(next.startTime).getTime() - new Date(current.endTime).getTime()
+    const gapMs = new Date(next.startTime).getTime() - new Date(current.endTime).getTime()
     const gapMinutes = gapMs / (1000 * 60)
 
-    if (gapMinutes <= RELAY_GAP_MINUTES && gapMinutes >= 0 && current.userId !== next.userId)  {
+    if (gapMinutes <= RELAY_GAP_MINUTES && gapMinutes >= 0 && current.userId !== next.userId) {
       result[i] = {
         ...current,
         relay: {

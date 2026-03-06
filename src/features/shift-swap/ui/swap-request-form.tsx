@@ -49,13 +49,15 @@ export function SwapRequestForm({
   shiftDate,
 }: SwapRequestFormProps) {
   const t = useTranslations('swap')
-  const [shifts, setShifts] = useState<Array<{
-    id: string
-    startTime: Date
-    endTime: Date
-    user: { id: string; name: string }
-    shiftType: { id: string; name: string; color: string; icon: string | null }
-  }>>([])
+  const [shifts, setShifts] = useState<
+    Array<{
+      id: string
+      startTime: Date
+      endTime: Date
+      user: { id: string; name: string }
+      shiftType: { id: string; name: string; color: string; icon: string | null }
+    }>
+  >([])
   const [status, setStatus] = useState<'idle' | 'loading' | 'submitting'>('idle')
   const [selectedShiftId, setSelectedShiftId] = useState<string | null>(null)
   const [reason, setReason] = useState('')
@@ -65,8 +67,7 @@ export function SwapRequestForm({
   const loadShifts = useCallback(async () => {
     setStatus('loading')
     const result = await getAvailableShiftsForSwapAction(areaId)
-    if (result.success && result.data)
-      setShifts(result.data.shifts)
+    if (result.success && result.data) setShifts(result.data.shifts)
     setStatus('idle')
   }, [areaId])
 
@@ -75,7 +76,9 @@ export function SwapRequestForm({
     const wasOpen = prevOpenRef.current
     prevOpenRef.current = open
     if (open && !wasOpen)
-      startTransition(() => { void loadShifts() })
+      startTransition(() => {
+        void loadShifts()
+      })
   }, [open, loadShifts])
 
   const handleSubmit = async () => {
@@ -91,8 +94,7 @@ export function SwapRequestForm({
       onOpenChange(false)
       setSelectedShiftId(null)
       setReason('')
-    } else
-      toast.error(result.error)
+    } else toast.error(result.error)
     setStatus('idle')
   }
 
@@ -175,10 +177,7 @@ export function SwapRequestForm({
         </div>
 
         <DialogFooter>
-          <Button
-            onClick={handleSubmit}
-            disabled={!selectedShiftId || status === 'submitting'}
-          >
+          <Button onClick={handleSubmit} disabled={!selectedShiftId || status === 'submitting'}>
             {status === 'submitting' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {t('confirm')}
           </Button>

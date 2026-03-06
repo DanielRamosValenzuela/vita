@@ -1,9 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { m, useReducedMotion } from 'framer-motion'
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
+import { m, useReducedMotion } from 'framer-motion'
 import { Menu } from 'lucide-react'
 
 import { fadeIn } from '@/src/shared/lib/animations/motion-variants'
@@ -19,7 +19,12 @@ interface DashboardShellProps extends DashboardSidebarProps {
   children: React.ReactNode
 }
 
-export function DashboardShell({ user, children, unreadNotificationCount, displayRole }: DashboardShellProps) {
+export function DashboardShell({
+  user,
+  children,
+  unreadNotificationCount,
+  displayRole,
+}: DashboardShellProps) {
   const t = useTranslations('common')
   const tNav = useTranslations('nav')
   const tDashboard = useTranslations('dashboard')
@@ -66,7 +71,11 @@ export function DashboardShell({ user, children, unreadNotificationCount, displa
       </Sheet>
 
       <div className="hidden lg:block">
-        <DashboardSidebar user={user} unreadNotificationCount={unreadNotificationCount} displayRole={displayRole} />
+        <DashboardSidebar
+          user={user}
+          unreadNotificationCount={unreadNotificationCount}
+          displayRole={displayRole}
+        />
       </div>
 
       <main className="bg-background flex-1 overflow-y-auto pt-14 lg:pt-0">
@@ -76,9 +85,7 @@ export function DashboardShell({ user, children, unreadNotificationCount, displa
           initial="hidden"
           animate="visible"
           variants={
-            shouldReduceMotion
-              ? { hidden: { opacity: 1 }, visible: { opacity: 1 } }
-              : fadeIn
+            shouldReduceMotion ? { hidden: { opacity: 1 }, visible: { opacity: 1 } } : fadeIn
           }
         >
           {children}

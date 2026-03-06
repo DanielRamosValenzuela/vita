@@ -1,9 +1,16 @@
 'use client'
 
 import { m, useReducedMotion } from 'framer-motion'
+
 import { fadeInUp, staggerContainer } from '@/src/shared/lib/animations/motion-variants'
 
-export function PageAnimationWrapper({ children, className }: { children: React.ReactNode; className?: string }) {
+export function PageAnimationWrapper({
+  children,
+  className,
+}: {
+  children: React.ReactNode
+  className?: string
+}) {
   const shouldReduceMotion = useReducedMotion()
 
   return (
@@ -22,7 +29,13 @@ export function PageAnimationWrapper({ children, className }: { children: React.
   )
 }
 
-export function PageSection({ children, className }: { children: React.ReactNode; className?: string }) {
+export function PageSection({
+  children,
+  className,
+}: {
+  children: React.ReactNode
+  className?: string
+}) {
   const shouldReduceMotion = useReducedMotion()
 
   return (

@@ -2,9 +2,9 @@
 
 import { useState } from 'react'
 import { signIn } from 'next-auth/react'
-import { Eye, EyeOff } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
+import { Eye, EyeOff } from 'lucide-react'
 
 import { Button } from '@/src/shared/ui/button'
 import { GoogleIcon } from '@/src/shared/ui/icons'
@@ -89,7 +89,12 @@ export function LoginForm({ callbackUrl }: { callbackUrl?: string }) {
       <div className="space-y-2">
         <Label htmlFor="password">{t('password')}</Label>
         <div className="relative">
-          <Input type={showPassword ? 'text' : 'password'} id="password" name="password" className="pr-10" />
+          <Input
+            type={showPassword ? 'text' : 'password'}
+            id="password"
+            name="password"
+            className="pr-10"
+          />
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}

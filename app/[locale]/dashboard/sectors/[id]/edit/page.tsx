@@ -1,19 +1,12 @@
-import { notFound } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
+import { notFound } from 'next/navigation'
 
-import {
-  requireAdminHROrChief,
-  isAdminHR,
-  isChiefArea,
-} from '@/src/shared/lib/auth'
+import { isAdminHR, isChiefArea, requireAdminHROrChief } from '@/src/shared/lib/auth'
 import { prisma } from '@/src/shared/lib/db'
-import { getSectorById } from '@/src/entities/sector'
 import { getChiefsForSectorAction } from '@/src/features/sector/api'
-import {
-  SectorAreasCard,
-  SectorBasicInfoCard,
-  SectorChiefsCard,
-} from '@/src/features/sector/ui'
+import { SectorAreasCard, SectorBasicInfoCard, SectorChiefsCard } from '@/src/features/sector/ui'
+
+import { getSectorById } from '@/src/entities/sector'
 
 interface EditSectorPageProps {
   params: Promise<{ locale: string; id: string }>

@@ -1,7 +1,10 @@
 'use server'
 
 import { requireAdminHROrChief } from '@/src/shared/lib/auth'
-import { getChiefAccessibleAreaIds, resolveChiefOrganizationId } from '@/src/shared/lib/auth/chief-access'
+import {
+  getChiefAccessibleAreaIds,
+  resolveChiefOrganizationId,
+} from '@/src/shared/lib/auth/chief-access'
 import { isChiefArea } from '@/src/shared/lib/auth/rbac'
 import { prisma } from '@/src/shared/lib/db'
 import type { ActionResult } from '@/src/shared/lib/types'
@@ -44,7 +47,7 @@ export const getShiftTypesAction = async (): Promise<ActionResult<ShiftType[]>> 
     const session = await requireAdminHROrChief()
     const orgId = isChiefArea(session)
       ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
-      : session.organizationId ?? null
+      : (session.organizationId ?? null)
     if (!orgId)
       return {
         success: false,
@@ -119,9 +122,8 @@ export const createShiftTypeAction = async (data: {
     const isChief = isChiefArea(session)
     const orgId = isChief
       ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
-      : session.organizationId ?? null
-    if (!orgId)
-      return { success: false, error: 'No tienes una organización asignada' }
+      : (session.organizationId ?? null)
+    if (!orgId) return { success: false, error: 'No tienes una organización asignada' }
     const organizationId = orgId
 
     const color = data.color ?? '#3b82f6'
@@ -270,9 +272,8 @@ export const updateShiftTypeAction = async (
     const isChief = isChiefArea(session)
     const orgId = isChief
       ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
-      : session.organizationId ?? null
-    if (!orgId)
-      return { success: false, error: 'No tienes una organización asignada' }
+      : (session.organizationId ?? null)
+    if (!orgId) return { success: false, error: 'No tienes una organización asignada' }
     const organizationId = orgId
 
     if (data.color) {
@@ -320,7 +321,10 @@ export const updateShiftTypeAction = async (
         }
       const chiefAreaIdsList = await getChiefAccessibleAreaIds(session.id)
       const chiefAreaIds = new Set(chiefAreaIdsList)
-      const areaConfigs = data.areaConfigs ?? existingType.areaShiftTypes?.map((a) => ({ areaId: a.areaId, isActive: true })) ?? []
+      const areaConfigs =
+        data.areaConfigs ??
+        existingType.areaShiftTypes?.map((a) => ({ areaId: a.areaId, isActive: true })) ??
+        []
       if (areaConfigs.length === 0)
         return {
           success: false,
@@ -337,7 +341,8 @@ export const updateShiftTypeAction = async (
     const isGlobal = isChief ? false : (data.isGlobal ?? existingType.isGlobal)
     const areaConfigsForDb =
       data.areaConfigs ??
-      (existingType.areaShiftTypes?.map((a) => ({ areaId: a.areaId, isActive: true })) ?? [])
+      existingType.areaShiftTypes?.map((a) => ({ areaId: a.areaId, isActive: true })) ??
+      []
     if (!isChief) {
       if (!isGlobal && areaConfigsForDb.length === 0)
         return {
@@ -423,9 +428,8 @@ export const deleteShiftTypeAction = async (id: string): Promise<ActionResult<nu
     const isChief = isChiefArea(session)
     const orgId = isChief
       ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
-      : session.organizationId ?? null
-    if (!orgId)
-      return { success: false, error: 'No tienes una organización asignada' }
+      : (session.organizationId ?? null)
+    if (!orgId) return { success: false, error: 'No tienes una organización asignada' }
 
     const existingType = await prisma.shiftType.findUnique({
       where: { id },

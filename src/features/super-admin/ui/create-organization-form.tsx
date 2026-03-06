@@ -192,8 +192,7 @@ export function CreateOrganizationForm() {
                 aria-invalid={!!errors.maxStaff}
               />
               <p className="text-muted-foreground text-xs">
-                {t('form.maxStaff.description')}{' '}
-                {t('form.maxSuffix', { max: planLimits.maxStaff })}
+                {t('form.maxStaff.description')} {t('form.maxSuffix', { max: planLimits.maxStaff })}
               </p>
               {errors.maxStaff && (
                 <p className="text-destructive text-sm">{errors.maxStaff.message}</p>

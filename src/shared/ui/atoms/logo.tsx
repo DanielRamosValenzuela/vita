@@ -1,8 +1,8 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useTranslations } from 'next-intl'
 
 import { cn } from '@/src/shared/lib/utils'
 
@@ -41,11 +41,7 @@ export function Logo({ className, showText = true, size = 'md', locale = 'es' }:
         priority
       />
       {showText && (
-        <span
-          className={cn('text-foreground font-semibold', config.text)}
-        >
-          {t('appName')}
-        </span>
+        <span className={cn('text-foreground font-semibold', config.text)}>{t('appName')}</span>
       )}
     </Link>
   )

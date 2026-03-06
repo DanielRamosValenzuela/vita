@@ -1,6 +1,6 @@
 import { getTranslations } from 'next-intl/server'
 import Link from 'next/link'
-import { Rocket, Calendar, CreditCard, UserCircle, ChevronRight } from 'lucide-react'
+import { Calendar, ChevronRight, CreditCard, Rocket, UserCircle } from 'lucide-react'
 
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardHeader } from '@/src/shared/ui/card'
@@ -29,12 +29,8 @@ export default async function SupportPage({ params }: SupportPageProps) {
     <PageAnimationWrapper className="flex flex-col">
       <PageSection className="bg-background py-20 text-center">
         <div className="container mx-auto max-w-4xl px-4">
-          <h1 className="mb-4 text-4xl font-bold tracking-tight sm:text-5xl">
-            {t('title')}
-          </h1>
-          <p className="text-muted-foreground text-lg sm:text-xl">
-            {t('description')}
-          </p>
+          <h1 className="mb-4 text-4xl font-bold tracking-tight sm:text-5xl">{t('title')}</h1>
+          <p className="text-muted-foreground text-lg sm:text-xl">{t('description')}</p>
         </div>
       </PageSection>
 
@@ -64,9 +60,7 @@ export default async function SupportPage({ params }: SupportPageProps) {
                       {categoryItems.map((item) => (
                         <li key={item} className="flex items-center gap-2">
                           <ChevronRight className="text-primary h-4 w-4 shrink-0" />
-                          <span className="text-sm">
-                            {t(`categories.${categoryKey}.${item}`)}
-                          </span>
+                          <span className="text-sm">{t(`categories.${categoryKey}.${item}`)}</span>
                         </li>
                       ))}
                     </ul>
@@ -80,12 +74,8 @@ export default async function SupportPage({ params }: SupportPageProps) {
 
       <PageSection className="bg-background py-20 text-center">
         <div className="container mx-auto max-w-3xl px-4">
-          <h2 className="mb-4 text-3xl font-bold tracking-tight">
-            {t('contact.title')}
-          </h2>
-          <p className="text-muted-foreground mb-8 text-lg">
-            {t('contact.description')}
-          </p>
+          <h2 className="mb-4 text-3xl font-bold tracking-tight">{t('contact.title')}</h2>
+          <p className="text-muted-foreground mb-8 text-lg">{t('contact.description')}</p>
           <Button asChild size="lg" className="text-base">
             <Link href={`/${locale}/contact`}>{t('contact.button')}</Link>
           </Button>

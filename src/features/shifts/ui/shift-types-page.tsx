@@ -5,7 +5,6 @@ import { useTranslations } from 'next-intl'
 import { Palette, Plus } from 'lucide-react'
 import { toast } from 'sonner'
 
-import { Spinner } from '@/src/shared/ui/atoms'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,6 +15,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/src/shared/ui/alert-dialog'
+import { Spinner } from '@/src/shared/ui/atoms'
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/src/shared/ui/card'
@@ -27,7 +27,6 @@ import {
   deleteShiftTypeAction,
   updateShiftTypeAction,
 } from '../api/shift-type-actions'
-
 import { DeleteShiftTypeDialog } from './delete-shift-type-dialog'
 import { ShiftTypeFormDialog } from './shift-type-form-dialog'
 import { ShiftTypesTable } from './shift-types-table'
@@ -68,7 +67,7 @@ export function ShiftTypesPage({
 
   const hasChanges = useMemo(
     () => hasShiftTypeFormChanged(formData, editingShiftType),
-    [formData, editingShiftType],
+    [formData, editingShiftType]
   )
 
   const formatDuration = (mins: number) => {

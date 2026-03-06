@@ -114,9 +114,7 @@ export async function upsertNoteAction(
   }
 }
 
-export async function deleteNoteAction(
-  noteId: string
-): Promise<ActionResult<void>> {
+export async function deleteNoteAction(noteId: string): Promise<ActionResult<void>> {
   try {
     const session = await requireDashboardUser()
 
@@ -124,8 +122,7 @@ export async function deleteNoteAction(
       where: { id: noteId, userId: session.id },
     })
 
-    if (!note)
-      return { success: false, error: 'Nota no encontrada' }
+    if (!note) return { success: false, error: 'Nota no encontrada' }
 
     await prisma.calendarNote.delete({ where: { id: noteId } })
 

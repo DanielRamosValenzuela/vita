@@ -27,8 +27,7 @@ export function useCounterAnimation({
       const eased = 1 - Math.pow(1 - progress, 3)
       setCount(Math.round(eased * target))
 
-      if (progress < 1)
-        requestAnimationFrame(update)
+      if (progress < 1) requestAnimationFrame(update)
     }
 
     requestAnimationFrame(update)

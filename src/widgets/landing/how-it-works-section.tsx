@@ -1,7 +1,7 @@
 'use client'
 
-import { m, useReducedMotion } from 'framer-motion'
 import { useTranslations } from 'next-intl'
+import { m, useReducedMotion } from 'framer-motion'
 
 import { fadeInUp, staggerContainer } from '@/src/shared/lib/animations'
 import { Badge } from '@/src/shared/ui/badge'

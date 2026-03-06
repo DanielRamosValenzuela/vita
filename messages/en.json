@@ -542,6 +542,18 @@
       "allAreas": "All areas",
       "noAreas": "No assigned areas"
     },
+    "detail": {
+      "title": "Shift Detail",
+      "area": "Area",
+      "shiftType": "Shift Type",
+      "date": "Date",
+      "schedule": "Schedule",
+      "rotation": "Rotation",
+      "notes": "Notes",
+      "nightShift": "Night shift (continues to next day)",
+      "editAction": "Edit Shift",
+      "deleteAction": "Delete Shift"
+    },
     "deleteConfirm": {
       "title": "Delete shift?",
       "description": "This shift will be removed. This action cannot be undone.",

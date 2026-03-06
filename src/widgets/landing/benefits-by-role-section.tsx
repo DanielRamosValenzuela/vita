@@ -1,14 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-
+import { useTranslations } from 'next-intl'
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion'
 import { CheckCircle2 } from 'lucide-react'
-import { useTranslations } from 'next-intl'
 
 import { Badge } from '@/src/shared/ui/badge'
-import { Tabs, TabsList, TabsTrigger } from '@/src/shared/ui/tabs'
 import { MotionSection } from '@/src/shared/ui/motion'
+import { Tabs, TabsList, TabsTrigger } from '@/src/shared/ui/tabs'
 
 type RoleKey = 'hr' | 'chief' | 'staff'
 
@@ -23,10 +22,7 @@ export function BenefitsByRoleSection() {
     { key: 'staff', label: t('benefits.staff.tab') },
   ]
 
-  const content: Record<
-    RoleKey,
-    { title: string; description: string; benefits: string[] }
-  > = {
+  const content: Record<RoleKey, { title: string; description: string; benefits: string[] }> = {
     hr: {
       title: t('benefits.hr.title'),
       description: t('benefits.hr.description'),

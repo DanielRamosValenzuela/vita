@@ -6,13 +6,13 @@ import { Check, X } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Spinner } from '@/src/shared/ui/atoms'
-
-import { useRouter } from '@/i18n/navigation'
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
 import { IconDisplay } from '@/src/shared/ui/icon-picker'
 import { Input } from '@/src/shared/ui/input'
+
+import { useRouter } from '@/i18n/navigation'
 
 import { assignAreasToSectorAction } from '../api'
 
@@ -51,8 +51,7 @@ export function SectorAreasCard({
     selectedIds.size !== initialIds.size || [...selectedIds].some((id) => !initialIds.has(id))
 
   const filteredAreas = allAreas.filter(
-    (area) =>
-      !selectedIds.has(area.id) && area.name.toLowerCase().includes(search.toLowerCase())
+    (area) => !selectedIds.has(area.id) && area.name.toLowerCase().includes(search.toLowerCase())
   )
 
   const toggleArea = (id: string) => {

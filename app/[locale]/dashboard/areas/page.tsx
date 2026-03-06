@@ -67,7 +67,5 @@ export default async function AreasPage({ params }: AreasPageProps) {
     _count?: { shiftTypes: number; userAreas?: number; contracts?: number }
   }>
 
-  return (
-    <AreasTable areas={areas} canCreate={!isChiefArea(user)} canDelete={!isChiefArea(user)} />
-  )
+  return <AreasTable areas={areas} canCreate={!isChiefArea(user)} canDelete={!isChiefArea(user)} />
 }

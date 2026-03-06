@@ -535,4 +535,3 @@ export const endContractAction = async (contractId: string): Promise<ActionResul
     return handleActionError(error, 'endContractAction', 'Error al finalizar contrato')
   }
 }
-

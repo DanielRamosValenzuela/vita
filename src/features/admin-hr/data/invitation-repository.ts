@@ -18,4 +18,3 @@ export async function createInvitation(
 ) {
   return await createInvitationEntity(organizationId, userId, role, invitedBy)
 }
-

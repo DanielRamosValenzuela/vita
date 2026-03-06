@@ -6,6 +6,7 @@
 ---
 
 ### [CRITICO] WF-001: Flujo de autenticacion no protege rutas del dashboard
+
 - **Workflow:** Login → Dashboard → Operaciones protegidas
 - **Descripcion:** Un usuario no autenticado puede acceder directamente a URLs del dashboard. No hay middleware ni redirect en el layout que fuerce autenticacion.
 - **Flujo esperado:**
@@ -25,6 +26,7 @@
 ---
 
 ### [ALTO] WF-002: Flujo login → dashboard requiere paso manual
+
 - **Workflow:** Login con credenciales → Dashboard
 - **Descripcion:** Tras login exitoso, el usuario aterriza en la landing page en vez del dashboard. Debe navegar manualmente.
 - **Flujo esperado:**
@@ -43,7 +45,9 @@
 ---
 
 ### [INFO] WF-003: Workflows funcionales verificados
+
 Los siguientes workflows se verificaron como **funcionales**:
+
 - Login con credenciales validas (con bug de redireccion)
 - Login con credenciales invalidas → error mostrado correctamente
 - Logout → sesion cerrada correctamente (con timeout WebSocket)

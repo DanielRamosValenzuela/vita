@@ -7,14 +7,13 @@ import { requireAdminHROrChief } from '@/src/shared/lib/auth/session'
 import type { ActionResult } from '@/src/shared/lib/types'
 import { handleActionError } from '@/src/shared/lib/utils/action-error-handler'
 import { revalidatePaths } from '@/src/shared/lib/utils/revalidate-paths'
+import { createNotification } from '@/src/features/notifications/lib/notification-service'
 
 import {
   getSwapRequestById,
   updateSwapStatus,
   type SwapRequestWithRelations,
 } from '@/src/entities/swap'
-
-import { createNotification } from '@/src/features/notifications/lib/notification-service'
 
 import { executeSwap } from '../lib/swap-execution'
 
@@ -28,12 +27,10 @@ export async function reviewSwapAction(
     const tSwap = await getTranslations('swap')
 
     const organizationId = session.organizationId
-    if (!organizationId)
-      return { success: false, error: tSwap('errors.noOrganization') }
+    if (!organizationId) return { success: false, error: tSwap('errors.noOrganization') }
 
     const request = await getSwapRequestById(requestId, organizationId)
-    if (!request)
-      return { success: false, error: tSwap('errors.requestNotFound') }
+    if (!request) return { success: false, error: tSwap('errors.requestNotFound') }
 
     if (request.status !== 'PENDING_CHIEF')
       return { success: false, error: tSwap('errors.invalidStatus') }

@@ -117,11 +117,7 @@ export function CreateContractDialog({
         </div>
 
         <DialogFooter className="mt-6">
-          <Button
-            variant="outline"
-            onClick={() => handleOpenChange(false)}
-            disabled={isPending}
-          >
+          <Button variant="outline" onClick={() => handleOpenChange(false)} disabled={isPending}>
             {t('templateForm.cancel')}
           </Button>
           <Button

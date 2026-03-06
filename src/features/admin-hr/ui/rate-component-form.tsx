@@ -170,9 +170,7 @@ function ValueConditionRow({
         <LabelWithTooltip label={t('applyCondition')} tooltip={t('applyConditionTooltip')} />
         <Select
           value={component.applyCondition}
-          onValueChange={(value) =>
-            onUpdate(index, { applyCondition: value as ApplyCondition })
-          }
+          onValueChange={(value) => onUpdate(index, { applyCondition: value as ApplyCondition })}
         >
           <SelectTrigger>
             <SelectValue />
@@ -211,12 +209,9 @@ function ShiftTypePicker({
   const filteredShiftTypes = useMemo(() => {
     let list = shiftTypes
     const q = searchQuery.trim().toLowerCase()
-    if (q)
-      list = list.filter((st) => st.name.toLowerCase().includes(q))
+    if (q) list = list.filter((st) => st.name.toLowerCase().includes(q))
     if (areaFilterId !== FILTER_ALL)
-      list = list.filter(
-        (st) => st.isGlobal || st.areas.some((a) => a.id === areaFilterId)
-      )
+      list = list.filter((st) => st.isGlobal || st.areas.some((a) => a.id === areaFilterId))
     return list
   }, [shiftTypes, searchQuery, areaFilterId])
 
@@ -262,10 +257,7 @@ function ShiftTypePicker({
               />
             </div>
             {areas.length > 0 && (
-              <Select
-                value={areaFilterId}
-                onValueChange={setAreaFilterId}
-              >
+              <Select value={areaFilterId} onValueChange={setAreaFilterId}>
                 <SelectTrigger className="w-full sm:w-[180px]">
                   <SelectValue placeholder={t('filterByArea')} />
                 </SelectTrigger>
@@ -365,29 +357,27 @@ export function RateComponentForm({
           component.unit !== COMPONENT_UNITS.BIWEEKLY &&
           component.unit !== COMPONENT_UNITS.WEEKLY &&
           component.unit !== COMPONENT_UNITS.DAILY && (
-          <div className="flex items-center gap-2">
-            <Checkbox
-              id={`extra-only-${index}`}
-              checked={component.extraOnly ?? false}
-              onCheckedChange={(checked) =>
-                onUpdate(index, { extraOnly: checked === true })
-              }
-            />
-            <Label htmlFor={`extra-only-${index}`} className="cursor-pointer text-sm">
-              {t('extraOnly')}
-            </Label>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Info className="h-4 w-4 text-muted-foreground cursor-help" />
-                </TooltipTrigger>
-                <TooltipContent className="max-w-xs">
-                  <p>{t('extraOnlyTooltip')}</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
-        )}
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id={`extra-only-${index}`}
+                checked={component.extraOnly ?? false}
+                onCheckedChange={(checked) => onUpdate(index, { extraOnly: checked === true })}
+              />
+              <Label htmlFor={`extra-only-${index}`} className="cursor-pointer text-sm">
+                {t('extraOnly')}
+              </Label>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs">
+                    <p>{t('extraOnlyTooltip')}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+          )}
 
         {component.type === COMPONENT_TYPES.CUSTOM && (
           <div>

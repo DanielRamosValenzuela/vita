@@ -7,12 +7,12 @@ import { prisma } from '@/src/shared/lib/db'
 import type { ActionResult } from '@/src/shared/lib/types'
 import { handleActionError } from '@/src/shared/lib/utils/action-error-handler'
 
+import { detectRelays } from '../lib/relay-detection'
 import type {
   PersonnelShift,
   SectorAreaPersonnel,
   SectorPersonnelResult,
 } from '../types/staff-dashboard-types'
-import { detectRelays } from '../lib/relay-detection'
 
 export async function getSectorPersonnelForShiftAction(params: {
   shiftId: string
@@ -22,10 +22,9 @@ export async function getSectorPersonnelForShiftAction(params: {
 
     const organizationId = isChief(session)
       ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
-      : session.organizationId ?? null
+      : (session.organizationId ?? null)
 
-    if (!organizationId)
-      return { success: false, error: 'No organization found' }
+    if (!organizationId) return { success: false, error: 'No organization found' }
 
     const shift = await prisma.shift.findUnique({
       where: { id: params.shiftId },
@@ -36,8 +35,7 @@ export async function getSectorPersonnelForShiftAction(params: {
       },
     })
 
-    if (!shift)
-      return { success: false, error: 'NOT_FOUND' }
+    if (!shift) return { success: false, error: 'NOT_FOUND' }
 
     if (shift.userId !== session.id || shift.organizationId !== organizationId)
       return { success: false, error: 'FORBIDDEN' }
@@ -59,8 +57,7 @@ export async function getSectorPersonnelForShiftAction(params: {
         select: { areaId: true },
       })
       areaIds = sectorAreas.map((sa) => sa.areaId)
-    } else
-      areaIds = [shift.areaId]
+    } else areaIds = [shift.areaId]
 
     const overlappingShifts = await prisma.shift.findMany({
       where: {
@@ -81,7 +78,10 @@ export async function getSectorPersonnelForShiftAction(params: {
       orderBy: [{ areaId: 'asc' }, { startTime: 'asc' }],
     })
 
-    const areaMap = new Map<string, { area: SectorAreaPersonnel['area']; shifts: PersonnelShift[] }>()
+    const areaMap = new Map<
+      string,
+      { area: SectorAreaPersonnel['area']; shifts: PersonnelShift[] }
+    >()
 
     for (const s of overlappingShifts) {
       if (!areaMap.has(s.areaId))

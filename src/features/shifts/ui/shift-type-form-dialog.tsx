@@ -16,16 +16,16 @@ import {
 import { IconPicker } from '@/src/shared/ui/icon-picker'
 import { Label } from '@/src/shared/ui/label'
 
+import { ShiftTypeAreaAssignment } from './shift-type-area-assignment'
+import { ShiftTypeBasicFields } from './shift-type-basic-fields'
+import { ShiftTypeColorPicker } from './shift-type-color-picker'
+import { ShiftTypeStaffFields } from './shift-type-staff-fields'
 import type {
   AreaOption,
   ShiftType,
   ShiftTypeFormData,
   ShiftTypesAction,
 } from './shift-types-utils'
-import { ShiftTypeAreaAssignment } from './shift-type-area-assignment'
-import { ShiftTypeBasicFields } from './shift-type-basic-fields'
-import { ShiftTypeColorPicker } from './shift-type-color-picker'
-import { ShiftTypeStaffFields } from './shift-type-staff-fields'
 
 interface ShiftTypeFormDialogProps {
   isOpen: boolean

@@ -56,9 +56,7 @@ export function EmailListItem({
               </Badge>
             )}
           </div>
-          {!email.isVerified && (
-            <p className="text-muted-foreground text-xs">{t('notVerified')}</p>
-          )}
+          {!email.isVerified && <p className="text-muted-foreground text-xs">{t('notVerified')}</p>}
         </div>
       </div>
 

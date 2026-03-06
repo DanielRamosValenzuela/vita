@@ -32,20 +32,17 @@ export async function calculateShiftPayment(shiftId: string): Promise<ShiftPayme
     },
   })
 
-  if (!shift.contract || !shift.contract.rateTemplate) 
+  if (!shift.contract || !shift.contract.rateTemplate)
     throw new Error(`Shift ${shiftId} has no contract or rate template`)
-  
 
   const contract = shift.contract
   const components = contract.rateTemplate.components
 
-  
   const endTime = shift.actualEndTime ?? shift.endTime
   const startTime = shift.actualStartTime ?? shift.startTime
   const minutesWorked = Math.round((endTime.getTime() - startTime.getTime()) / 60000)
   const isPartialCompletion = shift.actualEndTime !== null && shift.actualEndTime < shift.endTime
 
-  
   const shiftDate = new Date(shift.startTime)
   shiftDate.setHours(0, 0, 0, 0)
 
@@ -61,7 +58,6 @@ export async function calculateShiftPayment(shiftId: string): Promise<ShiftPayme
   const dayType: DayType = calendarDay?.type ?? getDayTypeFromDate(shiftDate)
   const calendarMultiplier = calendarDay?.multiplier ?? 1.0
 
-  
   const context: ComponentEvaluationContext = {
     dayType,
     shiftTypeId: shift.shiftTypeId,
@@ -70,14 +66,17 @@ export async function calculateShiftPayment(shiftId: string): Promise<ShiftPayme
     classification: shift.shiftType.classification,
   }
 
-  
   const breakdowns: ComponentBreakdown[] = []
   let baseAmount = 0
 
   for (const component of components) {
-    
     if (component.type === 'BASE_SALARY') continue
-    if (component.unit === 'MONTHLY' || component.unit === 'BIWEEKLY' || component.unit === 'WEEKLY') continue
+    if (
+      component.unit === 'MONTHLY' ||
+      component.unit === 'BIWEEKLY' ||
+      component.unit === 'WEEKLY'
+    )
+      continue
 
     if (!evaluateComponent(component, context)) continue
 
@@ -97,28 +96,19 @@ export async function calculateShiftPayment(shiftId: string): Promise<ShiftPayme
       appliedMinutes: isMinuteBased(component.unit) ? minutesWorked : null,
     })
 
-    
-    if (!isMultiplierUnit(component.unit)) 
-      baseAmount += calculatedValue
-    
+    if (!isMultiplierUnit(component.unit)) baseAmount += calculatedValue
   }
 
-  
   let totalAfterMultipliers = baseAmount
-  for (const breakdown of breakdowns) 
-    if (isMultiplierUnit(getUnitFromType(breakdown.componentType, components))) 
+  for (const breakdown of breakdowns)
+    if (isMultiplierUnit(getUnitFromType(breakdown.componentType, components)))
       totalAfterMultipliers = totalAfterMultipliers * breakdown.calculatedValue
-    
-  
 
-  
   const customMultiplier = contract.customMultiplier ?? 1.0
   const totalAmount = totalAfterMultipliers * customMultiplier
 
-  
   const finalAmount = totalAmount * calendarMultiplier
 
-  
   const payment = await prisma.shiftPayment.create({
     data: {
       shiftId,
@@ -154,8 +144,6 @@ export async function calculateShiftPayment(shiftId: string): Promise<ShiftPayme
   }
 }
 
-
-
 function calculateComponentValue(
   value: number,
   unit: ComponentUnit,
@@ -180,7 +168,6 @@ function calculateComponentValue(
     case 'MULTIPLIER':
       return value
 
-    
     default:
       return value
   }

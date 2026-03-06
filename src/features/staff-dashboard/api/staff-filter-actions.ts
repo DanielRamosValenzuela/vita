@@ -31,10 +31,9 @@ export async function getMyAreasAndSectorsAction(): Promise<ActionResult<FilterO
 
     const organizationId = isChief(session)
       ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
-      : session.organizationId ?? null
+      : (session.organizationId ?? null)
 
-    if (!organizationId)
-      return { success: true, data: { areas: [], sectors: [] } }
+    if (!organizationId) return { success: true, data: { areas: [], sectors: [] } }
 
     const [userAreas, userSectors] = await Promise.all([
       prisma.userArea.findMany({

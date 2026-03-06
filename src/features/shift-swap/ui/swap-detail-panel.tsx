@@ -5,15 +5,6 @@ import { useTranslations } from 'next-intl'
 import { ArrowLeftRight, Check, Clock, Loader2, User, X } from 'lucide-react'
 import { toast } from 'sonner'
 
-import { Badge } from '@/src/shared/ui/badge'
-import { Button } from '@/src/shared/ui/button'
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from '@/src/shared/ui/sheet'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,12 +16,21 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/src/shared/ui/alert-dialog'
+import { Badge } from '@/src/shared/ui/badge'
+import { Button } from '@/src/shared/ui/button'
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from '@/src/shared/ui/sheet'
 
 import type { SwapRequestWithRelations } from '@/src/entities/swap'
 
-import { getSwapDetailAction } from '../api/swap-queries'
-import { respondToSwapAction, cancelSwapAction } from '../api/swap-actions'
+import { cancelSwapAction, respondToSwapAction } from '../api/swap-actions'
 import { selectSwapOfferAction } from '../api/swap-offer-actions'
+import { getSwapDetailAction } from '../api/swap-queries'
 
 interface SwapDetailPanelProps {
   requestId: string | null
@@ -65,14 +65,15 @@ export function SwapDetailPanel({
     setLoading(true)
     setData(null)
     const result = await getSwapDetailAction(id)
-    if (result.success && result.data)
-      setData(result.data)
+    if (result.success && result.data) setData(result.data)
     setLoading(false)
   }, [])
 
   useEffect(() => {
     if (open && requestId)
-      startTransition(() => { void load(requestId) })
+      startTransition(() => {
+        void load(requestId)
+      })
   }, [open, requestId, load])
 
   const handleRespond = async (accept: boolean) => {
@@ -83,8 +84,7 @@ export function SwapDetailPanel({
       toast.success(accept ? t('success.accepted') : t('success.rejected'))
       onUpdated?.()
       onOpenChange(false)
-    } else
-      toast.error(result.error)
+    } else toast.error(result.error)
     setActing(false)
   }
 
@@ -96,8 +96,7 @@ export function SwapDetailPanel({
       toast.success(t('success.cancelled'))
       onUpdated?.()
       onOpenChange(false)
-    } else
-      toast.error(result.error)
+    } else toast.error(result.error)
     setActing(false)
   }
 
@@ -108,8 +107,7 @@ export function SwapDetailPanel({
       toast.success(t('success.offerSelected'))
       onUpdated?.()
       if (requestId) load(requestId)
-    } else
-      toast.error(result.error)
+    } else toast.error(result.error)
     setActing(false)
   }
 
@@ -118,9 +116,7 @@ export function SwapDetailPanel({
       <SheetContent className="overflow-y-auto sm:max-w-lg">
         <SheetHeader>
           <SheetTitle>{t('detail.title')}</SheetTitle>
-          <SheetDescription className="sr-only">
-            {t('detail.title')}
-          </SheetDescription>
+          <SheetDescription className="sr-only">{t('detail.title')}</SheetDescription>
         </SheetHeader>
 
         {loading && (
@@ -154,7 +150,8 @@ export function SwapDetailPanel({
                     {data.requesterShift.shiftType.name}
                   </Badge>
                   <span className="text-xs text-muted-foreground">
-                    {formatDateTime(data.requesterShift.startTime)} - {formatDateTime(data.requesterShift.endTime)}
+                    {formatDateTime(data.requesterShift.startTime)} -{' '}
+                    {formatDateTime(data.requesterShift.endTime)}
                   </span>
                 </div>
               </div>
@@ -181,7 +178,8 @@ export function SwapDetailPanel({
                       {data.targetShift.shiftType.name}
                     </Badge>
                     <span className="text-xs text-muted-foreground">
-                      {formatDateTime(data.targetShift.startTime)} - {formatDateTime(data.targetShift.endTime)}
+                      {formatDateTime(data.targetShift.startTime)} -{' '}
+                      {formatDateTime(data.targetShift.endTime)}
                     </span>
                   </div>
                 </div>
@@ -208,21 +206,30 @@ export function SwapDetailPanel({
 
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <Clock className="h-3 w-3" />
-              <span>{t('detail.createdAt')}: {formatDateTime(data.createdAt)}</span>
+              <span>
+                {t('detail.createdAt')}: {formatDateTime(data.createdAt)}
+              </span>
             </div>
 
             {data.expiresAt && (
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <Clock className="h-3 w-3" />
-                <span>{t('detail.expiresAt')}: {formatDateTime(data.expiresAt)}</span>
+                <span>
+                  {t('detail.expiresAt')}: {formatDateTime(data.expiresAt)}
+                </span>
               </div>
             )}
 
             {data.type === 'OPEN' && data.offers.length > 0 && (
               <div className="space-y-3">
-                <h4 className="text-sm font-medium">{t('offers')} ({data.offers.length})</h4>
+                <h4 className="text-sm font-medium">
+                  {t('offers')} ({data.offers.length})
+                </h4>
                 {data.offers.map((offer) => (
-                  <div key={offer.id} className="flex items-center justify-between rounded-lg border p-3">
+                  <div
+                    key={offer.id}
+                    className="flex items-center justify-between rounded-lg border p-3"
+                  >
                     <div className="space-y-1">
                       <p className="text-sm font-medium">{offer.offerer.name}</p>
                       <div className="flex items-center gap-2">
@@ -239,20 +246,19 @@ export function SwapDetailPanel({
                           {formatDateTime(offer.offeredShift.startTime)}
                         </span>
                       </div>
-                      {offer.note && (
-                        <p className="text-xs text-muted-foreground">{offer.note}</p>
-                      )}
+                      {offer.note && <p className="text-xs text-muted-foreground">{offer.note}</p>}
                     </div>
-                    {offer.status === 'PENDING' && (data.status === 'PENDING_PEER' || data.status === 'PENDING_SELECTION') && (
-                      <Button
-                        size="sm"
-                        onClick={() => handleSelectOffer(offer.id)}
-                        disabled={acting}
-                      >
-                        <Check className="mr-1 h-3 w-3" />
-                        {t('selectOffer')}
-                      </Button>
-                    )}
+                    {offer.status === 'PENDING' &&
+                      (data.status === 'PENDING_PEER' || data.status === 'PENDING_SELECTION') && (
+                        <Button
+                          size="sm"
+                          onClick={() => handleSelectOffer(offer.id)}
+                          disabled={acting}
+                        >
+                          <Check className="mr-1 h-3 w-3" />
+                          {t('selectOffer')}
+                        </Button>
+                      )}
                     {offer.status === 'ACCEPTED' && (
                       <Badge variant="outline">{t('status.APPROVED')}</Badge>
                     )}
@@ -264,11 +270,7 @@ export function SwapDetailPanel({
             <div className="flex gap-2 pt-2">
               {data.status === 'PENDING_PEER' && data.type === 'DIRECT' && (
                 <>
-                  <Button
-                    onClick={() => handleRespond(true)}
-                    disabled={acting}
-                    className="flex-1"
-                  >
+                  <Button onClick={() => handleRespond(true)} disabled={acting} className="flex-1">
                     <Check className="mr-1 h-4 w-4" />
                     {t('accept')}
                   </Button>
@@ -300,9 +302,7 @@ export function SwapDetailPanel({
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel>{tCommon('cancel')}</AlertDialogCancel>
-                      <AlertDialogAction onClick={handleCancel}>
-                        {t('cancel')}
-                      </AlertDialogAction>
+                      <AlertDialogAction onClick={handleCancel}>{t('cancel')}</AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>

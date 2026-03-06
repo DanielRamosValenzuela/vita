@@ -30,9 +30,7 @@ export function ShiftTypeBasicFields({ formData, dispatch }: ShiftTypeBasicField
         <Input
           id="name"
           value={formData.name}
-          onChange={(e) =>
-            dispatch({ type: 'UPDATE_FORM', field: 'name', value: e.target.value })
-          }
+          onChange={(e) => dispatch({ type: 'UPDATE_FORM', field: 'name', value: e.target.value })}
           placeholder={t('form.namePlaceholder')}
         />
       </div>

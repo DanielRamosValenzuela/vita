@@ -7,14 +7,10 @@ import { prisma } from '@/src/shared/lib/db'
 import type { ActionResult } from '@/src/shared/lib/types'
 import { handleActionError } from '@/src/shared/lib/utils/action-error-handler'
 
-import {
-  createFeedToken,
-  getUserFeedTokens,
-  revokeFeedToken,
-} from '@/src/entities/calendar-feed'
+import { createFeedToken, getUserFeedTokens, revokeFeedToken } from '@/src/entities/calendar-feed'
 
-import { generateICalContent } from '../lib/ical-generator'
 import { buildFeedUrl, generateFeedToken } from '../lib/feed-token'
+import { generateICalContent } from '../lib/ical-generator'
 
 interface GenerateIcsParams {
   month: number
@@ -29,10 +25,9 @@ export async function generateIcsFileAction(
 
     const organizationId = isChief(session)
       ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
-      : session.organizationId ?? null
+      : (session.organizationId ?? null)
 
-    if (!organizationId)
-      return { success: true, data: { icsContent: '', filename: '' } }
+    if (!organizationId) return { success: true, data: { icsContent: '', filename: '' } }
 
     const startDate = new Date(params.year, params.month, 1)
     const endDate = new Date(params.year, params.month + 1, 1)
@@ -66,8 +61,18 @@ export async function generateIcsFileAction(
     )
 
     const monthNames = [
-      'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
-      'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre',
+      'enero',
+      'febrero',
+      'marzo',
+      'abril',
+      'mayo',
+      'junio',
+      'julio',
+      'agosto',
+      'septiembre',
+      'octubre',
+      'noviembre',
+      'diciembre',
     ]
     const filename = `turnos-${monthNames[params.month]}-${params.year}.ics`
 
@@ -121,10 +126,9 @@ export async function createFeedTokenAction(params: {
     if (params.type === 'per-org') {
       organizationId = isChief(session)
         ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
-        : session.organizationId ?? null
+        : (session.organizationId ?? null)
 
-      if (!organizationId)
-        return { success: false, error: 'No organization found' }
+      if (!organizationId) return { success: false, error: 'No organization found' }
     }
 
     const token = generateFeedToken()

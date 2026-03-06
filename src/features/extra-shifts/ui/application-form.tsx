@@ -27,12 +27,7 @@ interface ApplicationFormProps {
   onApplied?: () => void
 }
 
-export function ApplicationForm({
-  open,
-  onOpenChange,
-  shiftId,
-  onApplied,
-}: ApplicationFormProps) {
+export function ApplicationForm({ open, onOpenChange, shiftId, onApplied }: ApplicationFormProps) {
   const t = useTranslations('extraShifts')
   const [note, setNote] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -45,8 +40,7 @@ export function ApplicationForm({
       onOpenChange(false)
       setNote('')
       onApplied?.()
-    } else
-      toast.error(result.error)
+    } else toast.error(result.error)
     setSubmitting(false)
   }
 
@@ -55,9 +49,7 @@ export function ApplicationForm({
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{t('applyConfirm')}</AlertDialogTitle>
-          <AlertDialogDescription>
-            {t('applyConfirmDescription')}
-          </AlertDialogDescription>
+          <AlertDialogDescription>{t('applyConfirmDescription')}</AlertDialogDescription>
         </AlertDialogHeader>
 
         <div className="py-2">

@@ -1,9 +1,9 @@
 'use client'
 
-import { CheckCircle2 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
+import { CheckCircle2 } from 'lucide-react'
 
 import { cn } from '@/src/shared/lib/utils'
 import { Badge } from '@/src/shared/ui/badge'
@@ -68,11 +68,7 @@ export function PricingSection() {
                       </li>
                     ))}
                   </ul>
-                  <Button
-                    asChild
-                    variant={popular ? 'default' : 'outline'}
-                    className="w-full"
-                  >
+                  <Button asChild variant={popular ? 'default' : 'outline'} className="w-full">
                     <Link href={`/${locale}/contact`}>{t('pricing.cta')}</Link>
                   </Button>
                 </CardContent>

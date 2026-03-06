@@ -30,7 +30,7 @@ export default async function RotationsPage({ params }: RotationsPageProps) {
 
   const organizationId = isChiefArea(session)
     ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
-    : session.organizationId ?? null
+    : (session.organizationId ?? null)
 
   if (!organizationId)
     return (

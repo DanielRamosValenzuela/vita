@@ -1,6 +1,9 @@
 'use server'
 
-import { getChiefAccessibleAreaIds, resolveChiefOrganizationId } from '@/src/shared/lib/auth/chief-access'
+import {
+  getChiefAccessibleAreaIds,
+  resolveChiefOrganizationId,
+} from '@/src/shared/lib/auth/chief-access'
 import { isChief } from '@/src/shared/lib/auth/rbac'
 import { requireDashboardUser } from '@/src/shared/lib/auth/session'
 import { prisma } from '@/src/shared/lib/db'
@@ -31,14 +34,12 @@ export async function getExtraShiftsForAreaAction(): Promise<
 
     const organizationId = isChief(session)
       ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
-      : session.organizationId ?? null
+      : (session.organizationId ?? null)
 
-    if (!organizationId)
-      return { success: true, data: { shifts: [] } }
+    if (!organizationId) return { success: true, data: { shifts: [] } }
 
     let areaIds: string[]
-    if (isChief(session))
-      areaIds = await getChiefAccessibleAreaIds(session.id)
+    if (isChief(session)) areaIds = await getChiefAccessibleAreaIds(session.id)
     else {
       const userAreas = await prisma.userArea.findMany({
         where: { userId: session.id },
@@ -47,8 +48,7 @@ export async function getExtraShiftsForAreaAction(): Promise<
       areaIds = userAreas.map((ua) => ua.areaId)
     }
 
-    if (areaIds.length === 0)
-      return { success: true, data: { shifts: [] } }
+    if (areaIds.length === 0) return { success: true, data: { shifts: [] } }
 
     const shifts = await prisma.shift.findMany({
       where: {
@@ -84,10 +84,9 @@ export async function getMyApplicationsAction(): Promise<
 
     const organizationId = isChief(session)
       ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
-      : session.organizationId ?? null
+      : (session.organizationId ?? null)
 
-    if (!organizationId)
-      return { success: true, data: { applications: [] } }
+    if (!organizationId) return { success: true, data: { applications: [] } }
 
     const applications = await getApplicationsByUser(session.id, organizationId)
     return { success: true, data: { applications } }
@@ -104,27 +103,28 @@ export async function getApplicationsForShiftAction(
 
     const organizationId = isChief(session)
       ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
-      : session.organizationId ?? null
+      : (session.organizationId ?? null)
 
-    if (!organizationId)
-      return { success: true, data: { applications: [] } }
+    if (!organizationId) return { success: true, data: { applications: [] } }
 
     const shift = await prisma.shift.findFirst({
       where: { id: shiftId, organizationId },
       select: { areaId: true },
     })
-    if (!shift)
-      return { success: false, error: 'Turno no encontrado' }
+    if (!shift) return { success: false, error: 'Turno no encontrado' }
 
     if (isChief(session)) {
       const areaIds = await getChiefAccessibleAreaIds(session.id)
-      if (!areaIds.includes(shift.areaId))
-        return { success: false, error: 'Sin acceso al área' }
+      if (!areaIds.includes(shift.areaId)) return { success: false, error: 'Sin acceso al área' }
     }
 
     const applications = await getApplicationsForShift(shiftId, organizationId)
     return { success: true, data: { applications } }
   } catch (error) {
-    return handleActionError(error, 'getApplicationsForShiftAction', 'Error al obtener postulaciones')
+    return handleActionError(
+      error,
+      'getApplicationsForShiftAction',
+      'Error al obtener postulaciones'
+    )
   }
 }

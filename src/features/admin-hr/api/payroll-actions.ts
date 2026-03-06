@@ -13,12 +13,13 @@ import {
 import type { ActionResult } from '@/src/shared/lib/types'
 import { handleActionError } from '@/src/shared/lib/utils'
 import { revalidatePaths } from '@/src/shared/lib/utils/revalidate-paths'
+import { createNotification } from '@/src/features/notifications/lib/notification-service'
+
 import {
   createPayrollDocument,
   deletePayrollDocument as deletePayrollDocumentRecord,
   updatePayrollPeriod,
 } from '@/src/entities/payroll/lib/payroll-repository'
-import { createNotification } from '@/src/features/notifications/lib/notification-service'
 
 async function loadPdfModules() {
   const [{ renderToBuffer }, { PayrollDocumentPdf }] = await Promise.all([
@@ -29,8 +30,6 @@ async function loadPdfModules() {
 }
 
 const PAYROLL_PATHS = ['/dashboard/payroll', '/dashboard/rates'] as const
-
-
 
 export async function getBillingConfigAction(): Promise<
   ActionResult<{ billingDay: number | null; currency: string }>
@@ -47,8 +46,6 @@ export async function getBillingConfigAction(): Promise<
     return handleActionError(error, 'getBillingConfigAction', 'Error al obtener configuración')
   }
 }
-
-
 
 const updateBillingDaySchema = z.object({
   billingDay: z.number().int().min(1).max(31),
@@ -81,17 +78,17 @@ export async function updateBillingDayAction(
   }
 }
 
-
-
 const generatePayrollSchema = z.object({
   month: z.number().int().min(1).max(12),
-  year: z.number().int().min(2020).max(new Date().getFullYear() + 1),
+  year: z
+    .number()
+    .int()
+    .min(2020)
+    .max(new Date().getFullYear() + 1),
   force: z.boolean().optional().default(false),
 })
 
-export async function generatePayrollAction(
-  data: z.infer<typeof generatePayrollSchema>
-): Promise<
+export async function generatePayrollAction(data: z.infer<typeof generatePayrollSchema>): Promise<
   ActionResult<{
     periodId: string
     documentsGenerated: number
@@ -103,16 +100,14 @@ export async function generatePayrollAction(
     const session = await requireAdminHRWithOrg()
     const validated = generatePayrollSchema.parse(data)
 
-    
     const now = new Date()
     const currentMonth = now.getMonth() + 1
     const currentYear = now.getFullYear()
     if (
       validated.year > currentYear ||
       (validated.year === currentYear && validated.month >= currentMonth)
-    ) 
+    )
       return { success: false, error: 'No se puede generar nómina para un mes futuro' }
-    
 
     const result = await generatePayrollForOrganization({
       organizationId: session.organizationId,
@@ -122,9 +117,7 @@ export async function generatePayrollAction(
       actorId: session.id,
     })
 
-    if (!result.success) 
-      return { success: false, error: result.error }
-    
+    if (!result.success) return { success: false, error: result.error }
 
     revalidatePaths(...PAYROLL_PATHS)
 
@@ -141,8 +134,6 @@ export async function generatePayrollAction(
   }
 }
 
-
-
 const regenerateDocumentSchema = z.object({
   periodId: z.string().min(1),
   userId: z.string().min(1),
@@ -156,15 +147,11 @@ export async function regeneratePayrollDocumentAction(
     const validated = regenerateDocumentSchema.parse(data)
     const organizationId = session.organizationId
 
-    
     const period = await prisma.payrollPeriod.findFirst({
       where: { id: validated.periodId, organizationId },
     })
-    if (!period) 
-      return { success: false, error: 'Período de nómina no encontrado' }
-    
+    if (!period) return { success: false, error: 'Período de nómina no encontrado' }
 
-    
     const existingDoc = await prisma.payrollDocument.findUnique({
       where: {
         payrollPeriodId_userId: {
@@ -179,7 +166,6 @@ export async function regeneratePayrollDocumentAction(
       await deletePayrollDocumentRecord(existingDoc.id, organizationId)
     }
 
-    
     const result = await calculatePayrollForUser(
       validated.userId,
       organizationId,
@@ -188,13 +174,12 @@ export async function regeneratePayrollDocumentAction(
     )
 
     if (!result || result.totalAmount <= 0) {
-      
-      if (existingDoc) 
+      if (existingDoc)
         await updatePayrollPeriod(period.id, {
           totalDocuments: Math.max(0, period.totalDocuments - 1),
           totalAmount: Math.max(0, period.totalAmount - existingDoc.totalAmount),
         })
-      
+
       return { success: false, error: 'El empleado no tiene montos por pagar en este período' }
     }
 
@@ -222,9 +207,8 @@ export async function regeneratePayrollDocumentAction(
       Buffer.from(pdfBuffer)
     )
 
-    if (!uploadResult.success || !uploadResult.storagePath) 
+    if (!uploadResult.success || !uploadResult.storagePath)
       return { success: false, error: uploadResult.error ?? 'Error al subir documento' }
-    
 
     const user = await prisma.user.findUniqueOrThrow({
       where: { id: validated.userId },
@@ -249,7 +233,6 @@ export async function regeneratePayrollDocumentAction(
       fileName,
     })
 
-    
     const amountDiff = result.totalAmount - (existingDoc?.totalAmount ?? 0)
     const countDiff = existingDoc ? 0 : 1
     await updatePayrollPeriod(period.id, {
@@ -257,7 +240,6 @@ export async function regeneratePayrollDocumentAction(
       totalAmount: Math.round((period.totalAmount + amountDiff) * 100) / 100,
     })
 
-    
     try {
       await createNotification({
         userId: validated.userId,
@@ -267,9 +249,7 @@ export async function regeneratePayrollDocumentAction(
         title: `Tu documento de nómina de ${monthStr}/${period.year} ha sido actualizado`,
         actionUrl: '/dashboard/payroll',
       })
-    } catch {
-      
-    }
+    } catch {}
 
     revalidatePaths(...PAYROLL_PATHS)
 
@@ -287,8 +267,6 @@ export async function regeneratePayrollDocumentAction(
   }
 }
 
-
-
 const deleteDocumentSchema = z.object({
   documentId: z.string().min(1),
 })
@@ -301,36 +279,29 @@ export async function deletePayrollDocumentAction(
     const validated = deleteDocumentSchema.parse(data)
     const organizationId = session.organizationId
 
-    
     const doc = await prisma.payrollDocument.findFirst({
       where: { id: validated.documentId, organizationId },
       include: { payrollPeriod: true },
     })
 
-    if (!doc) 
-      return { success: false, error: 'Documento no encontrado' }
-    
+    if (!doc) return { success: false, error: 'Documento no encontrado' }
 
-    
     await deletePayrollDocumentFromStorage(doc.storagePath)
 
-    
     await deletePayrollDocumentRecord(doc.id, organizationId)
 
-    
     await updatePayrollPeriod(doc.payrollPeriodId, {
       totalDocuments: Math.max(0, doc.payrollPeriod.totalDocuments - 1),
-      totalAmount: Math.max(0, Math.round((doc.payrollPeriod.totalAmount - doc.totalAmount) * 100) / 100),
+      totalAmount: Math.max(
+        0,
+        Math.round((doc.payrollPeriod.totalAmount - doc.totalAmount) * 100) / 100
+      ),
     })
 
     revalidatePaths(...PAYROLL_PATHS)
 
     return { success: true, data: null, message: 'Documento eliminado' }
   } catch (error) {
-    return handleActionError(
-      error,
-      'deletePayrollDocumentAction',
-      'Error al eliminar documento'
-    )
+    return handleActionError(error, 'deletePayrollDocumentAction', 'Error al eliminar documento')
   }
 }

@@ -3,11 +3,16 @@
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
-import { chiefHasAreaAccess, getChiefAccessibleAreaIds, resolveChiefOrganizationId } from '@/src/shared/lib/auth/chief-access'
+import {
+  chiefHasAreaAccess,
+  getChiefAccessibleAreaIds,
+  resolveChiefOrganizationId,
+} from '@/src/shared/lib/auth/chief-access'
 import { isChiefArea } from '@/src/shared/lib/auth/rbac'
 import { requireAdminHROrChief } from '@/src/shared/lib/auth/session'
 import { prisma } from '@/src/shared/lib/db'
 import type { ActionResult } from '@/src/shared/lib/types'
+import { createNotification } from '@/src/features/notifications/lib/notification-service'
 
 import {
   calculateCoverage,
@@ -17,9 +22,11 @@ import {
   getStepForDay,
 } from '@/src/entities/rotation'
 
-import { createNotification } from '@/src/features/notifications/lib/notification-service'
-
-import { generateShiftsSchema, previewGenerationSchema, regenerateShiftsSchema } from '../lib/rotation-schemas'
+import {
+  generateShiftsSchema,
+  previewGenerationSchema,
+  regenerateShiftsSchema,
+} from '../lib/rotation-schemas'
 import type {
   CoverageAlert,
   CoverageDay,
@@ -35,7 +42,7 @@ function adjustOriginForStartingGroup(
   startDate: Date,
   startingGroupId: string | undefined,
   groups: Array<{ id: string; cycleOffset: number }>,
-  patternLength: number,
+  patternLength: number
 ): Date {
   if (!startingGroupId) return origin
   const targetGroup = groups.find((g) => g.id === startingGroupId)
@@ -45,11 +52,7 @@ function adjustOriginForStartingGroup(
   const adjustment = (patternLength - currentStep) % patternLength
   if (adjustment === 0) return origin
   return new Date(
-    Date.UTC(
-      origin.getUTCFullYear(),
-      origin.getUTCMonth(),
-      origin.getUTCDate() - adjustment,
-    )
+    Date.UTC(origin.getUTCFullYear(), origin.getUTCMonth(), origin.getUTCDate() - adjustment)
   )
 }
 
@@ -61,9 +64,8 @@ export const previewGenerationAction = async (
 
     const derivedOrgId = isChiefArea(session)
       ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
-      : session.organizationId ?? null
-    if (!derivedOrgId)
-      return { success: false, error: 'No tienes una organización asignada' }
+      : (session.organizationId ?? null)
+    if (!derivedOrgId) return { success: false, error: 'No tienes una organización asignada' }
     const organizationId = derivedOrgId
 
     const validatedData = previewGenerationSchema.parse(data)
@@ -118,13 +120,15 @@ export const previewGenerationAction = async (
       },
     })
 
-    if (!rotation)
-      return { success: false, error: 'Rotativa no encontrada' }
+    if (!rotation) return { success: false, error: 'Rotativa no encontrada' }
 
     if (isChiefArea(session)) {
       const hasAccess = await chiefHasAreaAccess(session.id, rotation.areaId)
       if (!hasAccess)
-        return { success: false, error: 'Solo puedes gestionar rotativas en las áreas que tienes asignadas' }
+        return {
+          success: false,
+          error: 'Solo puedes gestionar rotativas en las áreas que tienes asignadas',
+        }
     }
 
     const patternLength = rotation.steps.length
@@ -132,30 +136,28 @@ export const previewGenerationAction = async (
       return { success: false, error: 'La rotativa no tiene pasos definidos' }
 
     const configMap = new Map<string, string>()
-    for (const cfg of rotation.shiftConfigs)
-      configMap.set(cfg.shiftTypeId, cfg.startTime)
+    for (const cfg of rotation.shiftConfigs) configMap.set(cfg.shiftTypeId, cfg.startTime)
 
     const effectiveOrigin = adjustOriginForStartingGroup(
       rotation.startDate ?? validatedData.startDate,
       validatedData.startDate,
       validatedData.startingGroupId,
       rotation.groups,
-      patternLength,
+      patternLength
     )
     const daysInRange = daysBetween(validatedData.startDate, validatedData.endDate) + 1
 
     const conflicts: ShiftConflict[] = []
     const shiftsPerGroupMap = new Map<string, number>()
 
-    for (const group of rotation.groups)
-      shiftsPerGroupMap.set(group.id, 0)
+    for (const group of rotation.groups) shiftsPerGroupMap.set(group.id, 0)
 
     for (let d = 0; d < daysInRange; d++) {
       const currentDate = new Date(
         Date.UTC(
           validatedData.startDate.getUTCFullYear(),
           validatedData.startDate.getUTCMonth(),
-          validatedData.startDate.getUTCDate() + d,
+          validatedData.startDate.getUTCDate() + d
         )
       )
 
@@ -165,12 +167,10 @@ export const previewGenerationAction = async (
         const stepIndex = getStepForDay(patternLength, group.cycleOffset, dayIndex)
         const step = rotation.steps[stepIndex]
 
-        if (!step || step.isRestDay || !step.shiftTypeId || !step.shiftType)
-          continue
+        if (!step || step.isRestDay || !step.shiftTypeId || !step.shiftType) continue
 
         const shiftConfig = configMap.get(step.shiftTypeId)
-        if (!shiftConfig)
-          continue
+        if (!shiftConfig) continue
 
         const proposedStart = combineDateAndTime(currentDate, shiftConfig)
         const proposedEnd = calculateEndTime(proposedStart, step.shiftType.durationMinutes)
@@ -216,7 +216,10 @@ export const previewGenerationAction = async (
       }
     }
 
-    const totalShiftsToCreate = Array.from(shiftsPerGroupMap.values()).reduce((sum, n) => sum + n, 0)
+    const totalShiftsToCreate = Array.from(shiftsPerGroupMap.values()).reduce(
+      (sum, n) => sum + n,
+      0
+    )
 
     const shiftsPerGroup = rotation.groups.map((group) => ({
       groupId: group.id,
@@ -254,9 +257,8 @@ export const generateShiftsAction = async (
 
     const derivedOrgId = isChiefArea(session)
       ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
-      : session.organizationId ?? null
-    if (!derivedOrgId)
-      return { success: false, error: 'No tienes una organización asignada' }
+      : (session.organizationId ?? null)
+    if (!derivedOrgId) return { success: false, error: 'No tienes una organización asignada' }
     const organizationId = derivedOrgId
 
     const validatedData = generateShiftsSchema.parse(data)
@@ -304,13 +306,15 @@ export const generateShiftsAction = async (
       },
     })
 
-    if (!rotation)
-      return { success: false, error: 'Rotativa no encontrada' }
+    if (!rotation) return { success: false, error: 'Rotativa no encontrada' }
 
     if (isChiefArea(session)) {
       const hasAccess = await chiefHasAreaAccess(session.id, rotation.areaId)
       if (!hasAccess)
-        return { success: false, error: 'Solo puedes gestionar rotativas en las áreas que tienes asignadas' }
+        return {
+          success: false,
+          error: 'Solo puedes gestionar rotativas en las áreas que tienes asignadas',
+        }
     }
 
     const patternLength = rotation.steps.length
@@ -318,8 +322,7 @@ export const generateShiftsAction = async (
       return { success: false, error: 'La rotativa no tiene pasos definidos' }
 
     const configMap = new Map<string, string>()
-    for (const cfg of rotation.shiftConfigs)
-      configMap.set(cfg.shiftTypeId, cfg.startTime)
+    for (const cfg of rotation.shiftConfigs) configMap.set(cfg.shiftTypeId, cfg.startTime)
 
     const shiftTypeIds = [
       ...new Set(
@@ -343,7 +346,7 @@ export const generateShiftsAction = async (
       validatedData.startDate,
       validatedData.startingGroupId,
       rotation.groups,
-      patternLength,
+      patternLength
     )
     const daysInRange = daysBetween(validatedData.startDate, validatedData.endDate) + 1
 
@@ -370,7 +373,7 @@ export const generateShiftsAction = async (
         Date.UTC(
           validatedData.startDate.getUTCFullYear(),
           validatedData.startDate.getUTCMonth(),
-          validatedData.startDate.getUTCDate() + d,
+          validatedData.startDate.getUTCDate() + d
         )
       )
 
@@ -380,14 +383,12 @@ export const generateShiftsAction = async (
         const stepIndex = getStepForDay(patternLength, group.cycleOffset, dayIndex)
         const step = rotation.steps[stepIndex]
 
-        if (!step || step.isRestDay || !step.shiftTypeId)
-          continue
+        if (!step || step.isRestDay || !step.shiftTypeId) continue
 
         const shiftConfig = configMap.get(step.shiftTypeId)
         const shiftType = shiftTypeMap.get(step.shiftTypeId)
 
-        if (!shiftConfig || !shiftType)
-          continue
+        if (!shiftConfig || !shiftType) continue
 
         const proposedStart = combineDateAndTime(currentDate, shiftConfig)
         const proposedEnd = calculateEndTime(proposedStart, shiftType.durationMinutes)
@@ -488,9 +489,8 @@ export const getCoverageOverviewAction = async (
 
     const derivedOrgId = isChiefArea(session)
       ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
-      : session.organizationId ?? null
-    if (!derivedOrgId)
-      return { success: false, error: 'No tienes una organización asignada' }
+      : (session.organizationId ?? null)
+    if (!derivedOrgId) return { success: false, error: 'No tienes una organización asignada' }
     const organizationId = derivedOrgId
 
     const rotation = await prisma.rotation.findFirst({
@@ -534,13 +534,15 @@ export const getCoverageOverviewAction = async (
       },
     })
 
-    if (!rotation)
-      return { success: false, error: 'Rotativa no encontrada' }
+    if (!rotation) return { success: false, error: 'Rotativa no encontrada' }
 
     if (isChiefArea(session)) {
       const hasAccess = await chiefHasAreaAccess(session.id, rotation.areaId)
       if (!hasAccess)
-        return { success: false, error: 'Solo puedes gestionar rotativas en las áreas que tienes asignadas' }
+        return {
+          success: false,
+          error: 'Solo puedes gestionar rotativas en las áreas que tienes asignadas',
+        }
     }
 
     const rotationInput = {
@@ -589,9 +591,8 @@ export const getCoverageOverviewAction = async (
       const dateKey = cd.date.toISOString().slice(0, 10)
       const groups = cd.groups.map((g) => ({
         ...g,
-        hasGeneratedShifts: g.stepType === 'shift'
-          ? generatedShiftSet.has(`${g.groupId}:${dateKey}`)
-          : false,
+        hasGeneratedShifts:
+          g.stepType === 'shift' ? generatedShiftSet.has(`${g.groupId}:${dateKey}`) : false,
       }))
       return {
         date: cd.date,
@@ -622,9 +623,7 @@ export const getCoverageOverviewAction = async (
           })
     }
 
-    const daysWithShifts = days.filter((d) =>
-      d.groups.some((g) => g.hasGeneratedShifts)
-    )
+    const daysWithShifts = days.filter((d) => d.groups.some((g) => g.hasGeneratedShifts))
 
     if (daysWithShifts.length > 0) {
       const lastGeneratedDay = daysWithShifts[daysWithShifts.length - 1]
@@ -668,9 +667,8 @@ export const regenerateShiftsAction = async (
 
     const derivedOrgId = isChiefArea(session)
       ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
-      : session.organizationId ?? null
-    if (!derivedOrgId)
-      return { success: false, error: 'No tienes una organización asignada' }
+      : (session.organizationId ?? null)
+    if (!derivedOrgId) return { success: false, error: 'No tienes una organización asignada' }
     const organizationId = derivedOrgId
 
     const validatedData = regenerateShiftsSchema.parse(data)
@@ -725,13 +723,15 @@ export const regenerateShiftsAction = async (
       },
     })
 
-    if (!rotation)
-      return { success: false, error: 'Rotativa no encontrada' }
+    if (!rotation) return { success: false, error: 'Rotativa no encontrada' }
 
     if (isChiefArea(session)) {
       const hasAccess = await chiefHasAreaAccess(session.id, rotation.areaId)
       if (!hasAccess)
-        return { success: false, error: 'Solo puedes gestionar rotativas en las áreas que tienes asignadas' }
+        return {
+          success: false,
+          error: 'Solo puedes gestionar rotativas en las áreas que tienes asignadas',
+        }
     }
 
     const patternLength = rotation.steps.length
@@ -748,8 +748,7 @@ export const regenerateShiftsAction = async (
       })
 
     const configMap = new Map<string, string>()
-    for (const cfg of rotation.shiftConfigs)
-      configMap.set(cfg.shiftTypeId, cfg.startTime)
+    for (const cfg of rotation.shiftConfigs) configMap.set(cfg.shiftTypeId, cfg.startTime)
 
     const shiftTypeIds = [
       ...new Set(
@@ -773,7 +772,7 @@ export const regenerateShiftsAction = async (
       validatedData.startDate,
       validatedData.startingGroupId,
       rotation.groups,
-      patternLength,
+      patternLength
     )
     const daysInRange = daysBetween(validatedData.startDate, validatedData.endDate) + 1
 
@@ -800,7 +799,7 @@ export const regenerateShiftsAction = async (
         Date.UTC(
           validatedData.startDate.getUTCFullYear(),
           validatedData.startDate.getUTCMonth(),
-          validatedData.startDate.getUTCDate() + d,
+          validatedData.startDate.getUTCDate() + d
         )
       )
 
@@ -810,14 +809,12 @@ export const regenerateShiftsAction = async (
         const stepIndex = getStepForDay(patternLength, group.cycleOffset, dayIndex)
         const step = rotation.steps[stepIndex]
 
-        if (!step || step.isRestDay || !step.shiftTypeId)
-          continue
+        if (!step || step.isRestDay || !step.shiftTypeId) continue
 
         const shiftConfig = configMap.get(step.shiftTypeId)
         const shiftType = shiftTypeMap.get(step.shiftTypeId)
 
-        if (!shiftConfig || !shiftType)
-          continue
+        if (!shiftConfig || !shiftType) continue
 
         const proposedStart = combineDateAndTime(currentDate, shiftConfig)
         const proposedEnd = calculateEndTime(proposedStart, shiftType.durationMinutes)
@@ -914,15 +911,13 @@ export const checkCoverageAlertsAction = async (): Promise<
 
     const derivedOrgId = isChiefArea(session)
       ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
-      : session.organizationId ?? null
-    if (!derivedOrgId)
-      return { success: false, error: 'No tienes una organización asignada' }
+      : (session.organizationId ?? null)
+    if (!derivedOrgId) return { success: false, error: 'No tienes una organización asignada' }
     const organizationId = derivedOrgId
 
     let areaIds: string[]
 
-    if (isChiefArea(session))
-      areaIds = await getChiefAccessibleAreaIds(session.id)
+    if (isChiefArea(session)) areaIds = await getChiefAccessibleAreaIds(session.id)
     else {
       const areas = await prisma.area.findMany({
         where: { organizationId },
@@ -931,16 +926,14 @@ export const checkCoverageAlertsAction = async (): Promise<
       areaIds = areas.map((a) => a.id)
     }
 
-    if (areaIds.length === 0)
-      return { success: true, data: [] }
+    if (areaIds.length === 0) return { success: true, data: [] }
 
     const rotations = await prisma.rotation.findMany({
       where: { areaId: { in: areaIds }, organizationId, status: 'ACTIVE' },
       select: { id: true, name: true },
     })
 
-    if (rotations.length === 0)
-      return { success: true, data: [] }
+    if (rotations.length === 0) return { success: true, data: [] }
 
     const rotationIds = rotations.map((r) => r.id)
 
@@ -952,8 +945,7 @@ export const checkCoverageAlertsAction = async (): Promise<
 
     const maxShiftMap = new Map<string, Date>()
     for (const row of maxShiftByRotation)
-      if (row.rotationId && row._max.startTime)
-        maxShiftMap.set(row.rotationId, row._max.startTime)
+      if (row.rotationId && row._max.startTime) maxShiftMap.set(row.rotationId, row._max.startTime)
 
     const now = new Date()
     const msPerDay = 1000 * 60 * 60 * 24
@@ -1002,22 +994,19 @@ export const getLastGenerationInfoAction = async (
 
     const derivedOrgId = isChiefArea(session)
       ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
-      : session.organizationId ?? null
-    if (!derivedOrgId)
-      return { success: false, error: 'No tienes una organización asignada' }
+      : (session.organizationId ?? null)
+    if (!derivedOrgId) return { success: false, error: 'No tienes una organización asignada' }
 
     const rotation = await prisma.rotation.findFirst({
       where: { id: rotationId, organizationId: derivedOrgId },
       select: { id: true, areaId: true },
     })
 
-    if (!rotation)
-      return { success: false, error: 'Rotativa no encontrada' }
+    if (!rotation) return { success: false, error: 'Rotativa no encontrada' }
 
     if (isChiefArea(session)) {
       const hasAccess = await chiefHasAreaAccess(session.id, rotation.areaId)
-      if (!hasAccess)
-        return { success: false, error: 'No tienes acceso a esta rotativa' }
+      if (!hasAccess) return { success: false, error: 'No tienes acceso a esta rotativa' }
     }
 
     const [lastShift, totalShifts] = await Promise.all([
@@ -1033,8 +1022,7 @@ export const getLastGenerationInfoAction = async (
       prisma.shift.count({ where: { rotationId } }),
     ])
 
-    if (!lastShift || !lastShift.rotationGroup)
-      return { success: true, data: null }
+    if (!lastShift || !lastShift.rotationGroup) return { success: true, data: null }
 
     return {
       success: true,

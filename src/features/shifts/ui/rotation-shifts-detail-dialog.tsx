@@ -55,17 +55,13 @@ export function RotationShiftsDetailDialog({
             <RefreshCw className="h-4 w-4 text-blue-500" />
             {t('rotationDetail.title')}
           </DialogTitle>
-          <DialogDescription>
-            {t('rotationDetail.description', { date })}
-          </DialogDescription>
+          <DialogDescription>{t('rotationDetail.description', { date })}</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
           <div className="flex items-center gap-2">
             <Badge variant="secondary">{shiftTypeName}</Badge>
-            <Badge variant="outline">
-              {shifts.length}
-            </Badge>
+            <Badge variant="outline">{shifts.length}</Badge>
           </div>
 
           {shifts.length === 0 ? (

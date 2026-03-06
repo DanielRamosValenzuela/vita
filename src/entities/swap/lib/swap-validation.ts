@@ -16,25 +16,19 @@ export async function validateSwapEligibility(
 
   if (!shift) return { valid: false, error: 'shift_not_found' }
 
-  if (shift.status !== 'SCHEDULED')
-    return { valid: false, error: 'shift_not_scheduled' }
+  if (shift.status !== 'SCHEDULED') return { valid: false, error: 'shift_not_scheduled' }
 
   const twentyFourHoursFromNow = new Date(Date.now() + 24 * 60 * 60 * 1000)
-  if (shift.startTime < twentyFourHoursFromNow)
-    return { valid: false, error: 'shift_too_soon' }
+  if (shift.startTime < twentyFourHoursFromNow) return { valid: false, error: 'shift_too_soon' }
 
   const activeSwap = await prisma.shiftSwapRequest.count({
     where: {
-      OR: [
-        { requesterShiftId: shiftId },
-        { targetShiftId: shiftId },
-      ],
+      OR: [{ requesterShiftId: shiftId }, { targetShiftId: shiftId }],
       status: { in: ['PENDING_PEER', 'PENDING_SELECTION', 'PENDING_CHIEF'] },
     },
   })
 
-  if (activeSwap > 0)
-    return { valid: false, error: 'shift_already_in_swap' }
+  if (activeSwap > 0) return { valid: false, error: 'shift_already_in_swap' }
 
   return { valid: true }
 }
@@ -48,19 +42,14 @@ export async function validateSameArea(
     prisma.shift.findUnique({ where: { id: shiftBId }, select: { areaId: true } }),
   ])
 
-  if (!shiftA || !shiftB)
-    return { valid: false, error: 'shift_not_found' }
+  if (!shiftA || !shiftB) return { valid: false, error: 'shift_not_found' }
 
-  if (shiftA.areaId !== shiftB.areaId)
-    return { valid: false, error: 'different_area' }
+  if (shiftA.areaId !== shiftB.areaId) return { valid: false, error: 'different_area' }
 
   return { valid: true }
 }
 
-export async function canUserSwapInArea(
-  userId: string,
-  areaId: string
-): Promise<boolean> {
+export async function canUserSwapInArea(userId: string, areaId: string): Promise<boolean> {
   const userArea = await prisma.userArea.findUnique({
     where: { userId_areaId: { userId, areaId } },
   })
@@ -86,8 +75,7 @@ export async function validateNoShiftConflict(
   if (excludeShiftId) where.id = { not: excludeShiftId }
 
   const conflict = await prisma.shift.findFirst({ where })
-  if (conflict)
-    return { valid: false, error: 'schedule_conflict' }
+  if (conflict) return { valid: false, error: 'schedule_conflict' }
 
   return { valid: true }
 }
