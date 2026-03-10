@@ -1,6 +1,6 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { hasLocale, NextIntlClientProvider } from 'next-intl'
-import { getMessages } from 'next-intl/server'
+import { getMessages, getTranslations } from 'next-intl/server'
 import {
   Bitter,
   Cormorant_Garamond,
@@ -35,11 +35,13 @@ import { siteMetadata } from './metadata'
 const geistSans = Geist({
   variable: '--font-geist-sans',
   subsets: ['latin'],
+  display: 'swap',
 })
 
 const geistMono = Geist_Mono({
   variable: '--font-geist-mono',
   subsets: ['latin'],
+  display: 'swap',
 })
 
 const oxanium = Oxanium({
@@ -146,6 +148,11 @@ const bitter = Bitter({
 
 export const metadata: Metadata = siteMetadata
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+}
+
 interface LocaleLayoutProps {
   children: React.ReactNode
   params: Promise<{ locale: string }>
@@ -156,7 +163,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
 
   if (!hasLocale(routing.locales, locale)) notFound()
 
-  const messages = await getMessages()
+  const [messages, t] = await Promise.all([getMessages(), getTranslations('common')])
 
   return (
     <html
@@ -165,6 +172,12 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
       className={`h-full ${geistSans.variable} ${geistMono.variable} ${oxanium.variable} ${outfit.variable} ${sourceCodePro.variable} ${spaceMono.variable} ${poppins.variable} ${libreBaskerville.variable} ${ibmPlexMono.variable} ${nunito.variable} ${merriweather.variable} ${dmSans.variable} ${playfairDisplay.variable} ${spaceGrotesk.variable} ${crimsonPro.variable} ${quicksand.variable} ${cormorantGaramond.variable} ${bitter.variable}`}
     >
       <body className="h-full antialiased font-sans" suppressHydrationWarning>
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground focus:outline-none"
+        >
+          {t('skipToContent')}
+        </a>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <AppProviders>{children}</AppProviders>
         </NextIntlClientProvider>

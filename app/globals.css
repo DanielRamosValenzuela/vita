@@ -485,3 +485,31 @@
 .animate-hero-glow-pulse {
   animation: hero-glow-pulse 3s ease-in-out infinite;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-shimmer,
+  .animate-vita-pulse,
+  .animate-vita-heartbeat,
+  .animate-logo-shimmer,
+  .animate-skeleton-wave,
+  .animate-hero-float,
+  .animate-hero-float-delay-1,
+  .animate-hero-float-delay-2,
+  .animate-hero-float-slow,
+  .animate-hero-gradient-rotate,
+  .animate-hero-glow-pulse,
+  .animate-nav-progress {
+    animation: none;
+  }
+
+  .animate-fade-in-up,
+  .animate-fade-in-up-delay-1,
+  .animate-fade-in-up-delay-2,
+  .animate-fade-in-up-delay-3,
+  .animate-fade-in-up-delay-4,
+  .animate-hero-scale-in,
+  .animate-hero-scale-in-delay-2 {
+    animation: none;
+    opacity: 1;
+  }
+}

@@ -10,9 +10,9 @@ import type { ActionResult } from '@/src/shared/lib/types'
 import { handleActionError } from '@/src/shared/lib/utils'
 
 import {
+  getFilteredPayrollPeriodSummaries,
   getPayrollDocumentById,
   getPayrollDocuments,
-  getPayrollPeriods,
 } from '@/src/entities/payroll/lib/payroll-repository'
 import type { PayrollDocumentSummary, PayrollPeriodSummary } from '@/src/entities/payroll/lib/types'
 
@@ -29,7 +29,20 @@ export async function getPayrollPeriodsAction(
     if (!organizationId) return { success: false, error: 'No tienes una organización asignada' }
 
     const validated = data ? getPeriodsSchema.parse(data) : {}
-    const periods = await getPayrollPeriods(organizationId, validated.year)
+
+    let options: { userId?: string; areaIds?: string[] } | undefined
+
+    if (isStaff(session)) options = { userId: session.id }
+    else if (isChiefArea(session)) {
+      const areaIds = await getChiefAccessibleAreaIds(session.id)
+      options = { areaIds }
+    }
+
+    const periods = await getFilteredPayrollPeriodSummaries(
+      organizationId,
+      validated.year,
+      options
+    )
 
     return { success: true, data: periods }
   } catch (error) {

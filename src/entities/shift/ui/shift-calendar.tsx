@@ -342,12 +342,19 @@ export function ShiftCalendar({
                 <Button
                   variant="outline"
                   size="icon"
-                  className="h-8 w-8"
+                  className="h-9 w-9"
                   onClick={handlePreviousMonth}
+                  aria-label={t('calendar.previousMonth')}
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
-                <Button variant="outline" size="icon" className="h-8 w-8" onClick={handleNextMonth}>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-9 w-9"
+                  onClick={handleNextMonth}
+                  aria-label={t('calendar.nextMonth')}
+                >
                   <ChevronRight className="h-4 w-4" />
                 </Button>
               </div>
@@ -355,10 +362,20 @@ export function ShiftCalendar({
             <div className="flex items-center gap-2">
               {headerExtra}
               <div className="hidden sm:flex sm:items-center sm:gap-1">
-                <Button variant="outline" size="icon" onClick={handlePreviousMonth}>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={handlePreviousMonth}
+                  aria-label={t('calendar.previousMonth')}
+                >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
-                <Button variant="outline" size="icon" onClick={handleNextMonth}>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={handleNextMonth}
+                  aria-label={t('calendar.nextMonth')}
+                >
                   <ChevronRight className="h-4 w-4" />
                 </Button>
               </div>

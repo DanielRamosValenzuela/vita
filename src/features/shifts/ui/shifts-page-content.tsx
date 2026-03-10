@@ -146,10 +146,12 @@ function pageReducer(state: PageState, action: PageAction): PageState {
 
 function ShiftStatsCards({
   shifts,
+  totalCount,
   isPending,
   t,
 }: {
   shifts: ShiftWithRelations[]
+  totalCount: number
   isPending: boolean
   t: ReturnType<typeof useTranslations<'shifts'>>
 }) {
@@ -163,7 +165,7 @@ function ShiftStatsCards({
           {isPending ? (
             <Skeleton className="h-8 w-12" />
           ) : (
-            <div className="text-2xl font-bold">{shifts.length}</div>
+            <div className="text-2xl font-bold">{totalCount}</div>
           )}
         </CardContent>
       </Card>
@@ -353,6 +355,7 @@ export function ShiftsPageContent({
   const tToast = useTranslations()
   const router = useRouter()
   const [shifts, setShifts] = useState<ShiftWithRelations[]>(() => initialShifts)
+  const [totalCount, setTotalCount] = useState<number>(initialShifts.length)
   const [selectedAreaId, setSelectedAreaId] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
   const [state, dispatch] = useReducer(pageReducer, initialPageState)
@@ -431,7 +434,10 @@ export function ShiftsPageContent({
         search: params.search || undefined,
         pageSize: 200,
       })
-      if (result.success && result.data) setShifts(result.data.shifts)
+      if (result.success && result.data) {
+        setShifts(result.data.shifts)
+        setTotalCount(result.data.total)
+      }
     })
   }
 
@@ -573,7 +579,7 @@ export function ShiftsPageContent({
         onAreaChange={handleAreaChange}
       />
 
-      <ShiftStatsCards shifts={shifts} isPending={isPending} t={t} />
+      <ShiftStatsCards shifts={shifts} totalCount={totalCount} isPending={isPending} t={t} />
 
       <Card>
         <CardContent className="pt-6">

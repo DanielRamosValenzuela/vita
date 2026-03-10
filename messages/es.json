@@ -19,6 +19,7 @@
     "darkMode": "Modo oscuro",
     "language": "Idioma",
     "logoLabel": "VITA - Inicio",
+    "skipToContent": "Saltar al contenido",
     "profile": "Perfil",
     "settings": "Configuración",
     "roles": {
@@ -423,7 +424,9 @@
     },
     "calendar": {
       "title": "Calendario de Turnos",
-      "rotationBlockPersons": "{count, plural, one {# persona} other {# personas}}"
+      "rotationBlockPersons": "{count, plural, one {# persona} other {# personas}}",
+      "previousMonth": "Mes anterior",
+      "nextMonth": "Mes siguiente"
     },
     "recent": {
       "title": "Turnos Recientes",
@@ -3327,7 +3330,8 @@
       "regenerate": "Regenerar",
       "delete": "Eliminar",
       "deleteSelected": "Eliminar seleccionados",
-      "actions": "Acciones"
+      "actions": "Acciones",
+      "moreActions": "Más acciones"
     },
     "generate": {
       "title": "Generar nómina",
