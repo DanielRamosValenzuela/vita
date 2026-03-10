@@ -60,6 +60,7 @@ export function BillingDayConfig() {
               placeholder={t('placeholder')}
               value={billingDay}
               onChange={(e) => setBillingDay(e.target.value)}
+              onInput={(e) => setBillingDay((e.target as HTMLInputElement).value)}
             />
             <p className="text-muted-foreground text-xs">{t('help')}</p>
           </div>

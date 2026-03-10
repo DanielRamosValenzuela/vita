@@ -78,7 +78,7 @@ export function DashboardShell({
         />
       </div>
 
-      <main className="bg-background flex-1 overflow-y-auto pt-14 lg:pt-0">
+      <main id="main-content" className="bg-background flex-1 overflow-y-auto pt-14 lg:pt-0">
         <m.div
           key={pathname}
           className="container mx-auto p-4 sm:p-6 lg:p-8"

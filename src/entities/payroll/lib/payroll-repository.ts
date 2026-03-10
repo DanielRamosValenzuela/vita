@@ -196,6 +196,50 @@ export async function deletePayrollDocumentsByPeriod(periodId: string) {
   })
 }
 
+export async function getFilteredPayrollPeriodSummaries(
+  organizationId: string,
+  year?: number,
+  options?: { userId?: string; areaIds?: string[] }
+): Promise<PayrollPeriodSummary[]> {
+  const periods = await getPayrollPeriods(organizationId, year)
+
+  if (!options) return periods
+
+  const periodIds = periods.map((p) => p.id)
+  if (periodIds.length === 0) return periods
+
+  const where: Prisma.PayrollDocumentWhereInput = {
+    payrollPeriodId: { in: periodIds },
+    organizationId,
+  }
+
+  if (options.userId) where.userId = options.userId
+  if (options.areaIds)
+    where.user = {
+      userAreas: { some: { areaId: { in: options.areaIds } } },
+    }
+
+  const aggregates = await prisma.payrollDocument.groupBy({
+    by: ['payrollPeriodId'],
+    where,
+    _count: true,
+    _sum: { totalAmount: true },
+  })
+
+  const aggMap = new Map(
+    aggregates.map((a) => [
+      a.payrollPeriodId,
+      { count: a._count, total: a._sum.totalAmount ?? 0 },
+    ])
+  )
+
+  return periods.map((period) => ({
+    ...period,
+    totalDocuments: aggMap.get(period.id)?.count ?? 0,
+    totalAmount: aggMap.get(period.id)?.total ?? 0,
+  }))
+}
+
 export async function deletePayrollPeriod(id: string, organizationId: string) {
   return prisma.payrollPeriod.delete({
     where: { id, organizationId },

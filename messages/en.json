@@ -19,6 +19,7 @@
     "darkMode": "Dark mode",
     "language": "Language",
     "logoLabel": "VITA - Home",
+    "skipToContent": "Skip to content",
     "profile": "Profile",
     "settings": "Settings",
     "roles": {
@@ -423,7 +424,9 @@
     },
     "calendar": {
       "title": "Shift Calendar",
-      "rotationBlockPersons": "{count, plural, one {# person} other {# people}}"
+      "rotationBlockPersons": "{count, plural, one {# person} other {# people}}",
+      "previousMonth": "Previous month",
+      "nextMonth": "Next month"
     },
     "recent": {
       "title": "Recent Shifts",
@@ -3327,7 +3330,8 @@
       "regenerate": "Regenerate",
       "delete": "Delete",
       "deleteSelected": "Delete selected",
-      "actions": "Actions"
+      "actions": "Actions",
+      "moreActions": "More actions"
     },
     "generate": {
       "title": "Generate Payroll",

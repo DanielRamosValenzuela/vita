@@ -13,7 +13,7 @@ export async function getAdminHRDashboardStats(
   const [totalAreas, totalShiftTypes, totalStaff, totalContracts, activeShifts] = await Promise.all(
     [
       prisma.area.count({
-        where: { organizationId },
+        where: { organizationId, isActive: true },
       }),
       prisma.shiftType.count({
         where: { organizationId, isActive: true },
@@ -22,7 +22,7 @@ export async function getAdminHRDashboardStats(
         where: {
           organizationId,
           role: {
-            in: [ROLES.CHIEF_AREA, ROLES.STAFF],
+            in: [ROLES.ADMIN_HR, ROLES.CHIEF_AREA, ROLES.STAFF],
           },
         },
       }),

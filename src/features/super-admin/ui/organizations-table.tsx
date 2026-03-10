@@ -3,7 +3,7 @@
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { OrganizationPlan, OrganizationStatus } from '@prisma/client'
-import { CreditCard, Eye, Unlock } from 'lucide-react'
+import { Circle, CreditCard, Eye, Unlock } from 'lucide-react'
 
 import { Button } from '@/src/shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/shared/ui/card'
@@ -31,16 +31,13 @@ export function OrganizationsTable({ organizations }: OrganizationsTableProps) {
   }
 
   const getStatusIcon = (status: OrganizationStatus) => {
-    switch (status) {
-      case 'ACTIVE':
-        return '🟢'
-      case 'PENDING_PAYMENT':
-        return '🟡'
-      case 'SUSPENDED':
-        return '🔴'
-      case 'INACTIVE':
-        return '⚫'
+    const statusColors: Record<OrganizationStatus, string> = {
+      ACTIVE: 'fill-green-500 text-green-500',
+      PENDING_PAYMENT: 'fill-yellow-500 text-yellow-500',
+      SUSPENDED: 'fill-red-500 text-red-500',
+      INACTIVE: 'fill-gray-500 text-gray-500',
     }
+    return <Circle className={`h-2.5 w-2.5 ${statusColors[status]}`} />
   }
 
   const getStatusText = (status: OrganizationStatus) => {
@@ -110,7 +107,7 @@ export function OrganizationsTable({ organizations }: OrganizationsTableProps) {
                     <span
                       className={`flex items-center gap-2 text-sm ${getStatusColor(org.status)}`}
                     >
-                      <span>{getStatusIcon(org.status)}</span>
+                      {getStatusIcon(org.status)}
                       {getStatusText(org.status)}
                     </span>
                   </td>
