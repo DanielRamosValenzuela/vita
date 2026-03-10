@@ -23,17 +23,11 @@ import { Textarea } from '@/src/shared/ui/textarea'
 
 import type { SwapRequestWithRelations } from '@/src/entities/swap'
 
+import { formatShortDate } from '@/src/shared/lib/utils/format'
+
 import { reviewSwapAction } from '../api/swap-chief-actions'
 import { getPendingChiefSwapsAction } from '../api/swap-queries'
 
-function formatShortDate(date: Date) {
-  return new Date(date).toLocaleDateString([], {
-    day: 'numeric',
-    month: 'short',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-}
 
 export function SwapChiefReview() {
   const t = useTranslations('swap')

@@ -4,6 +4,7 @@ import { startTransition, useCallback, useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { ArrowLeftRight, Loader2 } from 'lucide-react'
 
+import { formatShortDate } from '@/src/shared/lib/utils/format'
 import { Badge } from '@/src/shared/ui/badge'
 import { Tabs, TabsList, TabsTrigger } from '@/src/shared/ui/tabs'
 
@@ -12,14 +13,6 @@ import type { SwapRequestWithRelations } from '@/src/entities/swap'
 import { getMySwapRequestsAction } from '../api/swap-queries'
 import { SwapDetailPanel } from './swap-detail-panel'
 
-function formatShortDate(date: Date) {
-  return new Date(date).toLocaleDateString([], {
-    day: 'numeric',
-    month: 'short',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-}
 
 const STATUS_VARIANT: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
   PENDING_PEER: 'default',

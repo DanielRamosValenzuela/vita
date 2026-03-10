@@ -249,7 +249,9 @@ export async function regeneratePayrollDocumentAction(
         title: `Tu documento de nómina de ${monthStr}/${period.year} ha sido actualizado`,
         actionUrl: '/dashboard/payroll',
       })
-    } catch {}
+    } catch (e) {
+      console.error('[payroll] Notification failed:', e)
+    }
 
     revalidatePaths(...PAYROLL_PATHS)
 

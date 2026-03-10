@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 import { Download, MoreHorizontal, RefreshCw, Trash2 } from 'lucide-react'
 
+import { formatCurrencyByCode } from '@/src/shared/lib/utils/format'
 import { toastActionResult } from '@/src/shared/lib/utils/toast-action-result'
 import {
   AlertDialog,
@@ -45,12 +46,6 @@ interface PayrollDocumentsTableProps {
   currency: string
   isAdminHR: boolean
   onRefresh: () => void
-}
-
-function formatCurrency(amount: number, currency: string): string {
-  if (currency === 'CLP') return `$${Math.round(amount).toLocaleString('es-CL')}`
-
-  return `$${amount.toFixed(2)}`
 }
 
 export function PayrollDocumentsTable({
@@ -105,7 +100,9 @@ export function PayrollDocumentsTable({
 
   const confirmBulkDelete = () => {
     startTransition(async () => {
-      for (const docId of selectedIds) await deletePayrollDocumentAction({ documentId: docId })
+      await Promise.allSettled(
+        [...selectedIds].map((docId) => deletePayrollDocumentAction({ documentId: docId }))
+      )
 
       setSelectedIds(new Set())
       setBulkDeleteOpen(false)
@@ -179,13 +176,13 @@ export function PayrollDocumentsTable({
                 </div>
               </TableCell>
               <TableCell className="text-right">
-                {formatCurrency(doc.baseSalaryAmount, currency)}
+                {formatCurrencyByCode(doc.baseSalaryAmount, currency)}
               </TableCell>
               <TableCell className="text-right">
-                {formatCurrency(doc.shiftsAmount, currency)}
+                {formatCurrencyByCode(doc.shiftsAmount, currency)}
               </TableCell>
               <TableCell className="text-right font-medium">
-                {formatCurrency(doc.totalAmount, currency)}
+                {formatCurrencyByCode(doc.totalAmount, currency)}
               </TableCell>
               <TableCell className="text-right">{doc.shiftsCount}</TableCell>
               <TableCell>

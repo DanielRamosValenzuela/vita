@@ -7,6 +7,10 @@ import { endOfMonth, format, startOfMonth } from 'date-fns'
 import { CalendarDays, RefreshCw, Star } from 'lucide-react'
 import { toast } from 'sonner'
 
+import {
+  SHIFT_STATUS_COLORS_HOVER,
+  SHIFT_STATUS_I18N_KEYS,
+} from '@/src/shared/lib/constants/shift-status'
 import { useClientPagination } from '@/src/shared/lib/hooks/use-client-pagination'
 import {
   AlertDialog,
@@ -49,42 +53,6 @@ import { ShiftFilters } from './shift-filters'
 import type { ShiftTypeOption } from './shift-form'
 import { ShiftFormDialog } from './shift-form-dialog'
 
-function getStatusColor(status: ShiftStatus): string {
-  switch (status) {
-    case 'SCHEDULED':
-      return 'bg-green-100 text-green-800 hover:bg-green-200'
-    case 'IN_PROGRESS':
-      return 'bg-blue-100 text-blue-800 hover:bg-blue-200'
-    case 'COMPLETED':
-      return 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-    case 'CANCELLED':
-      return 'bg-red-100 text-red-800 hover:bg-red-200'
-    case 'NO_SHOW':
-      return 'bg-orange-100 text-orange-800 hover:bg-orange-200'
-    default:
-      return 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-  }
-}
-
-function getStatusLabel(
-  status: ShiftStatus,
-  t: ReturnType<typeof useTranslations<'shifts'>>
-): string {
-  switch (status) {
-    case 'SCHEDULED':
-      return t('status.scheduled')
-    case 'IN_PROGRESS':
-      return t('status.inProgress')
-    case 'COMPLETED':
-      return t('status.completed')
-    case 'CANCELLED':
-      return t('status.cancelled')
-    case 'NO_SHOW':
-      return t('status.noShow')
-    default:
-      return status
-  }
-}
 
 type PageState = {
   dialogOpen: boolean
@@ -335,8 +303,8 @@ function ShiftsTableSection({
                       })}
                     </TableCell>
                     <TableCell>
-                      <Badge className={getStatusColor(shift.status)}>
-                        {getStatusLabel(shift.status, t)}
+                      <Badge className={SHIFT_STATUS_COLORS_HOVER[shift.status]}>
+                        {t(SHIFT_STATUS_I18N_KEYS[shift.status])}
                       </Badge>
                     </TableCell>
                   </TableRow>
@@ -636,8 +604,8 @@ export function ShiftsPageContent({
           shiftTypeName={rotationDetail.meta.shiftTypeName}
           date={rotationDetail.meta.date}
           onEditShift={handleEditShiftFromRotationDetail}
-          getStatusColor={(status) => getStatusColor(status as ShiftStatus)}
-          getStatusLabel={(status) => getStatusLabel(status as ShiftStatus, t)}
+          getStatusColor={(status) => SHIFT_STATUS_COLORS_HOVER[status as ShiftStatus] ?? 'bg-gray-100 text-gray-800'}
+          getStatusLabel={(status) => t(SHIFT_STATUS_I18N_KEYS[status as ShiftStatus] ?? 'status.scheduled')}
         />
 
         <ShiftsTableSection

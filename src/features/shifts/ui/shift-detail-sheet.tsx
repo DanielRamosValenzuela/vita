@@ -1,7 +1,6 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import type { ShiftStatus } from '@prisma/client'
 import { format } from 'date-fns'
 import {
   Calendar,
@@ -15,6 +14,10 @@ import {
   User,
 } from 'lucide-react'
 
+import {
+  SHIFT_STATUS_COLORS,
+  SHIFT_STATUS_I18N_KEYS,
+} from '@/src/shared/lib/constants/shift-status'
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 import {
@@ -26,23 +29,6 @@ import {
 } from '@/src/shared/ui/sheet'
 
 import type { ShiftWithRelations } from '@/src/entities/shift/types/shift-types'
-
-function getStatusColor(status: ShiftStatus): string {
-  switch (status) {
-    case 'SCHEDULED':
-      return 'bg-green-100 text-green-800'
-    case 'IN_PROGRESS':
-      return 'bg-blue-100 text-blue-800'
-    case 'COMPLETED':
-      return 'bg-gray-100 text-gray-800'
-    case 'CANCELLED':
-      return 'bg-red-100 text-red-800'
-    case 'NO_SHOW':
-      return 'bg-orange-100 text-orange-800'
-    default:
-      return 'bg-gray-100 text-gray-800'
-  }
-}
 
 interface ShiftDetailSheetProps {
   shift: ShiftWithRelations | null
@@ -149,10 +135,8 @@ export function ShiftDetailSheet({
             </div>
 
             <div className="flex items-center gap-3">
-              <Badge className={`${getStatusColor(shift.status)} shrink-0`}>
-                {t(
-                  `status.${shift.status === 'SCHEDULED' ? 'scheduled' : shift.status === 'IN_PROGRESS' ? 'inProgress' : shift.status === 'COMPLETED' ? 'completed' : shift.status === 'CANCELLED' ? 'cancelled' : 'noShow'}`
-                )}
+              <Badge className={`${SHIFT_STATUS_COLORS[shift.status]} shrink-0`}>
+                {t(SHIFT_STATUS_I18N_KEYS[shift.status])}
               </Badge>
             </div>
 

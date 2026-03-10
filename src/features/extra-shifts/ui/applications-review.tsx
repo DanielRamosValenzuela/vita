@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl'
 import { Check, Loader2, X } from 'lucide-react'
 import { toast } from 'sonner'
 
+import { formatShortDate } from '@/src/shared/lib/utils/format'
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 
@@ -16,14 +17,6 @@ import {
   getExtraShiftsForAreaAction,
 } from '../api/extra-shift-queries'
 
-function formatShortDate(date: Date) {
-  return new Date(date).toLocaleDateString([], {
-    day: 'numeric',
-    month: 'short',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-}
 
 interface ShiftWithApplications {
   shiftId: string

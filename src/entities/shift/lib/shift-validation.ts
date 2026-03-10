@@ -1,6 +1,7 @@
 import type { Prisma } from '@prisma/client'
 
 import { prisma } from '@/src/shared/lib/db'
+import { formatDateTimeCL } from '@/src/shared/lib/utils/format'
 
 interface ShiftConflict {
   hasConflict: boolean
@@ -114,7 +115,7 @@ export async function checkShiftConflicts(
         userName: conflict.user.name,
         areaName: conflict.area.name,
       },
-      message: `El usuario ya tiene un turno asignado en ese horario: ${conflict.title || 'Turno sin título'} (${formatDateTime(conflict.startTime)} - ${formatDateTime(conflict.endTime)})`,
+      message: `El usuario ya tiene un turno asignado en ese horario: ${conflict.title || 'Turno sin título'} (${formatDateTimeCL(conflict.startTime)} - ${formatDateTimeCL(conflict.endTime)})`,
     }
   }
 
@@ -125,12 +126,3 @@ export async function checkShiftConflicts(
   }
 }
 
-function formatDateTime(date: Date): string {
-  return new Intl.DateTimeFormat('es-CL', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(date)
-}

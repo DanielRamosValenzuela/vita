@@ -35,6 +35,38 @@ export const formatPercentage = (value: number, total: number): string => {
   return `${((value / total) * 100).toFixed(1)}%`
 }
 
+export function formatShortDate(date: Date | string, options?: { weekday?: boolean }): string {
+  const d = new Date(date)
+  return d.toLocaleDateString([], {
+    ...(options?.weekday && { weekday: 'short' }),
+    day: 'numeric',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
+export function formatDateTime(date: Date | string): string {
+  const d = new Date(date)
+  return d.toLocaleString([], {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
+export function formatDateTimeCL(date: Date): string {
+  return new Intl.DateTimeFormat('es-CL', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(date)
+}
+
 export function formatCurrencyByCode(amount: number, currency: string): string {
   if (currency === 'CLP') return `$${Math.round(amount).toLocaleString('es-CL')}`
 

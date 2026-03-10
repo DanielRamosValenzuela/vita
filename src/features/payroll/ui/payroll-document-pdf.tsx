@@ -1,4 +1,5 @@
 /* eslint-disable react/jsx-no-literals, @sanity/i18n/no-attribute-string-literals */
+import { MONTH_NAMES_ES } from '@/src/shared/lib/constants/date-formats'
 import type { PayrollCalculationResult, ShiftPaymentSummary } from '@/src/shared/lib/payment/types'
 import { formatCurrencyByCode } from '@/src/shared/lib/utils/format'
 import { PdfHeader } from '@/src/shared/ui/pdf/pdf-header'
@@ -25,20 +26,6 @@ function formatMinutesToHours(minutes: number): string {
   return `${hours}h ${mins}m`
 }
 
-const MONTH_NAMES = [
-  'Enero',
-  'Febrero',
-  'Marzo',
-  'Abril',
-  'Mayo',
-  'Junio',
-  'Julio',
-  'Agosto',
-  'Septiembre',
-  'Octubre',
-  'Noviembre',
-  'Diciembre',
-]
 
 const DAY_TYPE_LABELS: Record<string, string> = {
   NORMAL: '',
@@ -70,7 +57,7 @@ export function PayrollDocumentPdf({
   documentId,
 }: PayrollDocumentPdfProps) {
   const currency = data.currency
-  const periodLabel = `${MONTH_NAMES[data.month - 1]} ${data.year}`
+  const periodLabel = `${MONTH_NAMES_ES[data.month - 1]} ${data.year}`
 
   const completedShifts = data.shifts.filter((s) => s.status !== 'DISPUTED')
   const disputedShifts = data.shifts.filter((s) => s.status === 'DISPUTED')

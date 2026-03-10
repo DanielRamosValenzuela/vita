@@ -13,6 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/src/shared/ui/dialog'
+import { formatDateTime } from '@/src/shared/lib/utils/format'
 import {
   Sheet,
   SheetContent,
@@ -34,15 +35,6 @@ interface ShiftDetailPanelProps {
   currentUserId?: string
 }
 
-function formatDateTime(date: Date) {
-  return new Date(date).toLocaleString([], {
-    weekday: 'short',
-    day: 'numeric',
-    month: 'short',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-}
 
 export function ShiftDetailPanel({
   shiftId,

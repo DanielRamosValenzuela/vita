@@ -14,3 +14,18 @@ const COUNTRY_LOCALES: Record<Country, Locale> = {
 export function getLocaleByCountry(country: Country): Locale {
   return COUNTRY_LOCALES[country] || es
 }
+
+export const MONTH_NAMES_ES = [
+  'Enero',
+  'Febrero',
+  'Marzo',
+  'Abril',
+  'Mayo',
+  'Junio',
+  'Julio',
+  'Agosto',
+  'Septiembre',
+  'Octubre',
+  'Noviembre',
+  'Diciembre',
+] as const

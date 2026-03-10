@@ -18,6 +18,7 @@ import {
 } from '@/src/shared/ui/alert-dialog'
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
+import { formatDateTime } from '@/src/shared/lib/utils/format'
 import {
   Sheet,
   SheetContent,
@@ -39,15 +40,6 @@ interface SwapDetailPanelProps {
   onUpdated?: () => void
 }
 
-function formatDateTime(date: Date) {
-  return new Date(date).toLocaleString([], {
-    weekday: 'short',
-    day: 'numeric',
-    month: 'short',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-}
 
 export function SwapDetailPanel({
   requestId,

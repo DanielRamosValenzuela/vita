@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl'
 import type { Role } from '@prisma/client'
 import { Calendar, Loader2, Plus } from 'lucide-react'
 
+import { formatShortDate } from '@/src/shared/lib/utils/format'
 import { Badge } from '@/src/shared/ui/badge'
 import { Button } from '@/src/shared/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/src/shared/ui/tabs'
@@ -18,15 +19,6 @@ interface ExtraShiftListProps {
   userRole: Role
 }
 
-function formatShortDate(date: Date) {
-  return new Date(date).toLocaleDateString([], {
-    weekday: 'short',
-    day: 'numeric',
-    month: 'short',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-}
 
 interface ExtraShiftItem {
   id: string
@@ -111,7 +103,7 @@ export function ExtraShiftList({ userRole: _userRole }: ExtraShiftListProps) {
                     </Badge>
                   </div>
                   <p className="text-sm">
-                    {formatShortDate(shift.startTime)} - {formatShortDate(shift.endTime)}
+                    {formatShortDate(shift.startTime, { weekday: true })} - {formatShortDate(shift.endTime, { weekday: true })}
                   </p>
                   <p className="text-xs text-muted-foreground">
                     {t('applicants', { count: shift._count.applications })}
@@ -151,7 +143,7 @@ export function ExtraShiftList({ userRole: _userRole }: ExtraShiftListProps) {
                   </Badge>
                 </div>
                 <p className="text-sm">
-                  {formatShortDate(app.shift.startTime)} - {formatShortDate(app.shift.endTime)}
+                  {formatShortDate(app.shift.startTime, { weekday: true })} - {formatShortDate(app.shift.endTime, { weekday: true })}
                 </p>
               </div>
               <Badge

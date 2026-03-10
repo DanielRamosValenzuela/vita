@@ -18,6 +18,8 @@ import {
 import { Label } from '@/src/shared/ui/label'
 import { Textarea } from '@/src/shared/ui/textarea'
 
+import { formatShortDate } from '@/src/shared/lib/utils/format'
+
 import { createDirectSwapAction } from '../api/swap-actions'
 import { getAvailableShiftsForSwapAction } from '../api/swap-queries'
 
@@ -28,16 +30,6 @@ interface SwapRequestFormProps {
   areaId: string
   shiftTypeName: string
   shiftDate: string
-}
-
-function formatShortDate(date: Date) {
-  return new Date(date).toLocaleDateString([], {
-    weekday: 'short',
-    day: 'numeric',
-    month: 'short',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
 }
 
 export function SwapRequestForm({
@@ -153,7 +145,7 @@ export function SwapRequestForm({
                             {shift.shiftType.name}
                           </Badge>
                           <span className="text-xs text-muted-foreground">
-                            {formatShortDate(shift.startTime)}
+                            {formatShortDate(shift.startTime, { weekday: true })}
                           </span>
                         </div>
                       </div>

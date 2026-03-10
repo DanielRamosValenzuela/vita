@@ -2,25 +2,13 @@
 
 import { useTranslations } from 'next-intl'
 
+import { formatCurrencyByCode } from '@/src/shared/lib/utils/format'
+import { MONTH_NAMES_ES } from '@/src/shared/lib/constants/date-formats'
 import { Badge } from '@/src/shared/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/src/shared/ui/card'
 
 import type { PayrollPeriodSummary } from '@/src/entities/payroll/lib/types'
 
-const MONTH_NAMES = [
-  'Enero',
-  'Febrero',
-  'Marzo',
-  'Abril',
-  'Mayo',
-  'Junio',
-  'Julio',
-  'Agosto',
-  'Septiembre',
-  'Octubre',
-  'Noviembre',
-  'Diciembre',
-]
 
 const STATUS_VARIANT: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
   GENERATING: 'secondary',
@@ -34,12 +22,6 @@ interface PayrollPeriodsListProps {
   selectedPeriodId: string | null
   onSelectPeriod: (periodId: string) => void
   currency: string
-}
-
-function formatCurrency(amount: number, currency: string): string {
-  if (currency === 'CLP') return `$${Math.round(amount).toLocaleString('es-CL')}`
-
-  return `$${amount.toFixed(2)}`
 }
 
 export function PayrollPeriodsList({
@@ -72,7 +54,7 @@ export function PayrollPeriodsList({
           <CardHeader className="p-4 pb-2">
             <div className="flex items-center justify-between">
               <CardTitle className="text-base">
-                {MONTH_NAMES[period.month - 1]} {period.year}
+                {MONTH_NAMES_ES[period.month - 1]} {period.year}
               </CardTitle>
               <Badge variant={STATUS_VARIANT[period.status] ?? 'secondary'}>
                 {t(`status.${period.status}`)}
@@ -84,7 +66,7 @@ export function PayrollPeriodsList({
               {t('periods.documents', { count: period.totalDocuments })}
             </span>
             <span className="text-sm font-medium">
-              {formatCurrency(period.totalAmount, currency)}
+              {formatCurrencyByCode(period.totalAmount, currency)}
             </span>
           </CardContent>
         </Card>
