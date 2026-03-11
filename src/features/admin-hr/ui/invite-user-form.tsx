@@ -122,7 +122,7 @@ export function InviteUserForm({
 
     startTransition(async () => {
       let result
-      if (role === ROLES.CHIEF_AREA || role === ROLES.CHIEF_SECTOR)
+      if (role === ROLES.CHIEF_AREA)
         result = await inviteChiefAction(organizationId, state.foundUser!.id)
       else if (role === ROLES.STAFF)
         result = await inviteStaffAction(organizationId, state.foundUser!.id)

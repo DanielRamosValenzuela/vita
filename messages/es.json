@@ -25,8 +25,7 @@
     "roles": {
       "SUPER_ADMIN": "Super Administrador",
       "ADMIN_HR": "Administrador",
-      "CHIEF_AREA": "Jefe de Área",
-      "CHIEF_SECTOR": "Jefe de Sector",
+      "CHIEF_AREA": "Coordinador",
       "STAFF": "Personal"
     },
     "languages": {
@@ -49,8 +48,7 @@
       "withContract": "Con contrato",
       "withoutContract": "Sin contrato",
       "allRoles": "Todos los roles",
-      "chiefArea": "Jefe de Área",
-      "chiefSector": "Jefe de Sector",
+      "chiefArea": "Coordinador",
       "staff": "Personal",
       "allAreas": "Todas las áreas",
       "allTemplates": "Todas las plantillas"
@@ -203,8 +201,7 @@
     "warningsMessage": "Algunos roles están cerca de alcanzar sus límites",
     "roles": {
       "ADMIN_HR": "Administradores",
-      "CHIEF_AREA": "Jefes de Área",
-      "CHIEF_SECTOR": "Jefes de Sector",
+      "CHIEF_AREA": "Coordinadores",
       "STAFF": "Personal",
       "unknown": "Desconocido"
     },
@@ -381,6 +378,21 @@
     "noOrganization": "No tienes una organización asignada",
     "loading": "Cargando turnos...",
     "loadError": "Error al cargar los turnos",
+    "completion": {
+      "dialogTitle": "Completar turnos del día",
+      "dialogDescription": "Completar turnos de {area} del {date}",
+      "noShifts": "No hay turnos pendientes para este día",
+      "selectedCount": "{count} turno(s) seleccionado(s)",
+      "total": "total",
+      "employee": "Empleado",
+      "shiftType": "Tipo de turno",
+      "time": "Horario",
+      "confirmButton": "Completar {count} turno(s)",
+      "error": "Error al completar turnos",
+      "successSummary": "{completed} turno(s) completado(s), {payments} pago(s) calculado(s)",
+      "pendingAlert": "{count} turno(s) pendientes de completar",
+      "completeDay": "Completar día"
+    },
     "stats": {
       "totalShifts": "Total de Turnos",
       "thisMonth": "Este Mes",
@@ -452,7 +464,8 @@
       "holiday": "Feriado",
       "rotation": "Rotativa",
       "extra": "Turno Extra",
-      "note": "Nota personal"
+      "note": "Nota personal",
+      "completed": "Completado"
     },
     "rotationDetail": {
       "title": "Turnos de Rotativa",
@@ -909,8 +922,7 @@
       "roles": {
         "SUPER_ADMIN": "Super Administrador",
         "ADMIN_HR": "Administrador",
-        "CHIEF_AREA": "Jefe de Área",
-        "CHIEF_SECTOR": "Jefe de Sector",
+        "CHIEF_AREA": "Coordinador",
         "STAFF": "Personal"
       },
       "actions": {
@@ -2159,14 +2171,14 @@
       "contract": "Contrato",
       "status": "Estado",
       "totalStaff": "personas",
+      "totalBreakdown": "{total} personas ({staff} personal + {chiefs} coordinadores)",
       "hasContract": "Con contrato",
       "noContract": "Sin contrato",
       "noContractStatus": "Sin asignar",
       "multiplierBadge": "{value}x"
     },
     "roles": {
-      "chiefArea": "Jefe de Área",
-      "chiefSector": "Jefe de Sector",
+      "chiefArea": "Coordinador",
       "staff": "Personal"
     },
     "goToRates": "Gestionar Tarifas",
@@ -2423,6 +2435,25 @@
     "empty": "No hay rotativas configuradas",
     "emptyDescription": "Crea tu primera rotativa para organizar los turnos de tu personal",
     "createButton": "Nueva Rotativa",
+    "massGeneration": {
+      "button": "Generación masiva",
+      "title": "Generación masiva de turnos",
+      "description": "Genera turnos para múltiples rotativas activas en una sola operación",
+      "selectRotations": "Seleccionar rotativas",
+      "selectAll": "Seleccionar todas",
+      "noActiveRotations": "No hay rotativas activas disponibles",
+      "selectedCount": "{count} rotativa(s) seleccionada(s)",
+      "generateButton": "Generar turnos",
+      "created": "Creados",
+      "skipped": "Omitidos",
+      "status": "Estado",
+      "success": "OK",
+      "error": "Error",
+      "successSummary": "Se crearon {count} turnos en total",
+      "totalCreated": "Total de turnos creados: {count}",
+      "errorsCount": "{count} error(es)",
+      "close": "Cerrar"
+    },
     "status": {
       "DRAFT": "Borrador",
       "ACTIVE": "Activa",
@@ -2643,9 +2674,12 @@
         "groups": "Grupos",
         "members": "Miembros",
         "shifts": "Turnos",
+        "coverage": "Cobertura",
         "status": "Estado",
         "actions": "Acciones"
-      }
+      },
+      "coverageDays": "{days}d restantes",
+      "noCoverage": "Sin cobertura"
     },
     "detail": {
       "pageTitle": "Detalle de Rotativa",
@@ -3346,6 +3380,11 @@
       "success": "Nómina generada correctamente: {count} documentos creados",
       "successWithErrors": "Nómina generada con errores: {count} documentos, {errors} errores",
       "error": "Error al generar la nómina"
+    },
+    "progress": {
+      "generating": "Generando {current}/{total} documentos...",
+      "completed": "Generación completada",
+      "failed": "Error en la generación"
     },
     "billingDay": {
       "title": "Fecha de facturación",

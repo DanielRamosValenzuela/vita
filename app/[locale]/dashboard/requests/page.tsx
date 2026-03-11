@@ -10,7 +10,7 @@ export default async function RequestsRoute() {
   if (user.role === Role.SUPER_ADMIN) redirect('/dashboard')
 
   const isChiefOrAdmin =
-    user.role === Role.ADMIN_HR || user.role === Role.CHIEF_AREA || user.role === Role.CHIEF_SECTOR
+    user.role === Role.ADMIN_HR || user.role === Role.CHIEF_AREA
 
   return <RequestsPage showApprovals={isChiefOrAdmin} userRole={user.role} />
 }

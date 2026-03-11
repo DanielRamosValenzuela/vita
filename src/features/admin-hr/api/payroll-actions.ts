@@ -6,6 +6,7 @@ import { requireAdminHRWithOrg } from '@/src/shared/lib/auth'
 import { prisma } from '@/src/shared/lib/db'
 import { calculatePayrollForUser } from '@/src/shared/lib/payment/calculate-payroll'
 import { generatePayrollForOrganization } from '@/src/shared/lib/payment/generate-payroll-core'
+import { clearProgress, updateProgress } from '@/src/shared/lib/payment/payroll-progress'
 import {
   deletePayrollDocument as deletePayrollDocumentFromStorage,
   uploadPayrollDocument,
@@ -109,13 +110,26 @@ export async function generatePayrollAction(data: z.infer<typeof generatePayroll
     )
       return { success: false, error: 'No se puede generar nómina para un mes futuro' }
 
+    const progressKey = `${session.organizationId}-${validated.month}-${validated.year}`
+    updateProgress(progressKey, { current: 0, total: 0, status: 'generating' })
+
     const result = await generatePayrollForOrganization({
       organizationId: session.organizationId,
       month: validated.month,
       year: validated.year,
       force: validated.force,
       actorId: session.id,
+      onProgress: (current, total) => {
+        updateProgress(progressKey, { current, total, status: 'generating' })
+      },
     })
+
+    updateProgress(progressKey, {
+      current: 0,
+      total: 0,
+      status: result.success ? 'completed' : 'failed',
+    })
+    setTimeout(() => clearProgress(progressKey), 10_000)
 
     if (!result.success) return { success: false, error: result.error }
 

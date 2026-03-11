@@ -23,7 +23,7 @@ export function DashboardShell({
   user,
   children,
   unreadNotificationCount,
-  displayRole,
+  sectorName,
 }: DashboardShellProps) {
   const t = useTranslations('common')
   const tNav = useTranslations('nav')
@@ -65,7 +65,7 @@ export function DashboardShell({
             user={user}
             className="h-full w-full border-0"
             unreadNotificationCount={unreadNotificationCount}
-            displayRole={displayRole}
+            sectorName={sectorName}
           />
         </SheetContent>
       </Sheet>
@@ -74,7 +74,7 @@ export function DashboardShell({
         <DashboardSidebar
           user={user}
           unreadNotificationCount={unreadNotificationCount}
-          displayRole={displayRole}
+          sectorName={sectorName}
         />
       </div>
 

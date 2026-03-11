@@ -171,7 +171,6 @@ enum Role {
   SUPER_ADMIN
   ADMIN_HR
   CHIEF_AREA
-  CHIEF_SECTOR
   STAFF
 }
 

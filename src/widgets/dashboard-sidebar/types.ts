@@ -7,7 +7,7 @@ export interface DashboardSidebarProps {
   user: CurrentUser
   className?: string
   unreadNotificationCount?: number
-  displayRole?: Role
+  sectorName?: string | null
 }
 
 export interface NavItem {

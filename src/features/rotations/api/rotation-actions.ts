@@ -300,6 +300,11 @@ export const getRotationsAction = async (
               },
             },
           },
+          shifts: {
+            orderBy: { startTime: 'desc' },
+            take: 1,
+            select: { startTime: true },
+          },
           _count: {
             select: {
               groups: true,
@@ -320,6 +325,14 @@ export const getRotationsAction = async (
         }))
       )
 
+      const lastShift = r.shifts[0]
+      let coverageDaysRemaining: number | null = null
+      if (lastShift) {
+        const now = new Date()
+        const diffMs = lastShift.startTime.getTime() - now.getTime()
+        coverageDaysRemaining = Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)))
+      }
+
       return {
         id: r.id,
         name: r.name,
@@ -329,6 +342,7 @@ export const getRotationsAction = async (
         _count: r._count,
         patternSummary,
         totalMembers,
+        coverageDaysRemaining,
       }
     })
 

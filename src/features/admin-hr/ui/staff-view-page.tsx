@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { CheckCircle2, ExternalLink, XCircle } from 'lucide-react'
 
@@ -44,12 +44,17 @@ export function StaffViewPage({ staff, canManageRates = false }: StaffViewPagePr
   const staffWithContract = staff.filter((s) => s.contracts.length > 0)
   const staffWithoutContract = staff.filter((s) => s.contracts.length === 0)
 
+  const roleBreakdown = useMemo(() => {
+    const chiefs = staff.filter((s) => s.role === 'CHIEF_AREA').length
+    const members = staff.filter((s) => s.role === 'STAFF').length
+    return { chiefs, members }
+  }, [staff])
+
   const filterFn = useCallback(
     (person: StaffWithContract) => {
       if (contractFilter === 'withContract' && person.contracts.length === 0) return false
       if (contractFilter === 'withoutContract' && person.contracts.length > 0) return false
       if (roleFilter === 'CHIEF_AREA' && person.role !== 'CHIEF_AREA') return false
-      if (roleFilter === 'CHIEF_SECTOR' && person.role !== 'CHIEF_SECTOR') return false
       if (roleFilter === 'STAFF' && person.role !== 'STAFF') return false
       return true
     },
@@ -76,7 +81,11 @@ export function StaffViewPage({ staff, canManageRates = false }: StaffViewPagePr
             </div>
             <div className="flex items-center gap-4">
               <div className="text-sm text-muted-foreground">
-                {staff.length} {t('table.totalStaff')}
+                {t('table.totalBreakdown', {
+                  total: staff.length,
+                  staff: roleBreakdown.members,
+                  chiefs: roleBreakdown.chiefs,
+                })}
               </div>
               {canManageRates && (
                 <Link href="/dashboard/rates">
@@ -118,7 +127,6 @@ export function StaffViewPage({ staff, canManageRates = false }: StaffViewPagePr
                   <SelectContent>
                     <SelectItem value="all">{tFilters('allRoles')}</SelectItem>
                     <SelectItem value="CHIEF_AREA">{tFilters('chiefArea')}</SelectItem>
-                    <SelectItem value="CHIEF_SECTOR">{tFilters('chiefSector')}</SelectItem>
                     <SelectItem value="STAFF">{tFilters('staff')}</SelectItem>
                   </SelectContent>
                 </Select>
@@ -148,13 +156,18 @@ export function StaffViewPage({ staff, canManageRates = false }: StaffViewPagePr
                             </div>
                           </TableCell>
                           <TableCell>
-                            <Badge variant="outline">
-                              {person.role === 'CHIEF_AREA'
-                                ? t('roles.chiefArea')
-                                : person.role === 'CHIEF_SECTOR'
-                                  ? t('roles.chiefSector')
+                            <div className="flex items-center gap-1.5">
+                              <Badge variant="outline">
+                                {person.role === 'CHIEF_AREA'
+                                  ? t('roles.chiefArea')
                                   : t('roles.staff')}
-                            </Badge>
+                              </Badge>
+                              {person.sectorName && (
+                                <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
+                                  {person.sectorName}
+                                </Badge>
+                              )}
+                            </div>
                           </TableCell>
                           <TableCell>
                             {areaName ? (

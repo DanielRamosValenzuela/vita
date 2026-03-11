@@ -25,8 +25,7 @@
     "roles": {
       "SUPER_ADMIN": "Super Administrator",
       "ADMIN_HR": "Administrator",
-      "CHIEF_AREA": "Area Chief",
-      "CHIEF_SECTOR": "Sector Chief",
+      "CHIEF_AREA": "Coordinator",
       "STAFF": "Staff"
     },
     "languages": {
@@ -49,8 +48,7 @@
       "withContract": "With contract",
       "withoutContract": "Without contract",
       "allRoles": "All roles",
-      "chiefArea": "Area Chief",
-      "chiefSector": "Sector Chief",
+      "chiefArea": "Coordinator",
       "staff": "Staff",
       "allAreas": "All areas",
       "allTemplates": "All templates"
@@ -203,8 +201,7 @@
     "warningsMessage": "Some roles are close to reaching their limits",
     "roles": {
       "ADMIN_HR": "Administrators",
-      "CHIEF_AREA": "Area Chiefs",
-      "CHIEF_SECTOR": "Sector Chiefs",
+      "CHIEF_AREA": "Coordinators",
       "STAFF": "Staff",
       "unknown": "Unknown"
     },
@@ -381,6 +378,21 @@
     "noOrganization": "You don't have an assigned organization",
     "loading": "Loading shifts...",
     "loadError": "Error loading shifts",
+    "completion": {
+      "dialogTitle": "Complete day shifts",
+      "dialogDescription": "Complete shifts for {area} on {date}",
+      "noShifts": "No pending shifts for this day",
+      "selectedCount": "{count} shift(s) selected",
+      "total": "total",
+      "employee": "Employee",
+      "shiftType": "Shift type",
+      "time": "Time",
+      "confirmButton": "Complete {count} shift(s)",
+      "error": "Error completing shifts",
+      "successSummary": "{completed} shift(s) completed, {payments} payment(s) calculated",
+      "pendingAlert": "{count} shift(s) pending completion",
+      "completeDay": "Complete day"
+    },
     "stats": {
       "totalShifts": "Total Shifts",
       "thisMonth": "This Month",
@@ -452,7 +464,8 @@
       "holiday": "Holiday",
       "rotation": "Rotation",
       "extra": "Extra Shift",
-      "note": "Personal note"
+      "note": "Personal note",
+      "completed": "Completed"
     },
     "rotationDetail": {
       "title": "Rotation Shifts",
@@ -929,8 +942,7 @@
       "roles": {
         "SUPER_ADMIN": "Super Administrator",
         "ADMIN_HR": "Administrator",
-        "CHIEF_AREA": "Area Chief",
-        "CHIEF_SECTOR": "Sector Chief",
+        "CHIEF_AREA": "Coordinator",
         "STAFF": "Staff"
       },
       "actions": {
@@ -2159,14 +2171,14 @@
       "contract": "Contract",
       "status": "Status",
       "totalStaff": "people",
+      "totalBreakdown": "{total} people ({staff} staff + {chiefs} coordinators)",
       "hasContract": "With contract",
       "noContract": "No contract",
       "noContractStatus": "Not assigned",
       "multiplierBadge": "{value}x"
     },
     "roles": {
-      "chiefArea": "Area Chief",
-      "chiefSector": "Sector Chief",
+      "chiefArea": "Coordinator",
       "staff": "Staff"
     },
     "goToRates": "Manage Rates",
@@ -2423,6 +2435,25 @@
     "empty": "No rotations configured",
     "emptyDescription": "Create your first rotation to organize your staff shifts",
     "createButton": "New Rotation",
+    "massGeneration": {
+      "button": "Bulk generation",
+      "title": "Bulk shift generation",
+      "description": "Generate shifts for multiple active rotations in a single operation",
+      "selectRotations": "Select rotations",
+      "selectAll": "Select all",
+      "noActiveRotations": "No active rotations available",
+      "selectedCount": "{count} rotation(s) selected",
+      "generateButton": "Generate shifts",
+      "created": "Created",
+      "skipped": "Skipped",
+      "status": "Status",
+      "success": "OK",
+      "error": "Error",
+      "successSummary": "{count} shifts created in total",
+      "totalCreated": "Total shifts created: {count}",
+      "errorsCount": "{count} error(s)",
+      "close": "Close"
+    },
     "status": {
       "DRAFT": "Draft",
       "ACTIVE": "Active",
@@ -2643,9 +2674,12 @@
         "groups": "Groups",
         "members": "Members",
         "shifts": "Shifts",
+        "coverage": "Coverage",
         "status": "Status",
         "actions": "Actions"
-      }
+      },
+      "coverageDays": "{days}d remaining",
+      "noCoverage": "No coverage"
     },
     "detail": {
       "pageTitle": "Rotation Detail",
@@ -3346,6 +3380,11 @@
       "success": "Payroll generated successfully: {count} documents created",
       "successWithErrors": "Payroll generated with errors: {count} documents, {errors} errors",
       "error": "Error generating payroll"
+    },
+    "progress": {
+      "generating": "Generating {current}/{total} documents...",
+      "completed": "Generation completed",
+      "failed": "Generation failed"
     },
     "billingDay": {
       "title": "Billing date",

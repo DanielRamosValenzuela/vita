@@ -64,7 +64,7 @@ export async function applyToExtraShiftAction(
     const chiefIds = await prisma.userArea.findMany({
       where: {
         areaId: shift.areaId,
-        user: { role: { in: ['CHIEF_AREA', 'CHIEF_SECTOR'] } },
+        user: { role: 'CHIEF_AREA' },
       },
       select: { userId: true },
     })

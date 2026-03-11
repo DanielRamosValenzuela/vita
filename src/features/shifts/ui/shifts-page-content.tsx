@@ -48,6 +48,7 @@ import {
 import { deleteShiftAction, getShiftsAction } from '../api/shift-actions'
 import { AreaSwitcher } from './area-switcher'
 import { RotationShiftsDetailDialog } from './rotation-shifts-detail-dialog'
+import { ShiftCompletionDialog } from './shift-completion-dialog'
 import { ShiftDetailSheet } from './shift-detail-sheet'
 import { ShiftFilters } from './shift-filters'
 import type { ShiftTypeOption } from './shift-form'
@@ -75,6 +76,7 @@ type PageState = {
     endDate?: Date
   }
   currentMonth: Date
+  completionDialog: { open: boolean; date: Date | null }
 }
 
 type PageAction =
@@ -93,6 +95,8 @@ type PageAction =
   | { type: 'CLOSE_ROTATION_DETAIL' }
   | { type: 'SET_FILTERS'; payload: PageState['currentFilters'] }
   | { type: 'SET_MONTH'; payload: Date }
+  | { type: 'OPEN_COMPLETION'; payload: Date }
+  | { type: 'CLOSE_COMPLETION' }
 
 const initialPageState: PageState = {
   dialogOpen: false,
@@ -108,6 +112,7 @@ const initialPageState: PageState = {
   },
   currentFilters: {},
   currentMonth: new Date(),
+  completionDialog: { open: false, date: null },
 }
 
 function pageReducer(state: PageState, action: PageAction): PageState {
@@ -139,6 +144,10 @@ function pageReducer(state: PageState, action: PageAction): PageState {
       return { ...state, currentFilters: action.payload }
     case 'SET_MONTH':
       return { ...state, currentMonth: action.payload }
+    case 'OPEN_COMPLETION':
+      return { ...state, completionDialog: { open: true, date: action.payload } }
+    case 'CLOSE_COMPLETION':
+      return { ...state, completionDialog: { open: false, date: null } }
     default:
       return state
   }
@@ -370,6 +379,7 @@ export function ShiftsPageContent({
     rotationDetail,
     currentFilters,
     currentMonth,
+    completionDialog,
   } = state
 
   const calendarShifts = useMemo(
@@ -601,6 +611,7 @@ export function ShiftsPageContent({
           onShiftClick={handleShiftClick}
           onShiftDelete={handleShiftDeleteClick}
           onRotationBlockClick={handleRotationBlockClick}
+          onDayComplete={selectedAreaId ? (date) => dispatch({ type: 'OPEN_COMPLETION', payload: date }) : undefined}
         />
 
         <RotationShiftsDetailDialog
@@ -613,6 +624,17 @@ export function ShiftsPageContent({
           getStatusColor={(status) => SHIFT_STATUS_COLORS_HOVER[status as ShiftStatus] ?? 'bg-gray-100 text-gray-800'}
           getStatusLabel={(status) => t(SHIFT_STATUS_I18N_KEYS[status as ShiftStatus] ?? 'status.scheduled')}
         />
+
+        {completionDialog.date && selectedAreaId && (
+          <ShiftCompletionDialog
+            open={completionDialog.open}
+            onOpenChange={(open) => { if (!open) dispatch({ type: 'CLOSE_COMPLETION' }) }}
+            date={completionDialog.date}
+            areaId={selectedAreaId}
+            areaName={areas.find((a) => a.id === selectedAreaId)?.name ?? ''}
+            onCompleted={() => fetchShifts({ ...currentFilters })}
+          />
+        )}
 
         <ShiftsTableSection
           shifts={shifts}

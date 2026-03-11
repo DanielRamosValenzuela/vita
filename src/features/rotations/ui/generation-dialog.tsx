@@ -186,6 +186,7 @@ function DateStepContent({ state, dispatch, groups, locale, t }: DateStepContent
               <Calendar
                 mode="single"
                 selected={state.startDate}
+                defaultMonth={state.startDate}
                 onSelect={(date) =>
                   dispatch({ type: 'SET_START_DATE', payload: date ?? undefined })
                 }
