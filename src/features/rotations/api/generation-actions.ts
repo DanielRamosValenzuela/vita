@@ -28,6 +28,8 @@ import {
   regenerateShiftsSchema,
 } from '../lib/rotation-schemas'
 import type {
+  BulkGenerationResult,
+  BulkRotationItem,
   CoverageAlert,
   CoverageDay,
   CoverageOverview,
@@ -1039,6 +1041,132 @@ export const getLastGenerationInfoAction = async (
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Error al obtener información de generación',
+    }
+  }
+}
+
+export const getActiveRotationsForBulkAction = async (): Promise<
+  ActionResult<BulkRotationItem[]>
+> => {
+  try {
+    const session = await requireAdminHROrChief()
+
+    const derivedOrgId = isChiefArea(session)
+      ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
+      : (session.organizationId ?? null)
+    if (!derivedOrgId) return { success: false, error: 'No tienes una organización asignada' }
+
+    let areaFilter: { in: string[] } | undefined
+
+    if (isChiefArea(session)) {
+      const areaIds = await getChiefAccessibleAreaIds(session.id)
+      if (areaIds.length === 0) return { success: true, data: [] }
+      areaFilter = { in: areaIds }
+    }
+
+    const rotations = await prisma.rotation.findMany({
+      where: {
+        organizationId: derivedOrgId,
+        status: 'ACTIVE',
+        ...(areaFilter ? { areaId: areaFilter } : {}),
+      },
+      select: {
+        id: true,
+        name: true,
+        area: { select: { name: true } },
+        groups: {
+          select: {
+            _count: { select: { members: { where: { leftAt: null } } } },
+          },
+        },
+        _count: { select: { groups: true } },
+        shifts: {
+          orderBy: { startTime: 'desc' as const },
+          take: 1,
+          select: { startTime: true },
+        },
+      },
+      orderBy: { name: 'asc' },
+    })
+
+    const items: BulkRotationItem[] = rotations.map((r) => ({
+      id: r.id,
+      name: r.name,
+      areaName: r.area.name,
+      memberCount: r.groups.reduce((sum, g) => sum + g._count.members, 0),
+      lastGeneratedDate: r.shifts[0]?.startTime ?? null,
+      groupCount: r._count.groups,
+    }))
+
+    return { success: true, data: items }
+  } catch (error) {
+    console.error('[getActiveRotationsForBulkAction] Error:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Error al obtener rotativas activas',
+    }
+  }
+}
+
+export const bulkGenerateShiftsAction = async (data: {
+  rotationIds: string[]
+  startDate: Date
+  endDate: Date
+}): Promise<ActionResult<BulkGenerationResult[]>> => {
+  try {
+    const session = await requireAdminHROrChief()
+
+    const derivedOrgId = isChiefArea(session)
+      ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
+      : (session.organizationId ?? null)
+    if (!derivedOrgId) return { success: false, error: 'No tienes una organización asignada' }
+
+    const results: BulkGenerationResult[] = []
+
+    for (const rotationId of data.rotationIds) 
+      try {
+        const result = await generateShiftsAction({
+          rotationId,
+          startDate: data.startDate,
+          endDate: data.endDate,
+          overrideConflicts: false,
+        })
+
+        const rotation = await prisma.rotation.findFirst({
+          where: { id: rotationId },
+          select: { name: true },
+        })
+
+        results.push({
+          rotationId,
+          rotationName: rotation?.name ?? rotationId,
+          shiftsCreated: result.data?.shiftsCreated ?? 0,
+          shiftsSkipped: result.data?.shiftsSkipped ?? 0,
+          conflictsDetected: result.data?.conflictsDetected ?? 0,
+          error: result.success ? null : (result.error ?? 'Error desconocido'),
+        })
+      } catch (err) {
+        results.push({
+          rotationId,
+          rotationName: rotationId,
+          shiftsCreated: 0,
+          shiftsSkipped: 0,
+          conflictsDetected: 0,
+          error: err instanceof Error ? err.message : 'Error inesperado',
+        })
+      }
+    
+
+    revalidatePath('/dashboard/shifts')
+    revalidatePath('/dashboard/rotations')
+    revalidatePath('/dashboard/calendar')
+
+    return { success: true, data: results }
+  } catch (error) {
+    console.error('[bulkGenerateShiftsAction] Error:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Error al generar turnos masivamente',
     }
   }
 }

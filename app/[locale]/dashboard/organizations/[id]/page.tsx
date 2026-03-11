@@ -76,7 +76,6 @@ const OrganizationDetailsPage = async ({ params }: PageProps) => {
       | 'roles.SUPER_ADMIN'
       | 'roles.ADMIN_HR'
       | 'roles.CHIEF_AREA'
-      | 'roles.CHIEF_SECTOR'
       | 'roles.STAFF'
     return tCommon(key) || role
   }

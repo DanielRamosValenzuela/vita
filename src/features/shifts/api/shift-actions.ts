@@ -619,3 +619,158 @@ export const getShiftsAction = async (
     }
   }
 }
+
+export const completeShiftsByDayAction = async (data: {
+  date: Date
+  areaId: string
+  excludeShiftIds?: string[]
+}): Promise<
+  ActionResult<{ completed: number; paymentsCreated: number; errors: string[] }>
+> => {
+  try {
+    const session = await requireAdminHROrChief()
+
+    const derivedOrgId = isChiefArea(session)
+      ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
+      : (session.organizationId ?? null)
+    if (!derivedOrgId) return { success: false, error: 'No tienes una organización asignada' }
+
+    if (isChiefArea(session)) {
+      const hasAccess = await chiefHasAreaAccess(session.id, data.areaId)
+      if (!hasAccess)
+        return { success: false, error: 'No tienes acceso a esta área' }
+    }
+
+    const dayStart = new Date(data.date)
+    dayStart.setUTCHours(0, 0, 0, 0)
+    const dayEnd = new Date(data.date)
+    dayEnd.setUTCHours(23, 59, 59, 999)
+
+    const shifts = await prisma.shift.findMany({
+      where: {
+        organizationId: derivedOrgId,
+        areaId: data.areaId,
+        startTime: { gte: dayStart, lte: dayEnd },
+        status: 'SCHEDULED',
+        ...(data.excludeShiftIds?.length
+          ? { id: { notIn: data.excludeShiftIds } }
+          : {}),
+      },
+      select: {
+        id: true,
+        contractId: true,
+        userId: true,
+        user: { select: { name: true } },
+        payment: { select: { id: true } },
+      },
+    })
+
+    if (shifts.length === 0)
+      return {
+        success: true,
+        data: { completed: 0, paymentsCreated: 0, errors: [] },
+        message: 'No hay turnos pendientes para este día',
+      }
+
+    let completed = 0
+    let paymentsCreated = 0
+    const errors: string[] = []
+
+    for (const shift of shifts) 
+      try {
+        await prisma.shift.update({
+          where: { id: shift.id },
+          data: { status: 'COMPLETED' },
+        })
+        completed++
+
+        if (shift.contractId && !shift.payment) 
+          try {
+            await calculateShiftPayment(shift.id)
+            paymentsCreated++
+          } catch (payErr) {
+            errors.push(
+              `${shift.user.name}: Error al calcular pago - ${payErr instanceof Error ? payErr.message : 'Error desconocido'}`
+            )
+          }
+        
+      } catch (err) {
+        errors.push(
+          `${shift.user.name}: ${err instanceof Error ? err.message : 'Error al completar'}`
+        )
+      }
+    
+
+    revalidatePath('/dashboard/shifts')
+    revalidatePath('/dashboard/shifts/calendar')
+
+    const t = await getTranslations('shifts')
+
+    return {
+      success: true,
+      data: { completed, paymentsCreated, errors },
+      message: t('completion.successSummary', { completed, payments: paymentsCreated }),
+    }
+  } catch (error) {
+    console.error('[completeShiftsByDayAction] Error:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Error al completar turnos',
+    }
+  }
+}
+
+export const getPendingCompletionCountAction = async (): Promise<
+  ActionResult<Array<{ areaId: string; areaName: string; count: number }>>
+> => {
+  try {
+    const session = await requireAdminHROrChief()
+
+    const derivedOrgId = isChiefArea(session)
+      ? await resolveChiefOrganizationId(session.id, session.organizationId ?? null)
+      : (session.organizationId ?? null)
+    if (!derivedOrgId) return { success: false, error: 'No tienes una organización asignada' }
+
+    let areaIds: string[] | null = null
+    if (isChiefArea(session)) {
+      areaIds = await getChiefAccessibleAreaIds(session.id)
+      if (areaIds.length === 0) return { success: true, data: [] }
+    }
+
+    const now = new Date()
+
+    const grouped = await prisma.shift.groupBy({
+      by: ['areaId'],
+      where: {
+        organizationId: derivedOrgId,
+        status: 'SCHEDULED',
+        startTime: { lt: now },
+        ...(areaIds ? { areaId: { in: areaIds } } : {}),
+      },
+      _count: true,
+    })
+
+    if (grouped.length === 0) return { success: true, data: [] }
+
+    const areas = await prisma.area.findMany({
+      where: { id: { in: grouped.map((g) => g.areaId) } },
+      select: { id: true, name: true },
+    })
+
+    const areaMap = new Map(areas.map((a) => [a.id, a.name]))
+
+    const result = grouped.map((g) => ({
+      areaId: g.areaId,
+      areaName: areaMap.get(g.areaId) ?? g.areaId,
+      count: g._count,
+    }))
+
+    return { success: true, data: result }
+  } catch (error) {
+    console.error('[getPendingCompletionCountAction] Error:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Error al obtener turnos pendientes',
+    }
+  }
+}

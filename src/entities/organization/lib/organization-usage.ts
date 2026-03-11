@@ -50,7 +50,7 @@ export async function getOrganizationUsageSummary(
     {} as Record<Role, number>
   )
 
-  const roles: Role[] = [ROLES.ADMIN_HR, ROLES.CHIEF_AREA, ROLES.CHIEF_SECTOR, ROLES.STAFF]
+  const roles: Role[] = [ROLES.ADMIN_HR, ROLES.CHIEF_AREA, ROLES.STAFF]
   const roleUsage: RoleUsage[] = []
 
   for (const role of roles) {
@@ -62,7 +62,6 @@ export async function getOrganizationUsageSummary(
         maxLimit = organization.maxAdminHR
         break
       case ROLES.CHIEF_AREA:
-      case ROLES.CHIEF_SECTOR:
         maxLimit = organization.maxChiefs
         break
       case ROLES.STAFF:

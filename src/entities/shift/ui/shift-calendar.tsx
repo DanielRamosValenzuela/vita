@@ -13,7 +13,7 @@ import {
   subMonths,
 } from 'date-fns'
 import { enUS, es } from 'date-fns/locale'
-import { ChevronLeft, ChevronRight, Minus, RefreshCw, Star, StickyNote } from 'lucide-react'
+import { CheckCircle2, ChevronLeft, ChevronRight, Minus, RefreshCw, Star, StickyNote } from 'lucide-react'
 
 import holidaysClSample from '@/src/shared/lib/constants/holidays-cl-sample.json'
 import type { BoostrHolidaysResponse } from '@/src/shared/lib/types/holidays'
@@ -59,6 +59,7 @@ interface ShiftCalendarProps {
   onShiftClick?: (shift: CalendarEvent) => void
   onShiftDelete?: (shift: CalendarEvent) => void
   onRotationBlockClick?: (block: RotationGroupCalendarEvent) => void
+  onDayComplete?: (date: Date) => void
   onMonthChange?: (month: Date) => void
   selectedDate?: Date
   noteDates?: Set<string>
@@ -74,6 +75,7 @@ interface ShiftCalendarDayCellProps {
   onShiftClick?: (shift: CalendarEvent) => void
   onShiftDelete?: (shift: CalendarEvent) => void
   onRotationBlockClick?: (block: RotationGroupCalendarEvent) => void
+  onDayComplete?: (date: Date) => void
 }
 
 const SKELETON_PATTERN = [
@@ -115,6 +117,7 @@ function ShiftCalendarDayCell({
   onShiftClick,
   onShiftDelete,
   onRotationBlockClick,
+  onDayComplete,
 }: ShiftCalendarDayCellProps) {
   const t = useTranslations('shifts')
   const dayShifts = shifts
@@ -130,11 +133,35 @@ function ShiftCalendarDayCell({
     )
 
   const now = new Date()
+  const isPastDay = date < new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const hasScheduled = dayShifts.some(
+    (s) => s.kind === 'individual' && s.status === 'SCHEDULED'
+  )
+  const showCompleteButton = onDayComplete && isPastDay && hasScheduled
 
   return (
     <div className="relative flex h-full w-full flex-col">
-      <div className="shrink-0 p-0.5">
+      <div className="flex shrink-0 items-center justify-between p-0.5">
         <div className="text-xs font-medium sm:text-sm">{formattedDay}</div>
+        {showCompleteButton && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                className="flex items-center rounded p-0.5 text-emerald-600 hover:bg-emerald-100 focus:outline-none"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onDayComplete(date)
+                }}
+              >
+                <CheckCircle2 className="h-3 w-3" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="top" className="text-xs">
+              {t('completion.completeDay')}
+            </TooltipContent>
+          </Tooltip>
+        )}
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col gap-0.5 p-0.5 pt-0">
@@ -187,14 +214,16 @@ function ShiftCalendarDayCell({
               </div>
             )
 
+          const isCompleted = shift.status === 'COMPLETED'
+
           return (
             <div
               key={shift.id}
               className="flex min-h-0 flex-1 items-stretch gap-0.5 overflow-hidden rounded"
               style={{
-                backgroundColor: shift.color + (isPast ? '30' : '20'),
-                borderLeft: `3px solid ${shift.color}`,
-                opacity,
+                backgroundColor: shift.color + (isCompleted ? '15' : isPast ? '30' : '20'),
+                borderLeft: `3px ${isCompleted ? 'dashed' : 'solid'} ${shift.color}`,
+                opacity: isCompleted ? 0.55 : opacity,
               }}
             >
               {onShiftDelete && (
@@ -221,7 +250,10 @@ function ShiftCalendarDayCell({
                       onShiftClick?.(shift)
                     }}
                   >
-                    <span className="font-medium shrink-0">{format(shift.startTime, 'HH:mm')}</span>
+                    <span className="flex items-center gap-0.5 font-medium shrink-0">
+                      {isCompleted && <CheckCircle2 className="h-2.5 w-2.5 shrink-0 text-emerald-600" />}
+                      {format(shift.startTime, 'HH:mm')}
+                    </span>
                     {shift.isExtra && (
                       <Star className="h-2.5 w-2.5 shrink-0 fill-amber-500 text-amber-500" />
                     )}
@@ -236,6 +268,7 @@ function ShiftCalendarDayCell({
                   <p className="text-muted-foreground">{shift.areaName}</p>
                   {shift.title && <p className="text-muted-foreground">{shift.title}</p>}
                   {shift.isExtra && <p className="font-medium text-amber-600">{t('extraBadge')}</p>}
+                  {isCompleted && <p className="font-medium text-emerald-600">{t('status.completed')}</p>}
                 </TooltipContent>
               </Tooltip>
             </div>
@@ -253,6 +286,7 @@ export function ShiftCalendar({
   onShiftClick,
   onShiftDelete,
   onRotationBlockClick,
+  onDayComplete,
   onMonthChange,
   selectedDate,
   noteDates,
@@ -434,6 +468,7 @@ export function ShiftCalendar({
                                 onShiftClick={onShiftClick}
                                 onShiftDelete={onShiftDelete}
                                 onRotationBlockClick={onRotationBlockClick}
+                                onDayComplete={onDayComplete}
                               />
                             )}
                           </div>
@@ -516,6 +551,10 @@ export function ShiftCalendar({
             <div className="flex items-center gap-1.5 text-xs">
               <Star className="h-2.5 w-2.5 shrink-0 fill-amber-500 text-amber-500" />
               <span className="text-muted-foreground">{t('legend.extra')}</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-xs">
+              <CheckCircle2 className="h-2.5 w-2.5 shrink-0 text-emerald-600" />
+              <span className="text-muted-foreground">{t('legend.completed')}</span>
             </div>
             {noteDates && noteDates.size > 0 && (
               <>

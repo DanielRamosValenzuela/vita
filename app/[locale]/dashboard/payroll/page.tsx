@@ -50,7 +50,7 @@ export default async function PayrollRoute({ params }: PayrollRouteProps) {
         <p className="text-muted-foreground mt-2">{t('description')}</p>
       </div>
 
-      {isAdmin && <PayrollGeneration />}
+      {isAdmin && <PayrollGeneration organizationId={session.organizationId} />}
 
       <PayrollPage
         role={session.role}

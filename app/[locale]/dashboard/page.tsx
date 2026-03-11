@@ -8,6 +8,7 @@ import { isChief } from '@/src/shared/lib/auth/rbac'
 import { requireSuperAdmin } from '@/src/shared/lib/auth/session'
 import { prisma } from '@/src/shared/lib/db'
 import { CalendarView } from '@/src/widgets/calendar-view'
+import { PendingShiftsAlert } from '@/src/features/shifts/ui/pending-shifts-alert'
 import { getNotesForMonthAction } from '@/src/features/staff-dashboard/api/calendar-note-actions'
 import { getMyAreasAndSectorsAction } from '@/src/features/staff-dashboard/api/staff-filter-actions'
 import {
@@ -101,13 +102,16 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
   const filterOptions = filtersResult.success && filtersResult.data ? filtersResult.data : undefined
 
   return (
-    <StaffDashboardContent
-      initialShifts={initialShifts}
-      initialUpcoming={initialUpcoming}
-      initialNotes={initialNotes}
-      organizationName={org?.name}
-      filterOptions={filterOptions}
-      currentUserId={user.id}
-    />
+    <div className="space-y-4">
+      {isChief(user) && <PendingShiftsAlert />}
+      <StaffDashboardContent
+        initialShifts={initialShifts}
+        initialUpcoming={initialUpcoming}
+        initialNotes={initialNotes}
+        organizationName={org?.name}
+        filterOptions={filterOptions}
+        currentUserId={user.id}
+      />
+    </div>
   )
 }

@@ -19,21 +19,24 @@ export default async function DashboardLayout({ children, params }: DashboardLay
 
   if (!user) redirect(`/${resolvedParams.locale}/login`)
 
-  const [pendingNotifications, unreadNotificationCount, displayRole] = await Promise.all([
+  const [pendingNotifications, unreadNotificationCount, sectorName] = await Promise.all([
     getUserPendingNotifications({ userId: user.id }),
     getUnreadCount(user.id),
     user.role === Role.CHIEF_AREA
       ? prisma.userSector
-          .count({ where: { userId: user.id } })
-          .then((c) => (c > 0 ? Role.CHIEF_SECTOR : undefined))
-      : Promise.resolve(undefined),
+          .findFirst({
+            where: { userId: user.id },
+            select: { sector: { select: { name: true } } },
+          })
+          .then((us) => us?.sector.name ?? null)
+      : Promise.resolve(null),
   ])
 
   return (
     <DashboardShell
       user={user}
       unreadNotificationCount={unreadNotificationCount}
-      displayRole={displayRole}
+      sectorName={sectorName}
     >
       <PendingNotificationsToaster notifications={pendingNotifications} />
       {children}

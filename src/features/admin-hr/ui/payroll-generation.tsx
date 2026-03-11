@@ -25,6 +25,8 @@ import {
   SelectValue,
 } from '@/src/shared/ui/select'
 
+import { PayrollProgressBar } from '@/src/features/payroll/ui/payroll-progress-bar'
+
 import { generatePayrollAction } from '../api/payroll-actions'
 
 const MONTHS = [
@@ -42,7 +44,11 @@ const MONTHS = [
   { value: '12', label: 'Diciembre' },
 ]
 
-export function PayrollGeneration() {
+interface PayrollGenerationProps {
+  organizationId: string
+}
+
+export function PayrollGeneration({ organizationId }: PayrollGenerationProps) {
   const t = useTranslations('payroll.generate')
   const now = new Date()
   const defaultMonth = now.getMonth() === 0 ? 12 : now.getMonth()
@@ -52,10 +58,14 @@ export function PayrollGeneration() {
   const [year, setYear] = useState<string>(String(defaultYear))
   const [isPending, startTransition] = useTransition()
   const [showForceDialog, setShowForceDialog] = useState(false)
+  const [progressKey, setProgressKey] = useState<string | null>(null)
 
   const years = Array.from({ length: 5 }, (_, i) => now.getFullYear() - i)
 
   const handleGenerate = (force = false) => {
+    const key = `${organizationId}-${month}-${year}`
+    setProgressKey(key)
+
     startTransition(async () => {
       const result = await generatePayrollAction({
         month: parseInt(month),
@@ -64,6 +74,7 @@ export function PayrollGeneration() {
       })
 
       if (!result.success && result.error?.includes('Ya existe')) {
+        setProgressKey(null)
         setShowForceDialog(true)
         return
       }
@@ -115,6 +126,10 @@ export function PayrollGeneration() {
               {isPending ? t('generating') : t('button')}
             </Button>
           </div>
+          <PayrollProgressBar
+            progressKey={progressKey}
+            onComplete={() => setProgressKey(null)}
+          />
         </CardContent>
       </Card>
 

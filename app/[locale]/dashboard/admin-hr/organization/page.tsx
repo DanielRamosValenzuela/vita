@@ -97,7 +97,6 @@ export default async function AdminHROrganizationPage({ params }: AdminHROrganiz
         showRoleColumn={true}
         roleLabels={{
           [ROLES.CHIEF_AREA]: tInvitations('table.roleChief'),
-          [ROLES.CHIEF_SECTOR]: tInvitations('table.roleChiefSector'),
           [ROLES.STAFF]: tInvitations('table.roleStaff'),
         }}
       />

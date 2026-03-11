@@ -30,6 +30,7 @@ export interface StaffWithContract {
   role: string
   primaryAreaId: string | null
   primaryAreaName: string | null
+  sectorName: string | null
   contracts: StaffContractSummary[]
 }
 
@@ -85,6 +86,12 @@ export const getContractsPageDataAction = async (): Promise<ActionResult<Contrac
                   name: true,
                 },
               },
+            },
+          },
+          userSectors: {
+            take: 1,
+            select: {
+              sector: { select: { name: true } },
             },
           },
         },
@@ -164,6 +171,7 @@ export const getContractsPageDataAction = async (): Promise<ActionResult<Contrac
         role: user.role,
         primaryAreaId: primaryArea?.id ?? null,
         primaryAreaName: primaryArea?.name ?? null,
+        sectorName: user.userSectors[0]?.sector.name ?? null,
         contracts: userContracts.map((contract) => ({
           id: contract.id,
           areaId: contract.areaId,
@@ -252,6 +260,12 @@ export const getStaffPageDataAction = async (): Promise<ActionResult<ContractsPa
             },
           },
         },
+        userSectors: {
+          take: 1,
+          select: {
+            sector: { select: { name: true } },
+          },
+        },
       },
       orderBy: { name: 'asc' },
     })
@@ -336,6 +350,7 @@ export const getStaffPageDataAction = async (): Promise<ActionResult<ContractsPa
         role: user.role,
         primaryAreaId: primaryArea?.id ?? null,
         primaryAreaName: primaryArea?.name ?? null,
+        sectorName: user.userSectors[0]?.sector.name ?? null,
         contracts: userContracts.map((contract) => ({
           id: contract.id,
           areaId: contract.areaId,

@@ -28,7 +28,7 @@ export function DashboardSidebar({
   user,
   className,
   unreadNotificationCount,
-  displayRole,
+  sectorName,
 }: DashboardSidebarProps) {
   const t = useTranslations('dashboard')
   const tCommon = useTranslations('common')
@@ -66,9 +66,16 @@ export function DashboardSidebar({
         />
         <div>
           <h2 className="text-primary text-xl font-bold">{tCommon('appName')}</h2>
-          <p className="text-muted-foreground text-sm">
-            {tCommon(`roles.${displayRole ?? user.role}`)}
-          </p>
+          <div className="flex items-center gap-1.5">
+            <p className="text-muted-foreground text-sm">
+              {tCommon(`roles.${user.role}`)}
+            </p>
+            {sectorName && (
+              <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
+                {sectorName}
+              </Badge>
+            )}
+          </div>
         </div>
       </Link>
 

@@ -2,7 +2,7 @@
 
 import { useEffect, useReducer, useRef, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
-import { AlertTriangle, Pencil, Plus, RefreshCw, Search, Trash2 } from 'lucide-react'
+import { AlertTriangle, CalendarPlus, Pencil, Plus, RefreshCw, Search, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { useClientPagination } from '@/src/shared/lib/hooks/use-client-pagination'
@@ -43,6 +43,7 @@ import { Link } from '@/i18n/navigation'
 
 import { checkCoverageAlertsAction, deleteRotationAction, getRotationsAction } from '../api'
 import type { CoverageAlert, RotationListItem } from '../types/rotation-types'
+import { MassGenerationDialog } from './mass-generation-dialog'
 import { RotationFormDialog } from './rotation-form-dialog'
 
 interface RotationsPageContentProps {
@@ -65,6 +66,7 @@ interface PageState {
   statusFilter: string
   rotationToDelete: RotationListItem | null
   createOpen: boolean
+  massGenOpen: boolean
   coverageAlerts: Array<{ rotationId: string; rotationName: string; alerts: CoverageAlert[] }>
 }
 
@@ -75,6 +77,7 @@ type PageAction =
   | { type: 'SET_STATUS_FILTER'; statusFilter: string }
   | { type: 'SET_DELETE'; rotation: RotationListItem | null }
   | { type: 'SET_CREATE_OPEN'; open: boolean }
+  | { type: 'SET_MASS_GEN_OPEN'; open: boolean }
   | { type: 'SET_ALERTS'; alerts: PageState['coverageAlerts'] }
 
 function pageReducer(state: PageState, action: PageAction): PageState {
@@ -91,6 +94,8 @@ function pageReducer(state: PageState, action: PageAction): PageState {
       return { ...state, rotationToDelete: action.rotation }
     case 'SET_CREATE_OPEN':
       return { ...state, createOpen: action.open }
+    case 'SET_MASS_GEN_OPEN':
+      return { ...state, massGenOpen: action.open }
     case 'SET_ALERTS':
       return { ...state, coverageAlerts: action.alerts }
     default:
@@ -109,6 +114,7 @@ function initPage(init: PageInit): PageState {
     statusFilter: '',
     rotationToDelete: null,
     createOpen: false,
+    massGenOpen: false,
     coverageAlerts: [],
   }
 }
@@ -151,6 +157,7 @@ function RotationsTable({ rotations, onDelete, onCreate, t }: RotationsTableProp
               <TableHead className="text-center">{t('list.columns.groups')}</TableHead>
               <TableHead className="text-center">{t('list.columns.members')}</TableHead>
               <TableHead className="text-center">{t('list.columns.shifts')}</TableHead>
+              <TableHead className="text-center">{t('list.columns.coverage')}</TableHead>
               <TableHead>{t('list.columns.status')}</TableHead>
               <TableHead className="w-24 text-right">{t('list.columns.actions')}</TableHead>
             </TableRow>
@@ -166,6 +173,17 @@ function RotationsTable({ rotations, onDelete, onCreate, t }: RotationsTableProp
                 <TableCell className="text-center">{rotation._count.groups}</TableCell>
                 <TableCell className="text-center">{rotation.totalMembers}</TableCell>
                 <TableCell className="text-center">{rotation._count.shifts}</TableCell>
+                <TableCell className="text-center">
+                  {rotation.coverageDaysRemaining !== null ? (
+                    <Badge variant={rotation.coverageDaysRemaining > 7 ? 'secondary' : rotation.coverageDaysRemaining > 0 ? 'outline' : 'destructive'}>
+                      {rotation.coverageDaysRemaining > 0
+                        ? t('list.coverageDays', { days: rotation.coverageDaysRemaining })
+                        : t('list.noCoverage')}
+                    </Badge>
+                  ) : (
+                    <span className="text-muted-foreground text-sm">-</span>
+                  )}
+                </TableCell>
                 <TableCell>
                   <Badge variant={getStatusVariant(rotation.status)}>
                     {t(`status.${rotation.status}`)}
@@ -339,10 +357,19 @@ export function RotationsPageContent({
           </h2>
           <p className="text-muted-foreground mt-1">{t('description')}</p>
         </div>
-        <Button onClick={() => dispatch({ type: 'SET_CREATE_OPEN', open: true })}>
-          <Plus className="mr-2 h-4 w-4" aria-hidden />
-          {t('createButton')}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            onClick={() => dispatch({ type: 'SET_MASS_GEN_OPEN', open: true })}
+          >
+            <CalendarPlus className="mr-2 h-4 w-4" aria-hidden />
+            {t('massGeneration.button')}
+          </Button>
+          <Button onClick={() => dispatch({ type: 'SET_CREATE_OPEN', open: true })}>
+            <Plus className="mr-2 h-4 w-4" aria-hidden />
+            {t('createButton')}
+          </Button>
+        </div>
       </header>
 
       {state.coverageAlerts.length > 0 && (
@@ -436,6 +463,15 @@ export function RotationsPageContent({
         onClose={() => dispatch({ type: 'SET_DELETE', rotation: null })}
         onDelete={handleDelete}
         t={t}
+      />
+
+      <MassGenerationDialog
+        open={state.massGenOpen}
+        onOpenChange={(open) => dispatch({ type: 'SET_MASS_GEN_OPEN', open })}
+        onGenerated={() => {
+          dispatch({ type: 'SET_MASS_GEN_OPEN', open: false })
+          fetchRotations(state.searchTerm, state.areaFilter, state.statusFilter)
+        }}
       />
     </section>
   )

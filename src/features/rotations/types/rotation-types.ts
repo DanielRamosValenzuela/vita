@@ -74,6 +74,7 @@ export type RotationListItem = {
   }
   patternSummary: string
   totalMembers: number
+  coverageDaysRemaining: number | null
   createdAt: Date
 }
 
@@ -176,6 +177,24 @@ export type CoverageOverview = {
     end: Date
   }
   alerts: CoverageAlert[]
+}
+
+export type BulkRotationItem = {
+  id: string
+  name: string
+  areaName: string
+  memberCount: number
+  lastGeneratedDate: Date | null
+  groupCount: number
+}
+
+export type BulkGenerationResult = {
+  rotationId: string
+  rotationName: string
+  shiftsCreated: number
+  shiftsSkipped: number
+  conflictsDetected: number
+  error: string | null
 }
 
 export type ExtraTier = 'TIER_1' | 'TIER_2' | 'TIER_3' | 'NEVER_RECOMMEND'
